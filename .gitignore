@@ -22,3 +22,6 @@ cabal.project.local~
 .ghc.environment.*
 headroom.cabal
 stack.yaml.lock
+
+## macOS specific
+.DS_Store
