@@ -29,6 +29,8 @@ executables:
 
 library:
   source-dirs: src
+  dependencies:
+    - aeson
 
 tests:
   spec:
