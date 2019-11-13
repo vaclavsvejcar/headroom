@@ -11,9 +11,9 @@ import           Headroom.Types
 spec :: Spec
 spec = do
   describe "parseAppConfig" $ do
-    rawAppConfig <- runIO $ loadAppConfig "test-data/test-config.json"
+    rawAppConfig <- runIO $ loadAppConfig "test-data/test-config.yaml"
     it "parses configuration from JSON file" $ do
       let options  = Map.fromList [("option1", "value1")]
           actual   = parseAppConfig rawAppConfig
           expected = AppConfig "Hello" "World" options
-      actual `shouldBe` Just expected
+      actual `shouldBe` Right expected
