@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Headroom.Types
-  ( dropFieldPrefix
+  ( AppConfig(..)
+  , dropFieldPrefix
   )
 where
 
@@ -16,7 +17,7 @@ import           GHC.Generics                   ( Generic )
 data AppConfig =
     AppConfig { acFoo :: String
               , acBar :: String
-              } deriving (Generic, Show)
+              } deriving (Eq, Generic, Show)
 
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON aesonOptions
