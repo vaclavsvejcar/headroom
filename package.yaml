@@ -9,6 +9,8 @@ copyright: Copyright (c) 2019 Vaclav Svejcar
 
 dependencies:
   - base >= 4.7 && < 5
+  - containers
+
 ghc-options:
   - -Wall
   - -Wcompat
@@ -38,6 +40,5 @@ tests:
     main: Spec.hs
     source-dirs: test
     dependencies:
-      - base >= 4.7 && < 5
       - headroom
       - hspec

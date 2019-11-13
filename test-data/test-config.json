@@ -1,4 +1,7 @@
 {
     "foo": "Hello",
-    "bar": "World"
+    "bar": "World",
+    "options": {
+        "option1": "value1"
+    }
 }
