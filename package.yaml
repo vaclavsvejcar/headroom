@@ -33,6 +33,8 @@ library:
   source-dirs: src
   dependencies:
     - aeson
+    - either
+    - ginger
     - yaml
 
 tests:
