@@ -17,6 +17,6 @@ spec = do
       let parsed = parseTemplate (T.pack raw)
       parsed `shouldSatisfy` isRight
 
-    parsed <- runIO $ parseTemplateFile "test-data/test-template.jinja2"
     it "parses valid Ginger template from template file" $ do
+      parsed <- parseTemplateFile "test-data/test-template.jinja2"
       parsed `shouldSatisfy` isRight

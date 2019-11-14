@@ -14,8 +14,8 @@ import qualified RIO.Map                       as Map
 spec :: Spec
 spec = do
   describe "parseAppConfig" $ do
-    rawAppConfig <- runIO $ loadAppConfig "test-data/test-config.yaml"
     it "parses configuration from JSON file" $ do
+      rawAppConfig <- loadAppConfig "test-data/test-config.yaml"
       let options  = Map.fromList [("option1", "value1")]
           actual   = parseAppConfig rawAppConfig
           expected = AppConfig "Hello" "World" options
