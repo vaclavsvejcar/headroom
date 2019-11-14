@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.TypesSpec
   ( spec
   )
@@ -5,6 +6,7 @@ where
 
 import           Test.Hspec
 import           Headroom.Types
+import           RIO
 
 spec :: Spec
 spec = do

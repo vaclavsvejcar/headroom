@@ -9,7 +9,7 @@ copyright: Copyright (c) 2019 Vaclav Svejcar
 
 dependencies:
   - base >= 4.7 && < 5
-  - containers
+  - rio
 
 ghc-options:
   - -Wall
@@ -33,7 +33,6 @@ library:
   source-dirs: src
   dependencies:
     - aeson
-    - bytestring
     - yaml
 
 tests:

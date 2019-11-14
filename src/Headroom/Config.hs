@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Config
   ( loadAppConfig
   , parseAppConfig
@@ -5,9 +6,10 @@ module Headroom.Config
 where
 
 import           Control.Arrow                  ( left )
-import qualified Data.ByteString               as B
 import qualified Data.Yaml                     as Y
 import           Headroom.Types                 ( AppConfig )
+import           RIO
+import qualified RIO.ByteString                as B
 
 loadAppConfig :: FilePath -> IO B.ByteString
 loadAppConfig = B.readFile

@@ -1,19 +1,21 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Types
   ( AppConfig(..)
   , dropFieldPrefix
   )
 where
 
-import           Data.Aeson                     ( defaultOptions
+import           Data.Aeson                     ( FromJSON(parseJSON)
+                                                , Options
+                                                , defaultOptions
                                                 , fieldLabelModifier
                                                 , genericParseJSON
-                                                , FromJSON(parseJSON)
-                                                , Options
                                                 )
 import qualified Data.Char                     as C
-import qualified Data.Map.Strict               as Map
 import           GHC.Generics                   ( Generic )
+import           RIO
+import qualified RIO.Map                       as Map
 
 data AppConfig =
     AppConfig { acFoo     :: String

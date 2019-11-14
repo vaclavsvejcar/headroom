@@ -1,12 +1,15 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.ConfigSpec
   ( spec
   )
 where
 
-import qualified Data.Map.Strict               as Map
 import           Test.Hspec
 import           Headroom.Config
 import           Headroom.Types
+import           RIO
+import qualified RIO.Map                       as Map
+
 
 spec :: Spec
 spec = do
