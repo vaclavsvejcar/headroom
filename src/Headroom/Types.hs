@@ -15,12 +15,13 @@ import           Data.Aeson                     ( FromJSON(parseJSON)
 import qualified Data.Char                     as C
 import           GHC.Generics                   ( Generic )
 import           RIO
-import qualified RIO.Map                       as Map
+import qualified RIO.HashMap                   as HM
+import qualified RIO.Text                      as T
 
 data AppConfig =
-    AppConfig { acFoo     :: String
-              , acBar     :: String
-              , acOptions :: Map.Map String String
+    AppConfig { acFoo     :: T.Text
+              , acBar     :: T.Text
+              , acOptions :: HM.HashMap T.Text T.Text
               } deriving (Eq, Generic, Show)
 
 instance FromJSON AppConfig where
