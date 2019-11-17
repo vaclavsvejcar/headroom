@@ -17,8 +17,11 @@ import           Data.Aeson                     ( FromJSON(parseJSON)
 import qualified Data.Char                     as C
 import           GHC.Generics                   ( Generic )
 import           RIO
+import           RIO.Char                       ( toLower )
 import qualified RIO.HashMap                   as HM
+import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
+import           Text.Read                      ( readsPrec )
 
 data AppConfig =
     AppConfig { acFoo     :: T.Text
@@ -26,20 +29,26 @@ data AppConfig =
               , acOptions :: HM.HashMap T.Text T.Text
               } deriving (Eq, Generic, Show)
 
-data FileType = CSS | HTML deriving (Bounded, Enum, Eq, Ord, Show)
+data FileType = CSS | Haskell | HTML deriving (Bounded, Enum, Eq, Ord, Show)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON aesonOptions
 
-------------------------------  HELPER FUNCTIONS  ------------------------------
+instance Read FileType where
+  readsPrec _ s =
+    let textRepr   = fmap toLower . show
+        maybeValue = L.find (\ft -> textRepr ft == s) (allValues :: [FileType])
+    in  maybe [] (\x -> [(x, "")]) maybeValue
 
-allValues :: (Bounded a, Enum a) => [a]
-allValues = [minBound ..]
+------------------------------  HELPER FUNCTIONS  ------------------------------
 
 aesonOptions :: Options
 aesonOptions = defaultOptions { fieldLabelModifier = dropFieldPrefix }
+
+allValues :: (Bounded a, Enum a) => [a]
+allValues = [minBound ..]
 
 dropFieldPrefix :: String -> String
 dropFieldPrefix (x : n : xs) | C.isUpper x && C.isUpper n = x : n : xs
