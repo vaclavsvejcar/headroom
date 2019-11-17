@@ -9,12 +9,12 @@ import           RIO.Directory                  ( doesDirectoryExist
 import           RIO.FilePath                   ( (</>) )
 
 
-traverseDir :: FilePath -> IO [FilePath]
-traverseDir dir = do
+listFiles :: FilePath -> IO [FilePath]
+listFiles dir = do
   names <- getDirectoryContents dir
   let filteredNames = filter (`notElem` [".", ".."]) names
   paths <- forM filteredNames $ \name -> do
     let path = dir </> name
     isDirectory <- doesDirectoryExist path
-    if isDirectory then traverseDir path else return [path]
+    if isDirectory then listFiles path else return [path]
   return $ concat paths

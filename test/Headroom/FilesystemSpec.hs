@@ -11,9 +11,9 @@ import           RIO.List                       ( sort )
 
 spec :: Spec
 spec = do
-  describe "traverseDir" $ do
+  describe "listFiles" $ do
     it "recursively finds all files in directory" $ do
-      filePaths <- traverseDir "test-data/test-traverse/"
+      filePaths <- listFiles "test-data/test-traverse/"
       let expected =
             [ "test-data/test-traverse/a.html"
             , "test-data/test-traverse/foo/b.html"
