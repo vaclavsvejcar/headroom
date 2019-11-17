@@ -32,5 +32,5 @@ dropFieldPrefix []                         = []
 readEnumCI :: (Bounded a, Enum a, Show a) => ReadS a
 readEnumCI str =
   let textRepr = fmap C.toLower . show
-      result   = L.find (\ft -> textRepr ft == fmap C.toLower str) allValues
-  in  maybe [] (\x -> [(x, "")]) result
+      result   = L.find (\item -> textRepr item == fmap C.toLower str) allValues
+  in  maybe [] (\item -> [(item, "")]) result

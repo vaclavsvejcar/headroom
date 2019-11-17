@@ -1,5 +1,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Filesystem where
+module Headroom.Filesystem
+  ( listFiles
+  )
+where
 
 import           Control.Monad                  ( forM )
 import           RIO
