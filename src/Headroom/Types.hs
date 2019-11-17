@@ -2,6 +2,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Types
   ( AppConfig(..)
+  , FileType(..)
+  , allValues
   , dropFieldPrefix
   )
 where
@@ -24,8 +26,17 @@ data AppConfig =
               , acOptions :: HM.HashMap T.Text T.Text
               } deriving (Eq, Generic, Show)
 
+data FileType = CSS | HTML deriving (Bounded, Enum, Eq, Ord, Show)
+
+----------------------------  TYPE CLASS INSTANCES  ----------------------------
+
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON aesonOptions
+
+------------------------------  HELPER FUNCTIONS  ------------------------------
+
+allValues :: (Bounded a, Enum a) => [a]
+allValues = [minBound ..]
 
 aesonOptions :: Options
 aesonOptions = defaultOptions { fieldLabelModifier = dropFieldPrefix }

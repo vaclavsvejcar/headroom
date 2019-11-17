@@ -7,9 +7,16 @@ where
 import           Test.Hspec
 import           Headroom.Types
 import           RIO
+import           RIO.List                       ( sort )
 
 spec :: Spec
 spec = do
+  describe "allValues" $ do
+    it "should list all values of FileType enum" $ do
+      let actual   = allValues :: [FileType]
+          expected = [HTML, CSS]
+      sort actual `shouldBe` sort expected
+
   describe "dropFieldPrefix" $ do
     it "removes prefix and lowercases first letter for 'prSomeField'" $ do
       dropFieldPrefix "prSomeField" `shouldBe` "someField"
