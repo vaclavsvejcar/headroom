@@ -24,3 +24,11 @@ spec = do
 
     it "removes prefix and keeps case for 'prURLField'" $ do
       dropFieldPrefix "prURLField" `shouldBe` "URLField"
+
+  describe "readEnumCI" $ do
+    it "reads enum value from string representation (case insensitive)" $ do
+      let expected = [(Haskell, "")]
+      readEnumCI "haskell" `shouldBe` expected
+      readEnumCI "Haskell" `shouldBe` expected
+      readEnumCI "HASKELL" `shouldBe` expected
+
