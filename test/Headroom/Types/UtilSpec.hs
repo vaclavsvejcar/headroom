@@ -1,11 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.TypesSpec
+module Headroom.Types.UtilSpec
   ( spec
   )
 where
 
 import           Test.Hspec
 import           Headroom.Types
+import           Headroom.Types.Util
 import           RIO
 import           RIO.List                       ( sort )
 

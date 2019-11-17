@@ -3,21 +3,18 @@
 module Headroom.Types
   ( AppConfig(..)
   , FileType(..)
-  , allValues
-  , dropFieldPrefix
   )
 where
 
 import           Data.Aeson                     ( FromJSON(parseJSON)
-                                                , Options
-                                                , defaultOptions
-                                                , fieldLabelModifier
                                                 , genericParseJSON
                                                 )
-import qualified Data.Char                     as C
 import           GHC.Generics                   ( Generic )
+import           Headroom.Types.Util            ( aesonOptions
+                                                , allValues
+                                                )
 import           RIO
-import           RIO.Char                       ( toLower )
+import qualified RIO.Char                      as C
 import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
@@ -38,20 +35,6 @@ instance FromJSON AppConfig where
 
 instance Read FileType where
   readsPrec _ s =
-    let textRepr   = fmap toLower . show
+    let textRepr   = fmap C.toLower . show
         maybeValue = L.find (\ft -> textRepr ft == s) (allValues :: [FileType])
     in  maybe [] (\x -> [(x, "")]) maybeValue
-
-------------------------------  HELPER FUNCTIONS  ------------------------------
-
-aesonOptions :: Options
-aesonOptions = defaultOptions { fieldLabelModifier = dropFieldPrefix }
-
-allValues :: (Bounded a, Enum a) => [a]
-allValues = [minBound ..]
-
-dropFieldPrefix :: String -> String
-dropFieldPrefix (x : n : xs) | C.isUpper x && C.isUpper n = x : n : xs
-dropFieldPrefix (x : n : xs) | C.isUpper x = C.toLower x : n : xs
-dropFieldPrefix (_ : xs)                   = dropFieldPrefix xs
-dropFieldPrefix []                         = []
