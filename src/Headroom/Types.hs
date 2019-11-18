@@ -3,6 +3,7 @@
 module Headroom.Types
   ( AppConfig(..)
   , FileType(..)
+  , NewLine(..)
   )
 where
 
@@ -25,6 +26,8 @@ data AppConfig =
               } deriving (Eq, Generic, Show)
 
 data FileType = Haskell deriving (Bounded, Enum, Eq, Ord, Show)
+
+data NewLine = CR | CRLF | LF deriving (Eq, Show)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
