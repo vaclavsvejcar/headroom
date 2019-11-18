@@ -25,3 +25,11 @@ spec = do
     it "detects no new line sequence" $ do
       detectNewLine "hello world" `shouldBe` Nothing
 
+  describe "lines'" $ do
+    it "detects new line separator and split text into lines" $ do
+      lines' "foo\nbar" `shouldBe` (LF, ["foo", "bar"])
+
+  describe "unlines'" $ do
+    it "joins lines into single text, using the given line separator" $ do
+      unlines' LF ["foo", "bar"] `shouldBe` "foo\nbar"
+
