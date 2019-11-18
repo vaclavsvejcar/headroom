@@ -24,7 +24,7 @@ data AppConfig =
               , acOptions :: HM.HashMap T.Text T.Text
               } deriving (Eq, Generic, Show)
 
-data FileType = CSS | Haskell | HTML deriving (Bounded, Enum, Eq, Ord, Show)
+data FileType = Haskell deriving (Bounded, Enum, Eq, Ord, Show)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
