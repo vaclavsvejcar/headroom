@@ -21,3 +21,8 @@ spec = do
             , "test-data/test-traverse/foo/bar/c.html"
             ]
       sort filePaths `shouldBe` sort expected
+
+    it "returns file if file path is passed as argument" $ do
+      filePaths <- listFiles "test-data/test-traverse/a.html"
+      let expected = ["test-data/test-traverse/a.html"]
+      sort filePaths `shouldBe` sort expected

@@ -13,11 +13,15 @@ import           RIO.FilePath                   ( (</>) )
 
 
 listFiles :: FilePath -> IO [FilePath]
-listFiles dir = do
-  names <- getDirectoryContents dir
-  let filteredNames = filter (`notElem` [".", ".."]) names
-  paths <- forM filteredNames $ \name -> do
-    let path = dir </> name
-    isDirectory <- doesDirectoryExist path
-    if isDirectory then listFiles path else return [path]
-  return $ concat paths
+listFiles fileOrDir = do
+  isDir <- doesDirectoryExist fileOrDir
+  if isDir then listDirectory fileOrDir else return [fileOrDir]
+ where
+  listDirectory dir = do
+    names <- getDirectoryContents dir
+    let filteredNames = filter (`notElem` [".", ".."]) names
+    paths <- forM filteredNames $ \name -> do
+      let path = dir </> name
+      isDirectory <- doesDirectoryExist path
+      if isDirectory then listFiles path else return [path]
+    return $ concat paths
