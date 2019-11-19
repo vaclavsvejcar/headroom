@@ -6,17 +6,19 @@ module Headroom.Header
 where
 
 import           Headroom.Header.All
-import           Headroom.Types                 ( FileType(..) )
+import           Headroom.Types                 ( FileType(..)
+                                                , Header(..)
+                                                )
 import qualified Headroom.Text                 as T
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 
-headerSize :: FileType -> T.Text -> Int
-headerSize Haskell = headerSizeHaskell
+headerSize :: Header -> Int
+headerSize (Header Haskell text) = headerSizeHaskell text
 
-stripHeader :: FileType -> T.Text -> T.Text
-stripHeader fileType text = T.unlines' newLine . L.drop numLines $ lines'
+stripHeader :: Header -> T.Text
+stripHeader h@(Header _ text) = T.unlines' newLine . L.drop numLines $ lines'
  where
-  numLines          = headerSize fileType text
+  numLines          = headerSize h
   (newLine, lines') = T.lines' text
