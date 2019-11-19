@@ -13,7 +13,7 @@ spec :: Spec
 spec = do
   describe "headerSizeHaskell" $ do
     it "detects size of existing module header" $ do
-      source <- readFileUtf8 "test-data/code-samples/Test.hs"
+      source <- readFileUtf8 "test-data/code-samples/haskell/full.hs"
       headerSizeHaskell source `shouldBe` 15
 
     it "handles empty files" $ do

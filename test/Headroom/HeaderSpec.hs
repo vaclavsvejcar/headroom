@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Headroom.HeaderSpec
   ( spec
   )
@@ -13,13 +14,28 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
+  let readTemplate p = readFileUtf8 $ "test-data/code-samples/haskell/" ++ p
+  describe "addHeader" $ do
+    it "adds header to source code" $ do
+      let header = Header Haskell "-- This is header"
+      source   <- readTemplate "stripped.hs"
+      expected <- readTemplate "replaced-simple.hs"
+      addHeader header source `shouldBe` expected
+
   describe "headerSize" $ do
-    it "returns correct size of header for Haskell source file" $ do
-      source <- readFileUtf8 "test-data/code-samples/Test.hs"
-      headerSize (Header Haskell source) `shouldBe` 15
+    it "returns correct size of header for source code" $ do
+      source <- readTemplate "full.hs"
+      headerSize Haskell source `shouldBe` 15
+
+  describe "replaceHeader" $ do
+    it "replaces header in source code" $ do
+      let header = Header Haskell "-- This is header"
+      source   <- readTemplate "full.hs"
+      expected <- readTemplate "replaced-simple.hs"
+      replaceHeader header source `shouldBe` expected
 
   describe "stripHeader" $ do
-    it "strips header for Haskell source file" $ do
-      source   <- readFileUtf8 "test-data/code-samples/Test.hs"
-      expected <- readFileUtf8 "test-data/code-samples-striped/Test.hs"
-      stripHeader (Header Haskell source) `shouldBe` expected
+    it "strips header from source code" $ do
+      source   <- readTemplate "full.hs"
+      expected <- readTemplate "stripped.hs"
+      stripHeader Haskell source `shouldBe` expected
