@@ -10,6 +10,7 @@ import           Headroom.Types                 ( FileType(..) )
 import           RIO
 import qualified RIO.Text                      as T
 
+
 listExtensions :: FileType -> [T.Text]
 listExtensions Haskell = ["hs"]
 

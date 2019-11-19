@@ -9,6 +9,7 @@ import           Headroom.Header.Haskell
 import           Test.Hspec
 import           RIO
 
+
 spec :: Spec
 spec = do
   describe "headerSizeHaskell" $ do

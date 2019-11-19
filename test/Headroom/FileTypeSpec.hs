@@ -10,6 +10,7 @@ import           Headroom.Types                 ( FileType(..) )
 import           RIO
 import           Test.Hspec
 
+
 spec :: Spec
 spec = do
   describe "parseFileType" $ do

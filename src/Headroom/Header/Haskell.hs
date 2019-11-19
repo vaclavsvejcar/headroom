@@ -9,6 +9,7 @@ import           RIO
 import qualified RIO.Text                      as T
 import qualified RIO.List                      as L
 
+
 headerSizeHaskell :: T.Text -> Int
 headerSizeHaskell = findLine
  where

@@ -20,6 +20,7 @@ import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 import           Text.Read                      ( readsPrec )
 
+
 data AppConfig =
   AppConfig { acFoo     :: T.Text
             , acBar     :: T.Text

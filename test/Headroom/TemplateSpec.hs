@@ -11,6 +11,7 @@ import           RIO
 import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
+
 spec :: Spec
 spec = do
   describe "parseTemplate" $ do

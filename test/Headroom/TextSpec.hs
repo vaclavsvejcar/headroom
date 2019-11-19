@@ -10,6 +10,7 @@ import           Headroom.Types                 ( NewLine(..) )
 import           RIO
 import           Test.Hspec
 
+
 spec :: Spec
 spec = do
   describe "detectNewLine" $ do

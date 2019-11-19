@@ -13,6 +13,7 @@ import qualified RIO.Text                      as T
 import           System.IO.Error                ( isDoesNotExistError )
 import           Text.Ginger
 
+
 parseTemplate :: T.Text -> Either ParserError (Template SourcePos)
 parseTemplate raw =
   runIdentity $ parseGinger noIncludesResolver Nothing (T.unpack raw)

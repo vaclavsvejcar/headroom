@@ -13,6 +13,7 @@ import           RIO
 import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
 
+
 detectNewLine :: T.Text -> Maybe NewLine
 detectNewLine text | showNewLine CRLF `T.isInfixOf` text = Just CRLF
                    | showNewLine CR `T.isInfixOf` text   = Just CR

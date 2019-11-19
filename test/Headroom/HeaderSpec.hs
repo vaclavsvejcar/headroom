@@ -16,11 +16,23 @@ spec :: Spec
 spec = do
   let readTemplate p = readFileUtf8 $ "test-data/code-samples/haskell/" ++ p
   describe "addHeader" $ do
-    it "adds header to source code" $ do
+    it "adds header to source code if no header is present" $ do
       let header = Header Haskell "-- This is header"
       source   <- readTemplate "stripped.hs"
       expected <- readTemplate "replaced-simple.hs"
       addHeader header source `shouldBe` expected
+
+    it "does nothing if some header is already present" $ do
+      let header = Header Haskell "-- This is header"
+      source   <- readTemplate "full.hs"
+      addHeader header source `shouldBe` source
+
+  describe "containsHeader" $ do
+    it "detects whether source code header is present" $ do
+      withHeader    <- readTemplate "full.hs"
+      withoutHeader <- readTemplate "stripped.hs"
+      containsHeader Haskell withHeader `shouldBe` True
+      containsHeader Haskell withoutHeader `shouldBe` False
 
   describe "headerSize" $ do
     it "returns correct size of header for source code" $ do
