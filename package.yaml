@@ -24,6 +24,9 @@ executables:
   headroom:
     main: Main.hs
     source-dirs: app
+    dependencies:
+      - cmdargs
+      - data-default-class
     ghc-options:
       - -threaded
       - -rtsopts
