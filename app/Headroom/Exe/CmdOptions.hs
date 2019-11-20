@@ -1,9 +1,11 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-partial-fields #-}
+
 module Headroom.Exe.CmdOptions
   ( CmdOptions(..)
-  , def
+  , cmdOptions
   )
 where
 
@@ -13,14 +15,21 @@ import qualified RIO.Text                      as T
 import           System.Console.CmdArgs
 
 data CmdOptions =
-  CmdOptions { foo :: T.Text
-             , bar :: T.Text
-             } deriving (Data, Show, Typeable)
+    Run { foo :: T.Text }
+  | Generate { bar :: T.Text }
+  deriving (Eq, Data, Show, Typeable)
 
-instance Default CmdOptions where
-  def =
-    CmdOptions { foo = def &= help "test foo arg"
-               , bar = def &= help "test bar arg"
-               }
-      &= summary "headroom, Copyright (c) 2019 Vaclav Svejcar"
-      &= program "headroom"
+modeRun :: CmdOptions
+modeRun = Run { foo = def &= help "test foo arg" } &= help "run help text"
+
+modeTest :: CmdOptions
+modeTest =
+  Generate { bar = def &= help "test bar arg" } &= help "generator help text"
+
+cmdOptions :: Mode (CmdArgs CmdOptions)
+cmdOptions =
+  cmdArgsMode
+    $  modes [modeRun, modeTest]
+    &= help "summary text here"
+    &= program "headroom"
+    &= summary "headroom v1.0"

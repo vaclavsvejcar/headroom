@@ -9,5 +9,5 @@ import           System.Console.CmdArgs
 
 main :: IO ()
 main = do
-  opts <- cmdArgs (def :: CmdOptions)
+  opts <- cmdArgsRun cmdOptions
   runSimpleApp . logInfo . displayShow $ "hello, " ++ show opts
