@@ -1,9 +1,10 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Types.Util
-  ( aesonOptions
-  , allValues
+  ( allValues
+  , customOptions
   , dropFieldPrefix
   , readEnumCI
+  , symbolCase
   )
 where
 
@@ -17,11 +18,12 @@ import qualified RIO.List                      as L
 import           Text.Read                      ( ReadS )
 
 
-aesonOptions :: Options
-aesonOptions = defaultOptions { fieldLabelModifier = dropFieldPrefix }
-
 allValues :: (Bounded a, Enum a) => [a]
 allValues = [minBound ..]
+
+customOptions :: Options
+customOptions =
+  defaultOptions { fieldLabelModifier = symbolCase '-' . dropFieldPrefix }
 
 dropFieldPrefix :: String -> String
 dropFieldPrefix (x : n : xs) | C.isUpper x && C.isUpper n = x : n : xs
@@ -34,3 +36,10 @@ readEnumCI str =
   let textRepr = fmap C.toLower . show
       result   = L.find (\item -> textRepr item == fmap C.toLower str) allValues
   in  maybe [] (\item -> [(item, "")]) result
+
+symbolCase :: Char -> String -> String
+symbolCase sym = process
+ where
+  process [] = []
+  process (x : xs) | C.isUpper x = sym : C.toLower x : process xs
+                   | otherwise   = x : process xs

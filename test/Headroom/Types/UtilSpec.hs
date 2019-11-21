@@ -33,3 +33,9 @@ spec = do
       readEnumCI "Haskell" `shouldBe` expected
       readEnumCI "HASKELL" `shouldBe` expected
 
+  describe "symbolCase" $ do
+    it "replaces camel cased string into symbol cased" $ do
+      let input    = "camelCasedValue"
+          expected = "camel-cased-value"
+      symbolCase '-' input `shouldBe` expected
+

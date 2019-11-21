@@ -15,9 +15,12 @@ import qualified RIO.HashMap                   as HM
 spec :: Spec
 spec = do
   describe "parseAppConfig" $ do
-    it "parses configuration from JSON file" $ do
-      rawAppConfig <- loadAppConfig "test-data/test-config.yaml"
-      let options  = HM.fromList [("option1", "value1")]
+    it "parses configuration from YAML file" $ do
+      rawAppConfig <- loadAppConfig "test-data/.headroom.yaml"
+      let options = HM.fromList
+            [ ("copyright", "(c) 2019 John Smith")
+            , ("email"    , "john.smith@example.com")
+            ]
           actual   = parseAppConfig rawAppConfig
-          expected = AppConfig "Hello" "World" options
+          expected = AppConfig 1 options
       actual `shouldBe` Right expected
