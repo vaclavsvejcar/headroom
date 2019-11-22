@@ -1,4 +1,12 @@
 config-version: 1
+
+source-paths:
+  - path/to/src
+
+template-paths:
+  - path/to/dir1
+  - path/to/dir2
+
 placeholders:
   copyright: (c) 2019 John Smith
   email: john.smith@example.com
