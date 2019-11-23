@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import           Headroom.Exe.CmdOptions
+import           Headroom.Main.CmdOptions
 import           RIO
 import           System.Console.CmdArgs
 

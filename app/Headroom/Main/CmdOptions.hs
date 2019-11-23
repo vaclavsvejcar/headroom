@@ -3,13 +3,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-cse #-}
 {-# OPTIONS_GHC -Wno-partial-fields #-}
-module Headroom.Exe.CmdOptions
+module Headroom.Main.CmdOptions
   ( CmdOptions(..)
   , cmdOptions
   )
 where
 
-import           Headroom.Exe.OrphanInstances   ( )
+import           Headroom.Main.OrphanInstances  ( )
 import           RIO
 import qualified RIO.Text                      as T
 import           System.Console.CmdArgs
