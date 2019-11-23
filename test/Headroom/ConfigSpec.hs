@@ -24,5 +24,5 @@ spec = do
           sourcePaths   = ["path/to/src"]
           templatePaths = ["path/to/dir1", "path/to/dir2"]
           actual        = parseAppConfig rawAppConfig
-          expected      = AppConfig 1 sourcePaths templatePaths options
+          expected      = AppConfig 1 True sourcePaths templatePaths options
       actual `shouldBe` Right expected

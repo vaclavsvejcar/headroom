@@ -22,10 +22,11 @@ import           Text.Read                      ( readsPrec )
 
 
 data AppConfig =
-  AppConfig { acConfigVersion :: Int
-            , acSourcePaths :: [FilePath]
-            , acTemplatePaths :: [FilePath]
-            , acPlaceholders  :: HM.HashMap T.Text T.Text
+  AppConfig { acConfigVersion  :: Int
+            , acReplaceHeaders :: Bool
+            , acSourcePaths    :: [FilePath]
+            , acTemplatePaths  :: [FilePath]
+            , acPlaceholders   :: HM.HashMap T.Text T.Text
             } deriving (Eq, Generic, Show)
 
 data FileType = Haskell deriving (Bounded, Enum, Eq, Ord, Show)

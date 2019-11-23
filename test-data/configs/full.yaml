@@ -1,5 +1,7 @@
 config-version: 1
 
+replace-headers: true
+
 source-paths:
   - path/to/src
 
