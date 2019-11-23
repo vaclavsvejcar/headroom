@@ -10,11 +10,12 @@ import           Headroom.Types                 ( FileType(..)
                                                 , Header(..)
                                                 )
 import           RIO
+import           RIO.FilePath
 import           Test.Hspec
 
 spec :: Spec
 spec = do
-  let readTemplate p = readFileUtf8 $ "test-data/code-samples/haskell/" ++ p
+  let readTemplate p = readFileUtf8 $ "test-data/code-samples/haskell" </> p
   describe "addHeader" $ do
     it "adds header to source code if no header is present" $ do
       let header = Header Haskell "-- This is header"
@@ -24,7 +25,7 @@ spec = do
 
     it "does nothing if some header is already present" $ do
       let header = Header Haskell "-- This is header"
-      source   <- readTemplate "full.hs"
+      source <- readTemplate "full.hs"
       addHeader header source `shouldBe` source
 
   describe "containsHeader" $ do
