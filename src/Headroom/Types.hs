@@ -23,6 +23,8 @@ import           Text.Read                      ( readsPrec )
 
 data AppConfig =
   AppConfig { acConfigVersion :: Int
+            , acSourcePaths :: [FilePath]
+            , acTemplatePaths :: [FilePath]
             , acPlaceholders  :: HM.HashMap T.Text T.Text
             } deriving (Eq, Generic, Show)
 

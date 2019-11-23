@@ -21,6 +21,8 @@ spec = do
             [ ("copyright", "(c) 2019 John Smith")
             , ("email"    , "john.smith@example.com")
             ]
-          actual   = parseAppConfig rawAppConfig
-          expected = AppConfig 1 options
+          sourcePaths   = ["path/to/src"]
+          templatePaths = ["path/to/dir1", "path/to/dir2"]
+          actual        = parseAppConfig rawAppConfig
+          expected      = AppConfig 1 sourcePaths templatePaths options
       actual `shouldBe` Right expected
