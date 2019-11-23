@@ -9,6 +9,7 @@ module Headroom.Main.CmdOptions
   )
 where
 
+import           Headroom.Main.Meta             ( buildVer )
 import           Headroom.Main.OrphanInstances  ( )
 import           RIO
 import qualified RIO.Text                      as T
@@ -24,11 +25,14 @@ data CmdOptions =
 
 modeRun :: CmdOptions
 modeRun =
-  Run { source_path     = def &= typ "FILE/DIR" &= help "test foo arg"
-      , template_path   = def &= typ "FILE/DIR" &= help "foo"
-      , replace_headers = False &= help "foo bar"
+  Run
+      { source_path     = def &= typ "FILE/DIR" &= help
+                            "path to source code file/directory"
+      , template_path   = def &= typ "FILE/DIR" &= help
+                            "path to header template file/directory"
+      , replace_headers = False &= help "force replace existing headers"
       }
-    &= help "run help text"
+    &= help "add or replace source code headers"
 
 modeGenerate :: CmdOptions
 modeGenerate =
@@ -38,6 +42,10 @@ cmdOptions :: Mode (CmdArgs CmdOptions)
 cmdOptions =
   cmdArgsMode
     $  modes [modeRun, modeGenerate]
-    &= help "summary text here"
+    &= help "manage your source code license headers"
     &= program "headroom"
-    &= summary "headroom v1.0"
+    &= summary
+         (  "headroom v"
+         ++ buildVer
+         ++ " - https://github.com/vaclavsvejcar/headroom"
+         )
