@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Config
+module Headroom.AppConfig
   ( loadAppConfig
   , parseAppConfig
   )

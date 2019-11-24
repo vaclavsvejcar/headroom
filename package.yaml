@@ -9,6 +9,7 @@ copyright: Copyright (c) 2019 Vaclav Svejcar
 
 dependencies:
   - base >= 4.7 && < 5
+  - data-default
   - rio
 
 ghc-options:
@@ -27,7 +28,6 @@ executables:
     source-dirs: app
     dependencies:
       - cmdargs
-      - data-default-class
     ghc-options:
       - -threaded
       - -rtsopts

@@ -11,6 +11,9 @@ where
 import           Data.Aeson                     ( FromJSON(parseJSON)
                                                 , genericParseJSON
                                                 )
+import           Data.Default                   ( Default
+                                                , def
+                                                )
 import           GHC.Generics                   ( Generic )
 import           Headroom.Types.Util            ( customOptions
                                                 , readEnumCI
@@ -45,3 +48,16 @@ instance FromJSON AppConfig where
 
 instance Read FileType where
   readsPrec _ = readEnumCI
+
+instance Default AppConfig where
+  def = AppConfig 1 False [] [] HM.empty
+
+instance Semigroup AppConfig where
+  x <> y = AppConfig (acConfigVersion x `min` acConfigVersion y)
+                     (acReplaceHeaders x)
+                     (acSourcePaths x <> acSourcePaths y)
+                     (acTemplatePaths x <> acTemplatePaths y)
+                     (acPlaceholders x <> acPlaceholders y)
+
+instance Monoid AppConfig where
+  mempty = def

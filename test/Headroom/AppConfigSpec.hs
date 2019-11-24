@@ -1,12 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.ConfigSpec
+module Headroom.AppConfigSpec
   ( spec
   )
 where
 
 import           Test.Hspec
-import           Headroom.Config
+import           Headroom.AppConfig
 import           Headroom.Types
 import           RIO
 import qualified RIO.HashMap                   as HM
