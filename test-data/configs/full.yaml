@@ -1,6 +1,6 @@
 config-version: 1
 
-replace-heafders: true
+replace-headers: true
 
 source-paths:
   - path/to/src

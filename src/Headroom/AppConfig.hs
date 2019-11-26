@@ -12,7 +12,7 @@ import qualified RIO.ByteString                as B
 
 
 loadAppConfig :: MonadIO m => FilePath -> m AppConfig
-loadAppConfig path = liftIO (B.readFile path >>= parseAppConfig)
+loadAppConfig path = liftIO $ B.readFile path >>= parseAppConfig
 
 parseAppConfig :: MonadThrow m => B.ByteString -> m AppConfig
 parseAppConfig raw = case Y.decodeEither' raw of
