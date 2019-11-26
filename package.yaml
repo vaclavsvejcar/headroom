@@ -28,6 +28,7 @@ executables:
     source-dirs: app
     dependencies:
       - cmdargs
+      - headroom
     ghc-options:
       - -threaded
       - -rtsopts

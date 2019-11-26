@@ -6,11 +6,14 @@
 module Headroom.Main.CmdOptions
   ( CmdOptions(..)
   , cmdOptions
+  , toAppConfig
   )
 where
 
 import           Headroom.Main.Meta             ( buildVer )
 import           Headroom.Main.OrphanInstances  ( )
+import           Headroom.Types                 ( AppConfig(..) )
+import qualified Data.Default                  as D
 import           RIO
 import qualified RIO.Text                      as T
 import           System.Console.CmdArgs
@@ -49,3 +52,11 @@ cmdOptions =
          ++ buildVer
          ++ " - https://github.com/vaclavsvejcar/headroom"
          )
+
+toAppConfig :: CmdOptions -> AppConfig
+toAppConfig (Run sourcePaths templatePaths replaceHeaders) = D.def
+  { acSourcePaths    = sourcePaths
+  , acTemplatePaths  = templatePaths
+  , acReplaceHeaders = replaceHeaders
+  }
+toAppConfig _ = D.def
