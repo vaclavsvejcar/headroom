@@ -16,14 +16,9 @@ import           System.Console.CmdArgs
 
 
 main :: IO ()
-main = runApp bootstrap
-
-bootstrap :: RIO App ()
-bootstrap = do
+main = runApp $ do
   logInfo "starting app..."
-  appConfigs <- loadAppConfigs
-  let appConfig = mconcat appConfigs
-  logDebug $ "using merged AppConfig: " <> displayShow appConfig
+  appConfig <- mergedAppConfig
   displayArgs
 
 runApp :: RIO App a -> IO a
@@ -40,8 +35,8 @@ displayArgs = do
   cmdOptions' <- view cmdOptionsL
   logInfo $ "parsed cmdargs: " <> displayShow cmdOptions'
 
-loadAppConfigs :: (HasCmdOptions env, HasLogFunc env) => RIO env [AppConfig]
-loadAppConfigs = do
+mergedAppConfig :: (HasCmdOptions env, HasLogFunc env) => RIO env AppConfig
+mergedAppConfig = do
   cmdOptions' <- view cmdOptionsL
   configDir   <- getXdgDirectory XdgConfig "headroom"
   currDir     <- getCurrentDirectory
@@ -50,16 +45,18 @@ loadAppConfigs = do
     $  "trying to load configuration from following paths: "
     <> displayShow locations
   appConfigs <- fmap catMaybes (mapM loadAppConfigSafe locations)
-  return $ toAppConfig cmdOptions' : appConfigs
+  mergeAppConfigs $ toAppConfig cmdOptions' : appConfigs
  where
   configFile = ".headroom.yaml"
   loadAppConfigSafe path = catch
     (fmap Just (loadAppConfig path))
     (\ex -> do
       logDebug $ displayShow (ex :: IOException)
-      logWarn
-        $  "Cannot read configuration file '"
-        <> fromString path
-        <> "', skipping..."
+      logWarn $ "skipping missing configuration file: " <> fromString path
       return Nothing
     )
+  mergeAppConfigs appConfigs = do
+    let merged = mconcat appConfigs
+    logDebug $ "source AppConfig instances: " <> displayShow appConfigs
+    logDebug $ "merged AppConfig: " <> displayShow merged
+    return merged
