@@ -18,12 +18,12 @@ spec = do
     it "parses valid Ginger template from raw string" $ do
       let raw    = "Hello, {{name}}"
           parsed = parseTemplate (T.pack raw)
-      parsed `shouldSatisfy` isRight
+      parsed `shouldSatisfy` isJust
 
-  describe "parseTemplateFile" $ do
+  describe "loadTemplate" $ do
     it "parses valid Ginger template from template file" $ do
-      parsed <- parseTemplateFile "test-data/test-template.jinja2"
-      parsed `shouldSatisfy` isRight
+      parsed <- loadTemplate "test-data/test-template.jinja2"
+      parsed `shouldSatisfy` const True
 
   describe "renderTemplate" $ do
     it "renders template from raw string with given context" $ do

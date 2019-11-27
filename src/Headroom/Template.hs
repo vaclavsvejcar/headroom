@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Template
-  ( parseTemplate
-  , parseTemplateFile
+  ( loadTemplate
+  , parseTemplate
   , renderTemplate
   )
 where
@@ -14,17 +14,20 @@ import           System.IO.Error                ( isDoesNotExistError )
 import           Text.Ginger
 
 
-parseTemplate :: T.Text -> Either ParserError (Template SourcePos)
-parseTemplate raw =
-  runIdentity $ parseGinger noIncludesResolver Nothing (T.unpack raw)
-
-parseTemplateFile :: FilePath -> IO (Either ParserError (Template SourcePos))
-parseTemplateFile = parseGingerFile resolve
+loadTemplate :: MonadIO m => FilePath -> m (Template SourcePos)
+loadTemplate path = do
+  parsed <- liftIO $ parseGingerFile resolvePath path
+  liftIO $ handleError parsed
  where
-  resolve path = do
-    content <- fmap rightToMaybe (readFileSafe path)
-    return $ fmap T.unpack content
-  readFileSafe path = tryJust (guard . isDoesNotExistError) (readFileUtf8 path)
+  handleError (Left  err) = throwM err
+  handleError (Right res) = return res
+
+parseTemplate :: MonadThrow m => T.Text -> m (Template SourcePos)
+parseTemplate raw = case result of
+  Left  err -> throwM err
+  Right res -> return res
+ where
+  result = runIdentity $ parseGinger noIncludesResolver Nothing (T.unpack raw)
 
 renderTemplate :: HM.HashMap T.Text T.Text -> Template SourcePos -> T.Text
 renderTemplate = easyRender
@@ -33,3 +36,9 @@ renderTemplate = easyRender
 
 noIncludesResolver :: IncludeResolver Identity
 noIncludesResolver = const $ return Nothing
+
+resolvePath :: FilePath -> IO (Maybe String)
+resolvePath path = do
+  content <- fmap rightToMaybe (readFileSafe path)
+  return $ fmap T.unpack content
+  where readFileSafe p = tryJust (guard . isDoesNotExistError) (readFileUtf8 p)
