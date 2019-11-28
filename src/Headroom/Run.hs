@@ -1,27 +1,35 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
 module Headroom.Run
   ( runMode
   )
 where
 
 import           Control.Applicative            ( (<$>) )
+import           Data.Tuple.Extra               ( second )
 import           Headroom.AppConfig             ( loadAppConfig )
 import           Headroom.Filesystem            ( findFilesByExts )
+import           Headroom.FileType              ( parseFileType )
 import           Headroom.Run.Env
+import           Headroom.Template              ( loadTemplate
+                                                , renderTemplate
+                                                )
 import           Headroom.Types                 ( AppConfig(..)
                                                 , FileType
                                                 )
-import           RIO
+import           RIO                     hiding ( second )
 import           RIO.Directory
-import           RIO.FilePath                   ( (</>) )
-import qualified RIO.HashMap                   as HM
+import           RIO.FilePath                   ( (</>)
+                                                , takeBaseName
+                                                )
+import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
 
 runMode :: RunOptions -> IO ()
 runMode opts = bootstrap opts $ do
-  logInfo "todo"
   templates <- loadTemplates
+  logInfo $ "Done loading " <> displayShow (M.size templates) <> " template(s)"
   return ()
 
 bootstrap :: RunOptions -> RIO Env a -> IO a
@@ -41,7 +49,7 @@ mergedAppConfig = do
   currDir    <- getCurrentDirectory
   let locations = [currDir </> configFile, configDir </> configFile]
   logInfo
-    $  "trying to load configuration from following paths: "
+    $  "Trying to load configuration from following paths: "
     <> displayShow locations
   appConfigs <- fmap catMaybes (mapM loadAppConfigSafe locations)
   mergeAppConfigs $ toAppConfig runOptions : appConfigs
@@ -51,20 +59,35 @@ mergedAppConfig = do
     (fmap Just (loadAppConfig path))
     (\ex -> do
       logDebug $ displayShow (ex :: IOException)
-      logWarn $ "skipping missing configuration file: " <> fromString path
+      logWarn $ "Skipping missing configuration file: " <> fromString path
       return Nothing
     )
   mergeAppConfigs appConfigs = do
     let merged = mconcat appConfigs
-    logDebug $ "source AppConfig instances: " <> displayShow appConfigs
-    logDebug $ "merged AppConfig: " <> displayShow merged
+    logDebug $ "Source AppConfig instances: " <> displayShow appConfigs
+    logDebug $ "Merged AppConfig: " <> displayShow merged
     return merged
 
 loadTemplates
-  :: (HasAppConfig env, HasLogFunc env) => RIO env (HM.HashMap FileType T.Text)
+  :: (HasAppConfig env, HasLogFunc env) => RIO env (M.Map FileType T.Text)
 loadTemplates = do
   appConfig <- view appConfigL
   paths     <- liftIO (mconcat <$> mapM findPaths (acTemplatePaths appConfig))
-  logDebug $ "template paths: " <> displayShow paths
-  return HM.empty   -- TODO logic
-  where findPaths path = findFilesByExts path ["jinja", "jinja2"]
+  logDebug $ "Found template files: " <> displayShow paths
+  withTypes <- mapM (\path -> fmap (, path) (extractTemplateType path)) paths
+  let knownTemplates = mapMaybe filterTemplate withTypes
+  parsed <- mapM (\(t, p) -> fmap (t, ) (loadTemplate p)) knownTemplates
+  return $ M.fromList
+    (fmap (second $ renderTemplate $ acPlaceholders appConfig) parsed)
+ where
+  findPaths path = findFilesByExts path ["jinja", "jinja2"]
+  filterTemplate pair = case pair of
+    (Just fileType, path) -> Just (fileType, path)
+    _                     -> Nothing
+
+extractTemplateType :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
+extractTemplateType path = do
+  let fileType = parseFileType . T.pack . takeBaseName $ path
+  when (isNothing fileType)
+       (logWarn $ "Skipping unrecognized template type: " <> fromString path)
+  return fileType

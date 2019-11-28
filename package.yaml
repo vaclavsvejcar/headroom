@@ -39,6 +39,7 @@ library:
   dependencies:
     - aeson
     - either
+    - extra
     - ginger
     - yaml
 
