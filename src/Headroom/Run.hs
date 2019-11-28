@@ -5,17 +5,24 @@ module Headroom.Run
   )
 where
 
+import           Control.Applicative            ( (<$>) )
 import           Headroom.AppConfig             ( loadAppConfig )
+import           Headroom.Filesystem            ( findFilesByExts )
 import           Headroom.Run.Env
-import           Headroom.Types                 ( AppConfig )
+import           Headroom.Types                 ( AppConfig(..)
+                                                , FileType
+                                                )
 import           RIO
 import           RIO.Directory
 import           RIO.FilePath                   ( (</>) )
+import qualified RIO.HashMap                   as HM
+import qualified RIO.Text                      as T
 
 runMode :: RunOptions -> IO ()
 runMode opts = bootstrap opts $ do
   logInfo "todo"
-  logInfo "todo"
+  templates <- loadTemplates
+  return ()
 
 bootstrap :: RunOptions -> RIO Env a -> IO a
 bootstrap opts logic = do
@@ -52,3 +59,12 @@ mergedAppConfig = do
     logDebug $ "source AppConfig instances: " <> displayShow appConfigs
     logDebug $ "merged AppConfig: " <> displayShow merged
     return merged
+
+loadTemplates
+  :: (HasAppConfig env, HasLogFunc env) => RIO env (HM.HashMap FileType T.Text)
+loadTemplates = do
+  appConfig <- view appConfigL
+  paths     <- liftIO (mconcat <$> mapM findPaths (acTemplatePaths appConfig))
+  logDebug $ "template paths: " <> displayShow paths
+  return HM.empty   -- TODO logic
+  where findPaths path = findFilesByExts path ["jinja", "jinja2"]

@@ -1,6 +1,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Filesystem
-  ( listFiles
+  ( findFiles
+  , findFilesByExts
+  , listFiles
   )
 where
 
@@ -9,8 +11,18 @@ import           RIO
 import           RIO.Directory                  ( doesDirectoryExist
                                                 , getDirectoryContents
                                                 )
-import           RIO.FilePath                   ( (</>) )
+import           RIO.FilePath                   ( (</>)
+                                                , isExtensionOf
+                                                )
+import qualified RIO.Text                      as T
 
+
+findFiles :: FilePath -> (FilePath -> Bool) -> IO [FilePath]
+findFiles path predicate = fmap (filter predicate) (listFiles path)
+
+findFilesByExts :: FilePath -> [T.Text] -> IO [FilePath]
+findFilesByExts path exts = findFiles path predicate
+  where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 
 listFiles :: FilePath -> IO [FilePath]
 listFiles fileOrDir = do

@@ -3,6 +3,7 @@ module Headroom.Run.Env
   ( RunOptions(..)
   , StartupEnv(..)
   , Env(..)
+  , HasAppConfig(..)
   , HasRunOptions(..)
   , toAppConfig
   )
@@ -27,11 +28,17 @@ data Env =
     Env { envEnv :: !StartupEnv
         , envAppConfig :: !AppConfig}
 
+class HasAppConfig env where
+  appConfigL :: Lens' env AppConfig
+
 class (HasLogFunc env, HasRunOptions env) => HasEnv env where
-    envL :: Lens' env StartupEnv
+  envL :: Lens' env StartupEnv
 
 class HasRunOptions env where
-    runOptionsL :: Lens' env RunOptions
+  runOptionsL :: Lens' env RunOptions
+
+instance HasAppConfig Env where
+  appConfigL = lens envAppConfig (\x y -> x { envAppConfig = y })
 
 instance HasEnv StartupEnv where
   envL = id
