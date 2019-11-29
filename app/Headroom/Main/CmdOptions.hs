@@ -6,14 +6,11 @@
 module Headroom.Main.CmdOptions
   ( CmdOptions(..)
   , cmdOptions
-  , toAppConfig
   )
 where
 
 import           Headroom.Main.Meta             ( buildVer )
 import           Headroom.Main.OrphanInstances  ( )
-import           Headroom.Types                 ( AppConfig(..) )
-import qualified Data.Default                  as D
 import           RIO
 import qualified RIO.Text                      as T
 import           System.Console.CmdArgs
@@ -22,6 +19,7 @@ data CmdOptions =
     Run { source_path     :: [FilePath]
         , template_path   :: [FilePath]
         , replace_headers :: Bool
+        , placeholder     :: [T.Text]
         , debug           :: Bool
         }
   | Generate { bar :: T.Text }
@@ -35,6 +33,8 @@ modeRun =
       , template_path   = def &= typ "FILE/DIR" &= help
                             "path to header template file/directory"
       , replace_headers = False &= help "force replace existing headers"
+      , placeholder     = def &= typ "KEY=VALUE" &= help
+                            "placeholder to replace in templates"
       , debug           = False &= help "produce more verbose output"
       }
     &= help "add or replace source code headers"
@@ -55,10 +55,3 @@ cmdOptions =
          ++ " - https://github.com/vaclavsvejcar/headroom"
          )
 
-toAppConfig :: CmdOptions -> AppConfig
-toAppConfig (Run sourcePaths templatePaths replaceHeaders _) = D.def
-  { acSourcePaths    = sourcePaths
-  , acTemplatePaths  = templatePaths
-  , acReplaceHeaders = replaceHeaders
-  }
-toAppConfig _ = D.def

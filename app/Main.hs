@@ -14,6 +14,7 @@ import           System.Console.CmdArgs
 main :: IO ()
 main = cmdArgsRun cmdOptions >>= selectMode
  where
-  selectMode (Run sourcePaths templatePaths replaceHeaders debug) =
-    runMode (RunOptions replaceHeaders sourcePaths templatePaths debug)
+  selectMode (Run sourcePaths templatePaths replaceHeaders placeholders debug)
+    = runMode
+      (RunOptions replaceHeaders sourcePaths templatePaths placeholders debug)
   selectMode _ = undefined  -- TODO generator mode

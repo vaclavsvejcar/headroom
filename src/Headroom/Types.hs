@@ -4,6 +4,7 @@ module Headroom.Types
   ( AppConfig(..)
   , FileType(..)
   , Header(..)
+  , HeadroomError(..)
   , NewLine(..)
   )
 where
@@ -39,9 +40,13 @@ data Header =
          , hContent  :: T.Text
          } deriving (Eq, Show)
 
+data HeadroomError = InvalidPlaceholder T.Text deriving (Typeable)
+
 data NewLine = CR | CRLF | LF deriving (Eq, Show)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
+
+instance Exception HeadroomError
 
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
@@ -61,3 +66,7 @@ instance Semigroup AppConfig where
 
 instance Monoid AppConfig where
   mempty = def
+
+instance Show HeadroomError where
+  show (InvalidPlaceholder raw) =
+    "Cannot parse placeholder key=value from: " <> T.unpack raw

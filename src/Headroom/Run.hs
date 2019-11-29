@@ -64,8 +64,9 @@ mergedAppConfig = do
   logInfo
     $  "Trying to load configuration from following paths: "
     <> displayShow locations
-  appConfigs <- fmap catMaybes (mapM loadAppConfigSafe locations)
-  mergeAppConfigs $ toAppConfig runOptions : appConfigs
+  appConfigs        <- fmap catMaybes (mapM loadAppConfigSafe locations)
+  appConfigFromOpts <- toAppConfig runOptions
+  mergeAppConfigs $ appConfigFromOpts : appConfigs
  where
   loadAppConfigSafe path = catch
     (fmap Just (loadAppConfig path))
