@@ -19,9 +19,10 @@ import qualified RIO.Text                      as T
 import           System.Console.CmdArgs
 
 data CmdOptions =
-    Run { source_path :: [FilePath]
-        , template_path :: [FilePath]
+    Run { source_path     :: [FilePath]
+        , template_path   :: [FilePath]
         , replace_headers :: Bool
+        , debug           :: Bool
         }
   | Generate { bar :: T.Text }
   deriving (Eq, Data, Show, Typeable)
@@ -34,6 +35,7 @@ modeRun =
       , template_path   = def &= typ "FILE/DIR" &= help
                             "path to header template file/directory"
       , replace_headers = False &= help "force replace existing headers"
+      , debug           = False &= help "produce more verbose output"
       }
     &= help "add or replace source code headers"
 
@@ -54,7 +56,7 @@ cmdOptions =
          )
 
 toAppConfig :: CmdOptions -> AppConfig
-toAppConfig (Run sourcePaths templatePaths replaceHeaders) = D.def
+toAppConfig (Run sourcePaths templatePaths replaceHeaders _) = D.def
   { acSourcePaths    = sourcePaths
   , acTemplatePaths  = templatePaths
   , acReplaceHeaders = replaceHeaders

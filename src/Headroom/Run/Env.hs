@@ -14,13 +14,14 @@ import           Headroom.Types                 ( AppConfig(..) )
 import           RIO
 
 data RunOptions =
-    RunOptions { replaceHeaders :: Bool
-               , sourcePaths :: [FilePath]
-               , templatePaths :: [FilePath]
+    RunOptions { roReplaceHeaders :: Bool
+               , roSourcePaths    :: [FilePath]
+               , roTemplatePaths  :: [FilePath]
+               , roDebug          :: Bool
                } deriving (Eq, Show)
 
 data StartupEnv =
-    StartupEnv { envLogFunc :: !LogFunc
+    StartupEnv { envLogFunc    :: !LogFunc
                , envRunOptions :: !RunOptions
                }
 
@@ -59,7 +60,7 @@ instance HasRunOptions Env where
   runOptionsL = envL . runOptionsL
 
 toAppConfig :: RunOptions -> AppConfig
-toAppConfig opts = def { acSourcePaths    = sourcePaths opts
-                       , acTemplatePaths  = templatePaths opts
-                       , acReplaceHeaders = replaceHeaders opts
+toAppConfig opts = def { acSourcePaths    = roSourcePaths opts
+                       , acTemplatePaths  = roTemplatePaths opts
+                       , acReplaceHeaders = roReplaceHeaders opts
                        }

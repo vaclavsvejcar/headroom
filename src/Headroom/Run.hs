@@ -47,8 +47,8 @@ runMode opts = bootstrap opts $ do
 
 bootstrap :: RunOptions -> RIO Env a -> IO a
 bootstrap opts logic = do
-  logOptions <- logOptionsHandle stderr False
-  let logOptions' = setLogMinLevel LevelDebug logOptions
+  logOptions <- logOptionsHandle stderr (roDebug opts)
+  let logOptions' = setLogUseLoc False logOptions
   withLogFunc logOptions' $ \logFunc -> do
     let startupEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
     merged <- runRIO startupEnv mergedAppConfig
@@ -105,7 +105,7 @@ extractTemplateType path = do
 findSourceFiles :: HasRunOptions env => [FileType] -> RIO env [FilePath]
 findSourceFiles fileTypes = do
   runOptions <- view runOptionsL
-  let paths = sourcePaths runOptions
+  let paths = roSourcePaths runOptions
   liftIO $ fmap concat (mapM (`findFilesByTypes` fileTypes) paths)
 
 processHeaders
@@ -120,8 +120,8 @@ processHeaders templates paths = do
   withTemplate (fileType, path) =
     fmap (\t -> (Header fileType t, path)) (M.lookup fileType templates)
   processPath path = fmap (, path) (fileTypeFor path)
-  fileTypeFor = fileTypeByExt . T.pack . getExtension
-  getExtension path = case takeExtension path of
+  fileTypeFor = fileTypeByExt . T.pack . fileExt
+  fileExt path = case takeExtension path of
     '.' : xs -> xs
     other    -> other
 
@@ -131,6 +131,6 @@ processHeader header path = do
   logInfo $ "Processing file: " <> fromString path
   runOptions  <- view runOptionsL
   fileContent <- readFileUtf8 path
-  let process   = if replaceHeaders runOptions then replaceHeader else addHeader
-      processed = process header fileContent
+  let fn = if roReplaceHeaders runOptions then replaceHeader else addHeader
+      processed = fn header fileContent
   writeFileUtf8 path processed
