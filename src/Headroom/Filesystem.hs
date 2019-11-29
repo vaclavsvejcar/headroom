@@ -2,11 +2,14 @@
 module Headroom.Filesystem
   ( findFiles
   , findFilesByExts
+  , findFilesByTypes
   , listFiles
   )
 where
 
 import           Control.Monad                  ( forM )
+import           Headroom.FileType              ( listExtensions )
+import           Headroom.Types                 ( FileType )
 import           RIO
 import           RIO.Directory                  ( doesDirectoryExist
                                                 , getDirectoryContents
@@ -23,6 +26,9 @@ findFiles path predicate = fmap (filter predicate) (listFiles path)
 findFilesByExts :: FilePath -> [T.Text] -> IO [FilePath]
 findFilesByExts path exts = findFiles path predicate
   where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
+
+findFilesByTypes :: FilePath -> [FileType] -> IO [FilePath]
+findFilesByTypes path types = findFilesByExts path (types >>= listExtensions)
 
 listFiles :: FilePath -> IO [FilePath]
 listFiles fileOrDir = do
