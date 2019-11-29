@@ -81,9 +81,7 @@ loadTemplates = do
     (fmap (second $ renderTemplate $ acPlaceholders appConfig) parsed)
  where
   findPaths path = findFilesByExts path ["jinja", "jinja2"]
-  filterTemplate pair = case pair of
-    (Just fileType, path) -> Just (fileType, path)
-    _                     -> Nothing
+  filterTemplate (fileType, path) = (\ft -> Just (ft, path)) =<< fileType
 
 extractTemplateType :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
 extractTemplateType path = do
