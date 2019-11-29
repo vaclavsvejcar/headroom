@@ -13,8 +13,12 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "parseFileType" $ do
-    it "parses FileType from string representation" $ do
-      let actual   = parseFileType "haskell"
+  describe "fileTypeByExt" $ do
+    it "parses FileType from file extension" $ do
+      fileTypeByExt "hs" `shouldBe` Just Haskell
+
+  describe "readFileType" $ do
+    it "reads FileType from string representation" $ do
+      let actual   = readFileType "haskell"
           expected = Just Haskell
       actual `shouldBe` expected

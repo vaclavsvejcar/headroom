@@ -12,18 +12,25 @@ import           Headroom.AppConfig             ( loadAppConfig )
 import           Headroom.Filesystem            ( findFilesByExts
                                                 , findFilesByTypes
                                                 )
-import           Headroom.FileType              ( parseFileType )
+import           Headroom.FileType              ( fileTypeByExt
+                                                , readFileType
+                                                )
+import           Headroom.Header                ( addHeader
+                                                , replaceHeader
+                                                )
 import           Headroom.Run.Env
 import           Headroom.Template              ( loadTemplate
                                                 , renderTemplate
                                                 )
 import           Headroom.Types                 ( AppConfig(..)
                                                 , FileType
+                                                , Header(Header)
                                                 )
 import           RIO                     hiding ( second )
 import           RIO.Directory
 import           RIO.FilePath                   ( (</>)
                                                 , takeBaseName
+                                                , takeExtension
                                                 )
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
@@ -36,7 +43,7 @@ runMode opts = bootstrap opts $ do
   sourceFiles <- findSourceFiles (M.keys templates)
   let sourceFilesNum = displayShow . L.length $ sourceFiles
   logInfo $ "Found " <> sourceFilesNum <> " sources code files to process"
-  return ()
+  processHeaders templates sourceFiles
 
 bootstrap :: RunOptions -> RIO Env a -> IO a
 bootstrap opts logic = do
@@ -90,7 +97,7 @@ loadTemplates = do
 
 extractTemplateType :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
 extractTemplateType path = do
-  let fileType = parseFileType . T.pack . takeBaseName $ path
+  let fileType = readFileType . T.pack . takeBaseName $ path
   when (isNothing fileType)
        (logWarn $ "Skipping unrecognized template type: " <> fromString path)
   return fileType
@@ -100,3 +107,30 @@ findSourceFiles fileTypes = do
   runOptions <- view runOptionsL
   let paths = sourcePaths runOptions
   liftIO $ fmap concat (mapM (`findFilesByTypes` fileTypes) paths)
+
+processHeaders
+  :: (HasLogFunc env, HasRunOptions env)
+  => M.Map FileType T.Text
+  -> [FilePath]
+  -> RIO env ()
+processHeaders templates paths = do
+  let filesToProcess = mapMaybe withTemplate (mapMaybe processPath paths)
+  mapM_ (uncurry processHeader) filesToProcess
+ where
+  withTemplate (fileType, path) =
+    fmap (\t -> (Header fileType t, path)) (M.lookup fileType templates)
+  processPath path = fmap (, path) (fileTypeFor path)
+  fileTypeFor = fileTypeByExt . T.pack . getExtension
+  getExtension path = case takeExtension path of
+    '.' : xs -> xs
+    other    -> other
+
+processHeader
+  :: (HasLogFunc env, HasRunOptions env) => Header -> FilePath -> RIO env ()
+processHeader header path = do
+  logInfo $ "Processing file: " <> fromString path
+  runOptions  <- view runOptionsL
+  fileContent <- readFileUtf8 path
+  let process   = if replaceHeaders runOptions then replaceHeader else addHeader
+      processed = process header fileContent
+  writeFileUtf8 path processed
