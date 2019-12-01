@@ -38,12 +38,18 @@ import qualified RIO.Text                      as T
 
 runMode :: RunOptions -> IO ()
 runMode opts = bootstrap opts $ do
+  logInfo "Loading source code header templates..."
   templates <- loadTemplates
-  logInfo $ "Done loading " <> displayShow (M.size templates) <> " template(s)"
+  logInfo $ "Done, found " <> displayShow (M.size templates) <> " template(s)"
+  logInfo "Searching for source code files..."
   sourceFiles <- findSourceFiles (M.keys templates)
   let sourceFilesNum = displayShow . L.length $ sourceFiles
-  logInfo $ "Found " <> sourceFilesNum <> " sources code files to process"
+  logInfo
+    $  "Done, found "
+    <> sourceFilesNum
+    <> " sources code files(s) to process"
   processHeaders templates sourceFiles
+  logInfo "Done."
 
 bootstrap :: RunOptions -> RIO Env a -> IO a
 bootstrap opts logic = do
@@ -61,9 +67,8 @@ mergedAppConfig = do
   configDir  <- getXdgDirectory XdgConfig "headroom"
   currDir    <- getCurrentDirectory
   let locations = [currDir </> ".headroom.yaml", configDir </> "headroom.yaml"]
-  logInfo
-    $  "Trying to load configuration from following paths: "
-    <> displayShow locations
+  logInfo "Loading configuration file(s)..."
+  logDebug $ "Configuration files locations: " <> displayShow locations
   appConfigs        <- fmap catMaybes (mapM loadAppConfigSafe locations)
   appConfigFromOpts <- toAppConfig runOptions
   mergeAppConfigs $ appConfigFromOpts : appConfigs
@@ -129,7 +134,7 @@ processHeaders templates paths = do
 processHeader
   :: (HasLogFunc env, HasRunOptions env) => Header -> FilePath -> RIO env ()
 processHeader header path = do
-  logInfo $ "Processing file: " <> fromString path
+  logInfo $ "Adding/replacing header in: " <> fromString path
   runOptions  <- view runOptionsL
   fileContent <- readFileUtf8 path
   let fn = if roReplaceHeaders runOptions then replaceHeader else addHeader
