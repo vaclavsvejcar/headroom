@@ -22,7 +22,9 @@ data CmdOptions =
         , placeholder     :: [T.Text]
         , debug           :: Bool
         }
-  | Generate { bar :: T.Text }
+  | Gen { config_file :: Maybe FilePath
+        , debug       :: Bool
+        }
   deriving (Eq, Data, Show, Typeable)
 
 modeRun :: CmdOptions
@@ -39,14 +41,19 @@ modeRun =
       }
     &= help "add or replace source code headers"
 
-modeGenerate :: CmdOptions
-modeGenerate =
-  Generate { bar = def &= help "test bar arg" } &= help "generator help text"
+modeGen :: CmdOptions
+modeGen =
+  Gen
+      { config_file = def &= typFile &= help
+                        "generates stub YAML config file at given location"
+      , debug       = False &= help "produce more verbose output"
+      }
+    &= help "generator help text"
 
 cmdOptions :: Mode (CmdArgs CmdOptions)
 cmdOptions =
   cmdArgsMode
-    $  modes [modeRun, modeGenerate]
+    $  modes [modeRun, modeGen]
     &= help "manage your source code license headers"
     &= program "headroom"
     &= summary
