@@ -43,7 +43,7 @@ modeRun =
 
 modeGen :: CmdOptions
 modeGen =
-  Gen { config_file = def &= help "generates stub YAML config file to output"
+  Gen { config_file = def &= help "generates stub YAML config file to stdout"
       , debug       = False &= help "produce more verbose output"
       }
     &= help "generate stub configuration and template files"
