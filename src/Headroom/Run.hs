@@ -25,6 +25,7 @@ import           Headroom.Template              ( loadTemplate
 import           Headroom.Types                 ( AppConfig(..)
                                                 , FileType
                                                 , Header(Header)
+                                                , Progress(..)
                                                 )
 import           RIO                     hiding ( second )
 import           RIO.Directory
@@ -121,7 +122,10 @@ processHeaders
   -> RIO env ()
 processHeaders templates paths = do
   let filesToProcess = mapMaybe withTemplate (mapMaybe processPath paths)
-  mapM_ (uncurry processHeader) filesToProcess
+      zipped         = L.zip [1 ..] filesToProcess
+      withProgress   = fmap (\(i, (h, p)) -> (progress i, h, p)) zipped
+      progress curr = Progress curr (fromIntegral $ L.length paths)
+  mapM_ (\(i, h, p) -> processHeader i h p) withProgress
  where
   withTemplate (fileType, path) =
     fmap (\t -> (Header fileType t, path)) (M.lookup fileType templates)
@@ -132,9 +136,16 @@ processHeaders templates paths = do
     other    -> other
 
 processHeader
-  :: (HasLogFunc env, HasRunOptions env) => Header -> FilePath -> RIO env ()
-processHeader header path = do
-  logInfo $ "Adding/replacing header in: " <> fromString path
+  :: (HasLogFunc env, HasRunOptions env)
+  => Progress
+  -> Header
+  -> FilePath
+  -> RIO env ()
+processHeader progress header path = do
+  logInfo
+    $  displayShow progress
+    <> "  Adding or replacing source code header in: "
+    <> fromString path
   runOptions  <- view runOptionsL
   fileContent <- readFileUtf8 path
   let fn = if roReplaceHeaders runOptions then replaceHeader else addHeader

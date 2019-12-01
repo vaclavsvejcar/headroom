@@ -6,6 +6,7 @@ module Headroom.Types
   , Header(..)
   , HeadroomError(..)
   , NewLine(..)
+  , Progress(..)
   )
 where
 
@@ -21,8 +22,10 @@ import           Headroom.Types.Util            ( customOptions
                                                 )
 import           RIO
 import qualified RIO.HashMap                   as HM
+import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 import           Text.Read                      ( readsPrec )
+import           Text.Printf                    ( printf )
 
 
 data AppConfig =
@@ -43,6 +46,8 @@ data Header =
 data HeadroomError = InvalidPlaceholder T.Text deriving (Typeable)
 
 data NewLine = CR | CRLF | LF deriving (Eq, Show)
+
+data Progress = Progress Integer Integer deriving (Eq)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
@@ -70,3 +75,10 @@ instance Monoid AppConfig where
 instance Show HeadroomError where
   show (InvalidPlaceholder raw) =
     "Cannot parse placeholder key=value from: " <> T.unpack raw
+
+instance Show Progress where
+  show (Progress current total) = "[" <> currentS <> " of " <> totalS <> "]"
+   where
+    format   = "%" <> (show . L.length $ totalS) <> "d"
+    currentS = printf format current
+    totalS   = show total
