@@ -1,8 +1,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TupleSections     #-}
 module Headroom.Run
-  ( runMode
+  ( runRunMode
   )
 where
 
@@ -37,8 +37,8 @@ import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
 
-runMode :: RunOptions -> IO ()
-runMode opts = bootstrap opts $ do
+runRunMode :: RunOptions -> IO ()
+runRunMode opts = bootstrap opts $ do
   logInfo "Loading source code header templates..."
   templates <- loadTemplates
   logInfo $ "Done, found " <> displayShow (M.size templates) <> " template(s)"

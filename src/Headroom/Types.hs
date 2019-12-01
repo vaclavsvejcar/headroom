@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Types
   ( AppConfig(..)
@@ -43,7 +43,10 @@ data Header =
          , hContent  :: T.Text
          } deriving (Eq, Show)
 
-data HeadroomError = InvalidPlaceholder T.Text deriving (Typeable)
+data HeadroomError =
+  InvalidPlaceholder T.Text
+  | NoGenModeSelected
+  deriving (Typeable)
 
 data NewLine = CR | CRLF | LF deriving (Eq, Show)
 
@@ -75,6 +78,8 @@ instance Monoid AppConfig where
 instance Show HeadroomError where
   show (InvalidPlaceholder raw) =
     "Cannot parse placeholder key=value from: " <> T.unpack raw
+  show NoGenModeSelected
+    = "Please select at least one option what to generate (see --help for details)"
 
 instance Show Progress where
   show (Progress current total) = "[" <> currentS <> " of " <> totalS <> "]"

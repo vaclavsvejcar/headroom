@@ -1,7 +1,7 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -fno-cse #-}
+{-# LANGUAGE DeriveDataTypeable     #-}
+{-# LANGUAGE NoImplicitPrelude      #-}
+{-# LANGUAGE OverloadedStrings      #-}
+{-# OPTIONS_GHC -fno-cse            #-}
 {-# OPTIONS_GHC -Wno-partial-fields #-}
 module Headroom.Main.CmdOptions
   ( CmdOptions(..)
@@ -22,7 +22,7 @@ data CmdOptions =
         , placeholder     :: [T.Text]
         , debug           :: Bool
         }
-  | Gen { config_file :: Maybe FilePath
+  | Gen { config_file :: Bool
         , debug       :: Bool
         }
   deriving (Eq, Data, Show, Typeable)
@@ -43,12 +43,10 @@ modeRun =
 
 modeGen :: CmdOptions
 modeGen =
-  Gen
-      { config_file = def &= typFile &= help
-                        "generates stub YAML config file at given location"
+  Gen { config_file = def &= help "generates stub YAML config file to output"
       , debug       = False &= help "produce more verbose output"
       }
-    &= help "generator help text"
+    &= help "generate stub configuration and template files"
 
 cmdOptions :: Mode (CmdArgs CmdOptions)
 cmdOptions =
