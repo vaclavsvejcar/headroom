@@ -20,17 +20,17 @@ import           RIO.FilePath                   ( (</>)
 import qualified RIO.Text                      as T
 
 
-findFiles :: FilePath -> (FilePath -> Bool) -> IO [FilePath]
+findFiles :: MonadIO m => FilePath -> (FilePath -> Bool) -> m [FilePath]
 findFiles path predicate = fmap (filter predicate) (listFiles path)
 
-findFilesByExts :: FilePath -> [T.Text] -> IO [FilePath]
+findFilesByExts :: MonadIO m => FilePath -> [T.Text] -> m [FilePath]
 findFilesByExts path exts = findFiles path predicate
   where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 
-findFilesByTypes :: FilePath -> [FileType] -> IO [FilePath]
+findFilesByTypes :: MonadIO m => FilePath -> [FileType] -> m [FilePath]
 findFilesByTypes path types = findFilesByExts path (types >>= listExtensions)
 
-listFiles :: FilePath -> IO [FilePath]
+listFiles :: MonadIO m => FilePath -> m [FilePath]
 listFiles fileOrDir = do
   isDir <- doesDirectoryExist fileOrDir
   if isDir then listDirectory fileOrDir else return [fileOrDir]

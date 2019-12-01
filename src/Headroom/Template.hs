@@ -37,8 +37,10 @@ renderTemplate = easyRender
 noIncludesResolver :: IncludeResolver Identity
 noIncludesResolver = const $ return Nothing
 
-resolvePath :: FilePath -> IO (Maybe String)
+resolvePath :: MonadIO m => FilePath -> m (Maybe String)
 resolvePath path = do
   content <- fmap rightToMaybe (readFileSafe path)
   return $ fmap T.unpack content
-  where readFileSafe p = tryJust (guard . isDoesNotExistError) (readFileUtf8 p)
+ where
+  readFileSafe p =
+    liftIO $ tryJust (guard . isDoesNotExistError) (readFileUtf8 p)
