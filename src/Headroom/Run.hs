@@ -142,12 +142,15 @@ processHeader
   -> FilePath
   -> RIO env ()
 processHeader progress header path = do
-  logInfo
-    $  displayShow progress
-    <> "  Adding or replacing source code header in: "
-    <> fromString path
   runOptions  <- view runOptionsL
   fileContent <- readFileUtf8 path
+  let action = if roReplaceHeaders runOptions then "Replacing" else "Adding"
+  logInfo
+    $  displayShow progress
+    <> "  "
+    <> action
+    <> " source code header in: "
+    <> fromString path
   let fn = if roReplaceHeaders runOptions then replaceHeader else addHeader
       processed = fn header fileContent
   writeFileUtf8 path processed
