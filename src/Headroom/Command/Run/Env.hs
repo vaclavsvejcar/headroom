@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Run.Env
+module Headroom.Command.Run.Env
   ( RunOptions(..)
   , StartupEnv(..)
   , Env(..)

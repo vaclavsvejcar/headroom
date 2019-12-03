@@ -1,14 +1,16 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections     #-}
-module Headroom.Run
-  ( runRunMode
+module Headroom.Command.Run
+  ( commandRun
   )
 where
 
 import           Control.Applicative            ( (<$>) )
 import           Data.Tuple.Extra               ( second )
 import           Headroom.AppConfig             ( loadAppConfig )
+import           Headroom.Command.Run.Env
+import           Headroom.Command.Shared        ( bootstrap )
 import           Headroom.Filesystem            ( findFilesByExts
                                                 , findFilesByTypes
                                                 )
@@ -18,7 +20,6 @@ import           Headroom.FileType              ( fileTypeByExt
 import           Headroom.Header                ( addHeader
                                                 , replaceHeader
                                                 )
-import           Headroom.Run.Env
 import           Headroom.Template              ( loadTemplate
                                                 , renderTemplate
                                                 )
@@ -37,8 +38,15 @@ import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
 
-runRunMode :: RunOptions -> IO ()
-runRunMode opts = bootstrap opts $ do
+env' :: RunOptions -> LogFunc -> IO Env
+env' opts logFunc = do
+  let startupEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
+  merged <- runRIO startupEnv mergedAppConfig
+  let env = Env { envEnv = startupEnv, envAppConfig = merged }
+  return env
+
+commandRun :: RunOptions -> IO ()
+commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
   logInfo "Loading source code header templates..."
   templates <- loadTemplates
   logInfo $ "Done, found " <> displayShow (M.size templates) <> " template(s)"
@@ -51,16 +59,6 @@ runRunMode opts = bootstrap opts $ do
     <> " sources code files(s) to process"
   processHeaders templates sourceFiles
   logInfo "Done."
-
-bootstrap :: RunOptions -> RIO Env a -> IO a
-bootstrap opts logic = do
-  logOptions <- logOptionsHandle stderr (roDebug opts)
-  let logOptions' = setLogUseLoc False logOptions
-  withLogFunc logOptions' $ \logFunc -> do
-    let startupEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
-    merged <- runRIO startupEnv mergedAppConfig
-    let env = Env { envEnv = startupEnv, envAppConfig = merged }
-    runRIO env logic
 
 mergedAppConfig :: (HasRunOptions env, HasLogFunc env) => RIO env AppConfig
 mergedAppConfig = do

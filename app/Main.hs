@@ -8,8 +8,8 @@ import           Headroom.Gen                   ( runGenMode )
 import           Headroom.Gen.Env               ( GenMode(..)
                                                 , GenOptions(GenOptions)
                                                 )
-import           Headroom.Run                   ( runRunMode )
-import           Headroom.Run.Env               ( RunOptions(RunOptions) )
+import           Headroom.Command.Run           ( commandRun )
+import           Headroom.Command.Run.Env       ( RunOptions(RunOptions) )
 import           Headroom.Types                 ( HeadroomError(..) )
 import           Prelude                        ( putStrLn )
 import           RIO
@@ -23,7 +23,7 @@ main = catch (cmdArgsRun cmdOptions >>= selectMode) wrapException
     putStrLn $ "ERROR: " <> displayException (ex :: SomeException)
     exitWith $ ExitFailure 1
   selectMode (Run sourcePaths templatePaths replaceHeaders placeholders debug)
-    = runRunMode
+    = commandRun
       (RunOptions replaceHeaders sourcePaths templatePaths placeholders debug)
   selectMode g@(Gen _ debug) = do
     genMode <- parseGenMode g
