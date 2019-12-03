@@ -35,6 +35,22 @@ data AppConfig =
             , acPlaceholders   :: HM.HashMap T.Text T.Text
             } deriving (Eq, Generic, Show)
 
+instance FromJSON AppConfig where
+  parseJSON = genericParseJSON customOptions
+
+instance Default AppConfig where
+  def = AppConfig 1 False [] [] HM.empty
+
+instance Semigroup AppConfig where
+  x <> y = AppConfig (acConfigVersion x `min` acConfigVersion y)
+                     (acReplaceHeaders x)
+                     (acSourcePaths x <> acSourcePaths y)
+                     (acTemplatePaths x <> acTemplatePaths y)
+                     (acPlaceholders x <> acPlaceholders y)
+
+instance Monoid AppConfig where
+  mempty = def
+
 loadAppConfig :: MonadIO m => FilePath -> m AppConfig
 loadAppConfig path = do
   appConfig <- liftIO $ B.readFile path >>= parseAppConfig
@@ -56,19 +72,3 @@ parsePlaceholders placeholders = fmap HM.fromList (mapM parse placeholders)
   parse input = case T.split (== '=') input of
     [key, value] -> return (key, value)
     _            -> throwM $ InvalidPlaceholder input
-
-instance FromJSON AppConfig where
-  parseJSON = genericParseJSON customOptions
-
-instance Default AppConfig where
-  def = AppConfig 1 False [] [] HM.empty
-
-instance Semigroup AppConfig where
-  x <> y = AppConfig (acConfigVersion x `min` acConfigVersion y)
-                     (acReplaceHeaders x)
-                     (acSourcePaths x <> acSourcePaths y)
-                     (acTemplatePaths x <> acTemplatePaths y)
-                     (acPlaceholders x <> acPlaceholders y)
-
-instance Monoid AppConfig where
-  mempty = def
