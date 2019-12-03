@@ -11,13 +11,17 @@ import           Headroom.Gen.Env               ( GenMode(..)
 import           Headroom.Run                   ( runRunMode )
 import           Headroom.Run.Env               ( RunOptions(RunOptions) )
 import           Headroom.Types                 ( HeadroomError(..) )
+import           Prelude                        ( putStrLn )
 import           RIO
 import           System.Console.CmdArgs
 
 
 main :: IO ()
-main = cmdArgsRun cmdOptions >>= selectMode
+main = catch (cmdArgsRun cmdOptions >>= selectMode) wrapException
  where
+  wrapException ex = do -- TODO handle this using RIO's logError
+    putStrLn $ "ERROR: " <> displayException (ex :: SomeException)
+    exitWith $ ExitFailure 1
   selectMode (Run sourcePaths templatePaths replaceHeaders placeholders debug)
     = runRunMode
       (RunOptions replaceHeaders sourcePaths templatePaths placeholders debug)

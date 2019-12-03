@@ -46,7 +46,7 @@ data Header =
 data HeadroomError =
   InvalidPlaceholder T.Text
   | NoGenModeSelected
-  deriving (Typeable)
+  deriving (Show, Typeable)
 
 data NewLine = CR | CRLF | LF deriving (Eq, Show)
 
@@ -54,7 +54,11 @@ data Progress = Progress Integer Integer deriving (Eq)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
-instance Exception HeadroomError
+instance Exception HeadroomError where
+  displayException (InvalidPlaceholder raw) =
+    "Cannot parse placeholder key=value from: " <> T.unpack raw
+  displayException NoGenModeSelected
+    = "Please select at least one option what to generate (see --help for details)"
 
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
@@ -74,12 +78,6 @@ instance Semigroup AppConfig where
 
 instance Monoid AppConfig where
   mempty = def
-
-instance Show HeadroomError where
-  show (InvalidPlaceholder raw) =
-    "Cannot parse placeholder key=value from: " <> T.unpack raw
-  show NoGenModeSelected
-    = "Please select at least one option what to generate (see --help for details)"
 
 instance Show Progress where
   show (Progress current total) = "[" <> currentS <> " of " <> totalS <> "]"
