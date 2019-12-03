@@ -6,8 +6,8 @@ module Headroom.Header.HaskellSpec
 where
 
 import           Headroom.Header.Haskell
-import           Test.Hspec
 import           RIO
+import           Test.Hspec
 
 
 spec :: Spec

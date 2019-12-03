@@ -30,7 +30,7 @@ data StartupEnv =
                }
 
 data Env =
-    Env { envEnv :: !StartupEnv
+    Env { envEnv       :: !StartupEnv
         , envAppConfig :: !AppConfig}
 
 class HasAppConfig env where

@@ -30,9 +30,9 @@ import           Headroom.Template              ( loadTemplate
 import           Headroom.Types                 ( Progress(..) )
 import           RIO                     hiding ( second )
 import           RIO.Directory
-import           RIO.FilePath                   ( (</>)
-                                                , takeBaseName
+import           RIO.FilePath                   ( takeBaseName
                                                 , takeExtension
+                                                , (</>)
                                                 )
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M

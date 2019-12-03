@@ -11,8 +11,8 @@ where
 
 import           Headroom.FileType              ( FileType(..) )
 import           Headroom.Header.All
-import           Headroom.Types                 ( NewLine(..) )
 import qualified Headroom.Text                 as T
+import           Headroom.Types                 ( NewLine(..) )
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T

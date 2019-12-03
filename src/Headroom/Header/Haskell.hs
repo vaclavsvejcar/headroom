@@ -6,8 +6,8 @@ module Headroom.Header.Haskell
 where
 
 import           RIO
-import qualified RIO.Text                      as T
 import qualified RIO.List                      as L
+import qualified RIO.Text                      as T
 
 
 headerSizeHaskell :: T.Text -> Int

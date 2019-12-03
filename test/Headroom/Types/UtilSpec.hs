@@ -4,11 +4,11 @@ module Headroom.Types.UtilSpec
   )
 where
 
-import           Test.Hspec
 import           Headroom.FileType              ( FileType(..) )
 import           Headroom.Types.Util
 import           RIO
 import           RIO.List                       ( sort )
+import           Test.Hspec
 
 
 spec :: Spec

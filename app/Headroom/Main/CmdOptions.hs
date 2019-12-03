@@ -1,6 +1,6 @@
-{-# LANGUAGE DeriveDataTypeable     #-}
-{-# LANGUAGE NoImplicitPrelude      #-}
-{-# LANGUAGE OverloadedStrings      #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE NoImplicitPrelude  #-}
+{-# LANGUAGE OverloadedStrings  #-}
 {-# OPTIONS_GHC -fno-cse            #-}
 {-# OPTIONS_GHC -Wno-partial-fields #-}
 module Headroom.Main.CmdOptions

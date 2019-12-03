@@ -6,10 +6,10 @@ module Headroom.FilesystemSpec
 where
 
 import           Headroom.Filesystem
-import           Test.Hspec
 import           RIO
 import           RIO.List                       ( sort )
 import qualified RIO.List                      as L
+import           Test.Hspec
 
 
 spec :: Spec

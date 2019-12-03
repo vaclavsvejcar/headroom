@@ -1,15 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Main where
 
-import           Headroom.Main.CmdOptions       ( CmdOptions(Gen, Run)
-                                                , cmdOptions
-                                                )
 import           Headroom.Command.Gen           ( commandGen )
 import           Headroom.Command.Gen.Env       ( GenMode(..)
                                                 , GenOptions(GenOptions)
                                                 )
 import           Headroom.Command.Run           ( commandRun )
 import           Headroom.Command.Run.Env       ( RunOptions(RunOptions) )
+import           Headroom.Main.CmdOptions       ( CmdOptions(Gen, Run)
+                                                , cmdOptions
+                                                )
 import           Headroom.Types                 ( HeadroomError(..) )
 import           Prelude                        ( putStrLn )
 import           RIO

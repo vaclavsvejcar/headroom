@@ -6,8 +6,8 @@ module Headroom.TypesSpec
 where
 
 import           Headroom.Types
-import           Test.Hspec
 import           RIO
+import           Test.Hspec
 
 
 spec :: Spec

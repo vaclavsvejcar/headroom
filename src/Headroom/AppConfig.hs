@@ -20,8 +20,8 @@ import           Headroom.Types                 ( HeadroomError(..) )
 import           Headroom.Types.Util            ( customOptions )
 import           RIO
 import qualified RIO.ByteString                as B
-import           RIO.FilePath                   ( (</>)
-                                                , takeDirectory
+import           RIO.FilePath                   ( takeDirectory
+                                                , (</>)
                                                 )
 import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T

@@ -5,10 +5,10 @@ module Headroom.AppConfigSpec
   )
 where
 
-import           Test.Hspec
 import           Headroom.AppConfig
 import           RIO
 import qualified RIO.HashMap                   as HM
+import           Test.Hspec
 
 
 spec :: Spec

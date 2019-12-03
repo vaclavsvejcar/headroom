@@ -6,10 +6,10 @@ module Headroom.TemplateSpec
 where
 
 import           Headroom.Template
-import           Test.Hspec
 import           RIO
 import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
+import           Test.Hspec
 
 
 spec :: Spec

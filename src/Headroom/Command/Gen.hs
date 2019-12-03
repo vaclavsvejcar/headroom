@@ -4,9 +4,9 @@ module Headroom.Command.Gen
   )
 where
 
-import           Headroom.Embedded              ( configFileStub )
 import           Headroom.Command.Gen.Env
 import           Headroom.Command.Shared        ( bootstrap )
+import           Headroom.Embedded              ( configFileStub )
 import           RIO
 
 env' :: GenOptions -> LogFunc -> IO Env
