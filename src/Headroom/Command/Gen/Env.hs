@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Gen.Env
+module Headroom.Command.Gen.Env
   ( GenMode(..)
   , GenOptions(..)
   , Env(..)

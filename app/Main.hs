@@ -4,8 +4,8 @@ module Main where
 import           Headroom.Main.CmdOptions       ( CmdOptions(Gen, Run)
                                                 , cmdOptions
                                                 )
-import           Headroom.Gen                   ( runGenMode )
-import           Headroom.Gen.Env               ( GenMode(..)
+import           Headroom.Command.Gen           ( commandGen )
+import           Headroom.Command.Gen.Env       ( GenMode(..)
                                                 , GenOptions(GenOptions)
                                                 )
 import           Headroom.Command.Run           ( commandRun )
@@ -27,7 +27,7 @@ main = catch (cmdArgsRun cmdOptions >>= selectMode) wrapException
       (RunOptions replaceHeaders sourcePaths templatePaths placeholders debug)
   selectMode g@(Gen _ debug) = do
     genMode <- parseGenMode g
-    runGenMode (GenOptions genMode debug)
+    commandGen (GenOptions genMode debug)
 
 parseGenMode :: MonadThrow m => CmdOptions -> m GenMode
 parseGenMode (Gen True _) = return GenConfigFile
