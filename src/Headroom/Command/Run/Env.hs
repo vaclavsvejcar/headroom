@@ -10,8 +10,9 @@ module Headroom.Command.Run.Env
 where
 
 import           Data.Default                   ( def )
-import           Headroom.AppConfig             ( parsePlaceholders )
-import           Headroom.Types                 ( AppConfig(..) )
+import           Headroom.AppConfig             ( AppConfig(..)
+                                                , parsePlaceholders
+                                                )
 import           RIO
 import qualified RIO.Text                      as T
 

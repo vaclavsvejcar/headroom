@@ -20,7 +20,7 @@ main :: IO ()
 main = catch (cmdArgsRun cmdOptions >>= selectMode) wrapException
  where
   wrapException ex = do -- TODO handle this using RIO's logError
-    putStrLn $ "ERROR: " <> displayException (ex :: SomeException)
+    putStrLn $ "ERROR: " <> displayException (ex :: HeadroomError)
     exitWith $ ExitFailure 1
   selectMode (Run sourcePaths templatePaths replaceHeaders placeholders debug)
     = commandRun

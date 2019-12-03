@@ -8,7 +8,9 @@ where
 
 import           Control.Applicative            ( (<$>) )
 import           Data.Tuple.Extra               ( second )
-import           Headroom.AppConfig             ( loadAppConfig )
+import           Headroom.AppConfig             ( AppConfig(..)
+                                                , loadAppConfig
+                                                )
 import           Headroom.Command.Run.Env
 import           Headroom.Command.Shared        ( bootstrap )
 import           Headroom.Filesystem            ( findFilesByExts
@@ -23,8 +25,7 @@ import           Headroom.Header                ( addHeader
 import           Headroom.Template              ( loadTemplate
                                                 , renderTemplate
                                                 )
-import           Headroom.Types                 ( AppConfig(..)
-                                                , FileType
+import           Headroom.Types                 ( FileType
                                                 , Header(Header)
                                                 , Progress(..)
                                                 )
