@@ -1,18 +1,26 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.FileType
-  ( fileTypeByExt
+  ( FileType(..)
+  , fileTypeByExt
   , listExtensions
   , readFileType
   )
 where
 
-import           Headroom.Types                 ( FileType(..) )
-import           Headroom.Types.Util            ( allValues )
+import           Headroom.Types.Util            ( allValues
+                                                , readEnumCI
+                                                )
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
+import           Text.Read                      ( readsPrec )
 
+
+data FileType = Haskell deriving (Bounded, Enum, Eq, Ord, Show)
+
+instance Read FileType where
+  readsPrec _ = readEnumCI
 
 fileTypeByExt :: T.Text -> Maybe FileType
 fileTypeByExt ext =

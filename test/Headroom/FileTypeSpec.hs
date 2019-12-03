@@ -6,7 +6,6 @@ module Headroom.FileTypeSpec
 where
 
 import           Headroom.FileType
-import           Headroom.Types                 ( FileType(..) )
 import           RIO
 import           Test.Hspec
 

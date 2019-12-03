@@ -5,10 +5,8 @@ module Headroom.HeaderSpec
   )
 where
 
+import           Headroom.FileType              ( FileType(..) )
 import           Headroom.Header
-import           Headroom.Types                 ( FileType(..)
-                                                , Header(..)
-                                                )
 import           RIO
 import           RIO.FilePath
 import           Test.Hspec

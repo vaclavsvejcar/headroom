@@ -8,8 +8,7 @@ module Headroom.Filesystem
 where
 
 import           Control.Monad                  ( forM )
-import           Headroom.FileType              ( listExtensions )
-import           Headroom.Types                 ( FileType )
+import           Headroom.FileType              ( FileType, listExtensions )
 import           RIO
 import           RIO.Directory                  ( doesDirectoryExist
                                                 , getDirectoryContents

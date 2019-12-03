@@ -16,19 +16,18 @@ import           Headroom.Command.Shared        ( bootstrap )
 import           Headroom.Filesystem            ( findFilesByExts
                                                 , findFilesByTypes
                                                 )
-import           Headroom.FileType              ( fileTypeByExt
+import           Headroom.FileType              ( FileType
+                                                , fileTypeByExt
                                                 , readFileType
                                                 )
-import           Headroom.Header                ( addHeader
+import           Headroom.Header                ( Header(Header)
+                                                , addHeader
                                                 , replaceHeader
                                                 )
 import           Headroom.Template              ( loadTemplate
                                                 , renderTemplate
                                                 )
-import           Headroom.Types                 ( FileType
-                                                , Header(Header)
-                                                , Progress(..)
-                                                )
+import           Headroom.Types                 ( Progress(..) )
 import           RIO                     hiding ( second )
 import           RIO.Directory
 import           RIO.FilePath                   ( (</>)

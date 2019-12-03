@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Header
-  ( addHeader
+  ( Header(..)
+  , addHeader
   , containsHeader
   , headerSize
   , replaceHeader
@@ -8,15 +9,19 @@ module Headroom.Header
   )
 where
 
+import           Headroom.FileType              ( FileType(..) )
 import           Headroom.Header.All
-import           Headroom.Types                 ( FileType(..)
-                                                , Header(..)
-                                                , NewLine(..)
-                                                )
+import           Headroom.Types                 ( NewLine(..) )
 import qualified Headroom.Text                 as T
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
+
+
+data Header =
+  Header { hFileType :: FileType
+         , hContent  :: T.Text
+         } deriving (Eq, Show)
 
 addHeader :: Header -> T.Text -> T.Text
 addHeader (Header fileType content) input = output

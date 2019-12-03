@@ -5,7 +5,7 @@ module Headroom.Types.UtilSpec
 where
 
 import           Test.Hspec
-import           Headroom.Types
+import           Headroom.FileType              ( FileType(..) )
 import           Headroom.Types.Util
 import           RIO
 import           RIO.List                       ( sort )
