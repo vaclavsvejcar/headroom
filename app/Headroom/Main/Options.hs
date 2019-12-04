@@ -15,9 +15,9 @@ import qualified RIO.Text                      as T
 
 
 data Command
-    = Run [FilePath] [FilePath] [T.Text] Bool Bool
-    | Gen Bool Bool
-      deriving (Show)
+  = Run [FilePath] [FilePath] [T.Text] Bool Bool
+  | Gen Bool Bool
+    deriving (Show)
 
 commandParser :: ParserInfo Command
 commandParser = info

@@ -12,8 +12,8 @@ import qualified RIO.Text                      as T
 import           Text.Printf                    ( printf )
 
 
-data HeadroomError =
-  InvalidPlaceholder T.Text
+data HeadroomError
+  = InvalidPlaceholder T.Text
   | NoGenModeSelected
   deriving (Show, Typeable)
 
