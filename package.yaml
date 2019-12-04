@@ -27,8 +27,8 @@ executables:
     main: Main.hs
     source-dirs: app
     dependencies:
-      - cmdargs
       - headroom
+      - optparse-applicative
     ghc-options:
       - -threaded
       - -rtsopts

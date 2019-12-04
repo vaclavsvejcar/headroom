@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import           Headroom.Command.Gen           ( commandGen )
@@ -7,28 +8,32 @@ import           Headroom.Command.Gen.Env       ( GenMode(..)
                                                 )
 import           Headroom.Command.Run           ( commandRun )
 import           Headroom.Command.Run.Env       ( RunOptions(RunOptions) )
-import           Headroom.Main.CmdOptions       ( CmdOptions(Gen, Run)
-                                                , cmdOptions
+import           Headroom.Main.Options          ( Command(..)
+                                                , commandParser
                                                 )
 import           Headroom.Types                 ( HeadroomError(..) )
+import           Options.Applicative
 import           Prelude                        ( putStrLn )
 import           RIO
-import           System.Console.CmdArgs
-
 
 main :: IO ()
-main = catch (cmdArgsRun cmdOptions >>= selectMode) wrapException
- where
-  wrapException ex = do -- TODO handle this using RIO's logError
-    putStrLn $ "ERROR: " <> displayException (ex :: HeadroomError)
-    exitWith $ ExitFailure 1
-  selectMode (Run sourcePaths templatePaths replaceHeaders placeholders debug)
-    = commandRun
-      (RunOptions replaceHeaders sourcePaths templatePaths placeholders debug)
-  selectMode g@(Gen _ debug) = do
-    genMode <- parseGenMode g
+main = do
+  command' <- execParser commandParser
+  catch
+    (bootstrap command')
+    (\ex -> do
+      putStrLn $ "ERROR: " <> displayException (ex :: HeadroomError)
+      exitWith $ ExitFailure 1
+    )
+
+bootstrap :: Command -> IO ()
+bootstrap command' = case command' of
+  Run sourcePaths templatePaths placeholders replaceHeaders debug -> commandRun
+    (RunOptions replaceHeaders sourcePaths templatePaths placeholders debug)
+  c@(Gen _ debug) -> do
+    genMode <- parseGenMode c
     commandGen (GenOptions genMode debug)
 
-parseGenMode :: MonadThrow m => CmdOptions -> m GenMode
+parseGenMode :: MonadThrow m => Command -> m GenMode
 parseGenMode (Gen True _) = return GenConfigFile
 parseGenMode _            = throwM NoGenModeSelected
