@@ -13,6 +13,7 @@ dependencies:
   - rio
 
 ghc-options:
+  - -O2
   - -optP-Wno-nonportable-include-path
   - -Wall
   - -Wcompat

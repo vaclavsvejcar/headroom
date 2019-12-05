@@ -7,7 +7,7 @@ module Headroom.Main.Options
 where
 
 import           Data.Semigroup                 ( (<>) )
-import           Headroom.Main.Meta             ( buildVer )
+import           Headroom.Meta                  ( buildVer )
 import           Options.Applicative
 import           RIO
 import qualified RIO.Text                      as T
