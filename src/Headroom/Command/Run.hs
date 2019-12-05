@@ -85,8 +85,8 @@ mergedAppConfig = do
     logDebug $ "Merged AppConfig: " <> displayShow merged
     return merged
 
-loadTemplates
-  :: (HasAppConfig env, HasLogFunc env) => RIO env (M.Map FileType T.Text)
+loadTemplates :: (HasAppConfig env, HasLogFunc env)
+              => RIO env (M.Map FileType T.Text)
 loadTemplates = do
   appConfig <- view appConfigL
   paths     <- liftIO (mconcat <$> mapM findPaths (acTemplatePaths appConfig))
@@ -113,11 +113,10 @@ findSourceFiles fileTypes = do
   let paths = roSourcePaths runOptions
   liftIO $ fmap concat (mapM (`findFilesByTypes` fileTypes) paths)
 
-processHeaders
-  :: (HasLogFunc env, HasRunOptions env)
-  => M.Map FileType T.Text
-  -> [FilePath]
-  -> RIO env ()
+processHeaders :: (HasLogFunc env, HasRunOptions env)
+               => M.Map FileType T.Text
+               -> [FilePath]
+               -> RIO env ()
 processHeaders templates paths = do
   let filesToProcess = mapMaybe withTemplate (mapMaybe processPath paths)
       zipped         = L.zip [1 ..] filesToProcess
@@ -133,12 +132,11 @@ processHeaders templates paths = do
     '.' : xs -> xs
     other    -> other
 
-processHeader
-  :: (HasLogFunc env, HasRunOptions env)
-  => Progress
-  -> Header
-  -> FilePath
-  -> RIO env ()
+processHeader :: (HasLogFunc env, HasRunOptions env)
+              => Progress
+              -> Header
+              -> FilePath
+              -> RIO env ()
 processHeader progress header path = do
   runOptions  <- view runOptionsL
   fileContent <- readFileUtf8 path
