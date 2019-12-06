@@ -4,4 +4,4 @@ module Headroom.Header.All
   )
 where
 
-import           Headroom.Header.Haskell        ( headerSizeHaskell )
+import           Headroom.Header.Impl.Haskell   ( headerSizeHaskell )

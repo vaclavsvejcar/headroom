@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.Header.Haskell
+module Headroom.Header.Impl.Haskell
   ( headerSizeHaskell
   )
 where

@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.Header.HaskellSpec
+module Headroom.Header.Impl.HaskellSpec
   ( spec
   )
 where
 
-import           Headroom.Header.Haskell
+import           Headroom.Header.Impl.Haskell
 import           RIO
 import           Test.Hspec
 
