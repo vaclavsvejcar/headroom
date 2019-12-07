@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Types.UtilSpec
+module Headroom.Types.UtilsSpec
   ( spec
   )
 where
 
 import           Headroom.FileType              ( FileType(..) )
-import           Headroom.Types.Util
+import           Headroom.Types.Utils
 import           RIO
 import           RIO.List                       ( sort )
 import           Test.Hspec
@@ -16,7 +16,7 @@ spec = do
   describe "allValues" $ do
     it "should list all values of FileType enum" $ do
       let actual   = allValues :: [FileType]
-          expected = [Haskell]
+          expected = [Haskell, Scala]
       sort actual `shouldBe` sort expected
 
   describe "dropFieldPrefix" $ do

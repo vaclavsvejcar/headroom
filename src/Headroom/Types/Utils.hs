@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Types.Util
+module Headroom.Types.Utils
   ( allValues
   , customOptions
   , dropFieldPrefix

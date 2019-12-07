@@ -17,7 +17,7 @@ import           Data.Default                   ( Default
                                                 )
 import qualified Data.Yaml                     as Y
 import           Headroom.Types                 ( HeadroomError(..) )
-import           Headroom.Types.Util            ( customOptions )
+import           Headroom.Types.Utils           ( customOptions )
 import           RIO
 import qualified RIO.ByteString                as B
 import           RIO.FilePath                   ( takeDirectory

@@ -8,7 +8,7 @@ module Headroom.FileType
   )
 where
 
-import           Headroom.Types.Util            ( allValues
+import           Headroom.Types.Utils           ( allValues
                                                 , readEnumCI
                                                 )
 import           RIO
@@ -17,7 +17,10 @@ import qualified RIO.Text                      as T
 import           Text.Read                      ( readsPrec )
 
 
-data FileType = Haskell deriving (Bounded, Enum, Eq, Ord, Show)
+data FileType
+  = Haskell
+  | Scala
+  deriving (Bounded, Enum, Eq, Ord, Show)
 
 instance Read FileType where
   readsPrec _ = readEnumCI
@@ -28,6 +31,7 @@ fileTypeByExt ext =
 
 listExtensions :: FileType -> [T.Text]
 listExtensions Haskell = ["hs"]
+listExtensions Scala   = ["scala"]
 
 readFileType :: T.Text -> Maybe FileType
 readFileType = readMaybe . T.unpack

@@ -7,6 +7,7 @@ where
 import           Headroom.Command.Gen.Env
 import           Headroom.Command.Shared        ( bootstrap )
 import           Headroom.Embedded              ( configFileStub )
+import           Prelude                        ( putStrLn )
 import           RIO
 
 env' :: GenOptions -> LogFunc -> IO Env
@@ -14,7 +15,7 @@ env' opts logFunc = return $ Env { envLogFunc = logFunc, envGenOptions = opts }
 
 commandGen :: GenOptions -> IO ()
 commandGen opts = bootstrap (env' opts) (goDebug opts) $ case goGenMode opts of
-  GenConfigFile -> generateConfigFile
+  GenConfigFile -> liftIO printConfigFile
 
-generateConfigFile :: HasLogFunc env => RIO env ()
-generateConfigFile = logInfo configFileStub
+printConfigFile :: IO ()
+printConfigFile = putStrLn configFileStub

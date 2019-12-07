@@ -35,6 +35,7 @@ containsHeader fileType input = headerSize fileType input > 0
 
 headerSize :: FileType -> T.Text -> Int
 headerSize Haskell = headerSizeHaskell
+headerSize Scala   = headerSizeScala
 
 replaceHeader :: Header -> T.Text -> T.Text
 replaceHeader h@(Header fileType _) = addHeader h . stripHeader fileType

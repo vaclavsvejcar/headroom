@@ -107,10 +107,10 @@ extractTemplateType path = do
        (logWarn $ "Skipping unrecognized template type: " <> fromString path)
   return fileType
 
-findSourceFiles :: HasRunOptions env => [FileType] -> RIO env [FilePath]
+findSourceFiles :: HasAppConfig env => [FileType] -> RIO env [FilePath]
 findSourceFiles fileTypes = do
-  runOptions <- view runOptionsL
-  let paths = roSourcePaths runOptions
+  appConfig <- view appConfigL
+  let paths = acSourcePaths appConfig
   liftIO $ fmap concat (mapM (`findFilesByTypes` fileTypes) paths)
 
 processHeaders :: (HasLogFunc env, HasRunOptions env)
