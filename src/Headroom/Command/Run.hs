@@ -20,8 +20,9 @@ import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
                                                 , readFileType
                                                 )
-import           Headroom.Header                ( Header(Header)
+import           Headroom.Header                ( Header(..)
                                                 , addHeader
+                                                , containsHeader
                                                 , replaceHeader
                                                 )
 import           Headroom.Template              ( loadTemplate
@@ -140,13 +141,14 @@ processHeader :: (HasLogFunc env, HasRunOptions env)
 processHeader progress header path = do
   runOptions  <- view runOptionsL
   fileContent <- readFileUtf8 path
-  let action = if roReplaceHeaders runOptions then "Replacing" else "Adding"
-  logInfo
-    $  displayShow progress
-    <> "  "
-    <> action
-    <> " source code header in: "
-    <> fromString path
-  let fn = if roReplaceHeaders runOptions then replaceHeader else addHeader
-      processed = fn header fileContent
-  writeFileUtf8 path processed
+  action      <- if roReplaceHeaders runOptions
+    then do
+      log' $ "Replacing header in: " <> fromString path
+      return replaceHeader
+    else do
+      if containsHeader (hFileType header) fileContent
+        then log' $ "Skipping file: " <> fromString path
+        else log' $ "Adding header to: " <> fromString path
+      return addHeader
+  writeFileUtf8 path (action header fileContent)
+  where log' msg = logInfo $ displayShow progress <> "  " <> msg

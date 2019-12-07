@@ -13,7 +13,6 @@ import           RIO
 import qualified RIO.Text                      as T
 
 
-
 data Command
   = Run [FilePath] [FilePath] [T.Text] Bool Bool
   | Gen Bool Bool
@@ -28,7 +27,7 @@ commandParser = info
   )
  where
   header' =
-    "headroom v" <> buildVer <> " - https://github.com/vaclavsvejcar/headroom"
+    "headroom v" <> buildVer <> " :: https://github.com/vaclavsvejcar/headroom"
   commands   = subparser (runCommand <> genCommand)
   runCommand = command
     "run"
