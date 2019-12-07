@@ -14,5 +14,5 @@ findLine predicate text =
   fromMaybe 0 $ L.findIndex (predicate . T.strip) (T.lines text)
 
 findLineStartingWith :: [T.Text] -> T.Text -> Int
-findLineStartingWith patterns text = findLine predicate text
+findLineStartingWith patterns = findLine predicate
   where predicate line = or $ fmap (`T.isPrefixOf` line) patterns
