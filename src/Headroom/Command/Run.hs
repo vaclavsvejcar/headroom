@@ -134,7 +134,7 @@ processHeaders templates paths = do
   let filesToProcess = mapMaybe withTemplate (mapMaybe processPath paths)
       zipped         = L.zip [1 ..] filesToProcess
       withProgress   = fmap (\(i, (h, p)) -> (progress i, h, p)) zipped
-      progress curr = Progress curr (fromIntegral $ L.length paths)
+      progress curr = Progress curr (L.length paths)
   mapM_ (\(i, h, p) -> processHeader i h p) withProgress
  where
   withTemplate (fileType, path) =

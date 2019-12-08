@@ -30,7 +30,7 @@ data HeadroomError
 
 data NewLine = CR | CRLF | LF deriving (Eq, Show)
 
-data Progress = Progress Integer Integer deriving (Eq)
+data Progress = Progress Int Int deriving (Eq)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 

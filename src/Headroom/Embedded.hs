@@ -19,5 +19,6 @@ where
 import           Data.FileEmbed                 ( embedStringFile )
 import           RIO
 
+-- | Content of dummy /YAML/ configuration file for the application.
 configFileStub :: IsString a => a
 configFileStub = $(embedStringFile "embedded-data/config-file.yaml")

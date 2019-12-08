@@ -19,5 +19,6 @@ import           Data.Version                   ( showVersion )
 import           Paths_headroom                 ( version )
 import           RIO
 
+-- | Returns application version, as specified in @headroom.cabal@ file.
 buildVer :: String
 buildVer = showVersion version
