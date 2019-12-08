@@ -22,7 +22,7 @@ module Headroom.Header
 where
 
 import           Headroom.FileType              ( FileType(..) )
-import           Headroom.Header.All
+import           Headroom.Header.Impl
 import qualified Headroom.Text                 as T
 import           Headroom.Types                 ( NewLine(..) )
 import           RIO

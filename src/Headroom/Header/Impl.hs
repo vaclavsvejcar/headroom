@@ -1,5 +1,5 @@
 {-|
-Module      : Headroom.Header.All
+Module      : Headroom.Header.Impl
 Description : All license header implementations
 Copyright   : (c) 2019 Vaclav Svejcar
 License     : BSD-3
@@ -10,7 +10,7 @@ Portability : POSIX
 Re-exports @headerSizeXY@ functions from all existing implementation modules.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Header.All
+module Headroom.Header.Impl
   ( headerSizeHaskell
   , headerSizeScala
   )
