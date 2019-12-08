@@ -1,0 +1,24 @@
+## This is the generated configuration file for Headroom.
+## See https://github.com/vaclavsvejcar/headroom for more details.
+
+## Version of this config files (shouldn't be necessary to change).
+config-version: 1
+
+## Whether to replace existing headers in source code files.
+replace-headers: false
+
+## Paths to source code files (either files or directories).
+source-paths:
+  - app
+  - src
+
+## Paths to template files (either files or directories).
+template-paths:
+  - doc/templates
+
+## Placeholders (key-value) to replace in templates.
+placeholders:
+  author: Vaclav Svejcar
+  license: BSD-3
+  email: vaclav.svejcar@gmail.com
+  year: "2019"

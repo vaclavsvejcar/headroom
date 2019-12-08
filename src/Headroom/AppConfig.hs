@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.AppConfig
+Description : Application configuration
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Data types and functions for representing and handling application config.
+-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.AppConfig

@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Header
+Description : License header manipulation
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Data types and functions for adding and replacing license headers to source
+code files.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Header
   ( Header(..)

@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Command.Gen
+Description : Logic for Generate command
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Logic for the @gen@ command, used to generate /stub/ files.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Gen
   ( commandGen

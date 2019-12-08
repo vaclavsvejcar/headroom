@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Template
+Description : License header templating
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Support for loading, parsing and rendering license header templates.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Template
   ( loadTemplate

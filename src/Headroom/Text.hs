@@ -1,3 +1,14 @@
+{-|
+Module      : MODULE_NAME
+Description : Extras for text manipulation
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Adds some extra functionality to the "Data.Text" module.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.Text

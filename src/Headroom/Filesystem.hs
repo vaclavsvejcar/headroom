@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Filesystem
+Description : Files/directories manipulation
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Functions for manipulating files and directories.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Filesystem
   ( findFiles

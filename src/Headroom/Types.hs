@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Types
+Description : Data types and instances
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Shared data types and type class instances.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Types
   ( HeadroomError(..)

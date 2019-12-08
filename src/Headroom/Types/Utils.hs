@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Types.Utils
+Description : Shared data types utilities
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Shared functions and instances for data types.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Types.Utils
   ( allValues

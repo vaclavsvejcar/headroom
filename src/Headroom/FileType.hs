@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.FileType
+Description : Supported source code file types
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Data types and functions for representing and handling supported types of
+source code files.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.FileType

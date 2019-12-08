@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Header.Utils
+Description : License header utilities
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Shared data types and functions for license header functionality.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Header.Utils
   ( findLine

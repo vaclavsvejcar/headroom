@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Command.Gen.Env
+Description : Environment for the Generate command
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Data types and instances for the @gen@ command environment.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Gen.Env
   ( GenMode(..)

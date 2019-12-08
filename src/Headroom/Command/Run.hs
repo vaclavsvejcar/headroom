@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Command.Run
+Description : Logic for Run command
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Logic for the @run@ command, used to add or replace license headers in source
+code files.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections     #-}

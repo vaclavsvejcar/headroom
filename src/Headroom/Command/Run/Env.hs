@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Command.Run.Env
+Description : Environment for the Run command
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Data types and instances for the @run@ command environment.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Run.Env
   ( RunOptions(..)
