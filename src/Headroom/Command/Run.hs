@@ -25,7 +25,7 @@ import           Headroom.AppConfig             ( AppConfig(..)
                                                 )
 import           Headroom.Command.Run.Env
 import           Headroom.Command.Shared        ( bootstrap )
-import           Headroom.Filesystem            ( findFilesByExts
+import           Headroom.FileSystem            ( findFilesByExts
                                                 , findFilesByTypes
                                                 )
 import           Headroom.FileType              ( FileType

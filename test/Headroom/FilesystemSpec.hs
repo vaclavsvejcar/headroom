@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.FilesystemSpec
+module Headroom.FileSystemSpec
   ( spec
   )
 where
 
-import           Headroom.Filesystem
+import           Headroom.FileSystem
 import           RIO
 import           RIO.List                       ( sort )
 import qualified RIO.List                      as L
