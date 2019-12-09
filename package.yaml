@@ -10,6 +10,7 @@ copyright: Copyright (c) 2019 Vaclav Svejcar
 dependencies:
   - base >= 4.7 && < 5
   - data-default
+  - optparse-applicative
   - rio
 
 ghc-options:
@@ -29,7 +30,6 @@ executables:
     source-dirs: app
     dependencies:
       - headroom
-      - optparse-applicative
     ghc-options:
       - -threaded
       - -rtsopts

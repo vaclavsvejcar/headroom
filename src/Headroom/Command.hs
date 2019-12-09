@@ -1,5 +1,5 @@
 {-|
-Module      : Headroom.Main.Options
+Module      : Headroom.Command
 Description : Command line options processing
 Copyright   : (c) 2019 Vaclav Svejcar
 License     : BSD-3
@@ -7,11 +7,11 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Data types and functions for processing command line options.
+Data types and functions for parsing command line options.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.Main.Options
+module Headroom.Command
   ( Command(..)
   , commandParser
   )

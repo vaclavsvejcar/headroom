@@ -13,15 +13,15 @@ Functions responsible for application bootstrap.
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
+import           Headroom.Command               ( Command(..)
+                                                , commandParser
+                                                )
 import           Headroom.Command.Gen           ( commandGen )
 import           Headroom.Command.Gen.Env       ( GenMode(..)
                                                 , GenOptions(GenOptions)
                                                 )
 import           Headroom.Command.Run           ( commandRun )
 import           Headroom.Command.Run.Env       ( RunOptions(RunOptions) )
-import           Headroom.Main.Options          ( Command(..)
-                                                , commandParser
-                                                )
 import           Headroom.Types                 ( HeadroomError(..) )
 import           Options.Applicative
 import           Prelude                        ( putStrLn )
