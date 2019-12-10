@@ -13,7 +13,7 @@ import           Test.Hspec
 spec :: Spec
 spec = do
   describe "headerSizeJava" $ do
-    it "detects size of existing module header" $ do
+    it "detects size of existing license header" $ do
       source <- readFileUtf8 "test-data/code-samples/java/full.java"
       headerSizeJava source `shouldBe` 4
 

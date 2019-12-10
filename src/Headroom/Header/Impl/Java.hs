@@ -22,9 +22,9 @@ import qualified RIO.Text                      as T
 
 
 -- | Returns size of license header (as number of lines) in given /Java/
---   source code. Current implementation is pretty simple and it only takes line
---   starting with one of the following keywords as the start of code itself:
+-- source code. Current implementation is pretty simple and it only takes line
+-- starting with one of the following keywords as the start of code itself:
 --
---       * @package@
+--   * @package@
 headerSizeJava :: T.Text -> Int
 headerSizeJava = findLineStartingWith ["package"]

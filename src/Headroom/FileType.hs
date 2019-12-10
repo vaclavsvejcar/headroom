@@ -31,6 +31,7 @@ import           Text.Read                      ( readsPrec )
 
 data FileType
   = Haskell
+  | HTML
   | Java
   | Scala
   deriving (Bounded, Enum, Eq, Ord, Show)
@@ -44,6 +45,7 @@ fileTypeByExt ext =
 
 listExtensions :: FileType -> [T.Text]
 listExtensions Haskell = ["hs"]
+listExtensions HTML    = ["html", "htm"]
 listExtensions Java    = ["java"]
 listExtensions Scala   = ["scala"]
 

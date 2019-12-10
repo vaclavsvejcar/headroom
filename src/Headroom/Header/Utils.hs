@@ -13,12 +13,16 @@ Shared data types and functions for license header functionality.
 module Headroom.Header.Utils
   ( findLine
   , findLineStartingWith
+  , reML
   )
 where
 
+import           Language.Haskell.TH.Quote      ( QuasiQuoter )
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
+import           Text.Regex.PCRE.Heavy
+import           Text.Regex.PCRE.Light
 
 findLine :: (T.Text -> Bool) -> T.Text -> Int
 findLine predicate text =
@@ -27,3 +31,7 @@ findLine predicate text =
 findLineStartingWith :: [T.Text] -> T.Text -> Int
 findLineStartingWith patterns = findLine predicate
   where predicate line = or $ fmap (`T.isPrefixOf` line) patterns
+
+-- | Regex configuration for matching multi-line UTF strings.
+reML :: QuasiQuoter
+reML = mkRegexQQ [dotall, utf8]

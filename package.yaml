@@ -43,6 +43,9 @@ library:
     - extra
     - file-embed
     - ginger
+    - pcre-heavy
+    - pcre-light
+    - template-haskell
     - yaml
 
 tests:

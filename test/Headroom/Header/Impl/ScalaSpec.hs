@@ -13,7 +13,7 @@ import           Test.Hspec
 spec :: Spec
 spec = do
   describe "headerSizeScala" $ do
-    it "detects size of existing module header" $ do
+    it "detects size of existing license header" $ do
       source <- readFileUtf8 "test-data/code-samples/scala/full.scala"
       headerSizeScala source `shouldBe` 4
 
