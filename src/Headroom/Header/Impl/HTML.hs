@@ -26,8 +26,8 @@ import           Text.Regex.PCRE.Heavy
 
 
 -- | Returns size of license header (as number of lines) in given /HTML/ source
--- code. Anything that is not comment or blank line is considered as start of
--- the code itself.
+-- code. The very first /HTML/ comment is considered as license header, anything
+-- after as start of the actual code.
 headerSizeHTML :: T.Text -> Int
 headerSizeHTML text =
   case L.headMaybe $ scan [reML|(<!--(?:.*?)-->)\s*|] text of
