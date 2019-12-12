@@ -9,9 +9,7 @@ Portability : POSIX
 
 Support for detecting license header in /HTML/ source code files.
 -}
-{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 module Headroom.Header.Impl.HTML
   ( headerSizeHTML
