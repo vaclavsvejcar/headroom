@@ -30,10 +30,11 @@ import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 
 
-data Header
-  = Header { hFileType :: FileType
-           , hContent  :: T.Text
-           } deriving (Eq, Show)
+data Header = Header
+  { hFileType :: FileType
+  , hContent  :: T.Text
+  }
+  deriving (Eq, Show)
 
 addHeader :: Header -> T.Text -> T.Text
 addHeader (Header fileType content) input = output

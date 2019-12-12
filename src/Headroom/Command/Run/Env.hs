@@ -27,22 +27,24 @@ import           Headroom.AppConfig             ( AppConfig(..)
 import           RIO
 import qualified RIO.Text                      as T
 
-data RunOptions =
-    RunOptions { roReplaceHeaders :: Bool
-               , roSourcePaths    :: [FilePath]
-               , roTemplatePaths  :: [FilePath]
-               , roPlaceholders   :: [T.Text]
-               , roDebug          :: Bool
-               } deriving (Eq, Show)
+data RunOptions = RunOptions
+  { roReplaceHeaders :: Bool
+  , roSourcePaths    :: [FilePath]
+  , roTemplatePaths  :: [FilePath]
+  , roPlaceholders   :: [T.Text]
+  , roDebug          :: Bool
+  }
+  deriving (Eq, Show)
 
-data StartupEnv =
-    StartupEnv { envLogFunc    :: !LogFunc
-               , envRunOptions :: !RunOptions
-               }
+data StartupEnv = StartupEnv
+  { envLogFunc    :: !LogFunc
+  , envRunOptions :: !RunOptions
+  }
 
-data Env =
-    Env { envEnv       :: !StartupEnv
-        , envAppConfig :: !AppConfig}
+data Env = Env
+  { envEnv       :: !StartupEnv
+  , envAppConfig :: !AppConfig
+  }
 
 class HasAppConfig env where
   appConfigL :: Lens' env AppConfig

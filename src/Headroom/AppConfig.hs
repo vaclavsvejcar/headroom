@@ -38,13 +38,14 @@ import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
 
-data AppConfig
-  = AppConfig { acConfigVersion  :: Int
-              , acReplaceHeaders :: Bool
-              , acSourcePaths    :: [FilePath]
-              , acTemplatePaths  :: [FilePath]
-              , acPlaceholders   :: HM.HashMap T.Text T.Text
-              } deriving (Eq, Generic, Show)
+data AppConfig = AppConfig
+  { acConfigVersion  :: Int
+  , acReplaceHeaders :: Bool
+  , acSourcePaths    :: [FilePath]
+  , acTemplatePaths  :: [FilePath]
+  , acPlaceholders   :: HM.HashMap T.Text T.Text
+  }
+  deriving (Eq, Generic, Show)
 
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
