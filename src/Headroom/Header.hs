@@ -47,6 +47,7 @@ containsHeader :: FileType -> T.Text -> Bool
 containsHeader fileType input = headerSize fileType input > 0
 
 headerSize :: FileType -> T.Text -> Int
+headerSize CSS     = headerSizeCSS
 headerSize Haskell = headerSizeHaskell
 headerSize HTML    = headerSizeHTML
 headerSize Java    = headerSizeJava

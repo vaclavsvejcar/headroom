@@ -16,7 +16,7 @@ spec = do
   describe "allValues" $ do
     it "should list all values of FileType enum" $ do
       let actual   = allValues :: [FileType]
-          expected = [Haskell, HTML, Java, Scala]
+          expected = [CSS, Haskell, HTML, Java, Scala]
       sort actual `shouldBe` sort expected
 
   describe "dropFieldPrefix" $ do

@@ -30,7 +30,8 @@ import           Text.Read                      ( readsPrec )
 
 
 data FileType
-  = Haskell
+  = CSS
+  | Haskell
   | HTML
   | Java
   | Scala
@@ -44,6 +45,7 @@ fileTypeByExt ext =
   L.find (elem ext . listExtensions) (allValues :: [FileType])
 
 listExtensions :: FileType -> [T.Text]
+listExtensions CSS     = ["css"]
 listExtensions Haskell = ["hs"]
 listExtensions HTML    = ["html", "htm"]
 listExtensions Java    = ["java"]
