@@ -18,18 +18,15 @@ module Headroom.Header.Impl.HTML
   )
 where
 
-import           Headroom.Header.Utils          ( reML )
+import           Headroom.Header.Utils          ( linesCountByRegex
+                                                , reML
+                                                )
 import           RIO
-import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Heavy
 
 
 -- | Returns size of license header (as number of lines) in given /HTML/ source
 -- code. The very first /HTML/ comment is considered as license header, anything
 -- after as start of the actual code.
 headerSizeHTML :: T.Text -> Int
-headerSizeHTML text =
-  case L.headMaybe $ scan [reML|(<!--(?:.*?)-->)\s*|] text of
-    Just (comment, _) -> L.length . T.lines $ comment
-    _                 -> 0
+headerSizeHTML = linesCountByRegex [reML|(<!--(?:.*?)-->)\s*|]

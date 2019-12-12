@@ -13,6 +13,7 @@ Shared data types and functions for license header functionality.
 module Headroom.Header.Utils
   ( findLine
   , findLineStartingWith
+  , linesCountByRegex
   , reML
   )
 where
@@ -31,6 +32,11 @@ findLine predicate text =
 findLineStartingWith :: [T.Text] -> T.Text -> Int
 findLineStartingWith patterns = findLine predicate
   where predicate line = or $ fmap (`T.isPrefixOf` line) patterns
+
+linesCountByRegex :: Regex -> T.Text -> Int
+linesCountByRegex regex text = case L.headMaybe $ scan regex text of
+  Just (comment, _) -> L.length . T.lines $ comment
+  _                 -> 0
 
 -- | Regex configuration for matching multi-line UTF strings.
 reML :: QuasiQuoter
