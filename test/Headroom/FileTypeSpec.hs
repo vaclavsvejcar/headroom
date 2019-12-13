@@ -16,8 +16,8 @@ spec = do
     it "parses FileType from file extension" $ do
       fileTypeByExt "hs" `shouldBe` Just Haskell
 
-  describe "readFileType" $ do
+  describe "fileTypeByName" $ do
     it "reads FileType from string representation" $ do
-      let actual   = readFileType "haskell"
+      let actual   = fileTypeByName "haskell"
           expected = Just Haskell
       actual `shouldBe` expected

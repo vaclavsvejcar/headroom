@@ -31,7 +31,7 @@ import           Headroom.FileSystem            ( findFilesByExts
                                                 )
 import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
-                                                , readFileType
+                                                , fileTypeByName
                                                 )
 import           Headroom.Header                ( Header(..)
                                                 , addHeader
@@ -126,7 +126,7 @@ loadTemplates = do
 
 extractTemplateType :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
 extractTemplateType path = do
-  let fileType = readFileType . T.pack . takeBaseName $ path
+  let fileType = fileTypeByName . T.pack . takeBaseName $ path
   when (isNothing fileType)
        (logWarn $ "Skipping unrecognized template type: " <> fromString path)
   return fileType

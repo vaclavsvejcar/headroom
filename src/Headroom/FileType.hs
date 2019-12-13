@@ -16,7 +16,7 @@ module Headroom.FileType
   ( FileType(..)
   , fileTypeByExt
   , listExtensions
-  , readFileType
+  , fileTypeByName
   )
 where
 
@@ -29,23 +29,32 @@ import qualified RIO.Text                      as T
 import           Text.Read                      ( readsPrec )
 
 
+-- | Represents supported type of source code file, where license headers may
+-- be added, replaced or removed.
 data FileType
-  = CSS
-  | Haskell
-  | HTML
-  | Java
-  | JS
-  | Scala
+  = CSS     -- ^ /CSS/ source code file
+  | Haskell -- ^ /Haskell/ source code file
+  | HTML    -- ^ /HTML/ source code file
+  | Java    -- ^ /Java/ source code file
+  | JS      -- ^ /JavaScript/ source code file
+  | Scala   -- ^ /Scala/ source code file
   deriving (Bounded, Enum, Eq, Ord, Show)
 
 instance Read FileType where
   readsPrec _ = readEnumCI
 
-fileTypeByExt :: T.Text -> Maybe FileType
+-- | Returns 'FileType' for given file extension (without dot).
+--
+-- >>> fileTypeByExt "hs"
+-- Just Haskell
+fileTypeByExt :: T.Text         -- ^ file extension to search for
+              -> Maybe FileType -- ^ corresponding 'FileType' (if found)
 fileTypeByExt ext =
   L.find (elem ext . listExtensions) (allValues :: [FileType])
 
-listExtensions :: FileType -> [T.Text]
+-- | Lists all recognized file extensions for given 'Filetype'.
+listExtensions :: FileType -- ^ 'FileType' to list extensions for
+               -> [T.Text] -- ^ list of found file extensions
 listExtensions CSS     = ["css"]
 listExtensions Haskell = ["hs"]
 listExtensions HTML    = ["html", "htm"]
@@ -53,5 +62,10 @@ listExtensions Java    = ["java"]
 listExtensions JS      = ["js"]
 listExtensions Scala   = ["scala"]
 
-readFileType :: T.Text -> Maybe FileType
-readFileType = readMaybe . T.unpack
+-- | Reads 'FileType' from its textual representation.
+--
+-- >>> fileTypeByName "haskell"
+-- Just Haskell
+fileTypeByName :: T.Text         -- ^ textual representation of 'FileType'
+               -> Maybe FileType -- ^ corresponding 'FileType' (if found)
+fileTypeByName = readMaybe . T.unpack
