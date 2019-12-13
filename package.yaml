@@ -23,6 +23,7 @@ ghc-options:
   - -Wincomplete-uni-patterns
   - -Wpartial-fields
   - -Wredundant-constraints
+  - -Werror=incomplete-patterns
 
 executables:
   headroom:

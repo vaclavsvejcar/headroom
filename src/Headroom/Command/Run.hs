@@ -70,8 +70,13 @@ commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
     $  "Done, found "
     <> sourceFilesNum
     <> " sources code files(s) to process"
-  processHeaders templates sourceFiles
-  logInfo "Done."
+  (total, skipped) <- processHeaders templates sourceFiles
+  logInfo
+    $  "Done: modified "
+    <> displayShow (total - skipped)
+    <> ", skipped "
+    <> displayShow skipped
+    <> " files."
 
 mergedAppConfig :: (HasRunOptions env, HasLogFunc env) => RIO env AppConfig
 mergedAppConfig = do
@@ -129,13 +134,14 @@ findSourceFiles fileTypes = do
 processHeaders :: (HasLogFunc env, HasRunOptions env)
                => M.Map FileType T.Text
                -> [FilePath]
-               -> RIO env ()
+               -> RIO env (Int, Int)
 processHeaders templates paths = do
   let filesToProcess = mapMaybe withTemplate (mapMaybe processPath paths)
       zipped         = L.zip [1 ..] filesToProcess
       withProgress   = fmap (\(i, (h, p)) -> (progress i, h, p)) zipped
       progress curr = Progress curr (L.length paths)
-  mapM_ (\(i, h, p) -> processHeader i h p) withProgress
+  processed <- mapM (\(i, h, p) -> processHeader i h p) withProgress
+  return (L.length withProgress, L.length . filter (== True) $ processed)
  where
   withTemplate (fileType, path) =
     fmap (\t -> (Header fileType t, path)) (M.lookup fileType templates)
@@ -149,18 +155,21 @@ processHeader :: (HasLogFunc env, HasRunOptions env)
               => Progress
               -> Header
               -> FilePath
-              -> RIO env ()
+              -> RIO env Bool
 processHeader progress header path = do
-  runOptions  <- view runOptionsL
-  fileContent <- readFileUtf8 path
-  action      <- if roReplaceHeaders runOptions
-    then do
-      log' $ "Replacing header in: " <> fromString path
-      return replaceHeader
+  runOptions        <- view runOptionsL
+  fileContent       <- readFileUtf8 path
+  (skipped, action) <- if containsHeader (hFileType header) fileContent
+    then if roReplaceHeaders runOptions
+      then do
+        log' $ "Replacing header in: " <> fromString path
+        return (False, replaceHeader)
+      else do
+        log' $ "Skipping file: " <> fromString path
+        return (True, addHeader)
     else do
-      if containsHeader (hFileType header) fileContent
-        then log' $ "Skipping file: " <> fromString path
-        else log' $ "Adding header to: " <> fromString path
-      return addHeader
+      log' $ "Adding header to: " <> fromString path
+      return (False, addHeader)
   writeFileUtf8 path (action header fileContent)
+  return skipped
   where log' msg = logInfo $ displayShow progress <> "  " <> msg

@@ -51,6 +51,7 @@ headerSize CSS     = headerSizeCSS
 headerSize Haskell = headerSizeHaskell
 headerSize HTML    = headerSizeHTML
 headerSize Java    = headerSizeJava
+headerSize JS      = headerSizeJS
 headerSize Scala   = headerSizeScala
 
 replaceHeader :: Header -> T.Text -> T.Text
