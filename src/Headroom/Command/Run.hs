@@ -19,6 +19,7 @@ module Headroom.Command.Run
 where
 
 import           Control.Applicative            ( (<$>) )
+import           Data.Time.Clock.POSIX          ( getPOSIXTime )
 import           Data.Tuple.Extra               ( second )
 import           Headroom.AppConfig             ( AppConfig(..)
                                                 , loadAppConfig
@@ -60,6 +61,7 @@ env' opts logFunc = do
 
 commandRun :: RunOptions -> IO ()
 commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
+  startTS <- liftIO getPOSIXTime
   logInfo "Loading source code header templates..."
   templates <- loadTemplates
   logInfo $ "Done, found " <> displayShow (M.size templates) <> " template(s)"
@@ -71,12 +73,16 @@ commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
     <> sourceFilesNum
     <> " sources code files(s) to process"
   (total, skipped) <- processHeaders templates sourceFiles
+  endTS            <- liftIO getPOSIXTime
+  let (elapsedSeconds, _) = properFraction (endTS - startTS)
   logInfo
     $  "Done: modified "
     <> displayShow (total - skipped)
     <> ", skipped "
     <> displayShow skipped
-    <> " files."
+    <> " files in "
+    <> displayShow (elapsedSeconds :: Integer)
+    <> " second(s)."
 
 mergedAppConfig :: (HasRunOptions env, HasLogFunc env) => RIO env AppConfig
 mergedAppConfig = do
