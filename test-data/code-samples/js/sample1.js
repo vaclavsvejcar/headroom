@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-body {
-  background: white;
+function answer() {
+  return 42;
 }

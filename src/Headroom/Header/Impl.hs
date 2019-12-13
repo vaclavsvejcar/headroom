@@ -15,6 +15,7 @@ module Headroom.Header.Impl
   , headerSizeHaskell
   , headerSizeHTML
   , headerSizeJava
+  , headerSizeJS
   , headerSizeScala
   )
 where
@@ -23,4 +24,5 @@ import           Headroom.Header.Impl.CSS       ( headerSizeCSS )
 import           Headroom.Header.Impl.Haskell   ( headerSizeHaskell )
 import           Headroom.Header.Impl.HTML      ( headerSizeHTML )
 import           Headroom.Header.Impl.Java      ( headerSizeJava )
+import           Headroom.Header.Impl.JS        ( headerSizeJS )
 import           Headroom.Header.Impl.Scala     ( headerSizeScala )

@@ -34,6 +34,7 @@ data FileType
   | Haskell
   | HTML
   | Java
+  | JS
   | Scala
   deriving (Bounded, Enum, Eq, Ord, Show)
 
@@ -49,6 +50,7 @@ listExtensions CSS     = ["css"]
 listExtensions Haskell = ["hs"]
 listExtensions HTML    = ["html", "htm"]
 listExtensions Java    = ["java"]
+listExtensions JS      = ["js"]
 listExtensions Scala   = ["scala"]
 
 readFileType :: T.Text -> Maybe FileType
