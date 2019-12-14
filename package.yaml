@@ -57,3 +57,8 @@ tests:
     dependencies:
       - headroom
       - hspec
+  doctest:
+    main: Main.hs
+    source-dirs: doctest
+    dependencies:
+      - doctest
