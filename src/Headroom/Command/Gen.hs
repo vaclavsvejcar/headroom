@@ -17,7 +17,11 @@ where
 
 import           Headroom.Command.Gen.Env
 import           Headroom.Command.Shared        ( bootstrap )
-import           Headroom.Embedded              ( configFileStub )
+import           Headroom.Embedded              ( configFileStub
+                                                , licenseTemplate
+                                                )
+import           Headroom.License               ( parseLicense )
+import           Headroom.Types                 ( HeadroomError(..) )
 import           Prelude                        ( putStrLn )
 import           RIO
 import qualified RIO.Text                      as T
@@ -34,4 +38,6 @@ printConfigFile :: IO ()
 printConfigFile = putStrLn configFileStub
 
 printLicense :: T.Text -> IO ()
-printLicense _ = putStrLn "not implemented yet"
+printLicense license = case parseLicense license of
+  Just license' -> putStrLn $ licenseTemplate license'
+  Nothing       -> throwM $ InvalidLicense license

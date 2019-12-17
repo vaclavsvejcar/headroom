@@ -24,7 +24,8 @@ import           Text.Printf                    ( printf )
 
 
 data HeadroomError
-  = InvalidPlaceholder T.Text
+  = InvalidLicense T.Text
+  | InvalidPlaceholder T.Text
   | NoGenModeSelected
   deriving (Show, Typeable)
 
@@ -36,6 +37,8 @@ data Progress = Progress Int Int
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
 instance Exception HeadroomError where
+  displayException (InvalidLicense raw) =
+    "Cannot parse license type from: " <> T.unpack raw
   displayException (InvalidPlaceholder raw) =
     "Cannot parse placeholder key=value from: " <> T.unpack raw
   displayException NoGenModeSelected

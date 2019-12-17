@@ -29,11 +29,11 @@ import qualified RIO.Text.Partial              as TP
 import           Text.Read                      ( readsPrec )
 
 
--- | Represents type of the license.
+-- | Type of the license.
 data LicenseType = BSD3 -- ^ /BSD-3/ license
   deriving (Bounded, Enum, Eq, Ord, Show)
 
--- | Represents license (specified by 'LicenseType' and 'FileType')
+-- | License (specified by 'LicenseType' and 'FileType')
 data License = License LicenseType FileType
   deriving (Show, Eq)
 

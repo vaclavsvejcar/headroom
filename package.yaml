@@ -47,6 +47,7 @@ library:
     - pcre-heavy
     - pcre-light
     - template-haskell
+    - text
     - time
     - yaml
 
