@@ -18,6 +18,7 @@ module Headroom.Command.Gen.Env
 where
 
 import           RIO
+import qualified RIO.Text                      as T
 
 data GenOptions = GenOptions
   { goGenMode :: !GenMode
@@ -30,8 +31,8 @@ data Env = Env
   , envGenOptions :: !GenOptions
   }
 
-data GenMode = GenConfigFile
-  deriving (Bounded, Enum, Eq, Ord, Show)
+data GenMode = GenConfigFile | GenLicense T.Text
+  deriving (Eq, Show)
 
 instance HasLogFunc Env where
   logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })

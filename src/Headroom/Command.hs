@@ -26,7 +26,7 @@ import qualified RIO.Text                      as T
 
 data Command
   = Run [FilePath] [FilePath] [T.Text] Bool Bool
-  | Gen Bool Bool
+  | Gen Bool (Maybe T.Text) Bool
     deriving (Show)
 
 commandParser :: ParserInfo Command
@@ -84,6 +84,12 @@ genOptions =
   Gen
     <$> switch
           (long "config-file" <> short 'c' <> help
-            "generates stub YAML config file to stdout"
+            "generate stub YAML config file to stdout"
+          )
+    <*> optional
+          (strOption
+            (long "license" <> short 'l' <> metavar "name:type" <> help
+              "generate template for license and file type"
+            )
           )
     <*> switch (long "debug" <> short 'd' <> help "produce more verbose output")
