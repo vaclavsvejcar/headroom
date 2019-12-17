@@ -30,7 +30,9 @@ import           Text.Read                      ( readsPrec )
 
 
 -- | Type of the license.
-data LicenseType = BSD3 -- ^ /BSD-3/ license
+data LicenseType
+  = BSD3 -- ^ /BSD-3/ license
+  | MIT  -- ^ /MIT/ license
   deriving (Bounded, Enum, Eq, Ord, Show)
 
 -- | License (specified by 'LicenseType' and 'FileType')
