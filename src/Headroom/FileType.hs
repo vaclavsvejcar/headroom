@@ -7,8 +7,11 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Data types and functions for representing and handling supported types of
-source code files.
+This application can generate source code headers from templates for various
+type of source code files. Such headers are usually represented as a top level
+comment, the application must render such header with correct syntax.
+The 'FileType' represents such type of source code file, which is recognized by
+this application and for which the license headers can be manipulated.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -53,6 +56,9 @@ fileTypeByExt ext =
   L.find (elem ext . listExtensions) (allValues :: [FileType])
 
 -- | Lists all recognized file extensions for given 'Filetype'.
+--
+-- >>> listExtensions Haskell
+-- ["hs"]
 listExtensions :: FileType -- ^ 'FileType' to list extensions for
                -> [T.Text] -- ^ list of found file extensions
 listExtensions CSS     = ["css"]

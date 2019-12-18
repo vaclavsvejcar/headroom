@@ -1,14 +1,17 @@
 {-|
 Module      : Headroom.License
-Description : Supported license types
+Description : Representation of various license types
 Copyright   : (c) 2019 Vaclav Svejcar
 License     : BSD-3
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Data types and functions for representing supported license types, that can be
-generated using the @headroom gen@ command.
+This module provides data types and functions for representing various
+opensource licenses, for which this application can generate /Jinja/ templates.
+As the template text itself of given license may differ based on target
+programming language (i.e. syntax for comments is different), each 'License' is
+represented by the 'LicenseType' and 'FileType'.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}

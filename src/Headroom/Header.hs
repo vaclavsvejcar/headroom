@@ -7,8 +7,12 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Data types and functions for adding and replacing license headers to source
-code files.
+License header is usually the very top comment in source code, holding some
+short text about license type, author and copyright. This module provides data
+types and functions for adding, removing and replacing such headers. The license
+header is represented by 'Header' data type, where 'FileType' defines for which
+programming language source code this header is generated and the header text
+itself.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Header
@@ -30,23 +34,36 @@ import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 
 
+-- | Generated license header for specified source code file type.
 data Header = Header
-  { hFileType :: FileType
-  , hContent  :: T.Text
+  { hFileType :: FileType -- ^ type of the source code
+  , hContent  :: T.Text   -- ^ text of the header
   }
   deriving (Eq, Show)
 
-addHeader :: Header -> T.Text -> T.Text
+-- | Adds header to the given source code text if no existing header is
+-- detected, otherwise returns the unchanged input text. If you need to replace
+-- the header, use the 'replaceHeader' instead.
+addHeader :: Header -- ^ license header to add to the input text
+          -> T.Text -- ^ source code text
+          -> T.Text -- ^ source code text with added license header
 addHeader (Header fileType content) input = output
  where
   output = if containsHeader' then input else content <> newLine <> input
   containsHeader' = containsHeader fileType input
   newLine = T.showNewLine $ fromMaybe LF (T.detectNewLine input)
 
-containsHeader :: FileType -> T.Text -> Bool
+-- | Checks whether the license header is present in given source code text.
+containsHeader :: FileType -- ^ type of the input source code text
+               -> T.Text   -- ^ source code text
+               -> Bool     -- ^ result of check
 containsHeader fileType input = headerSize fileType input > 0
 
-headerSize :: FileType -> T.Text -> Int
+-- | Detects what is the header size in terms of lines in the given source code
+-- text. Returns @0@ if no header detected.
+headerSize :: FileType -- ^ type of the input source code text
+           -> T.Text   -- ^ source code text
+           -> Int      -- ^ size of the headers (number of lines)
 headerSize CSS     = headerSizeCSS
 headerSize Haskell = headerSizeHaskell
 headerSize HTML    = headerSizeHTML
@@ -54,10 +71,19 @@ headerSize Java    = headerSizeJava
 headerSize JS      = headerSizeJS
 headerSize Scala   = headerSizeScala
 
-replaceHeader :: Header -> T.Text -> T.Text
+-- | Replaces already existing (or adds if none detected) license header with
+-- the new one in the given source code text. If you need to only add header if
+-- none detected and skip if it already contains one, use the 'addHeader'
+-- instead.
+replaceHeader :: Header -- ^ new license header to use for replacement
+              -> T.Text -- ^ source code text
+              -> T.Text -- ^ source code text with replaced license header
 replaceHeader h@(Header fileType _) = addHeader h . stripHeader fileType
 
-stripHeader :: FileType -> T.Text -> T.Text
+-- | Strips license header (if detected) from the given source code text.
+stripHeader :: FileType -- ^ type of the input source code text
+            -> T.Text   -- ^ source code text
+            -> T.Text   -- ^ source code text without the license header
 stripHeader fileType input = T.unlines' newLine . L.drop numLines $ lines'
  where
   numLines          = headerSize fileType input
