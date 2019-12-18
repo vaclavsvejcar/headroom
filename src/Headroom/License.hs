@@ -32,6 +32,7 @@ import           Text.Read                      ( readsPrec )
 -- | Type of the license.
 data LicenseType
   = BSD3 -- ^ /BSD-3/ license
+  | GPL3 -- ^ /GNU GPL v.3/ license
   | MIT  -- ^ /MIT/ license
   deriving (Bounded, Enum, Eq, Ord, Show)
 
@@ -49,10 +50,10 @@ instance Read LicenseType where
 -- Just (License BSD3 Haskell)
 parseLicense :: T.Text        -- ^ raw string representation
              -> Maybe License -- ^ parsed 'License'
-parseLicense raw = case TP.splitOn ":" raw of
-  [rawLicenseType, rawFileType] -> do
+parseLicense raw
+  | [rawLicenseType, rawFileType] <- TP.splitOn ":" raw = do
     licenseType <- parseLicenseType rawLicenseType
     fileType    <- fileTypeByName rawFileType
     return $ License licenseType fileType
-  _ -> Nothing
+  | otherwise = Nothing
   where parseLicenseType = readMaybe . T.unpack

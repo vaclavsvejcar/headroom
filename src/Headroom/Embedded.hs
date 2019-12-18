@@ -40,6 +40,13 @@ licenseTemplate (License licenseType fileType) = case licenseType of
     Java    -> $(embedStringFile "embedded/license/bsd3-java.jinja2")
     JS      -> $(embedStringFile "embedded/license/bsd3-js.jinja2")
     Scala   -> $(embedStringFile "embedded/license/bsd3-scala.jinja2")
+  GPL3 -> case fileType of
+    CSS     -> $(embedStringFile "embedded/license/gpl3-css.jinja2")
+    Haskell -> $(embedStringFile "embedded/license/gpl3-haskell.jinja2")
+    HTML    -> $(embedStringFile "embedded/license/gpl3-html.jinja2")
+    Java    -> $(embedStringFile "embedded/license/gpl3-java.jinja2")
+    JS      -> $(embedStringFile "embedded/license/gpl3-js.jinja2")
+    Scala   -> $(embedStringFile "embedded/license/gpl3-scala.jinja2")
   MIT -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/mit-css.jinja2")
     Haskell -> $(embedStringFile "embedded/license/mit-haskell.jinja2")
