@@ -7,7 +7,8 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Embedded resource files, using the "Data.FileEmbed" module.
+Contains resources that were embedded from the @embedded/@ source folder during
+compile time, using the "Data.FileEmbed" module.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell   #-}
@@ -33,6 +34,13 @@ licenseTemplate :: IsString a
                 => License -- ^ 'License' for which to return the template
                 -> a       -- ^ template text
 licenseTemplate (License licenseType fileType) = case licenseType of
+  Apache2 -> case fileType of
+    CSS     -> $(embedStringFile "embedded/license/apache2/css.jinja2")
+    Haskell -> $(embedStringFile "embedded/license/apache2/haskell.jinja2")
+    HTML    -> $(embedStringFile "embedded/license/apache2/html.jinja2")
+    Java    -> $(embedStringFile "embedded/license/apache2/java.jinja2")
+    JS      -> $(embedStringFile "embedded/license/apache2/js.jinja2")
+    Scala   -> $(embedStringFile "embedded/license/apache2/scala.jinja2")
   BSD3 -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/bsd3/css.jinja2")
     Haskell -> $(embedStringFile "embedded/license/bsd3/haskell.jinja2")
