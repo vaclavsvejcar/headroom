@@ -36,6 +36,7 @@ import           Text.Read                      ( readsPrec )
 data LicenseType
   = Apache2 -- ^ /Apache License, version 2.0/
   | BSD3    -- ^ /BSD-3/ license
+  | GPL2    -- ^ /GNU GPL v.2/ license
   | GPL3    -- ^ /GNU GPL v.3/ license
   | MIT     -- ^ /MIT/ license
   deriving (Bounded, Enum, Eq, Ord, Show)
