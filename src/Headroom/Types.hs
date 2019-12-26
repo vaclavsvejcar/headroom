@@ -19,14 +19,17 @@ where
 
 import           RIO
 import qualified RIO.List                      as L
+import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import           Text.Printf                    ( printf )
 
 
 data HeadroomError
-  = InvalidLicense T.Text
-  | InvalidPlaceholder T.Text
+  = InvalidLicense Text
+  | InvalidPlaceholder Text
   | NoGenModeSelected
+  | MissingPlaceholders Text [Text]
+  | ParseError Text
   deriving (Show, Typeable)
 
 data NewLine = CR | CRLF | LF deriving (Eq, Show)
@@ -43,6 +46,13 @@ instance Exception HeadroomError where
     "Cannot parse placeholder key=value from: " <> T.unpack raw
   displayException NoGenModeSelected
     = "Please select at least one option what to generate (see --help for details)"
+  displayException (MissingPlaceholders name placeholders) =
+    "Missing placeholders for template '"
+      <> T.unpack name
+      <> "': "
+      <> show placeholders
+  displayException (ParseError msg) =
+    "Error parsing template: " <> T.unpack msg
 
 instance Show Progress where
   show (Progress current total) = "[" <> currentS <> " of " <> totalS <> "]"

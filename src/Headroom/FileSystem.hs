@@ -15,6 +15,7 @@ module Headroom.FileSystem
   , findFilesByExts
   , findFilesByTypes
   , listFiles
+  , loadFile
   )
 where
 
@@ -55,3 +56,6 @@ listFiles fileOrDir = do
       isDirectory <- doesDirectoryExist path
       if isDirectory then listFiles path else return [path]
     return $ concat paths
+
+loadFile :: MonadIO m => FilePath -> m Text
+loadFile = readFileUtf8

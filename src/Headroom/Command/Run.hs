@@ -20,7 +20,6 @@ where
 
 import           Control.Applicative            ( (<$>) )
 import           Data.Time.Clock.POSIX          ( getPOSIXTime )
-import           Data.Tuple.Extra               ( second )
 import           Headroom.AppConfig             ( AppConfig(..)
                                                 , loadAppConfig
                                                 )
@@ -38,9 +37,10 @@ import           Headroom.Header                ( Header(..)
                                                 , containsHeader
                                                 , replaceHeader
                                                 )
-import           Headroom.Template              ( loadTemplate
-                                                , renderTemplate
+import           Headroom.Template              ( Template(..)
+                                                , loadTemplate
                                                 )
+import           Headroom.Template.Mustache     ( Mustache(..) )
 import           Headroom.Types                 ( Progress(..) )
 import           RIO                     hiding ( second )
 import           RIO.Directory
@@ -51,6 +51,8 @@ import           RIO.FilePath                   ( takeBaseName
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
+
+type TemplateType = Mustache
 
 env' :: RunOptions -> LogFunc -> IO Env
 env' opts logFunc = do
@@ -118,10 +120,16 @@ loadTemplates = do
   withTypes <- mapM (\path -> fmap (, path) (extractTemplateType path)) paths
   parsed    <- mapM (\(t, p) -> fmap (t, ) (loadTemplate p))
                     (mapMaybe filterTemplate withTypes)
-  return $ M.fromList
-    (fmap (second $ renderTemplate $ acPlaceholders appConfig) parsed)
+  rendered <- mapM
+    (\(t, p) -> fmap
+      (t, )
+      (renderTemplate (acPlaceholders appConfig) (p :: TemplateType))
+    )
+    parsed
+  return $ M.fromList rendered
  where
-  findPaths path = findFilesByExts path ["jinja", "jinja2"]
+  extensions = templateExtensions (Proxy :: Proxy TemplateType)
+  findPaths path = findFilesByExts path extensions
   filterTemplate (fileType, path) = (\ft -> Just (ft, path)) =<< fileType
 
 extractTemplateType :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)

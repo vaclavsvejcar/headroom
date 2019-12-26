@@ -41,9 +41,8 @@ library:
   dependencies:
     - aeson
     - either
-    - extra
     - file-embed
-    - ginger
+    - mustache
     - pcre-heavy
     - pcre-light
     - template-haskell
