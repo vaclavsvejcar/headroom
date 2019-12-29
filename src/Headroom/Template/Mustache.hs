@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Template.Mustache
+Description : Support for Mustache templates
+Copyright   : (c) 2019 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Provides support for <https://mustache.github.io Mustache> templates using the
+'Template' type class.
+-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -16,8 +28,10 @@ import           Headroom.Types                 ( HeadroomError(..) )
 import qualified RIO.Text                      as T
 
 
+-- | The /Mustache/ template.
 newtype Mustache = Mustache MU.Template deriving (Show)
 
+-- | Support for /Mustache/ templates.
 instance Template Mustache where
   templateExtensions _ = ["mustache"]
   parseTemplate  = parseTemplate'
