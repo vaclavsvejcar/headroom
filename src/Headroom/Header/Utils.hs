@@ -21,19 +21,20 @@ where
 import           Language.Haskell.TH.Quote      ( QuasiQuoter )
 import           RIO
 import qualified RIO.List                      as L
+import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Heavy
 import           Text.Regex.PCRE.Light
 
-findLine :: (T.Text -> Bool) -> T.Text -> Int
+findLine :: (Text -> Bool) -> Text -> Int
 findLine predicate text =
   fromMaybe 0 $ L.findIndex (predicate . T.strip) (T.lines text)
 
-findLineStartingWith :: [T.Text] -> T.Text -> Int
+findLineStartingWith :: [Text] -> Text -> Int
 findLineStartingWith patterns = findLine predicate
   where predicate line = or $ fmap (`T.isPrefixOf` line) patterns
 
-linesCountByRegex :: Regex -> T.Text -> Int
+linesCountByRegex :: Regex -> Text -> Int
 linesCountByRegex regex text = case L.headMaybe $ scan regex text of
   Just (comment, _) -> L.length . T.lines $ comment
   _                 -> 0

@@ -30,13 +30,14 @@ import           RIO.Directory                  ( doesDirectoryExist
 import           RIO.FilePath                   ( isExtensionOf
                                                 , (</>)
                                                 )
+import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
 
 findFiles :: MonadIO m => FilePath -> (FilePath -> Bool) -> m [FilePath]
 findFiles path predicate = fmap (filter predicate) (listFiles path)
 
-findFilesByExts :: MonadIO m => FilePath -> [T.Text] -> m [FilePath]
+findFilesByExts :: MonadIO m => FilePath -> [Text] -> m [FilePath]
 findFilesByExts path exts = findFiles path predicate
   where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 

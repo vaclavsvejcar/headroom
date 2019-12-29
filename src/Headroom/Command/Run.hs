@@ -50,6 +50,7 @@ import           RIO.FilePath                   ( takeBaseName
                                                 )
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
+import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
 type TemplateType = Mustache
@@ -112,7 +113,7 @@ mergedAppConfig = do
     return merged
 
 loadTemplates :: (HasAppConfig env, HasLogFunc env)
-              => RIO env (M.Map FileType T.Text)
+              => RIO env (M.Map FileType Text)
 loadTemplates = do
   appConfig <- view appConfigL
   paths     <- liftIO (mconcat <$> mapM findPaths (acTemplatePaths appConfig))
@@ -146,7 +147,7 @@ findSourceFiles fileTypes = do
   liftIO $ fmap concat (mapM (`findFilesByTypes` fileTypes) paths)
 
 processHeaders :: (HasLogFunc env, HasRunOptions env)
-               => M.Map FileType T.Text
+               => M.Map FileType Text
                -> [FilePath]
                -> RIO env (Int, Int)
 processHeaders templates paths = do

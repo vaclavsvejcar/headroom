@@ -27,6 +27,7 @@ import           Headroom.FileType              ( FileType(..)
                                                 )
 import           Headroom.Types.Utils           ( readEnumCI )
 import           RIO
+import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
 import           Text.Read                      ( readsPrec )
@@ -53,7 +54,7 @@ instance Read LicenseType where
 --
 -- >>> parseLicense "bsd3:haskell"
 -- Just (License BSD3 Haskell)
-parseLicense :: T.Text        -- ^ raw string representation
+parseLicense :: Text          -- ^ raw string representation
              -> Maybe License -- ^ parsed 'License'
 parseLicense raw
   | [rawLicenseType, rawFileType] <- TP.splitOn ":" raw = do

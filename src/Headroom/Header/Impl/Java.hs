@@ -18,7 +18,7 @@ where
 
 import           Headroom.Header.Utils          ( findLineStartingWith )
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
 
 -- | Returns size of license header (as number of lines) in given /Java/
@@ -26,5 +26,5 @@ import qualified RIO.Text                      as T
 -- starting with one of the following keywords as the start of code itself:
 --
 --   * @package@
-headerSizeJava :: T.Text -> Int
+headerSizeJava :: Text -> Int
 headerSizeJava = findLineStartingWith ["package"]

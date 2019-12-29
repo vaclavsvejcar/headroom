@@ -34,8 +34,8 @@ class Template t where
   -- | Parses template from given raw text.
   parseTemplate :: MonadThrow m
                 => Maybe Text -- ^ name of the template (optional)
-                -> Text -- ^ raw template text
-                -> m t -- ^ parsed template
+                -> Text       -- ^ raw template text
+                -> m t        -- ^ parsed template
 
   -- | Renders parsed template and replaces all placeholders.
   renderTemplate :: MonadThrow m

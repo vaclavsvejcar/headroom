@@ -20,7 +20,7 @@ import           Headroom.Header.Utils          ( linesCountByRegex
                                                 , reML
                                                 )
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
-headerSizeJS :: T.Text -> Int
+headerSizeJS :: Text -> Int
 headerSizeJS = linesCountByRegex [reML|(\/\*(?:.*?)\*\/)\s*|(\s*)|]

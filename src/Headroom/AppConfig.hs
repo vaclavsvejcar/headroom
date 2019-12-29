@@ -35,6 +35,7 @@ import           RIO.FilePath                   ( takeDirectory
                                                 , (</>)
                                                 )
 import qualified RIO.HashMap                   as HM
+import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
 
@@ -43,7 +44,7 @@ data AppConfig = AppConfig
   , acReplaceHeaders :: Bool
   , acSourcePaths    :: [FilePath]
   , acTemplatePaths  :: [FilePath]
-  , acPlaceholders   :: HM.HashMap T.Text T.Text
+  , acPlaceholders   :: HM.HashMap Text Text
   }
   deriving (Eq, Generic, Show)
 
@@ -78,7 +79,7 @@ makePathsRelativeTo root appConfig = appConfig
 parseAppConfig :: MonadThrow m => B.ByteString -> m AppConfig
 parseAppConfig = Y.decodeThrow
 
-parsePlaceholders :: MonadThrow m => [T.Text] -> m (HM.HashMap T.Text T.Text)
+parsePlaceholders :: MonadThrow m => [Text] -> m (HM.HashMap Text Text)
 parsePlaceholders placeholders = fmap HM.fromList (mapM parse placeholders)
  where
   parse input = case T.split (== '=') input of

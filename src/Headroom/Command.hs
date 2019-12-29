@@ -21,12 +21,12 @@ import           Data.Semigroup                 ( (<>) )
 import           Headroom.Meta                  ( buildVer )
 import           Options.Applicative
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
 
 data Command
-  = Run [FilePath] [FilePath] [T.Text] Bool Bool
-  | Gen Bool (Maybe T.Text) Bool
+  = Run [FilePath] [FilePath] [Text] Bool Bool
+  | Gen Bool (Maybe Text) Bool
     deriving (Show)
 
 commandParser :: ParserInfo Command

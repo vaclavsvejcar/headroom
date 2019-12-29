@@ -20,11 +20,11 @@ import           Headroom.Header.Utils          ( linesCountByRegex
                                                 , reML
                                                 )
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
 
 -- | Returns size of license header (as number of lines) in given /HTML/ source
 -- code. The very first /HTML/ comment is considered as license header, anything
 -- after as start of the actual code.
-headerSizeHTML :: T.Text -> Int
+headerSizeHTML :: Text -> Int
 headerSizeHTML = linesCountByRegex [reML|(<!--(?:.*?)-->)\s*|]

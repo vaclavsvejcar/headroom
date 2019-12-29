@@ -25,13 +25,13 @@ import           Headroom.AppConfig             ( AppConfig(..)
                                                 , parsePlaceholders
                                                 )
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
 data RunOptions = RunOptions
   { roReplaceHeaders :: Bool
   , roSourcePaths    :: [FilePath]
   , roTemplatePaths  :: [FilePath]
-  , roPlaceholders   :: [T.Text]
+  , roPlaceholders   :: [Text]
   , roDebug          :: Bool
   }
   deriving (Eq, Show)

@@ -24,7 +24,7 @@ import           Headroom.License               ( parseLicense )
 import           Headroom.Types                 ( HeadroomError(..) )
 import           Prelude                        ( putStrLn )
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
 env' :: GenOptions -> LogFunc -> IO Env
 env' opts logFunc = return $ Env { envLogFunc = logFunc, envGenOptions = opts }
@@ -37,7 +37,7 @@ commandGen opts = bootstrap (env' opts) (goDebug opts) $ case goGenMode opts of
 printConfigFile :: IO ()
 printConfigFile = putStrLn configFileStub
 
-printLicense :: T.Text -> IO ()
+printLicense :: Text -> IO ()
 printLicense license = case parseLicense license of
   Just license' -> putStrLn $ licenseTemplate license'
   Nothing       -> throwM $ InvalidLicense license

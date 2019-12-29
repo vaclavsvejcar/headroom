@@ -18,7 +18,7 @@ where
 
 import           Headroom.Header.Utils          ( findLineStartingWith )
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
 
 -- | Returns size of license header (as number of lines) in given /Haskell/
@@ -27,5 +27,5 @@ import qualified RIO.Text                      as T
 --
 --   * @{-#@
 --   * @module@
-headerSizeHaskell :: T.Text -> Int
+headerSizeHaskell :: Text -> Int
 headerSizeHaskell = findLineStartingWith ["{-#", "module"]

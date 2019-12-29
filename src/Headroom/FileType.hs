@@ -28,6 +28,7 @@ import           Headroom.Types.Utils           ( allValues
                                                 )
 import           RIO
 import qualified RIO.List                      as L
+import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import           Text.Read                      ( readsPrec )
 
@@ -50,7 +51,7 @@ instance Read FileType where
 --
 -- >>> fileTypeByExt "hs"
 -- Just Haskell
-fileTypeByExt :: T.Text         -- ^ file extension to search for
+fileTypeByExt :: Text           -- ^ file extension to search for
               -> Maybe FileType -- ^ corresponding 'FileType' (if found)
 fileTypeByExt ext =
   L.find (elem ext . listExtensions) (allValues :: [FileType])
@@ -60,7 +61,7 @@ fileTypeByExt ext =
 -- >>> listExtensions Haskell
 -- ["hs"]
 listExtensions :: FileType -- ^ 'FileType' to list extensions for
-               -> [T.Text] -- ^ list of found file extensions
+               -> [Text]   -- ^ list of found file extensions
 listExtensions CSS     = ["css"]
 listExtensions Haskell = ["hs"]
 listExtensions HTML    = ["html", "htm"]
@@ -72,6 +73,6 @@ listExtensions Scala   = ["scala"]
 --
 -- >>> fileTypeByName "haskell"
 -- Just Haskell
-fileTypeByName :: T.Text         -- ^ textual representation of 'FileType'
+fileTypeByName :: Text           -- ^ textual representation of 'FileType'
                -> Maybe FileType -- ^ corresponding 'FileType' (if found)
 fileTypeByName = readMaybe . T.unpack

@@ -18,7 +18,7 @@ where
 
 import           Headroom.Header.Utils          ( findLineStartingWith )
 import           RIO
-import qualified RIO.Text                      as T
+import           RIO.Text                       ( Text )
 
 
 -- | Returns size of license header (as number of lines) in given /Scala/
@@ -28,5 +28,5 @@ import qualified RIO.Text                      as T
 --   * @class@
 --   * @object@
 --   * @package@
-headerSizeScala :: T.Text -> Int
+headerSizeScala :: Text -> Int
 headerSizeScala = findLineStartingWith ["class", "object", "package"]
