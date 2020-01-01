@@ -5,7 +5,7 @@ license: BSD3
 license-file: LICENSE
 author: Vaclav Svejcar
 maintainer: vaclav.svejcar@gmail.com
-copyright: Copyright (c) 2019 Vaclav Svejcar
+copyright: Copyright (c) 2019-2020 Vaclav Svejcar
 
 dependencies:
   - base >= 4.7 && < 5

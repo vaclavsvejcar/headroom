@@ -1,7 +1,7 @@
 {-|
 Module      : Headroom.Header.Impl.Java
 Description : Support for license header in Java files
-Copyright   : (c) 2019 Vaclav Svejcar
+Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
