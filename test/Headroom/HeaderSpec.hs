@@ -33,6 +33,12 @@ spec = do
       containsHeader Haskell withHeader `shouldBe` True
       containsHeader Haskell withoutHeader `shouldBe` False
 
+  describe "dropHeader" $ do
+    it "drops header from source code" $ do
+      source   <- readTemplate "full.hs"
+      expected <- readTemplate "stripped.hs"
+      dropHeader Haskell source `shouldBe` expected
+
   describe "headerSize" $ do
     it "returns correct size of header for source code" $ do
       source <- readTemplate "full.hs"
@@ -44,9 +50,3 @@ spec = do
       source   <- readTemplate "full.hs"
       expected <- readTemplate "replaced-simple.hs"
       replaceHeader header source `shouldBe` expected
-
-  describe "stripHeader" $ do
-    it "strips header from source code" $ do
-      source   <- readTemplate "full.hs"
-      expected <- readTemplate "stripped.hs"
-      stripHeader Haskell source `shouldBe` expected

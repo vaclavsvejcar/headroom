@@ -1,6 +1,6 @@
 config-version: 1
 
-replace-headers: true
+run-mode: add
 
 source-paths:
   - path/to/src

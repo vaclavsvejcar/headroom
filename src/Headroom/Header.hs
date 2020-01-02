@@ -9,7 +9,7 @@ Portability : POSIX
 
 License header is usually the very top comment in source code, holding some
 short text about license type, author and copyright. This module provides data
-types and functions for adding, removing and replacing such headers. The license
+types and functions for adding, dropping and replacing such headers. The license
 header is represented by 'Header' data type, where 'FileType' defines for which
 programming language source code this header is generated and the header text
 itself.
@@ -19,9 +19,9 @@ module Headroom.Header
   ( Header(..)
   , addHeader
   , containsHeader
+  , dropHeader
   , headerSize
   , replaceHeader
-  , stripHeader
   )
 where
 
@@ -59,6 +59,15 @@ containsHeader :: FileType -- ^ type of the input source code text
                -> Bool     -- ^ result of check
 containsHeader fileType input = headerSize fileType input > 0
 
+-- | Drops license header (if detected) from the given source code text.
+dropHeader :: FileType  -- ^ type of the input source code text
+           -> Text     -- ^ source code text
+           -> Text     -- ^ source code text without the license header
+dropHeader fileType input = T.unlines' newLine . L.drop numLines $ lines'
+ where
+  numLines          = headerSize fileType input
+  (newLine, lines') = T.lines' input
+
 -- | Detects what is the header size in terms of lines in the given source code
 -- text. Returns @0@ if no header detected.
 headerSize :: FileType -- ^ type of the input source code text
@@ -78,13 +87,4 @@ headerSize Scala   = headerSizeScala
 replaceHeader :: Header -- ^ new license header to use for replacement
               -> Text   -- ^ source code text
               -> Text   -- ^ source code text with replaced license header
-replaceHeader h@(Header fileType _) = addHeader h . stripHeader fileType
-
--- | Strips license header (if detected) from the given source code text.
-stripHeader :: FileType -- ^ type of the input source code text
-            -> Text     -- ^ source code text
-            -> Text     -- ^ source code text without the license header
-stripHeader fileType input = T.unlines' newLine . L.drop numLines $ lines'
- where
-  numLines          = headerSize fileType input
-  (newLine, lines') = T.lines' input
+replaceHeader h@(Header fileType _) = addHeader h . dropHeader fileType

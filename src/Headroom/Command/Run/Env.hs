@@ -24,15 +24,16 @@ import           Data.Default                   ( def )
 import           Headroom.AppConfig             ( AppConfig(..)
                                                 , parsePlaceholders
                                                 )
+import           Headroom.Types                 ( RunMode )
 import           RIO
 import           RIO.Text                       ( Text )
 
 data RunOptions = RunOptions
-  { roReplaceHeaders :: Bool
-  , roSourcePaths    :: [FilePath]
-  , roTemplatePaths  :: [FilePath]
-  , roPlaceholders   :: [Text]
-  , roDebug          :: Bool
+  { roRunMode       :: RunMode
+  , roSourcePaths   :: [FilePath]
+  , roTemplatePaths :: [FilePath]
+  , roPlaceholders  :: [Text]
+  , roDebug         :: Bool
   }
   deriving (Eq, Show)
 
@@ -79,8 +80,8 @@ instance HasRunOptions Env where
 toAppConfig :: MonadThrow m => RunOptions -> m AppConfig
 toAppConfig opts = do
   placeholders' <- parsePlaceholders (roPlaceholders opts)
-  return $ def { acSourcePaths    = roSourcePaths opts
-               , acTemplatePaths  = roTemplatePaths opts
-               , acReplaceHeaders = roReplaceHeaders opts
-               , acPlaceholders   = placeholders'
+  return $ def { acSourcePaths   = roSourcePaths opts
+               , acTemplatePaths = roTemplatePaths opts
+               , acRunMode       = roRunMode opts
+               , acPlaceholders  = placeholders'
                }

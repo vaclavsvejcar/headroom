@@ -35,13 +35,16 @@ import           Headroom.FileType              ( FileType
 import           Headroom.Header                ( Header(..)
                                                 , addHeader
                                                 , containsHeader
+                                                , dropHeader
                                                 , replaceHeader
                                                 )
 import           Headroom.Template              ( Template(..)
                                                 , loadTemplate
                                                 )
 import           Headroom.Template.Mustache     ( Mustache(..) )
-import           Headroom.Types                 ( Progress(..) )
+import           Headroom.Types                 ( Progress(..)
+                                                , RunMode(..)
+                                                )
 import           RIO                     hiding ( second )
 import           RIO.Directory
 import           RIO.FilePath                   ( takeBaseName
@@ -172,19 +175,19 @@ processHeader :: (HasLogFunc env, HasRunOptions env)
               -> FilePath
               -> RIO env Bool
 processHeader progress header path = do
-  runOptions        <- view runOptionsL
-  fileContent       <- readFileUtf8 path
-  (skipped, action) <- if containsHeader (hFileType header) fileContent
-    then if roReplaceHeaders runOptions
-      then do
-        log' $ "Replacing header in: " <> fromString path
-        return (False, replaceHeader)
-      else do
-        log' $ "Skipping file: " <> fromString path
-        return (True, addHeader)
-    else do
-      log' $ "Adding header to: " <> fromString path
-      return (False, addHeader)
+  runOptions  <- view runOptionsL
+  fileContent <- readFileUtf8 path
+  let hasHeader              = containsHeader (hFileType header) fileContent
+      (skipped, action, msg) = chooseAction (roRunMode runOptions) hasHeader
+      msg'                   = if skipped then "Skipping file" else msg
+  log' $ msg' <> ": " <> fromString path
   writeFileUtf8 path (action header fileContent)
   return skipped
-  where log' msg = logInfo $ displayShow progress <> "  " <> msg
+ where
+  log' msg = logInfo $ displayShow progress <> "  " <> msg
+  chooseAction runMode hasHeader = case runMode of
+    Add     -> (hasHeader, addHeader, "Adding header to")
+    Drop    -> (not hasHeader, dropHeader . hFileType, "Dropping header from")
+    Replace -> if hasHeader
+      then (False, replaceHeader, "Replacing header in")
+      else chooseAction Add hasHeader

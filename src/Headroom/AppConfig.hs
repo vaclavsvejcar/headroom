@@ -27,7 +27,9 @@ import           Data.Default                   ( Default
                                                 , def
                                                 )
 import qualified Data.Yaml                     as Y
-import           Headroom.Types                 ( HeadroomError(..) )
+import           Headroom.Types                 ( HeadroomError(..)
+                                                , RunMode(..)
+                                                )
 import           Headroom.Types.Utils           ( customOptions )
 import           RIO
 import qualified RIO.ByteString                as B
@@ -40,11 +42,11 @@ import qualified RIO.Text                      as T
 
 
 data AppConfig = AppConfig
-  { acConfigVersion  :: Int
-  , acReplaceHeaders :: Bool
-  , acSourcePaths    :: [FilePath]
-  , acTemplatePaths  :: [FilePath]
-  , acPlaceholders   :: HM.HashMap Text Text
+  { acConfigVersion :: Int
+  , acRunMode       :: RunMode
+  , acSourcePaths   :: [FilePath]
+  , acTemplatePaths :: [FilePath]
+  , acPlaceholders  :: HM.HashMap Text Text
   }
   deriving (Eq, Generic, Show)
 
@@ -52,11 +54,11 @@ instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
 
 instance Default AppConfig where
-  def = AppConfig 1 False [] [] HM.empty
+  def = AppConfig 1 Add [] [] HM.empty
 
 instance Semigroup AppConfig where
   x <> y = AppConfig (acConfigVersion x `min` acConfigVersion y)
-                     (acReplaceHeaders x)
+                     (acRunMode x)
                      (acSourcePaths x <> acSourcePaths y)
                      (acTemplatePaths x <> acTemplatePaths y)
                      (acPlaceholders x <> acPlaceholders y)

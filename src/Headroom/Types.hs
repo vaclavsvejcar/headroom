@@ -10,13 +10,18 @@ Portability : POSIX
 Shared data types and type class instances.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Headroom.Types
   ( HeadroomError(..)
   , NewLine(..)
   , Progress(..)
+  , RunMode(..)
   )
 where
 
+import           Data.Aeson                     ( FromJSON(parseJSON)
+                                                , Value(String)
+                                                )
 import           RIO
 import qualified RIO.List                      as L
 import           RIO.Text                       ( Text )
@@ -36,6 +41,8 @@ data NewLine = CR | CRLF | LF deriving (Eq, Show)
 
 data Progress = Progress Int Int
   deriving Eq
+
+data RunMode = Add | Drop | Replace deriving (Eq, Show)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
@@ -60,3 +67,11 @@ instance Show Progress where
     format   = "%" <> (show . L.length $ totalS) <> "d"
     currentS = printf format current
     totalS   = show total
+
+instance FromJSON RunMode where
+  parseJSON (String s) = case T.toLower s of
+    "add"     -> return Add
+    "drop"    -> return Drop
+    "replace" -> return Replace
+    _         -> error $ "Unknown run mode: " <> T.unpack s
+  parseJSON other = error $ "Invalid value for run mode: " <> show other

@@ -6,6 +6,7 @@ module Headroom.AppConfigSpec
 where
 
 import           Headroom.AppConfig
+import           Headroom.Types                 ( RunMode(..) )
 import           RIO
 import qualified RIO.HashMap                   as HM
 import           Test.Hspec
@@ -23,7 +24,7 @@ spec = do
           sourcePaths = ["test-data/configs/path/to/src"]
           templatePaths =
             ["test-data/configs/path/to/dir1", "test-data/configs/path/to/dir2"]
-          expected = AppConfig 1 True sourcePaths templatePaths options
+          expected = AppConfig 1 Add sourcePaths templatePaths options
       appConfig `shouldBe` expected
 
   describe "parsePlaceholders" $ do
@@ -35,11 +36,11 @@ spec = do
 
   let ph1        = HM.fromList [("key1", "value1")]
       ph2        = HM.fromList [("key2", "value2")]
-      appConfig1 = AppConfig 1 False ["source1"] [] ph1
-      appConfig2 = AppConfig 2 True ["source2"] ["template1"] ph2
+      appConfig1 = AppConfig 1 Replace ["source1"] [] ph1
+      appConfig2 = AppConfig 2 Add ["source2"] ["template1"] ph2
       expected'  = AppConfig
         1
-        False
+        Replace
         ["source1", "source2"]
         ["template1"]
         (HM.fromList [("key1", "value1"), ("key2", "value2")])

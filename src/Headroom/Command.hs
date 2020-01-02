@@ -19,13 +19,13 @@ where
 
 import           Data.Semigroup                 ( (<>) )
 import           Headroom.Meta                  ( buildVer )
+import           Headroom.Types                 ( RunMode(..) )
 import           Options.Applicative
 import           RIO
 import           RIO.Text                       ( Text )
 
-
 data Command
-  = Run [FilePath] [FilePath] [Text] Bool Bool
+  = Run [FilePath] [FilePath] [Text] RunMode Bool
   | Gen Bool (Maybe Text) Bool
     deriving (Show)
 
@@ -73,11 +73,19 @@ runOptions =
               "placeholder to replace in templates"
             )
           )
-    <*> switch
-          (long "replace-headers" <> short 'r' <> help
-            "force replace existing headers"
-          )
-    <*> switch (long "debug" <> short 'd' <> help "produce more verbose output")
+    <*> (   flag'
+            Replace
+            (long "replace-headers" <> short 'r' <> help
+              "force replace existing license headers"
+            )
+        <|> flag'
+              Drop
+              (long "drop-headers" <> short 'd' <> help
+                "drop existing license headers only"
+              )
+        <|> pure Add
+        )
+    <*> switch (long "debug" <> help "produce more verbose output")
 
 genOptions :: Parser Command
 genOptions =
@@ -92,4 +100,4 @@ genOptions =
               "generate template for license and file type"
             )
           )
-    <*> switch (long "debug" <> short 'd' <> help "produce more verbose output")
+    <*> switch (long "debug" <> help "produce more verbose output")
