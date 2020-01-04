@@ -11,9 +11,9 @@ __Table of Contents__
 - [2. Installation](#2-installation)
     - [2.1. From Source Code](#21-from-source-code)
 - [3. Case Example](#3-case-example)
-    - [Adding License Header Templates](#adding-license-header-templates)
-    - [Adding Headroom Configuration](#adding-headroom-configuration)
-    - [Running Headroom](#running-headroom)
+    - [3.1. Adding License Header Templates](#31-adding-license-header-templates)
+    - [3.2. Adding Headroom Configuration](#32-adding-headroom-configuration)
+    - [3.3. Running Headroom](#33-running-headroom)
 
 <!-- /TOC -->
 
@@ -48,7 +48,7 @@ project/
           └── template1.html
 ```
 
-### Adding License Header Templates
+### 3.1. Adding License Header Templates
 Let's say our project is licensed under the [3-Clause BSD License][web:bsd-3] license, so we want't to use appropriate license headers. Headroom already provides templates for this license which you can use without modifications, or as starting point for your customization. Now we need to generate template file for each source code file type we have. For reference see list of [supported file type](#todo) and [licenses](#todo).
 
 ```shell
@@ -77,7 +77,7 @@ project/
       └── scala.mustache
 ```
 
-### Adding Headroom Configuration
+### 3.2. Adding Headroom Configuration
 Now we need to add configuration file where we specify path to source code files, template files and define values for placeholders in templates. The configuration file should be placed in project root directory and should be named `.headroom.yaml`, so Headroom can locate it:
 
 ```
@@ -131,7 +131,7 @@ placeholders:
     year: "2019"
 ```
 
-### Running Headroom
+### 3.3. Running Headroom
 Now we're ready to run Headroom:
 
 ```shell
