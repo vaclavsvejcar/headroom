@@ -186,6 +186,17 @@ Available options:
   -h,--help                Show this help text
 ```
 
+Note that command line options overrides options set in the configuration _YAML_ file. Relation between command line options and _YAML_ configuration options is below:
+
+| YAML option         | Command Line Option       |
+|---------------------|---------------------------|
+| `run-mode: add`     | _(default mode)_          |
+| `run-mode: drop`    | `-d`, `--drop-headers`    |
+| `run-mode: replace` | `-r`, `--replace-headers` |
+| `source-paths`      | `-s`, `--source-path`     |
+| `template-paths`    | `-t`, `--template-path`   |
+
+
 ### 4.2. Generator Command
 Generator command is used to generate stubs for license header template and _YAML_ configuration file. You can display available options by running following command:
 
