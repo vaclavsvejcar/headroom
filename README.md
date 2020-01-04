@@ -55,7 +55,7 @@ project/
 ```
 
 ### 3.1. Adding License Header Templates
-Let's say our project is licensed under the [3-Clause BSD License][web:bsd-3] license, so we want't to use appropriate license headers. Headroom already provides templates for this license which you can use without modifications, or as starting point for your customization. Now we need to generate template file for each source code file type we have. The template must be always named as `<FILE_TYPE>.mustache`, for reference see list of [supported file types](#todo) and [supported license types](#todo).
+Let's say our project is licensed under the [3-Clause BSD License][web:bsd-3] license, so we want't to use appropriate license headers. Headroom already provides templates for this license which you can use without modifications, or as starting point for your customization. Now we need to generate template file for each source code file type we have. The template must be always named as `<FILE_TYPE>.mustache`, for reference see list of [supported file types](#422-supported-file-types) and [supported license types](#421-supported-license-types).
 
 ```shell
 cd project/
