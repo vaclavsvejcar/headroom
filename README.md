@@ -202,7 +202,7 @@ Generator command is used to generate stubs for license header template and _YAM
 
 ```
 $ headroom gen --help
-Usage: headroom gen [-c|--config-file] [-l|--license name:type] [--debug]
+Usage: headroom gen [-c|--config-file] [-l|--license name:type]
   generate stub configuration and template files
 
 Available options:
