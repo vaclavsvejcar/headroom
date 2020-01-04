@@ -14,6 +14,11 @@ __Table of Contents__
     - [3.1. Adding License Header Templates](#31-adding-license-header-templates)
     - [3.2. Adding Headroom Configuration](#32-adding-headroom-configuration)
     - [3.3. Running Headroom](#33-running-headroom)
+- [4. Command Line Interface Overview](#4-command-line-interface-overview)
+    - [4.1. Run Command](#41-run-command)
+    - [4.2. Generator Command](#42-generator-command)
+        - [4.2.1. Supported License Types](#421-supported-license-types)
+        - [4.2.2. Supported File Types](#422-supported-file-types)
 
 <!-- /TOC -->
 
@@ -30,6 +35,7 @@ Headroom is written in [Haskell][web:haskell], so you can just clone this reposi
 
 ```shell
 curl -sSL https://get.haskellstack.org/ | sh     # needed only if you don't have Stack
+
 git clone https://github.com/vaclavsvejcar/headroom.git
 cd headroom/
 stack install
@@ -49,7 +55,7 @@ project/
 ```
 
 ### 3.1. Adding License Header Templates
-Let's say our project is licensed under the [3-Clause BSD License][web:bsd-3] license, so we want't to use appropriate license headers. Headroom already provides templates for this license which you can use without modifications, or as starting point for your customization. Now we need to generate template file for each source code file type we have. For reference see list of [supported file type](#todo) and [licenses](#todo).
+Let's say our project is licensed under the [3-Clause BSD License][web:bsd-3] license, so we want't to use appropriate license headers. Headroom already provides templates for this license which you can use without modifications, or as starting point for your customization. Now we need to generate template file for each source code file type we have. The template must be always named as `<FILE_TYPE>.mustache`, for reference see list of [supported file types](#todo) and [supported license types](#todo).
 
 ```shell
 cd project/
@@ -141,7 +147,86 @@ headroom run -r   # adds or replaces existing license headers
 headroom run -d   # drops existing license headers from files
 ```
 
+## 4. Command Line Interface Overview
+Headroom provides various commands for different use cases. You can check commands overview by performing following command:
 
+```
+$ headroom --help
+headroom v0.1.0.0 :: https://github.com/vaclavsvejcar/headroom
+
+Usage: headroom COMMAND
+  manage your source code license headers
+
+Available options:
+  -h,--help                Show this help text
+
+Available commands:
+  run                      add or replace source code headers
+  gen                      generate stub configuration and template files
+```
+
+### 4.1. Run Command
+Run command is used to manipulate (add, replace or drop) license headers in source code files. You can display available options by running following command:
+
+```
+$ headroom run --help
+Usage: headroom run [-s|--source-path PATH] [-t|--template-path PATH]
+                    [-p|--placeholders KEY=VALUE] ([-r|--replace-headers] |
+                    [-d|--drop-headers]) [--debug]
+  add or replace source code headers
+
+Available options:
+  -s,--source-path PATH    path to source code file/directory
+  -t,--template-path PATH  path to header template file/directory
+  -p,--placeholders KEY=VALUE
+                           placeholder to replace in templates
+  -r,--replace-headers     force replace existing license headers
+  -d,--drop-headers        drop existing license headers only
+  --debug                  produce more verbose output
+  -h,--help                Show this help text
+```
+
+### 4.2. Generator Command
+Generator command is used to generate stubs for license header template and _YAML_ configuration file. You can display available options by running following command:
+
+```
+$ headroom gen --help
+Usage: headroom gen [-c|--config-file] [-l|--license name:type] [--debug]
+  generate stub configuration and template files
+
+Available options:
+  -c,--config-file         generate stub YAML config file to stdout
+  -l,--license name:type   generate template for license and file type
+  -h,--help                Show this help text
+```
+
+When using the `-l,--license` option, you need to select the _license type_ and _file type_ from the list of supported ones listed bellow. For example to generate template for _Apache 2.0_ license and _Haskell_ file type, you need to use the `headroom gen -l apache2:haskell`.
+
+#### 4.2.1. Supported License Types
+Below is the list of supported _open source_ license types. If you miss support for license you use, feel free to [open new issue][meta:new-issue].
+
+| License        | Used Name |
+|----------------|-----------|
+| _Apache 2.0_   | `apache2` |
+| _BSD 3-Clause_ | `bsd3`    |
+| _GPLv2_        | `gpl2`    |
+| _GPLv3_        | `gpl3`    |
+| _MIT_          | `mit`     |
+
+#### 4.2.2. Supported File Types
+Below is the list of supported source code file types. If you miss support for programming language you use, feel free to [open new issue][meta:new-issue].
+
+| Language     | Used Name | Supported Extensions |
+|--------------|-----------|----------------------|
+| _CSS_        | `css`     | `.css`               |
+| _Haskell_    | `haskell` | `.hs`                |
+| _HTML_       | `html`    | `.html`, `.htm`      |
+| _Java_       | `java`    | `.java`              |
+| _JavaScript_ | `js`      | `.js`                |
+| _Scala_      | `scala`   | `.scala`             |
+
+
+[meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
 [web:bsd-3]: https://opensource.org/licenses/BSD-3-Clause
 [web:haskell]: https://haskell.org
 [web:mustache]: https://mustache.github.io
