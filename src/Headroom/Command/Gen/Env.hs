@@ -20,9 +20,8 @@ where
 import           RIO
 import           RIO.Text                       ( Text )
 
-data GenOptions = GenOptions
-  { goGenMode :: !GenMode
-  , goDebug   :: !Bool
+newtype GenOptions = GenOptions
+  { goGenMode :: GenMode
   }
   deriving Show
 

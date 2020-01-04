@@ -26,7 +26,7 @@ import           RIO.Text                       ( Text )
 
 data Command
   = Run [FilePath] [FilePath] [Text] RunMode Bool
-  | Gen Bool (Maybe Text) Bool
+  | Gen Bool (Maybe Text)
     deriving (Show)
 
 commandParser :: ParserInfo Command
@@ -100,4 +100,3 @@ genOptions =
               "generate template for license and file type"
             )
           )
-    <*> switch (long "debug" <> help "produce more verbose output")

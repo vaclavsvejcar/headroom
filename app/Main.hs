@@ -41,11 +41,11 @@ bootstrap :: Command -> IO ()
 bootstrap command' = case command' of
   Run sourcePaths templatePaths placeholders runMode debug ->
     commandRun (RunOptions runMode sourcePaths templatePaths placeholders debug)
-  c@(Gen _ _ debug) -> do
+  c@(Gen _ _) -> do
     genMode <- parseGenMode c
-    commandGen (GenOptions genMode debug)
+    commandGen (GenOptions genMode)
 
 parseGenMode :: MonadThrow m => Command -> m GenMode
-parseGenMode (Gen True  Nothing        _) = return GenConfigFile
-parseGenMode (Gen False (Just license) _) = return $ GenLicense license
-parseGenMode _                            = throwM NoGenModeSelected
+parseGenMode (Gen True  Nothing       ) = return GenConfigFile
+parseGenMode (Gen False (Just license)) = return $ GenLicense license
+parseGenMode _                          = throwM NoGenModeSelected
