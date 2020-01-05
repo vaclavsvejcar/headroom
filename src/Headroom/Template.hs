@@ -20,7 +20,7 @@ where
 
 import           Headroom.FileSystem            ( loadFile )
 import           RIO
-import qualified RIO.HashMap                   as HM
+import           RIO.HashMap                    ( HashMap )
 import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
@@ -39,7 +39,7 @@ class Template t where
 
   -- | Renders parsed template and replaces all placeholders.
   renderTemplate :: MonadThrow m
-                => HM.HashMap Text Text -- ^ placeholders to replace
+                => HashMap Text Text    -- ^ placeholders to replace
                 -> t                    -- ^ parsed template to render
                 -> m Text               -- ^ rendered template text
 

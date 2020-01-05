@@ -20,7 +20,7 @@ where
 
 import           Headroom.Template              ( Template(..) )
 import           RIO
-import qualified RIO.HashMap                   as HM
+import           RIO.HashMap                    ( HashMap )
 import qualified Text.Mustache                 as MU
 import           Text.Mustache.Render           ( SubstitutionError(..) )
 
@@ -43,7 +43,7 @@ parseTemplate' name raw = case MU.compileTemplate templateName raw of
   Right res -> return $ Mustache res
   where templateName = T.unpack . fromMaybe "" $ name
 
-renderTemplate' :: MonadThrow m => HM.HashMap Text Text -> Mustache -> m Text
+renderTemplate' :: MonadThrow m => HashMap Text Text -> Mustache -> m Text
 renderTemplate' placeholders (Mustache t@(MU.Template name _ _)) =
   case MU.checkedSubstitute t placeholders of
     ([], rendered) -> return rendered
