@@ -65,7 +65,9 @@ env' opts logFunc = do
   let env = Env { envEnv = startupEnv, envAppConfig = merged }
   return env
 
-commandRun :: RunOptions -> IO ()
+-- | Handler for /Run/ command.
+commandRun :: RunOptions -- ^ /Run/ command options
+           -> IO ()      -- ^ execution result
 commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
   startTS <- liftIO getPOSIXTime
   logInfo "Loading source code header templates..."

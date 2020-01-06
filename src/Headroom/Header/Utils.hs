@@ -7,7 +7,8 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Shared data types and functions for license header functionality.
+Useful functions for searching specific text fragments in input text, used by
+other modules to detect existing license headers in source code files.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Header.Utils
@@ -26,15 +27,27 @@ import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Heavy
 import           Text.Regex.PCRE.Light
 
-findLine :: (Text -> Bool) -> Text -> Int
+-- | Finds line in given text that matches given predicate and returns its line
+-- number.
+findLine :: (Text -> Bool) -- ^ predicate to find line
+         -> Text           -- ^ input text
+         -> Int            -- ^ number of line that matches given predicate
 findLine predicate text =
   fromMaybe 0 $ L.findIndex (predicate . T.strip) (T.lines text)
 
-findLineStartingWith :: [Text] -> Text -> Int
+-- | Finds line starting with one of given patterns and returns its line number
+-- (specialized form of 'findLine').
+findLineStartingWith :: [Text] -- ^ patterns to use
+                     -> Text   -- ^ input text
+                     -> Int    -- ^ number of line starting with one of patterns
 findLineStartingWith patterns = findLine predicate
   where predicate line = or $ fmap (`T.isPrefixOf` line) patterns
 
-linesCountByRegex :: Regex -> Text -> Int
+-- | Count lines that matches the given (multiline) regex. Useful for example to
+-- find how many lines are taken by multi-line comment in source code.
+linesCountByRegex :: Regex -- ^ regular expression to use
+                  -> Text  -- ^ input text
+                  -> Int   -- ^ number of lines matching given regex
 linesCountByRegex regex text = case L.headMaybe $ scan regex text of
   Just (comment, _) -> L.length . T.lines $ comment
   _                 -> 0

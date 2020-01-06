@@ -34,17 +34,33 @@ import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
 
-findFiles :: MonadIO m => FilePath -> (FilePath -> Bool) -> m [FilePath]
+-- | Recursively finds files on given path whose filename matches the predicate.
+findFiles :: MonadIO m
+          => FilePath           -- ^ path to search
+          -> (FilePath -> Bool) -- ^ predicate to match filename
+          -> m [FilePath]       -- ^ found files
 findFiles path predicate = fmap (filter predicate) (listFiles path)
 
-findFilesByExts :: MonadIO m => FilePath -> [Text] -> m [FilePath]
+-- | Recursively finds files on given path by file extensions.
+findFilesByExts :: MonadIO m
+                => FilePath     -- ^ path to search
+                -> [Text]       -- ^ list of file extensions (without dot)
+                -> m [FilePath] -- ^ list of found files
 findFilesByExts path exts = findFiles path predicate
   where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 
-findFilesByTypes :: MonadIO m => FilePath -> [FileType] -> m [FilePath]
+-- | Recursively find files on given path by their file types.
+findFilesByTypes :: MonadIO m
+                 => FilePath     -- ^ path to search
+                 -> [FileType]   -- ^ list of file types
+                 -> m [FilePath] -- ^ list of found files
 findFilesByTypes path types = findFilesByExts path (types >>= listExtensions)
 
-listFiles :: MonadIO m => FilePath -> m [FilePath]
+-- | Recursively find all files on given path. If file reference is passed
+-- instead of directory, such file path is returned.
+listFiles :: MonadIO m
+          => FilePath     -- ^ path to search
+          -> m [FilePath] -- ^ list of found files
 listFiles fileOrDir = do
   isDir <- doesDirectoryExist fileOrDir
   if isDir then listDirectory fileOrDir else return [fileOrDir]
@@ -58,5 +74,8 @@ listFiles fileOrDir = do
       if isDirectory then listFiles path else return [path]
     return $ concat paths
 
-loadFile :: MonadIO m => FilePath -> m Text
+-- | Loads file content in UTF8 encoding.
+loadFile :: MonadIO m
+         => FilePath -- ^ file path
+         -> m Text   -- ^ file content
 loadFile = readFileUtf8

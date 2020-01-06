@@ -7,7 +7,7 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Logic for the @gen@ command, used to generate /stub/ files.
+Logic for the /Generator/ command, used to generate /stub/ files.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Gen
@@ -29,7 +29,9 @@ import           RIO.Text                       ( Text )
 env' :: GenOptions -> LogFunc -> IO Env
 env' opts logFunc = return $ Env { envLogFunc = logFunc, envGenOptions = opts }
 
-commandGen :: GenOptions -> IO ()
+-- | Handler for /Generator/ command.
+commandGen :: GenOptions -- ^ /Generator/ command options
+           -> IO ()      -- ^ execution result
 commandGen opts = bootstrap (env' opts) False $ case goGenMode opts of
   GenConfigFile      -> liftIO printConfigFile
   GenLicense license -> liftIO $ printLicense license

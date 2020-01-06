@@ -7,7 +7,7 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Shared data types and type class instances.
+Data types and type class instances shared between modules.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -29,20 +29,35 @@ import qualified RIO.Text                      as T
 import           Text.Printf                    ( printf )
 
 
+-- | Represents fatal application error, that should be displayed to user in
+-- some human readable form.
 data HeadroomError
-  = InvalidLicense Text
-  | InvalidPlaceholder Text
-  | NoGenModeSelected
-  | MissingPlaceholders Text [Text]
-  | ParseError Text
+  = InvalidLicense Text             -- ^ unknown license is selected in /Generator/
+  | InvalidPlaceholder Text         -- ^ invalid placeholder format (@key=value@)
+  | NoGenModeSelected               -- ^ no mode for /Generator/ command is selected
+  | MissingPlaceholders Text [Text] -- ^ not all placeholders were filled in template
+  | ParseError Text                 -- ^ error parsing template file
   deriving (Show, Typeable)
 
-data NewLine = CR | CRLF | LF deriving (Eq, Show)
+-- | Represents newline separator.
+data NewLine
+  = CR   -- ^ line ends with @\r@
+  | CRLF -- ^ line ends with @\r\n@
+  | LF   -- ^ line ends with @\n@
+  deriving (Eq, Show)
 
+-- | Progress indication. First argument is current progress, second the maximum
+-- value.
 data Progress = Progress Int Int
   deriving Eq
 
-data RunMode = Add | Drop | Replace deriving (Eq, Show)
+-- | Mode of the /Run/ command, states how to license headers in source code
+-- files.
+data RunMode
+  = Add     -- ^ add license header if missing in source code file
+  | Drop    -- ^ drop any license header if present in source code file
+  | Replace -- ^ replace existing or add license header
+  deriving (Eq, Show)
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 

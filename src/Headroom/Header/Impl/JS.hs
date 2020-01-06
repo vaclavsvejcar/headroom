@@ -22,5 +22,8 @@ import           Headroom.Header.Utils          ( linesCountByRegex
 import           RIO
 import           RIO.Text                       ( Text )
 
+-- | Returns size of license header (as number of lines) in given /JS/ source
+-- code. The very first comment block is considered as license header, anything
+-- after as start of the actual code.
 headerSizeJS :: Text -> Int
 headerSizeJS = linesCountByRegex [reML|(\/\*(?:.*?)\*\/)\s*|(\s*)|]

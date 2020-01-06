@@ -56,7 +56,7 @@ fileTypeByExt :: Text           -- ^ file extension to search for
 fileTypeByExt ext =
   L.find (elem ext . listExtensions) (allValues :: [FileType])
 
--- | Lists all recognized file extensions for given 'Filetype'.
+-- | Lists all recognized file extensions for given 'FileType'.
 --
 -- >>> listExtensions Haskell
 -- ["hs"]

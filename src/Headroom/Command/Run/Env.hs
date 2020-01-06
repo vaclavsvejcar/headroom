@@ -7,7 +7,7 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Data types and instances for the @run@ command environment.
+Data types and instances for the /Run/ command environment.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Run.Env
@@ -28,32 +28,39 @@ import           Headroom.Types                 ( RunMode )
 import           RIO
 import           RIO.Text                       ( Text )
 
+-- | Options for the /Run/ command.
 data RunOptions = RunOptions
-  { roRunMode       :: RunMode
-  , roSourcePaths   :: [FilePath]
-  , roTemplatePaths :: [FilePath]
-  , roPlaceholders  :: [Text]
-  , roDebug         :: Bool
+  { roRunMode       :: RunMode    -- ^ used /Run/ command mode
+  , roSourcePaths   :: [FilePath] -- ^ source code file paths
+  , roTemplatePaths :: [FilePath] -- ^ template file paths
+  , roPlaceholders  :: [Text]     -- ^ raw placeholders
+  , roDebug         :: Bool       -- ^ whether to run in debug mode
   }
   deriving (Eq, Show)
 
+-- | Initial /RIO/ startup environment for the /Run/ command.
 data StartupEnv = StartupEnv
-  { envLogFunc    :: !LogFunc
-  , envRunOptions :: !RunOptions
+  { envLogFunc    :: !LogFunc    -- ^ logging function
+  , envRunOptions :: !RunOptions -- ^ options
   }
 
+-- | Full /RIO/ environment for the /Run/ command.
 data Env = Env
-  { envEnv       :: !StartupEnv
-  , envAppConfig :: !AppConfig
+  { envEnv       :: !StartupEnv -- ^ startup /RIO/ environment
+  , envAppConfig :: !AppConfig  -- ^ application configuration
   }
 
+-- | Environment value with application configuration.
 class HasAppConfig env where
+  -- | Application config lens.
   appConfigL :: Lens' env AppConfig
 
 class (HasLogFunc env, HasRunOptions env) => HasEnv env where
   envL :: Lens' env StartupEnv
 
+-- | Environment value with /Run/ command options.
 class HasRunOptions env where
+  -- | /Run/ command options lens.
   runOptionsL :: Lens' env RunOptions
 
 instance HasAppConfig Env where
@@ -77,7 +84,10 @@ instance HasRunOptions StartupEnv where
 instance HasRunOptions Env where
   runOptionsL = envL . runOptionsL
 
-toAppConfig :: MonadThrow m => RunOptions -> m AppConfig
+-- | Converts options for /Run/ command into application config.
+toAppConfig :: MonadThrow m
+            => RunOptions  -- ^ /Run/ command options
+            -> m AppConfig -- ^ application configuration
 toAppConfig opts = do
   placeholders' <- parsePlaceholders (roPlaceholders opts)
   return $ def { acSourcePaths   = roSourcePaths opts

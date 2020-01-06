@@ -7,7 +7,7 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Data types and instances for the @gen@ command environment.
+Data types and instances for the /Generator/ command environment.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Gen.Env
@@ -20,17 +20,22 @@ where
 import           RIO
 import           RIO.Text                       ( Text )
 
+-- | Options for the /Generator/ command.
 newtype GenOptions = GenOptions
-  { goGenMode :: GenMode
+  { goGenMode :: GenMode -- ^ used /Generator/ command mode
   }
   deriving Show
 
+-- | /RIO/ Environment for the /Generator/ command.
 data Env = Env
-  { envLogFunc    :: !LogFunc
-  , envGenOptions :: !GenOptions
+  { envLogFunc    :: !LogFunc    -- ^ logging function
+  , envGenOptions :: !GenOptions -- ^ options
   }
 
-data GenMode = GenConfigFile | GenLicense Text
+-- | Represents what action should the /Generator/ perform.
+data GenMode 
+  = GenConfigFile   -- ^ generate /YAML/ config file stub
+  | GenLicense Text -- ^ generate license header template
   deriving (Eq, Show)
 
 instance HasLogFunc Env where

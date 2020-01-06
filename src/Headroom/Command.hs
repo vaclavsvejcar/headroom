@@ -24,11 +24,13 @@ import           Options.Applicative
 import           RIO
 import           RIO.Text                       ( Text )
 
+-- | Application command.
 data Command
-  = Run [FilePath] [FilePath] [Text] RunMode Bool
-  | Gen Bool (Maybe Text)
+  = Run [FilePath] [FilePath] [Text] RunMode Bool -- ^ /Run/ command
+  | Gen Bool (Maybe Text)                         -- ^ /Generator/ command
     deriving (Show)
 
+-- | Parses command line arguments.
 commandParser :: ParserInfo Command
 commandParser = info
   (commands <**> helper)

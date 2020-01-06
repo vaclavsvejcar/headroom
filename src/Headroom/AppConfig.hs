@@ -7,7 +7,10 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Data types and functions for representing and handling application config.
+This module adds support for loading and parsing application configuration.
+Such configuration can be loaded either from /YAML/ config file, or from command
+line arguments. Provided 'Semigroup' and 'Monoid' instances allows to merge
+multiple loaded configurations into one.
 -}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -42,18 +45,22 @@ import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
 
+-- | Application configuration, loaded either from configuration file or command
+-- line options.
 data AppConfig = AppConfig
-  { acConfigVersion :: Int
-  , acRunMode       :: RunMode
-  , acSourcePaths   :: [FilePath]
-  , acTemplatePaths :: [FilePath]
-  , acPlaceholders  :: HashMap Text Text
+  { acConfigVersion :: Int               -- ^ version of configuration
+  , acRunMode       :: RunMode           -- ^ selected mode of /Run/ command
+  , acSourcePaths   :: [FilePath]        -- ^ paths to source code files
+  , acTemplatePaths :: [FilePath]        -- ^ paths to template files
+  , acPlaceholders  :: HashMap Text Text -- ^ placeholders to replace
   }
   deriving (Eq, Generic, Show)
 
+-- | Support for reading configuration from /YAML/.
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
 
+-- | Default empty configuration.
 instance Default AppConfig where
   def = AppConfig 1 Add [] [] HM.empty
 
@@ -67,22 +74,37 @@ instance Semigroup AppConfig where
 instance Monoid AppConfig where
   mempty = def
 
-loadAppConfig :: MonadIO m => FilePath -> m AppConfig
+-- | Loads and parses application configuration from given file.
+loadAppConfig :: MonadIO m
+              => FilePath    -- ^ path to configuration file
+              -> m AppConfig -- ^ parsed configuration
 loadAppConfig path = do
   appConfig <- liftIO $ B.readFile path >>= parseAppConfig
   return $ makePathsRelativeTo (takeDirectory path) appConfig
 
-makePathsRelativeTo :: FilePath -> AppConfig -> AppConfig
+-- | Rewrites all file paths in 'AppConfig' to be relative to given file path.
+makePathsRelativeTo :: FilePath  -- ^ file path to use
+                    -> AppConfig -- ^ input application configuration
+                    -> AppConfig -- ^ result with relativized file paths
 makePathsRelativeTo root appConfig = appConfig
   { acSourcePaths   = processPaths . acSourcePaths $ appConfig
   , acTemplatePaths = processPaths . acTemplatePaths $ appConfig
   }
   where processPaths = fmap (root </>)
 
-parseAppConfig :: MonadThrow m => B.ByteString -> m AppConfig
+-- | Parses application configuration from given raw input.
+parseAppConfig :: MonadThrow m
+               => B.ByteString -- ^ raw input to parse
+               -> m AppConfig  -- ^ parsed application configuration
 parseAppConfig = Y.decodeThrow
 
-parsePlaceholders :: MonadThrow m => [Text] -> m (HashMap Text Text)
+-- | Parses placeholders from raw input in @key=value@ format.
+--
+-- >>> parsePlaceholders ["key1=value1"]
+-- fromList [("key1","value1")]
+parsePlaceholders :: MonadThrow m
+                  => [Text]                -- ^ list of raw placeholders
+                  -> m (HashMap Text Text) -- ^ parsed placeholders
 parsePlaceholders placeholders = fmap HM.fromList (mapM parse placeholders)
  where
   parse input = case T.split (== '=') input of
