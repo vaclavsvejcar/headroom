@@ -9,7 +9,6 @@ copyright: Copyright (c) 2019-2020 Vaclav Svejcar
 
 dependencies:
   - base >= 4.7 && < 5
-  - data-default
   - optparse-applicative
   - rio
 

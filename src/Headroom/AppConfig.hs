@@ -26,9 +26,6 @@ where
 import           Data.Aeson                     ( FromJSON(parseJSON)
                                                 , genericParseJSON
                                                 )
-import           Data.Default                   ( Default
-                                                , def
-                                                )
 import qualified Data.Yaml                     as Y
 import           Headroom.Types                 ( HeadroomError(..)
                                                 , RunMode(..)
@@ -60,10 +57,6 @@ data AppConfig = AppConfig
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
 
--- | Default empty configuration.
-instance Default AppConfig where
-  def = AppConfig 1 Add [] [] HM.empty
-
 instance Semigroup AppConfig where
   x <> y = AppConfig (acConfigVersion x `min` acConfigVersion y)
                      (acRunMode x)
@@ -72,7 +65,7 @@ instance Semigroup AppConfig where
                      (acPlaceholders x <> acPlaceholders y)
 
 instance Monoid AppConfig where
-  mempty = def
+  mempty = AppConfig 1 Add [] [] HM.empty
 
 -- | Loads and parses application configuration from given file.
 loadAppConfig :: MonadIO m

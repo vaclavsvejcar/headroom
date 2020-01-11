@@ -33,7 +33,7 @@ data Env = Env
   }
 
 -- | Represents what action should the /Generator/ perform.
-data GenMode 
+data GenMode
   = GenConfigFile   -- ^ generate /YAML/ config file stub
   | GenLicense Text -- ^ generate license header template
   deriving (Eq, Show)

@@ -20,7 +20,6 @@ module Headroom.Command.Run.Env
   )
 where
 
-import           Data.Default                   ( def )
 import           Headroom.AppConfig             ( AppConfig(..)
                                                 , parsePlaceholders
                                                 )
@@ -90,8 +89,8 @@ toAppConfig :: MonadThrow m
             -> m AppConfig -- ^ application configuration
 toAppConfig opts = do
   placeholders' <- parsePlaceholders (roPlaceholders opts)
-  return $ def { acSourcePaths   = roSourcePaths opts
-               , acTemplatePaths = roTemplatePaths opts
-               , acRunMode       = roRunMode opts
-               , acPlaceholders  = placeholders'
-               }
+  return $ mempty { acSourcePaths   = roSourcePaths opts
+                  , acTemplatePaths = roTemplatePaths opts
+                  , acRunMode       = roRunMode opts
+                  , acPlaceholders  = placeholders'
+                  }
