@@ -27,12 +27,12 @@ spec = do
           expected = AppConfig 1 Add sourcePaths templatePaths options
       appConfig `shouldBe` expected
 
-  describe "parsePlaceholders" $ do
-    it "parses placeholders map from raw string list" $ do
+  describe "parseVariables" $ do
+    it "parses variables map from raw string list" $ do
       let raw = ["key1=value1", "key2=value with spaces"]
           expected =
             HM.fromList [("key1", "value1"), ("key2", "value with spaces")]
-      parsePlaceholders raw `shouldBe` Just expected
+      parseVariables raw `shouldBe` Just expected
 
   let ph1        = HM.fromList [("key1", "value1")]
       ph2        = HM.fromList [("key2", "value2")]

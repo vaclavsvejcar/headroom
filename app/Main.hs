@@ -39,8 +39,8 @@ main = do
 
 bootstrap :: Command -> IO ()
 bootstrap command' = case command' of
-  Run sourcePaths templatePaths placeholders runMode debug ->
-    commandRun (RunOptions runMode sourcePaths templatePaths placeholders debug)
+  Run sourcePaths templatePaths variables runMode debug ->
+    commandRun (RunOptions runMode sourcePaths templatePaths variables debug)
   c@(Gen _ _) -> do
     genMode <- parseGenMode c
     commandGen (GenOptions genMode)

@@ -9,6 +9,6 @@ template-paths:
   - path/to/dir1
   - path/to/dir2
 
-placeholders:
+variables:
   copyright: (c) 2019 John Smith
   email: john.smith@example.com

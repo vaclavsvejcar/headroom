@@ -71,7 +71,7 @@ runOptions =
           )
     <*> many
           (strOption
-            (long "placeholders" <> short 'p' <> metavar "KEY=VALUE" <> help
+            (long "variables" <> short 'v' <> metavar "KEY=VALUE" <> help
               "placeholder to replace in templates"
             )
           )

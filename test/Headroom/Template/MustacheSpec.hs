@@ -22,22 +22,22 @@ spec = do
       parsed `shouldSatisfy` isJust
 
   describe "renderTemplate" $ do
-    it "renders Mustache template with given placeholders" $ do
-      let template     = "Hello, {{ name }}"
-          placeholders = HM.fromList [("name", "John")]
-          parsed = parseTemplate (Just "template") template :: Maybe Mustache
-          rendered     = parsed >>= renderTemplate placeholders :: Maybe Text
+    it "renders Mustache template with given variables" $ do
+      let template  = "Hello, {{ name }}"
+          variables = HM.fromList [("name", "John")]
+          parsed    = parseTemplate (Just "template") template :: Maybe Mustache
+          rendered  = parsed >>= renderTemplate variables :: Maybe Text
       rendered `shouldBe` Just "Hello, John"
 
-    it "fails if not enough placeholders is provided" $ do
+    it "fails if not enough variables is provided" $ do
       let
-        template     = "Hello, {{ name }} {{ surname }}"
-        placeholders = HM.fromList [("name", "John")]
+        template  = "Hello, {{ name }} {{ surname }}"
+        variables = HM.fromList [("name", "John")]
         parsed :: Either SomeException Mustache
         parsed   = parseTemplate (Just "test") template
-        rendered = parsed >>= renderTemplate placeholders
+        rendered = parsed >>= renderTemplate variables
         handleResult (Left ex)
-          | Just (MissingPlaceholders "test" ["surname"]) <- fromException ex
+          | Just (MissingVariables "test" ["surname"]) <- fromException ex
           = True
           | otherwise
           = False

@@ -127,9 +127,8 @@ loadTemplates = do
   parsed    <- mapM (\(t, p) -> fmap (t, ) (loadTemplate p))
                     (mapMaybe filterTemplate withTypes)
   rendered <- mapM
-    (\(t, p) -> fmap
-      (t, )
-      (renderTemplate (acPlaceholders appConfig) (p :: TemplateType))
+    (\(t, p) ->
+      fmap (t, ) (renderTemplate (acVariables appConfig) (p :: TemplateType))
     )
     parsed
   return $ M.fromList rendered

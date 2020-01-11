@@ -21,7 +21,7 @@ module Headroom.Command.Run.Env
 where
 
 import           Headroom.AppConfig             ( AppConfig(..)
-                                                , parsePlaceholders
+                                                , parseVariables
                                                 )
 import           Headroom.Types                 ( RunMode )
 import           RIO
@@ -32,7 +32,7 @@ data RunOptions = RunOptions
   { roRunMode       :: RunMode    -- ^ used /Run/ command mode
   , roSourcePaths   :: [FilePath] -- ^ source code file paths
   , roTemplatePaths :: [FilePath] -- ^ template file paths
-  , roPlaceholders  :: [Text]     -- ^ raw placeholders
+  , roVariables     :: [Text]     -- ^ raw variables
   , roDebug         :: Bool       -- ^ whether to run in debug mode
   }
   deriving (Eq, Show)
@@ -88,9 +88,9 @@ toAppConfig :: MonadThrow m
             => RunOptions  -- ^ /Run/ command options
             -> m AppConfig -- ^ application configuration
 toAppConfig opts = do
-  placeholders' <- parsePlaceholders (roPlaceholders opts)
+  variables' <- parseVariables (roVariables opts)
   return $ mempty { acSourcePaths   = roSourcePaths opts
                   , acTemplatePaths = roTemplatePaths opts
                   , acRunMode       = roRunMode opts
-                  , acPlaceholders  = placeholders'
+                  , acVariables     = variables'
                   }

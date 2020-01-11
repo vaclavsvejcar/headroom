@@ -2,7 +2,7 @@
 
 > :construction: __Work in Progress__ :construction: - This project is under heavy development, any parts (functionality, API or documentation) may change unexpectedly.
 
-So you are tired of managing license headers in your codebase by hand? Then __Headroom__ is the right tool for you! Now you can define your license header as [Mustache][web:mustache] template, put all the placeholders (such as author's name, year, etc.) into the [YAML][wiki:yaml] config file and Headroom will take care to add such license headers to all your source code files.
+So you are tired of managing license headers in your codebase by hand? Then __Headroom__ is the right tool for you! Now you can define your license header as [Mustache][web:mustache] template, put all the variables (such as author's name, year, etc.) into the [YAML][wiki:yaml] config file and Headroom will take care to add such license headers to all your source code files.
 
 __Table of Contents__
 <!-- TOC -->
@@ -84,7 +84,7 @@ project/
 ```
 
 ### 3.2. Adding Headroom Configuration
-Now we need to add configuration file where we specify path to source code files, template files and define values for placeholders in templates. The configuration file should be placed in project root directory and should be named `.headroom.yaml`, so Headroom can locate it:
+Now we need to add configuration file where we specify path to source code files, template files and define values for variables in templates. The configuration file should be placed in project root directory and should be named `.headroom.yaml`, so Headroom can locate it:
 
 ```
 cd project/
@@ -131,8 +131,8 @@ source-paths:
 template-paths:
     - templates
 
-## Placeholders (key-value) to replace in templates.
-placeholders:
+## Variables (key-value) to replace in templates.
+variables:
     author: John Smith
     year: "2019"
 ```
@@ -171,14 +171,14 @@ Run command is used to manipulate (add, replace or drop) license headers in sour
 ```
 $ headroom run --help
 Usage: headroom run [-s|--source-path PATH] [-t|--template-path PATH]
-                    [-p|--placeholders KEY=VALUE] ([-r|--replace-headers] |
+                    [-v|--variable KEY=VALUE] ([-r|--replace-headers] |
                     [-d|--drop-headers]) [--debug]
   add or replace source code headers
 
 Available options:
   -s,--source-path PATH    path to source code file/directory
   -t,--template-path PATH  path to header template file/directory
-  -p,--placeholders KEY=VALUE
+  -v,--variable KEY=VALUE
                            placeholder to replace in templates
   -r,--replace-headers     force replace existing license headers
   -d,--drop-headers        drop existing license headers only

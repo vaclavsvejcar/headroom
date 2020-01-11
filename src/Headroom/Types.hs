@@ -32,11 +32,11 @@ import           Text.Printf                    ( printf )
 -- | Represents fatal application error, that should be displayed to user in
 -- some human readable form.
 data HeadroomError
-  = InvalidLicense Text             -- ^ unknown license is selected in /Generator/
-  | InvalidPlaceholder Text         -- ^ invalid placeholder format (@key=value@)
-  | NoGenModeSelected               -- ^ no mode for /Generator/ command is selected
-  | MissingPlaceholders Text [Text] -- ^ not all placeholders were filled in template
-  | ParseError Text                 -- ^ error parsing template file
+  = InvalidLicense Text          -- ^ unknown license is selected in /Generator/
+  | InvalidPlaceholder Text      -- ^ invalid placeholder format (@key=value@)
+  | NoGenModeSelected            -- ^ no mode for /Generator/ command is selected
+  | MissingVariables Text [Text] -- ^ not all variables were filled in template
+  | ParseError Text              -- ^ error parsing template file
   deriving (Show, Typeable)
 
 -- | Represents newline separator.
@@ -68,11 +68,11 @@ instance Exception HeadroomError where
     "Cannot parse placeholder key=value from: " <> T.unpack raw
   displayException NoGenModeSelected
     = "Please select at least one option what to generate (see --help for details)"
-  displayException (MissingPlaceholders name placeholders) =
-    "Missing placeholders for template '"
+  displayException (MissingVariables name variables) =
+    "Missing variables for template '"
       <> T.unpack name
       <> "': "
-      <> show placeholders
+      <> show variables
   displayException (ParseError msg) =
     "Error parsing template: " <> T.unpack msg
 

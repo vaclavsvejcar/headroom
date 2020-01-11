@@ -19,7 +19,7 @@ module Headroom.AppConfig
   , loadAppConfig
   , makePathsRelativeTo
   , parseAppConfig
-  , parsePlaceholders
+  , parseVariables
   )
 where
 
@@ -49,7 +49,7 @@ data AppConfig = AppConfig
   , acRunMode       :: RunMode           -- ^ selected mode of /Run/ command
   , acSourcePaths   :: [FilePath]        -- ^ paths to source code files
   , acTemplatePaths :: [FilePath]        -- ^ paths to template files
-  , acPlaceholders  :: HashMap Text Text -- ^ placeholders to replace
+  , acVariables     :: HashMap Text Text -- ^ variables to replace
   }
   deriving (Eq, Generic, Show)
 
@@ -62,7 +62,7 @@ instance Semigroup AppConfig where
                      (acRunMode x)
                      (acSourcePaths x <> acSourcePaths y)
                      (acTemplatePaths x <> acTemplatePaths y)
-                     (acPlaceholders x <> acPlaceholders y)
+                     (acVariables x <> acVariables y)
 
 instance Monoid AppConfig where
   mempty = AppConfig 1 Add [] [] HM.empty
@@ -91,14 +91,14 @@ parseAppConfig :: MonadThrow m
                -> m AppConfig  -- ^ parsed application configuration
 parseAppConfig = Y.decodeThrow
 
--- | Parses placeholders from raw input in @key=value@ format.
+-- | Parses variables from raw input in @key=value@ format.
 --
--- >>> parsePlaceholders ["key1=value1"]
+-- >>> parseVariables ["key1=value1"]
 -- fromList [("key1","value1")]
-parsePlaceholders :: MonadThrow m
-                  => [Text]                -- ^ list of raw placeholders
-                  -> m (HashMap Text Text) -- ^ parsed placeholders
-parsePlaceholders placeholders = fmap HM.fromList (mapM parse placeholders)
+parseVariables :: MonadThrow m
+               => [Text]                -- ^ list of raw variables
+               -> m (HashMap Text Text) -- ^ parsed variables
+parseVariables variables = fmap HM.fromList (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
     [key, value] -> return (key, value)

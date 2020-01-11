@@ -37,9 +37,9 @@ class Template t where
                 -> Text       -- ^ raw template text
                 -> m t        -- ^ parsed template
 
-  -- | Renders parsed template and replaces all placeholders.
+  -- | Renders parsed template and replaces all variables.
   renderTemplate :: MonadThrow m
-                => HashMap Text Text    -- ^ placeholders to replace
+                => HashMap Text Text    -- ^ variables to replace
                 -> t                    -- ^ parsed template to render
                 -> m Text               -- ^ rendered template text
 

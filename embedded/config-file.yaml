@@ -16,5 +16,5 @@ source-paths: []
 ## Paths to template files (either files or directories).
 template-paths: []
 
-## Placeholders (key-value) to replace in templates.
-placeholders: {}
+## Variables (key-value) to replace in templates.
+variables: {}

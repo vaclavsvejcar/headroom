@@ -44,16 +44,16 @@ parseTemplate' name raw = case MU.compileTemplate templateName raw of
   where templateName = T.unpack . fromMaybe "" $ name
 
 renderTemplate' :: MonadThrow m => HashMap Text Text -> Mustache -> m Text
-renderTemplate' placeholders (Mustache t@(MU.Template name _ _)) =
-  case MU.checkedSubstitute t placeholders of
+renderTemplate' variables (Mustache t@(MU.Template name _ _)) =
+  case MU.checkedSubstitute t variables of
     ([], rendered) -> return rendered
     (errs, rendered) ->
-      let errs' = missingPlaceholders errs
+      let errs' = missingVariables errs
       in  if length errs == length errs'
-            then throwM $ MissingPlaceholders (T.pack name) errs'
+            then throwM $ MissingVariables (T.pack name) errs'
             else return rendered
  where
-  missingPlaceholders = concatMap
+  missingVariables = concatMap
     (\case
       (VariableNotFound ps) -> ps
       _                     -> []

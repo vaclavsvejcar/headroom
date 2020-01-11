@@ -19,8 +19,8 @@ source-paths:
 template-paths:
   - doc/templates
 
-## Placeholders (key-value) to replace in templates.
-placeholders:
+## Variables (key-value) to replace in templates.
+variables:
   author: Vaclav Svejcar
   license: BSD-3
   email: vaclav.svejcar@gmail.com
