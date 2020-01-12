@@ -20,14 +20,19 @@ module Headroom.AppConfig
   , makePathsRelativeTo
   , parseAppConfig
   , parseVariables
+  , validateAppConfig
   )
 where
 
+import           Control.Lens
 import           Data.Aeson                     ( FromJSON(parseJSON)
                                                 , genericParseJSON
                                                 )
+import           Data.Functor                   ( (<$) )
+import           Data.Validation
 import qualified Data.Yaml                     as Y
-import           Headroom.Types                 ( HeadroomError(..)
+import           Headroom.Types                 ( AppConfigError(..)
+                                                , HeadroomError(..)
                                                 , RunMode(..)
                                                 )
 import           Headroom.Types.Utils           ( customOptions )
@@ -40,7 +45,6 @@ import           RIO.HashMap                    ( HashMap )
 import qualified RIO.HashMap                   as HM
 import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
-
 
 -- | Application configuration, loaded either from configuration file or command
 -- line options.
@@ -103,3 +107,20 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
   parse input = case T.split (== '=') input of
     [key, value] -> return (key, value)
     _            -> throwM $ InvalidPlaceholder input
+
+validateAppConfig :: MonadThrow m => AppConfig -> m AppConfig
+validateAppConfig ac@(AppConfig version _ sourcePaths templatePaths _) =
+  case checked of
+    Success ac'    -> return ac'
+    Failure errors -> throwM $ InvalidAppConfig errors
+ where
+  checked :: Validation [AppConfigError] AppConfig
+  checked = ac <$ checkVersion <* checkSourcePaths <* checkTemplatePaths
+  checkSourcePaths =
+    if null sourcePaths then _Failure # [EmptySourcePaths] else _Success # ac
+  checkTemplatePaths = if null templatePaths
+    then _Failure # [EmptyTemplatePaths]
+    else _Success # ac
+  checkVersion = if version /= acConfigVersion mempty
+    then _Failure # [InvalidVersion version (acConfigVersion mempty)]
+    else _Success # ac

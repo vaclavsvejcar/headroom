@@ -41,12 +41,14 @@ library:
     - aeson
     - either
     - file-embed
+    - lens
     - mustache
     - pcre-heavy
     - pcre-light
     - template-haskell
     - text
     - time
+    - validation
     - yaml
 
 tests:

@@ -22,6 +22,7 @@ import           Control.Applicative            ( (<$>) )
 import           Data.Time.Clock.POSIX          ( getPOSIXTime )
 import           Headroom.AppConfig             ( AppConfig(..)
                                                 , loadAppConfig
+                                                , validateAppConfig
                                                 )
 import           Headroom.Command.Run.Env
 import           Headroom.Command.Shared        ( bootstrap )
@@ -102,7 +103,8 @@ mergedAppConfig = do
   logDebug $ "Configuration files locations: " <> displayShow locations
   appConfigs        <- fmap catMaybes (mapM loadAppConfigSafe locations)
   appConfigFromOpts <- toAppConfig runOptions
-  mergeAppConfigs $ appConfigFromOpts : appConfigs
+  merged            <- mergeAppConfigs $ appConfigFromOpts : appConfigs
+  validateAppConfig merged
  where
   loadAppConfigSafe path = catch
     (fmap Just (loadAppConfig path))

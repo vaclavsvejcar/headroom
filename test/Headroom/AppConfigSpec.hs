@@ -6,10 +6,14 @@ module Headroom.AppConfigSpec
 where
 
 import           Headroom.AppConfig
-import           Headroom.Types                 ( RunMode(..) )
+import           Headroom.Types                 ( AppConfigError(..)
+                                                , HeadroomError(..)
+                                                , RunMode(..)
+                                                )
 import           RIO
 import qualified RIO.HashMap                   as HM
 import           Test.Hspec
+import           Test.Utils                     ( matchesException )
 
 
 spec :: Spec
@@ -44,6 +48,12 @@ spec = do
         ["source1", "source2"]
         ["template1"]
         (HM.fromList [("key1", "value1"), ("key2", "value2")])
+
+  describe "validateAppConfig" $ do
+    it "validates configuration version" $ do
+      let check (Just (InvalidAppConfig [InvalidVersion 2 1])) = True
+          check _ = False
+      validateAppConfig appConfig2 `shouldSatisfy` matchesException check
 
   describe "<>" $ do
     it "joins two AppConfig records" $ do

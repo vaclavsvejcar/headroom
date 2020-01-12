@@ -12,6 +12,8 @@ import           Headroom.Types
 import           RIO
 import qualified RIO.HashMap                   as HM
 import           Test.Hspec
+import           Test.Utils                     ( matchesException )
+
 
 spec :: Spec
 spec = do
@@ -30,16 +32,11 @@ spec = do
       rendered `shouldBe` Just "Hello, John"
 
     it "fails if not enough variables is provided" $ do
-      let
-        template  = "Hello, {{ name }} {{ surname }}"
-        variables = HM.fromList [("name", "John")]
-        parsed :: Either SomeException Mustache
-        parsed   = parseTemplate (Just "test") template
-        rendered = parsed >>= renderTemplate variables
-        handleResult (Left ex)
-          | Just (MissingVariables "test" ["surname"]) <- fromException ex
-          = True
-          | otherwise
-          = False
-        handleResult _ = False
-      rendered `shouldSatisfy` handleResult
+      let template  = "Hello, {{ name }} {{ surname }}"
+          variables = HM.fromList [("name", "John")]
+          parsed :: Either SomeException Mustache
+          parsed   = parseTemplate (Just "test") template
+          rendered = parsed >>= renderTemplate variables
+          check (Just (MissingVariables "test" ["surname"])) = True
+          check _ = False
+      rendered `shouldSatisfy` matchesException check

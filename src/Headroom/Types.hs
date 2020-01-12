@@ -12,7 +12,8 @@ Data types and type class instances shared between modules.
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.Types
-  ( HeadroomError(..)
+  ( AppConfigError(..)
+  , HeadroomError(..)
   , NewLine(..)
   , Progress(..)
   , RunMode(..)
@@ -28,15 +29,22 @@ import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import           Text.Printf                    ( printf )
 
+-- | Error occured during validation of application configuration.
+data AppConfigError
+  = EmptySourcePaths       -- ^ no paths to source code files provided
+  | EmptyTemplatePaths     -- ^ no paths to license header templates provided
+  | InvalidVersion Int Int -- ^ invalid version of configuration file detected
+  deriving (Show)
 
 -- | Represents fatal application error, that should be displayed to user in
 -- some human readable form.
 data HeadroomError
-  = InvalidLicense Text          -- ^ unknown license is selected in /Generator/
-  | InvalidPlaceholder Text      -- ^ invalid placeholder format (@key=value@)
-  | NoGenModeSelected            -- ^ no mode for /Generator/ command is selected
-  | MissingVariables Text [Text] -- ^ not all variables were filled in template
-  | ParseError Text              -- ^ error parsing template file
+  = InvalidAppConfig [AppConfigError] -- ^ invalid application configuration
+  | InvalidLicense Text               -- ^ unknown license is selected in /Generator/
+  | InvalidPlaceholder Text           -- ^ invalid placeholder format (@key=value@)
+  | NoGenModeSelected                 -- ^ no mode for /Generator/ command is selected
+  | MissingVariables Text [Text]      -- ^ not all variables were filled in template
+  | ParseError Text                   -- ^ error parsing template file
   deriving (Show, Typeable)
 
 -- | Represents newline separator.
@@ -59,9 +67,22 @@ data RunMode
   | Replace -- ^ replace existing or add license header
   deriving (Eq, Show)
 
+displayAppConfigError :: AppConfigError -> Text
+displayAppConfigError EmptySourcePaths   = "no paths to source code files"
+displayAppConfigError EmptyTemplatePaths = "no paths to template files"
+displayAppConfigError (InvalidVersion actual required) =
+  "invalid configuration version (found: "
+    <> (T.pack . show $ actual)
+    <> ", required: "
+    <> (T.pack . show $ required)
+    <> ")"
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
 instance Exception HeadroomError where
+  displayException (InvalidAppConfig errors) =
+    "Invalid configuration, following problems found:\n" <> L.intercalate
+      "\n"
+      (fmap (\e -> "\t- " <> (T.unpack . displayAppConfigError $ e)) errors)
   displayException (InvalidLicense raw) =
     "Cannot parse license type from: " <> T.unpack raw
   displayException (InvalidPlaceholder raw) =
