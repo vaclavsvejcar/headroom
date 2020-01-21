@@ -10,6 +10,8 @@ __Table of Contents__
 - [1. Main Features](#1-main-features)
 - [2. Installation](#2-installation)
     - [2.1. From Source Code](#21-from-source-code)
+        - [2.1.1. Using Cabal](#211-using-cabal)
+        - [2.1.2. Using Stack](#212-using-stack)
 - [3. Case Example](#3-case-example)
     - [3.1. Adding License Header Templates](#31-adding-license-header-templates)
     - [3.2. Adding Headroom Configuration](#32-adding-headroom-configuration)
@@ -31,15 +33,18 @@ __Table of Contents__
 > Binary distribution, pre-built packages and installation from Stackage is not ready yet, but it's planned for production release.
 
 ### 2.1. From Source Code
-Headroom is written in [Haskell][web:haskell], so you can just clone this repository and install it using [Stack][web:stack]:
+Headroom is written in [Haskell][web:haskell], so you can install it from source code either using [Cabal][web:cabal] or [Stack][web:stack].
 
-```shell
-curl -sSL https://get.haskellstack.org/ | sh     # needed only if you don't have Stack
+#### 2.1.1. Using Cabal
+1. install [Cabal][web:cabal] for your platform
+1. run `cabal install headroom`
+1. add `$HOME/.cabal/bin` to your `$PATH`
 
-git clone https://github.com/vaclavsvejcar/headroom.git
-cd headroom/
-stack install
-```
+#### 2.1.2. Using Stack
+1. install [Stack][web:stack] for your platform
+1. clone this repository
+1. run `stack install` inside the `headroom/` directory
+1. add `$HOME/.local/bin` to your `$PATH`
 
 ## 3. Case Example
 Let's demonstrate how to use Headroom in real world example: imagine you have small source code repository with following structure and you'd like to setup Headroom for it:
@@ -239,6 +244,7 @@ Below is the list of supported source code file types. If you miss support for p
 
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
 [web:bsd-3]: https://opensource.org/licenses/BSD-3-Clause
+[web:cabal]: https://www.haskell.org/cabal/
 [web:haskell]: https://haskell.org
 [web:mustache]: https://mustache.github.io
 [web:stack]: https://www.haskellstack.org
