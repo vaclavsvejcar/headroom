@@ -20,7 +20,6 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
-headroom.cabal
 stack.yaml.lock
 .metals/
 

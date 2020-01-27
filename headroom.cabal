@@ -1,0 +1,131 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 342ac8a53645f94c2d35ac0366ba83ee0991444b75eef95449c862e395ced492
+
+name:           headroom
+version:        0.1.0.0
+homepage:       https://github.com/vaclavsvejcar/headroom
+author:         Vaclav Svejcar
+maintainer:     vaclav.svejcar@gmail.com
+copyright:      Copyright (c) 2019-2020 Vaclav Svejcar
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      Headroom.AppConfig
+      Headroom.Command
+      Headroom.Command.Gen
+      Headroom.Command.Gen.Env
+      Headroom.Command.Run
+      Headroom.Command.Run.Env
+      Headroom.Command.Shared
+      Headroom.Embedded
+      Headroom.FileSystem
+      Headroom.FileType
+      Headroom.Header
+      Headroom.Header.Impl
+      Headroom.Header.Impl.CSS
+      Headroom.Header.Impl.Haskell
+      Headroom.Header.Impl.HTML
+      Headroom.Header.Impl.Java
+      Headroom.Header.Impl.JS
+      Headroom.Header.Impl.Scala
+      Headroom.Header.Utils
+      Headroom.License
+      Headroom.Meta
+      Headroom.Template
+      Headroom.Template.Mustache
+      Headroom.Text
+      Headroom.Types
+      Headroom.Types.Utils
+  other-modules:
+      Paths_headroom
+  hs-source-dirs:
+      src
+  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , either
+    , file-embed
+    , lens
+    , mustache
+    , optparse-applicative
+    , pcre-heavy
+    , pcre-light
+    , rio
+    , template-haskell
+    , text
+    , time
+    , validation
+    , yaml
+  default-language: Haskell2010
+
+executable headroom
+  main-is: Main.hs
+  other-modules:
+      Paths_headroom
+  hs-source-dirs:
+      app
+  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , headroom
+    , optparse-applicative
+    , rio
+  default-language: Haskell2010
+
+test-suite doctest
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Paths_headroom
+  hs-source-dirs:
+      doctest
+  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
+  build-depends:
+      base >=4.7 && <5
+    , doctest
+    , optparse-applicative
+    , rio
+  default-language: Haskell2010
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Headroom.AppConfigSpec
+      Headroom.FileSystemSpec
+      Headroom.FileTypeSpec
+      Headroom.Header.Impl.CSSSpec
+      Headroom.Header.Impl.HaskellSpec
+      Headroom.Header.Impl.HTMLSpec
+      Headroom.Header.Impl.JavaSpec
+      Headroom.Header.Impl.JSSpec
+      Headroom.Header.Impl.ScalaSpec
+      Headroom.Header.UtilsSpec
+      Headroom.HeaderSpec
+      Headroom.LicenseSpec
+      Headroom.Template.MustacheSpec
+      Headroom.TextSpec
+      Headroom.Types.UtilsSpec
+      Headroom.TypesSpec
+      Test.Utils
+      Paths_headroom
+  hs-source-dirs:
+      test
+  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , headroom
+    , hspec
+    , optparse-applicative
+    , rio
+  default-language: Haskell2010
