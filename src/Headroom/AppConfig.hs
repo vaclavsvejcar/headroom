@@ -108,19 +108,22 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
     [key, value] -> return (key, value)
     _            -> throwM $ InvalidPlaceholder input
 
-validateAppConfig :: MonadThrow m => AppConfig -> m AppConfig
-validateAppConfig ac@(AppConfig version _ sourcePaths templatePaths _) =
-  case checked of
-    Success ac'    -> return ac'
-    Failure errors -> throwM $ InvalidAppConfig errors
+-- | Validates whether given 'AppConfig' contains valid data.
+validateAppConfig :: MonadThrow m
+                  => AppConfig   -- ^ application config to validate
+                  -> m AppConfig -- ^ validated application config (or errors)
+validateAppConfig appConfig = case checked of
+  Success ac'    -> return ac'
+  Failure errors -> throwM $ InvalidAppConfig errors
  where
-  checked :: Validation [AppConfigError] AppConfig
-  checked = ac <$ checkVersion <* checkSourcePaths <* checkTemplatePaths
-  checkSourcePaths =
-    if null sourcePaths then _Failure # [EmptySourcePaths] else _Success # ac
-  checkTemplatePaths = if null templatePaths
+  checked = appConfig <$ checkVersion <* checkSourcePaths <* checkTemplatePaths
+  checkSourcePaths = if null (acSourcePaths appConfig)
+    then _Failure # [EmptySourcePaths]
+    else _Success # appConfig
+  checkTemplatePaths = if null (acTemplatePaths appConfig)
     then _Failure # [EmptyTemplatePaths]
-    else _Success # ac
+    else _Success # appConfig
   checkVersion = if version /= acConfigVersion mempty
     then _Failure # [InvalidVersion version (acConfigVersion mempty)]
-    else _Success # ac
+    else _Success # appConfig
+  version = acConfigVersion appConfig

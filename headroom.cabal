@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 342ac8a53645f94c2d35ac0366ba83ee0991444b75eef95449c862e395ced492
+-- hash: 465d9f8c758f684da6cd269600ffec0e45fe03edbaf64d9cf1e5eb460b4a9353
 
 name:           headroom
 version:        0.1.0.0
@@ -48,7 +48,7 @@ library
       Paths_headroom
   hs-source-dirs:
       src
-  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
+  ghc-options: -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -73,7 +73,7 @@ executable headroom
       Paths_headroom
   hs-source-dirs:
       app
-  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , headroom
@@ -88,7 +88,7 @@ test-suite doctest
       Paths_headroom
   hs-source-dirs:
       doctest
-  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
+  ghc-options: -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
   build-depends:
       base >=4.7 && <5
     , doctest
@@ -120,7 +120,7 @@ test-suite spec
       Paths_headroom
   hs-source-dirs:
       test
-  ghc-options: -O2 -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
+  ghc-options: -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
   build-depends:
       aeson
     , base >=4.7 && <5
