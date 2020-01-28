@@ -6,6 +6,9 @@ license-file: LICENSE
 author: Vaclav Svejcar
 maintainer: vaclav.svejcar@gmail.com
 copyright: Copyright (c) 2019-2020 Vaclav Svejcar
+github: vaclavsvejcar/headroom
+category: Utils
+synopsis: License Header Manager
 
 dependencies:
   - base >= 4.7 && < 5

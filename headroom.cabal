@@ -4,17 +4,24 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 465d9f8c758f684da6cd269600ffec0e45fe03edbaf64d9cf1e5eb460b4a9353
+-- hash: f3d5374fd7c54d6feccfaf2f174f4e08aa6206c2aff65bfe7800b767a30d18b0
 
 name:           headroom
 version:        0.1.0.0
+synopsis:       License Header Manager
+category:       Utils
 homepage:       https://github.com/vaclavsvejcar/headroom
+bug-reports:    https://github.com/vaclavsvejcar/headroom/issues
 author:         Vaclav Svejcar
 maintainer:     vaclav.svejcar@gmail.com
 copyright:      Copyright (c) 2019-2020 Vaclav Svejcar
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/vaclavsvejcar/headroom
 
 library
   exposed-modules:
