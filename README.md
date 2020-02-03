@@ -1,5 +1,7 @@
 <p align="center"><img src ="https://github.com/vaclavsvejcar/headroom/blob/master/doc/assets/logo.png?raw=true" width="200" /></p>
 
+[![Build Status](https://travis-ci.com/vaclavsvejcar/headroom.svg?branch=master)](https://travis-ci.com/vaclavsvejcar/headroom)
+
 > :construction: __Work in Progress__ :construction: - This project is under heavy development, any parts (functionality, API or documentation) may change unexpectedly.
 
 So you are tired of managing license headers in your codebase by hand? Then __Headroom__ is the right tool for you! Now you can define your license header as [Mustache][web:mustache] template, put all the variables (such as author's name, year, etc.) into the [YAML][wiki:yaml] config file and Headroom will take care to add such license headers to all your source code files.
