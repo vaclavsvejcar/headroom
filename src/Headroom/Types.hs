@@ -9,6 +9,7 @@ Portability : POSIX
 
 Data types and type class instances shared between modules.
 -}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.Types
@@ -68,34 +69,34 @@ data RunMode
   deriving (Eq, Show)
 
 displayAppConfigError :: AppConfigError -> Text
-displayAppConfigError EmptySourcePaths   = "no paths to source code files"
-displayAppConfigError EmptyTemplatePaths = "no paths to template files"
-displayAppConfigError (InvalidVersion actual required) =
-  "invalid configuration version (found: "
-    <> (T.pack . show $ actual)
-    <> ", required: "
-    <> (T.pack . show $ required)
-    <> ")"
+displayAppConfigError = \case
+  EmptySourcePaths                 -> "no paths to source code files"
+  EmptyTemplatePaths               -> "no paths to template files"
+  (InvalidVersion actual required) -> mconcat
+    [ "invalid configuration version (found: "
+    , T.pack . show $ actual
+    , ", required: "
+    , T.pack . show $ required
+    , ")"
+    ]
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
 instance Exception HeadroomError where
-  displayException (InvalidAppConfig errors) =
-    "Invalid configuration, following problems found:\n" <> L.intercalate
-      "\n"
-      (fmap (\e -> "\t- " <> (T.unpack . displayAppConfigError $ e)) errors)
-  displayException (InvalidLicense raw) =
-    "Cannot parse license type from: " <> T.unpack raw
-  displayException (InvalidPlaceholder raw) =
-    "Cannot parse placeholder key=value from: " <> T.unpack raw
-  displayException NoGenModeSelected
-    = "Please select at least one option what to generate (see --help for details)"
-  displayException (MissingVariables name variables) =
-    "Missing variables for template '"
-      <> T.unpack name
-      <> "': "
-      <> show variables
-  displayException (ParseError msg) =
-    "Error parsing template: " <> T.unpack msg
+  displayException = \case
+    (InvalidAppConfig errors) -> mconcat
+      [ "Invalid configuration, following problems found:\n"
+      , L.intercalate
+        "\n"
+        (fmap (\e -> "\t- " <> (T.unpack . displayAppConfigError $ e)) errors)
+      ]
+    (InvalidLicense raw) -> "Cannot parse license type from: " <> T.unpack raw
+    (InvalidPlaceholder raw) ->
+      "Cannot parse placeholder key=value from: " <> T.unpack raw
+    NoGenModeSelected
+      -> "Please select at least one option what to generate (see --help for details)"
+    (MissingVariables name variables) -> mconcat
+      ["Missing variables for template '", T.unpack name, "': ", show variables]
+    (ParseError msg) -> "Error parsing template: " <> T.unpack msg
 
 instance Show Progress where
   show (Progress current total) = "[" <> currentS <> " of " <> totalS <> "]"

@@ -13,6 +13,7 @@ comment, the application must render such header with correct syntax.
 The 'FileType' represents such type of source code file, which is recognized by
 this application and for which the license headers can be manipulated.
 -}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.FileType
@@ -62,12 +63,13 @@ fileTypeByExt ext =
 -- ["hs"]
 listExtensions :: FileType -- ^ 'FileType' to list extensions for
                -> [Text]   -- ^ list of found file extensions
-listExtensions CSS     = ["css"]
-listExtensions Haskell = ["hs"]
-listExtensions HTML    = ["html", "htm"]
-listExtensions Java    = ["java"]
-listExtensions JS      = ["js"]
-listExtensions Scala   = ["scala"]
+listExtensions = \case
+  CSS     -> ["css"]
+  Haskell -> ["hs"]
+  HTML    -> ["html", "htm"]
+  Java    -> ["java"]
+  JS      -> ["js"]
+  Scala   -> ["scala"]
 
 -- | Reads 'FileType' from its textual representation.
 --

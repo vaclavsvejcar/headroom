@@ -9,6 +9,7 @@ Portability : POSIX
 
 Utilities related to data types.
 -}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Types.Utils
   ( allValues
@@ -43,10 +44,11 @@ customOptions =
 -- >>> dropFieldPrefix "xxHelloWorld"
 -- "helloWorld"
 dropFieldPrefix :: String -> String
-dropFieldPrefix (x : n : xs) | C.isUpper x && C.isUpper n = x : n : xs
-dropFieldPrefix (x : n : xs) | C.isUpper x = C.toLower x : n : xs
-dropFieldPrefix (_ : xs)                   = dropFieldPrefix xs
-dropFieldPrefix []                         = []
+dropFieldPrefix = \case
+  (x : n : xs) | C.isUpper x && C.isUpper n -> x : n : xs
+  (x : n : xs) | C.isUpper x -> C.toLower x : n : xs
+  (_ : xs)                   -> dropFieldPrefix xs
+  []                         -> []
 
 -- | Parses enum value from its string representation.
 readEnumCI :: (Bounded a, Enum a, Show a) => ReadS a
@@ -62,8 +64,7 @@ readEnumCI str =
 symbolCase :: Char   -- ^ word separator symbol
            -> String -- ^ input text
            -> String -- ^ processed text
-symbolCase sym = process
- where
-  process [] = []
-  process (x : xs) | C.isUpper x = sym : C.toLower x : process xs
-                   | otherwise   = x : process xs
+symbolCase sym = \case
+  [] -> []
+  (x : xs) | C.isUpper x -> sym : C.toLower x : symbolCase sym xs
+           | otherwise   -> x : symbolCase sym xs

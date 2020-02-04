@@ -9,6 +9,7 @@ Portability : POSIX
 
 Adds some extra functionality to the "Data.Text" module.
 -}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.Text
@@ -46,9 +47,10 @@ detectNewLine text | showNewLine CRLF `isInfixOf` text = Just CRLF
 -- "\n"
 showNewLine :: NewLine -- ^ newline character to render
             -> Text    -- ^ rendered character
-showNewLine CR   = "\r"
-showNewLine CRLF = "\r\n"
-showNewLine LF   = "\n"
+showNewLine = \case
+  CR   -> "\r"
+  CRLF -> "\r\n"
+  LF   -> "\n"
 
 -- | Split text into lines, return lines and detected newline separator.
 --

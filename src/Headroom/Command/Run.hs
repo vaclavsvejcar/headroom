@@ -77,21 +77,20 @@ commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
   logInfo "Searching for source code files..."
   sourceFiles <- findSourceFiles (M.keys templates)
   let sourceFilesNum = displayShow . L.length $ sourceFiles
-  logInfo
-    $  "Done, found "
-    <> sourceFilesNum
-    <> " sources code files(s) to process"
+  logInfo $ mconcat
+    ["Done, found ", sourceFilesNum, " sources code files(s) to process"]
   (total, skipped) <- processHeaders templates sourceFiles
   endTS            <- liftIO getPOSIXTime
   let (elapsedSeconds, _) = properFraction (endTS - startTS)
-  logInfo
-    $  "Done: modified "
-    <> displayShow (total - skipped)
-    <> ", skipped "
-    <> displayShow skipped
-    <> " files in "
-    <> displayShow (elapsedSeconds :: Integer)
-    <> " second(s)."
+  logInfo $ mconcat
+    [ "Done: modified "
+    , displayShow (total - skipped)
+    , ", skipped "
+    , displayShow skipped
+    , " files in "
+    , displayShow (elapsedSeconds :: Integer)
+    , " second(s)."
+    ]
 
 mergedAppConfig :: (HasRunOptions env, HasLogFunc env) => RIO env AppConfig
 mergedAppConfig = do

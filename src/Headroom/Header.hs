@@ -14,6 +14,7 @@ header is represented by 'Header' data type, where 'FileType' defines for which
 programming language source code this header is generated and the header text
 itself.
 -}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Header
   ( Header(..)
@@ -73,12 +74,13 @@ dropHeader fileType input = T.unlines' newLine . L.drop numLines $ lines'
 headerSize :: FileType -- ^ type of the input source code text
            -> Text     -- ^ source code text
            -> Int      -- ^ size of the headers (number of lines)
-headerSize CSS     = headerSizeCSS
-headerSize Haskell = headerSizeHaskell
-headerSize HTML    = headerSizeHTML
-headerSize Java    = headerSizeJava
-headerSize JS      = headerSizeJS
-headerSize Scala   = headerSizeScala
+headerSize = \case
+  CSS     -> headerSizeCSS
+  Haskell -> headerSizeHaskell
+  HTML    -> headerSizeHTML
+  Java    -> headerSizeJava
+  JS      -> headerSizeJS
+  Scala   -> headerSizeScala
 
 -- | Replaces already existing (or adds if none detected) license header with
 -- the new one in the given source code text. If you need to only add header if
