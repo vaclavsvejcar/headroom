@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8040ae80f7e7888992e2fe6f56d836307fcb5e1cfd9dea32992d8f0f5ac86d7c
+-- hash: a36baf8c2a934ede7acd0e0e5b3ede220e22bda4a64ca73dcda8d973b303ea37
 
 name:           headroom
 version:        0.1.0.0
@@ -19,6 +19,10 @@ copyright:      Copyright (c) 2019-2020 Vaclav Svejcar
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
+extra-source-files:
+    CHANGELOG.md
+    LICENSE
+    README.md
 
 source-repository head
   type: git

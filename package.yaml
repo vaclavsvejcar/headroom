@@ -16,6 +16,11 @@ description: >
   into the YAML config file and Headroom will take care to add such license
   headers to all your source code files.
 
+extra-source-files:
+  - CHANGELOG.md
+  - LICENSE
+  - README.md
+
 dependencies:
   - base >= 4.7 && < 5
   - optparse-applicative
