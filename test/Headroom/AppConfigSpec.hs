@@ -28,7 +28,7 @@ spec = do
           sourcePaths = ["test-data/configs/path/to/src"]
           templatePaths =
             ["test-data/configs/path/to/dir1", "test-data/configs/path/to/dir2"]
-          expected = AppConfig 1 Add sourcePaths templatePaths options
+          expected = AppConfig Add sourcePaths templatePaths options
       appConfig `shouldBe` expected
 
   describe "parseVariables" $ do
@@ -40,10 +40,10 @@ spec = do
 
   let ph1        = HM.fromList [("key1", "value1")]
       ph2        = HM.fromList [("key2", "value2")]
-      appConfig1 = AppConfig 1 Replace ["source1"] [] ph1
-      appConfig2 = AppConfig 2 Add ["source2"] ["template1"] ph2
+      appConfig1 = AppConfig Replace ["source1"] [] ph1
+      appConfig2 = AppConfig Add ["source2"] ["template1"] ph2
+      appConfig3 = AppConfig Add [] ["template1"] ph2
       expected'  = AppConfig
-        1
         Replace
         ["source1", "source2"]
         ["template1"]
@@ -51,9 +51,9 @@ spec = do
 
   describe "validateAppConfig" $ do
     it "validates configuration version" $ do
-      let check (Just (InvalidAppConfig [InvalidVersion 2 1])) = True
+      let check (Just (InvalidAppConfig [EmptySourcePaths])) = True
           check _ = False
-      validateAppConfig appConfig2 `shouldSatisfy` matchesException check
+      validateAppConfig appConfig3 `shouldSatisfy` matchesException check
 
   describe "<>" $ do
     it "joins two AppConfig records" $ do

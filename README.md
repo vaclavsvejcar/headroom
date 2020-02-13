@@ -121,9 +121,6 @@ Let's now edit configuration file to match our project:
 ## This is the configuration file for Headroom.
 ## See https://github.com/vaclavsvejcar/headroom for more details.
 
-## Version of this config files (shouldn't be necessary to change).
-config-version: 1
-
 ## Defines the behaviour how to handle license headers, possible options are:
 ##   - add     = (default) adds license header to files with no existing header
 ##   - drop    = drops existing license header from without replacement

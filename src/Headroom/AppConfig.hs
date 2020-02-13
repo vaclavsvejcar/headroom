@@ -49,8 +49,7 @@ import qualified RIO.Text                      as T
 -- | Application configuration, loaded either from configuration file or command
 -- line options.
 data AppConfig = AppConfig
-  { acConfigVersion :: Int               -- ^ version of configuration
-  , acRunMode       :: RunMode           -- ^ selected mode of /Run/ command
+  { acRunMode       :: RunMode           -- ^ selected mode of /Run/ command
   , acSourcePaths   :: [FilePath]        -- ^ paths to source code files
   , acTemplatePaths :: [FilePath]        -- ^ paths to template files
   , acVariables     :: HashMap Text Text -- ^ variables to replace
@@ -62,14 +61,13 @@ instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
 
 instance Semigroup AppConfig where
-  x <> y = AppConfig (acConfigVersion x `min` acConfigVersion y)
-                     (acRunMode x)
+  x <> y = AppConfig (acRunMode x)
                      (acSourcePaths x <> acSourcePaths y)
                      (acTemplatePaths x <> acTemplatePaths y)
                      (acVariables x <> acVariables y)
 
 instance Monoid AppConfig where
-  mempty = AppConfig 1 Add [] [] HM.empty
+  mempty = AppConfig Add [] [] HM.empty
 
 -- | Loads and parses application configuration from given file.
 loadAppConfig :: MonadIO m
@@ -116,14 +114,10 @@ validateAppConfig appConfig = case checked of
   Success ac'    -> return ac'
   Failure errors -> throwM $ InvalidAppConfig errors
  where
-  checked = appConfig <$ checkVersion <* checkSourcePaths <* checkTemplatePaths
+  checked = appConfig <$ checkSourcePaths <* checkTemplatePaths
   checkSourcePaths = if null (acSourcePaths appConfig)
     then _Failure # [EmptySourcePaths]
     else _Success # appConfig
   checkTemplatePaths = if null (acTemplatePaths appConfig)
     then _Failure # [EmptyTemplatePaths]
     else _Success # appConfig
-  checkVersion = if version /= acConfigVersion mempty
-    then _Failure # [InvalidVersion version (acConfigVersion mempty)]
-    else _Success # appConfig
-  version = acConfigVersion appConfig

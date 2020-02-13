@@ -34,7 +34,6 @@ import           Text.Printf                    ( printf )
 data AppConfigError
   = EmptySourcePaths       -- ^ no paths to source code files provided
   | EmptyTemplatePaths     -- ^ no paths to license header templates provided
-  | InvalidVersion Int Int -- ^ invalid version of configuration file detected
   deriving (Show)
 
 -- | Represents fatal application error, that should be displayed to user in
@@ -72,13 +71,7 @@ displayAppConfigError :: AppConfigError -> Text
 displayAppConfigError = \case
   EmptySourcePaths                 -> "no paths to source code files"
   EmptyTemplatePaths               -> "no paths to template files"
-  (InvalidVersion actual required) -> mconcat
-    [ "invalid configuration version (found: "
-    , T.pack . show $ actual
-    , ", required: "
-    , T.pack . show $ required
-    , ")"
-    ]
+
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
 instance Exception HeadroomError where
