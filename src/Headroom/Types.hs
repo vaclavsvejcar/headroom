@@ -41,7 +41,7 @@ data AppConfigError
 data HeadroomError
   = InvalidAppConfig [AppConfigError] -- ^ invalid application configuration
   | InvalidLicense Text               -- ^ unknown license is selected in /Generator/
-  | InvalidPlaceholder Text           -- ^ invalid placeholder format (@key=value@)
+  | InvalidVariable Text              -- ^ invalid variable format (@key=value@)
   | NoGenModeSelected                 -- ^ no mode for /Generator/ command is selected
   | MissingVariables Text [Text]      -- ^ not all variables were filled in template
   | ParseError Text                   -- ^ error parsing template file
@@ -69,8 +69,8 @@ data RunMode
 
 displayAppConfigError :: AppConfigError -> Text
 displayAppConfigError = \case
-  EmptySourcePaths                 -> "no paths to source code files"
-  EmptyTemplatePaths               -> "no paths to template files"
+  EmptySourcePaths   -> "no paths to source code files"
+  EmptyTemplatePaths -> "no paths to template files"
 
 ----------------------------  TYPE CLASS INSTANCES  ----------------------------
 
@@ -83,8 +83,8 @@ instance Exception HeadroomError where
         (fmap (\e -> "\t- " <> (T.unpack . displayAppConfigError $ e)) errors)
       ]
     (InvalidLicense raw) -> "Cannot parse license type from: " <> T.unpack raw
-    (InvalidPlaceholder raw) ->
-      "Cannot parse placeholder key=value from: " <> T.unpack raw
+    (InvalidVariable raw) ->
+      "Cannot parse variable key=value from: " <> T.unpack raw
     NoGenModeSelected
       -> "Please select at least one option what to generate (see --help for details)"
     (MissingVariables name variables) -> mconcat

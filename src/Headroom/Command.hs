@@ -72,7 +72,7 @@ runOptions =
     <*> many
           (strOption
             (long "variables" <> short 'v' <> metavar "KEY=VALUE" <> help
-              "placeholder to replace in templates"
+              "values for template variables"
             )
           )
     <*> (   flag'

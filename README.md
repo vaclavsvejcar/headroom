@@ -183,7 +183,7 @@ Available options:
   -s,--source-path PATH    path to source code file/directory
   -t,--template-path PATH  path to header template file/directory
   -v,--variable KEY=VALUE
-                           placeholder to replace in templates
+                           values for template variables
   -r,--replace-headers     force replace existing license headers
   -d,--drop-headers        drop existing license headers only
   --debug                  produce more verbose output

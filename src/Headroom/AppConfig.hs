@@ -104,7 +104,7 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
     [key, value] -> return (key, value)
-    _            -> throwM $ InvalidPlaceholder input
+    _            -> throwM $ InvalidVariable input
 
 -- | Validates whether given 'AppConfig' contains valid data.
 validateAppConfig :: MonadThrow m
@@ -114,7 +114,7 @@ validateAppConfig appConfig = case checked of
   Success ac'    -> return ac'
   Failure errors -> throwM $ InvalidAppConfig errors
  where
-  checked = appConfig <$ checkSourcePaths <* checkTemplatePaths
+  checked          = appConfig <$ checkSourcePaths <* checkTemplatePaths
   checkSourcePaths = if null (acSourcePaths appConfig)
     then _Failure # [EmptySourcePaths]
     else _Success # appConfig
