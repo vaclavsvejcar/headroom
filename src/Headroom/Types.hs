@@ -92,7 +92,7 @@ instance Exception HeadroomError where
     (ParseError msg) -> "Error parsing template: " <> T.unpack msg
 
 instance Show Progress where
-  show (Progress current total) = "[" <> currentS <> " of " <> totalS <> "]"
+  show (Progress current total) = mconcat ["[", currentS, " of ", totalS, "]"]
    where
     format   = "%" <> (show . L.length $ totalS) <> "d"
     currentS = printf format current
