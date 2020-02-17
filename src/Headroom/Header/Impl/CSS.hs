@@ -20,7 +20,6 @@ import           Headroom.Header.Utils          ( linesCountByRegex
                                                 , reML
                                                 )
 import           RIO
-import           RIO.Text                       ( Text )
 
 
 -- | Returns size of license header (as number of lines) in given /CSS/ source

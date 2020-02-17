@@ -25,7 +25,7 @@ import           Headroom.AppConfig             ( AppConfig(..)
                                                 )
 import           Headroom.Types                 ( RunMode )
 import           RIO
-import           RIO.Text                       ( Text )
+
 
 -- | Options for the /Run/ command.
 data RunOptions = RunOptions

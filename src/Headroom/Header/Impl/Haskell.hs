@@ -18,7 +18,6 @@ where
 
 import           Headroom.Header.Utils          ( findLineStartingWith )
 import           RIO
-import           RIO.Text                       ( Text )
 
 
 -- | Returns size of license header (as number of lines) in given /Haskell/

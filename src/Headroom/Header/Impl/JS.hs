@@ -20,7 +20,7 @@ import           Headroom.Header.Utils          ( linesCountByRegex
                                                 , reML
                                                 )
 import           RIO
-import           RIO.Text                       ( Text )
+
 
 -- | Returns size of license header (as number of lines) in given /JS/ source
 -- code. The very first comment block is considered as license header, anything

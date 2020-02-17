@@ -32,7 +32,6 @@ import qualified Headroom.Text                 as T
 import           Headroom.Types                 ( NewLine(..) )
 import           RIO
 import qualified RIO.List                      as L
-import           RIO.Text                       ( Text )
 
 
 -- | Generated license header for specified source code file type.

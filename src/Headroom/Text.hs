@@ -22,9 +22,7 @@ where
 
 import           Headroom.Types                 ( NewLine(..) )
 import           RIO
-import           RIO.Text                       ( Text
-                                                , isInfixOf
-                                                )
+import           RIO.Text                       ( isInfixOf )
 import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
 

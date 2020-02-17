@@ -22,7 +22,6 @@ where
 import           Language.Haskell.TH.Quote      ( QuasiQuoter )
 import           RIO
 import qualified RIO.List                      as L
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Heavy
 import           Text.Regex.PCRE.Light

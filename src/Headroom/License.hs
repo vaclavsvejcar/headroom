@@ -27,7 +27,6 @@ import           Headroom.FileType              ( FileType(..)
                                                 )
 import           Headroom.Types.Utils           ( readEnumCI )
 import           RIO
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
 import           Text.Read                      ( readsPrec )

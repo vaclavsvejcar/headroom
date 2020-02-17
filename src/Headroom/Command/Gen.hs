@@ -24,7 +24,7 @@ import           Headroom.License               ( parseLicense )
 import           Headroom.Types                 ( HeadroomError(..) )
 import           Prelude                        ( putStrLn )
 import           RIO
-import           RIO.Text                       ( Text )
+
 
 env' :: GenOptions -> LogFunc -> IO Env
 env' opts logFunc = return $ Env { envLogFunc = logFunc, envGenOptions = opts }

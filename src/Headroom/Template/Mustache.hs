@@ -20,7 +20,6 @@ where
 
 import           Headroom.Template              ( Template(..) )
 import           RIO
-import           RIO.HashMap                    ( HashMap )
 import qualified Text.Mustache                 as MU
 import           Text.Mustache.Render           ( SubstitutionError(..) )
 

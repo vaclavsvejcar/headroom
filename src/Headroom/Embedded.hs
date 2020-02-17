@@ -25,6 +25,7 @@ import           Headroom.License               ( License(..)
                                                 )
 import           RIO
 
+
 -- | Content of dummy /YAML/ configuration file for the application.
 configFileStub :: IsString a => a
 configFileStub = $(embedStringFile "embedded/config-file.yaml")

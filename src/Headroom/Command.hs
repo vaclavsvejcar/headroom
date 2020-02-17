@@ -17,12 +17,11 @@ module Headroom.Command
   )
 where
 
-import           Data.Semigroup                 ( (<>) )
 import           Headroom.Meta                  ( buildVer )
 import           Headroom.Types                 ( RunMode(..) )
 import           Options.Applicative
 import           RIO
-import           RIO.Text                       ( Text )
+
 
 -- | Application command.
 data Command

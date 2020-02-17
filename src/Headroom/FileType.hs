@@ -29,7 +29,6 @@ import           Headroom.Types.Utils           ( allValues
                                                 )
 import           RIO
 import qualified RIO.List                      as L
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import           Text.Read                      ( readsPrec )
 

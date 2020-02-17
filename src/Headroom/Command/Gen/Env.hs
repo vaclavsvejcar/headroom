@@ -18,7 +18,7 @@ module Headroom.Command.Gen.Env
 where
 
 import           RIO
-import           RIO.Text                       ( Text )
+
 
 -- | Options for the /Generator/ command.
 newtype GenOptions = GenOptions

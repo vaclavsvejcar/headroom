@@ -19,7 +19,6 @@ module Headroom.FileSystem
   )
 where
 
-import           Control.Monad                  ( forM )
 import           Headroom.FileType              ( FileType
                                                 , listExtensions
                                                 )
@@ -30,7 +29,6 @@ import           RIO.Directory                  ( doesDirectoryExist
 import           RIO.FilePath                   ( isExtensionOf
                                                 , (</>)
                                                 )
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
 

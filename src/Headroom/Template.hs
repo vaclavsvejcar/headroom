@@ -20,8 +20,6 @@ where
 
 import           Headroom.FileSystem            ( loadFile )
 import           RIO
-import           RIO.HashMap                    ( HashMap )
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 
 

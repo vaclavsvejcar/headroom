@@ -28,7 +28,6 @@ import           Control.Lens
 import           Data.Aeson                     ( FromJSON(parseJSON)
                                                 , genericParseJSON
                                                 )
-import           Data.Functor                   ( (<$) )
 import           Data.Validation
 import qualified Data.Yaml                     as Y
 import           Headroom.Types                 ( AppConfigError(..)
@@ -41,10 +40,9 @@ import qualified RIO.ByteString                as B
 import           RIO.FilePath                   ( takeDirectory
                                                 , (</>)
                                                 )
-import           RIO.HashMap                    ( HashMap )
 import qualified RIO.HashMap                   as HM
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
+
 
 -- | Application configuration, loaded either from configuration file or command
 -- line options.

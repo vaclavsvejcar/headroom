@@ -26,7 +26,6 @@ import           Data.Aeson                     ( FromJSON(parseJSON)
                                                 )
 import           RIO
 import qualified RIO.List                      as L
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
 import           Text.Printf                    ( printf )
 

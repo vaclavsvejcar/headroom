@@ -18,7 +18,6 @@ module Headroom.Command.Run
   )
 where
 
-import           Control.Applicative            ( (<$>) )
 import           Data.Time.Clock.POSIX          ( getPOSIXTime )
 import           Headroom.AppConfig             ( AppConfig(..)
                                                 , loadAppConfig
@@ -54,8 +53,8 @@ import           RIO.FilePath                   ( takeBaseName
                                                 )
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
-import           RIO.Text                       ( Text )
 import qualified RIO.Text                      as T
+
 
 type TemplateType = Mustache
 
