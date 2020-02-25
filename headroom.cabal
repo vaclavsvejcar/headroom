@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a36baf8c2a934ede7acd0e0e5b3ede220e22bda4a64ca73dcda8d973b303ea37
+-- hash: 2c50c31272063b2b81a25f27ed42dc1375c1523d213662f8ee322e7ab10ec095
 
 name:           headroom
-version:        0.1.0.0
+version:        0.1.1.0
 synopsis:       License Header Manager
 description:    So you are tired of managing license headers in your codebase by hand? Then Headroom is the right tool for you! Now you can define your license header as Mustache template, put all the variables (such as author's name, year, etc.) into the YAML config file and Headroom will take care to add such license headers to all your source code files.
 category:       Utils
@@ -23,6 +23,37 @@ extra-source-files:
     CHANGELOG.md
     LICENSE
     README.md
+    embedded/config-file.yaml
+    embedded/license/apache2/css.mustache
+    embedded/license/apache2/haskell.mustache
+    embedded/license/apache2/html.mustache
+    embedded/license/apache2/java.mustache
+    embedded/license/apache2/js.mustache
+    embedded/license/apache2/scala.mustache
+    embedded/license/bsd3/css.mustache
+    embedded/license/bsd3/haskell.mustache
+    embedded/license/bsd3/html.mustache
+    embedded/license/bsd3/java.mustache
+    embedded/license/bsd3/js.mustache
+    embedded/license/bsd3/scala.mustache
+    embedded/license/gpl2/css.mustache
+    embedded/license/gpl2/haskell.mustache
+    embedded/license/gpl2/html.mustache
+    embedded/license/gpl2/java.mustache
+    embedded/license/gpl2/js.mustache
+    embedded/license/gpl2/scala.mustache
+    embedded/license/gpl3/css.mustache
+    embedded/license/gpl3/haskell.mustache
+    embedded/license/gpl3/html.mustache
+    embedded/license/gpl3/java.mustache
+    embedded/license/gpl3/js.mustache
+    embedded/license/gpl3/scala.mustache
+    embedded/license/mit/css.mustache
+    embedded/license/mit/haskell.mustache
+    embedded/license/mit/html.mustache
+    embedded/license/mit/java.mustache
+    embedded/license/mit/js.mustache
+    embedded/license/mit/scala.mustache
 
 source-repository head
   type: git
