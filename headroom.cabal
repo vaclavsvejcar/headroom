@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2c50c31272063b2b81a25f27ed42dc1375c1523d213662f8ee322e7ab10ec095
+-- hash: 829d8c36efd57e251d0f75900418e00099784623a733234251dc5a74c615ba9f
 
 name:           headroom
 version:        0.1.1.0
