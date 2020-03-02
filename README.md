@@ -31,8 +31,8 @@ __Table of Contents__
 - __Template Generator__ - generates license header templates for most popular _open source_ licenses. You can use these as-is, customize them or ignore them and use your custom templates.
 
 ## 2. Planned Features
-- __init command__ - automates initial Headroom setup for your project (generates config files, detects source code file types and generates license template stubs for them)
-- __binary distribution__ - pre-built binaries will be generated for each release for major OS platforms
+- [[#24]][i24] __Init Command__ - automates initial Headroom setup for your project (generates config files, detects source code file types and generates license template stubs for them)
+- __Binary Distribution__ - pre-built binaries will be generated for each release for major OS platforms
 
 ## 3. Installation
 > Binary distribution, pre-built packages and installation from Stackage will be available soon.
@@ -244,6 +244,7 @@ Below is the list of supported source code file types. If you miss support for p
 | _Scala_      | `scala`   | `.scala`             |
 
 
+[i24]: https://github.com/vaclavsvejcar/headroom/issues/24
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
 [web:bsd-3]: https://opensource.org/licenses/BSD-3-Clause
 [web:cabal]: https://www.haskell.org/cabal/
