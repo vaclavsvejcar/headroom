@@ -1,0 +1,11 @@
+## Manual description of project structure due to bug in HIE
+## https://github.com/haskell/haskell-ide-engine/issues/1564
+
+cradle:
+  stack:
+    - path: ./test
+      component: "headroom:test:spec"
+    - path: ./src
+      component: "headroom:lib"
+    - path: ./app
+      component: "headroom:exe:headroom"
