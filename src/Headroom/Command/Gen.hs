@@ -27,7 +27,7 @@ import           RIO
 
 
 env' :: GenOptions -> LogFunc -> IO Env
-env' opts logFunc = return $ Env { envLogFunc = logFunc, envGenOptions = opts }
+env' opts logFunc = pure $ Env { envLogFunc = logFunc, envGenOptions = opts }
 
 -- | Handler for /Generator/ command.
 commandGen :: GenOptions -- ^ /Generator/ command options

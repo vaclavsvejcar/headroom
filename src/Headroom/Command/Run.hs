@@ -62,8 +62,7 @@ env' :: RunOptions -> LogFunc -> IO Env
 env' opts logFunc = do
   let startupEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
   merged <- runRIO startupEnv mergedAppConfig
-  let env = Env { envEnv = startupEnv, envAppConfig = merged }
-  return env
+  pure $ Env { envEnv = startupEnv, envAppConfig = merged }
 
 -- | Handler for /Run/ command.
 commandRun :: RunOptions -- ^ /Run/ command options
@@ -109,13 +108,13 @@ mergedAppConfig = do
     (\ex -> do
       logDebug $ displayShow (ex :: IOException)
       logWarn $ "Skipping missing configuration file: " <> fromString path
-      return Nothing
+      pure Nothing
     )
   mergeAppConfigs appConfigs = do
     let merged = mconcat appConfigs
     logDebug $ "Source AppConfig instances: " <> displayShow appConfigs
     logDebug $ "Merged AppConfig: " <> displayShow merged
-    return merged
+    pure merged
 
 loadTemplates :: (HasAppConfig env, HasLogFunc env)
               => RIO env (M.Map FileType Text)
@@ -131,7 +130,7 @@ loadTemplates = do
       fmap (t, ) (renderTemplate (acVariables appConfig) (p :: TemplateType))
     )
     parsed
-  return $ M.fromList rendered
+  pure $ M.fromList rendered
  where
   extensions = templateExtensions (Proxy :: Proxy TemplateType)
   findPaths path = findFilesByExts path extensions
@@ -142,7 +141,7 @@ extractTemplateType path = do
   let fileType = fileTypeByName . T.pack . takeBaseName $ path
   when (isNothing fileType)
        (logWarn $ "Skipping unrecognized template type: " <> fromString path)
-  return fileType
+  pure fileType
 
 findSourceFiles :: HasAppConfig env => [FileType] -> RIO env [FilePath]
 findSourceFiles fileTypes = do
@@ -160,7 +159,7 @@ processHeaders templates paths = do
       withProgress   = fmap (\(i, (h, p)) -> (progress i, h, p)) zipped
       progress curr = Progress curr (L.length paths)
   processed <- mapM (\(i, h, p) -> processHeader i h p) withProgress
-  return (L.length withProgress, L.length . filter (== True) $ processed)
+  pure (L.length withProgress, L.length . filter (== True) $ processed)
  where
   withTemplate (fileType, path) =
     fmap (\t -> (Header fileType t, path)) (M.lookup fileType templates)
@@ -183,7 +182,7 @@ processHeader progress header path = do
       msg'                   = if skipped then "Skipping file" else msg
   log' $ msg' <> ": " <> fromString path
   writeFileUtf8 path (action header fileContent)
-  return skipped
+  pure skipped
  where
   log' msg = logInfo $ displayShow progress <> "  " <> msg
   chooseAction runMode hasHeader = case runMode of

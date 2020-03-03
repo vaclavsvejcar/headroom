@@ -9,8 +9,10 @@ Portability : POSIX
 
 Functions responsible for application bootstrap.
 -}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import           Headroom.Command               ( Command(..)
@@ -38,7 +40,7 @@ main = do
     )
 
 bootstrap :: Command -> IO ()
-bootstrap command' = case command' of
+bootstrap = \case
   Run sourcePaths templatePaths variables runMode debug ->
     commandRun (RunOptions runMode sourcePaths templatePaths variables debug)
   c@(Gen _ _) -> do
@@ -46,6 +48,7 @@ bootstrap command' = case command' of
     commandGen (GenOptions genMode)
 
 parseGenMode :: MonadThrow m => Command -> m GenMode
-parseGenMode (Gen True  Nothing       ) = return GenConfigFile
-parseGenMode (Gen False (Just license)) = return $ GenLicense license
-parseGenMode _                          = throwM NoGenModeSelected
+parseGenMode = \case
+  Gen True  Nothing        -> pure GenConfigFile
+  Gen False (Just license) -> pure $ GenLicense license
+  _                        -> throwM NoGenModeSelected

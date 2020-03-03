@@ -39,18 +39,18 @@ instance Template Mustache where
 parseTemplate' :: MonadThrow m => Maybe Text -> Text -> m Mustache
 parseTemplate' name raw = case MU.compileTemplate templateName raw of
   Left  err -> throwM $ ParseError (T.pack . show $ err)
-  Right res -> return $ Mustache res
+  Right res -> pure $ Mustache res
   where templateName = T.unpack . fromMaybe "" $ name
 
 renderTemplate' :: MonadThrow m => HashMap Text Text -> Mustache -> m Text
 renderTemplate' variables (Mustache t@(MU.Template name _ _)) =
   case MU.checkedSubstitute t variables of
-    ([], rendered) -> return rendered
+    ([], rendered) -> pure rendered
     (errs, rendered) ->
       let errs' = missingVariables errs
       in  if length errs == length errs'
             then throwM $ MissingVariables (T.pack name) errs'
-            else return rendered
+            else pure rendered
  where
   missingVariables = concatMap
     (\case

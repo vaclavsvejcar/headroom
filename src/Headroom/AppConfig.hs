@@ -73,7 +73,7 @@ loadAppConfig :: MonadIO m
               -> m AppConfig -- ^ parsed configuration
 loadAppConfig path = do
   appConfig <- liftIO $ B.readFile path >>= parseAppConfig
-  return $ makePathsRelativeTo (takeDirectory path) appConfig
+  pure $ makePathsRelativeTo (takeDirectory path) appConfig
 
 -- | Rewrites all file paths in 'AppConfig' to be relative to given file path.
 makePathsRelativeTo :: FilePath  -- ^ file path to use
@@ -101,7 +101,7 @@ parseVariables :: MonadThrow m
 parseVariables variables = fmap HM.fromList (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
-    [key, value] -> return (key, value)
+    [key, value] -> pure (key, value)
     _            -> throwM $ InvalidVariable input
 
 -- | Validates whether given 'AppConfig' contains valid data.
@@ -109,7 +109,7 @@ validateAppConfig :: MonadThrow m
                   => AppConfig   -- ^ application config to validate
                   -> m AppConfig -- ^ validated application config (or errors)
 validateAppConfig appConfig = case checked of
-  Success ac'    -> return ac'
+  Success ac'    -> pure ac'
   Failure errors -> throwM $ InvalidAppConfig errors
  where
   checked          = appConfig <$ checkSourcePaths <* checkTemplatePaths

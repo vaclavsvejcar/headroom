@@ -99,8 +99,8 @@ instance Show Progress where
 
 instance FromJSON RunMode where
   parseJSON (String s) = case T.toLower s of
-    "add"     -> return Add
-    "drop"    -> return Drop
-    "replace" -> return Replace
+    "add"     -> pure Add
+    "drop"    -> pure Drop
+    "replace" -> pure Replace
     _         -> error $ "Unknown run mode: " <> T.unpack s
   parseJSON other = error $ "Invalid value for run mode: " <> show other

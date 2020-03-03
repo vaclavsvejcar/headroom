@@ -89,8 +89,8 @@ toAppConfig :: MonadThrow m
             -> m AppConfig -- ^ application configuration
 toAppConfig opts = do
   variables' <- parseVariables (roVariables opts)
-  return $ mempty { acSourcePaths   = roSourcePaths opts
-                  , acTemplatePaths = roTemplatePaths opts
-                  , acRunMode       = roRunMode opts
-                  , acVariables     = variables'
-                  }
+  pure $ mempty { acSourcePaths   = roSourcePaths opts
+                , acTemplatePaths = roTemplatePaths opts
+                , acRunMode       = roRunMode opts
+                , acVariables     = variables'
+                }

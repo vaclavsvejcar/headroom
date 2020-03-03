@@ -59,6 +59,6 @@ parseLicense raw
   | [rawLicenseType, rawFileType] <- TP.splitOn ":" raw = do
     licenseType <- parseLicenseType rawLicenseType
     fileType    <- fileTypeByName rawFileType
-    return $ License licenseType fileType
+    pure $ License licenseType fileType
   | otherwise = Nothing
   where parseLicenseType = readMaybe . T.unpack
