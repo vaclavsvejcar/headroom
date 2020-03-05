@@ -4,6 +4,8 @@
 
 So you are tired of managing license headers in your codebase by hand? Then __Headroom__ is the right tool for you! Now you can define your license header as [Mustache][web:mustache] template, put all the variables (such as author's name, year, etc.) into the [YAML][wiki:yaml] config file and Headroom will take care to add such license headers to all your source code files.
 
+<p align="center"><img src ="https://github.com/vaclavsvejcar/headroom/blob/master/doc/assets/demo.gif?raw=true" /></p>
+
 __Table of Contents__
 <!-- TOC -->
 
