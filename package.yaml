@@ -22,6 +22,12 @@ extra-source-files:
   - README.md
   - embedded/**
   - embedded/license/*/*.mustache
+  - test-data/*
+  - test-data/code-samples/*/*
+  - test-data/configs/*
+  - test-data/test-traverse/*
+  - test-data/test-traverse/foo/*
+  - test-data/test-traverse/foo/bar/*
 
 dependencies:
   - base >= 4.7 && < 5

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 829d8c36efd57e251d0f75900418e00099784623a733234251dc5a74c615ba9f
+-- hash: 73f9436aca93b42f5cee35d2bf48001adf45553b4676638ae7ada7b5f379856c
 
 name:           headroom
 version:        0.1.1.0
@@ -54,6 +54,25 @@ extra-source-files:
     embedded/license/mit/java.mustache
     embedded/license/mit/js.mustache
     embedded/license/mit/scala.mustache
+    test-data/test-template.mustache
+    test-data/code-samples/css/sample1.css
+    test-data/code-samples/css/sample2.css
+    test-data/code-samples/css/sample3.css
+    test-data/code-samples/haskell/full.hs
+    test-data/code-samples/haskell/replaced-simple.hs
+    test-data/code-samples/haskell/stripped.hs
+    test-data/code-samples/html/with-doctype.html
+    test-data/code-samples/html/without-doctype.html
+    test-data/code-samples/java/full.java
+    test-data/code-samples/js/sample1.js
+    test-data/code-samples/js/sample2.js
+    test-data/code-samples/js/sample3.js
+    test-data/code-samples/scala/full.scala
+    test-data/configs/full.yaml
+    test-data/test-traverse/a.html
+    test-data/test-traverse/foo/b.html
+    test-data/test-traverse/foo/test.xml
+    test-data/test-traverse/foo/bar/c.html
 
 source-repository head
   type: git
