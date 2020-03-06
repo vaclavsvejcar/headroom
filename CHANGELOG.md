@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.1.2.0 (released 2020-03-06)
-- FIXED: missing `test-data/` forlder in dist tarball prevents tests execution
+- FIXED: missing `test-data/` folder in dist tarball prevents tests execution
 - bump _LTS Haskell_ to `15.2`
 
 ## 0.1.1.0 (released 2020-02-26)
