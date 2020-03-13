@@ -22,6 +22,8 @@ import           Headroom.Command.Gen           ( commandGen )
 import           Headroom.Command.Gen.Env       ( GenMode(..)
                                                 , GenOptions(GenOptions)
                                                 )
+import           Headroom.Command.Init          ( commandInit )
+import           Headroom.Command.Init.Env      ( InitOptions(InitOptions) )
 import           Headroom.Command.Run           ( commandRun )
 import           Headroom.Command.Run.Env       ( RunOptions(RunOptions) )
 import           Headroom.Types                 ( HeadroomError(..) )
@@ -46,6 +48,7 @@ bootstrap = \case
   c@(Gen _ _) -> do
     genMode <- parseGenMode c
     commandGen (GenOptions genMode)
+  Init sourcePaths -> commandInit (InitOptions sourcePaths)
 
 parseGenMode :: MonadThrow m => Command -> m GenMode
 parseGenMode = \case

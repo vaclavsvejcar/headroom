@@ -27,6 +27,7 @@ import           RIO
 data Command
   = Run [FilePath] [FilePath] [Text] RunMode Bool -- ^ /Run/ command
   | Gen Bool (Maybe Text)                         -- ^ /Generator/ command
+  | Init [FilePath]                               -- ^ /Init/ command
     deriving (Show)
 
 -- | Parses command line arguments.
@@ -40,7 +41,7 @@ commandParser = info
  where
   header' =
     "headroom v" <> buildVer <> " :: https://github.com/vaclavsvejcar/headroom"
-  commands   = subparser (runCommand <> genCommand)
+  commands   = subparser (runCommand <> genCommand <> initCommand)
   runCommand = command
     "run"
     (info (runOptions <**> helper)
@@ -51,7 +52,11 @@ commandParser = info
     (info (genOptions <**> helper)
           (progDesc "generate stub configuration and template files")
     )
-
+  initCommand = command
+    "init"
+    (info (initOptions <**> helper)
+          (progDesc "initialize current project for Headroom")
+    )
 
 runOptions :: Parser Command
 runOptions =
@@ -101,3 +106,11 @@ genOptions =
               "generate template for license and file type"
             )
           )
+
+initOptions :: Parser Command
+initOptions = Init <$> many
+  (strOption
+    (long "source-path" <> short 's' <> metavar "PATH" <> help
+      "path to source code file/directory"
+    )
+  )

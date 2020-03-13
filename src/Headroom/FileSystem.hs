@@ -11,7 +11,8 @@ Functions for manipulating files and directories.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.FileSystem
-  ( findFiles
+  ( fileExtension
+  , findFiles
   , findFilesByExts
   , findFilesByTypes
   , listFiles
@@ -27,10 +28,20 @@ import           RIO.Directory                  ( doesDirectoryExist
                                                 , getDirectoryContents
                                                 )
 import           RIO.FilePath                   ( isExtensionOf
+                                                , takeExtension
                                                 , (</>)
                                                 )
 import qualified RIO.Text                      as T
 
+
+-- | Returns file extension for given path (if file), or nothing otherwise.
+--
+-- >>> fileExtension "path/to/some/file.txt"
+-- Just "txt"
+fileExtension :: FilePath -> Maybe Text
+fileExtension path = case takeExtension path of
+  '.' : xs -> Just $ T.pack xs
+  _        -> Nothing
 
 -- | Recursively finds files on given path whose filename matches the predicate.
 findFiles :: MonadIO m

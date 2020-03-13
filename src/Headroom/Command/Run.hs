@@ -25,7 +25,8 @@ import           Headroom.AppConfig             ( AppConfig(..)
                                                 )
 import           Headroom.Command.Run.Env
 import           Headroom.Command.Shared        ( bootstrap )
-import           Headroom.FileSystem            ( findFilesByExts
+import           Headroom.FileSystem            ( fileExtension
+                                                , findFilesByExts
                                                 , findFilesByTypes
                                                 )
 import           Headroom.FileType              ( FileType
@@ -48,7 +49,6 @@ import           Headroom.Types                 ( Progress(..)
 import           RIO                     hiding ( second )
 import           RIO.Directory
 import           RIO.FilePath                   ( takeBaseName
-                                                , takeExtension
                                                 , (</>)
                                                 )
 import qualified RIO.List                      as L
@@ -163,11 +163,7 @@ processHeaders templates paths = do
  where
   withTemplate (fileType, path) =
     fmap (\t -> (Header fileType t, path)) (M.lookup fileType templates)
-  processPath path = fmap (, path) (fileTypeFor path)
-  fileTypeFor = fileTypeByExt . T.pack . fileExt
-  fileExt path = case takeExtension path of
-    '.' : xs -> xs
-    other    -> other
+  processPath path = fmap (, path) (fileExtension path >>= fileTypeByExt)
 
 processHeader :: (HasLogFunc env, HasRunOptions env)
               => Progress

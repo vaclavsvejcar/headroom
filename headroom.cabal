@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5235b6b6f9f4c6b961949a1978d4c3f4ffcc356afe62f93715f12c43a01f3ad7
+-- hash: 54b20bb330a9aa78911e0713103cd2ba4ca12edee28992e31ffee2fb00a7f0fd
 
 name:           headroom
 version:        0.1.2.0
@@ -84,6 +84,8 @@ library
       Headroom.Command
       Headroom.Command.Gen
       Headroom.Command.Gen.Env
+      Headroom.Command.Init
+      Headroom.Command.Init.Env
       Headroom.Command.Run
       Headroom.Command.Run.Env
       Headroom.Command.Shared
@@ -163,6 +165,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Headroom.AppConfigSpec
+      Headroom.Command.InitSpec
       Headroom.FileSystemSpec
       Headroom.FileTypeSpec
       Headroom.Header.Impl.CSSSpec

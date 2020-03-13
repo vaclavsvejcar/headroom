@@ -41,9 +41,10 @@ data HeadroomError
   = InvalidAppConfig [AppConfigError] -- ^ invalid application configuration
   | InvalidLicense Text               -- ^ unknown license is selected in /Generator/
   | InvalidVariable Text              -- ^ invalid variable format (@key=value@)
-  | NoGenModeSelected                 -- ^ no mode for /Generator/ command is selected
   | MissingVariables Text [Text]      -- ^ not all variables were filled in template
+  | NoGenModeSelected                 -- ^ no mode for /Generator/ command is selected
   | ParseError Text                   -- ^ error parsing template file
+  | NoSupportedFileType
   deriving (Show, Typeable)
 
 -- | Represents newline separator.
@@ -75,20 +76,21 @@ displayAppConfigError = \case
 
 instance Exception HeadroomError where
   displayException = \case
-    (InvalidAppConfig errors) -> mconcat
+    InvalidAppConfig errors -> mconcat
       [ "Invalid configuration, following problems found:\n"
       , L.intercalate
         "\n"
         (fmap (\e -> "\t- " <> (T.unpack . displayAppConfigError $ e)) errors)
       ]
-    (InvalidLicense raw) -> "Cannot parse license type from: " <> T.unpack raw
-    (InvalidVariable raw) ->
+    InvalidLicense raw -> "Cannot parse license type from: " <> T.unpack raw
+    InvalidVariable raw ->
       "Cannot parse variable key=value from: " <> T.unpack raw
     NoGenModeSelected
       -> "Please select at least one option what to generate (see --help for details)"
-    (MissingVariables name variables) -> mconcat
+    MissingVariables name variables -> mconcat
       ["Missing variables for template '", T.unpack name, "': ", show variables]
-    (ParseError msg) -> "Error parsing template: " <> T.unpack msg
+    NoSupportedFileType -> "No supported file type found"
+    ParseError msg -> "Error parsing template: " <> T.unpack msg
 
 instance Show Progress where
   show (Progress current total) = mconcat ["[", currentS, " of ", totalS, "]"]

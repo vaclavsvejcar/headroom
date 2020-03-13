@@ -14,6 +14,12 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
+  describe "fileExtension" $ do
+    it "returns file extension for valid file path" $ do
+      fileExtension "/some/path/to/file.txt" `shouldBe` Just "txt"
+    it "returns nothing for invalid file path" $ do
+      fileExtension "/some/nonsense/path" `shouldBe` Nothing
+
   describe "findFiles" $ do
     it "recursively finds files filtered by given predicate" $ do
       files <- findFiles "test-data/test-traverse/" ("b.html" `L.isSuffixOf`)
