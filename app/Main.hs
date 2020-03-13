@@ -48,7 +48,7 @@ bootstrap = \case
   c@(Gen _ _) -> do
     genMode <- parseGenMode c
     commandGen (GenOptions genMode)
-  Init sourcePaths -> commandInit (InitOptions sourcePaths)
+  Init licenseType sourcePaths -> commandInit (InitOptions sourcePaths)
 
 parseGenMode :: MonadThrow m => Command -> m GenMode
 parseGenMode = \case

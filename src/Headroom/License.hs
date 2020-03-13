@@ -19,6 +19,7 @@ module Headroom.License
   ( License(..)
   , LicenseType(..)
   , parseLicense
+  , parseLicenseType
   )
 where
 
@@ -61,4 +62,10 @@ parseLicense raw
     fileType    <- fileTypeByName rawFileType
     pure $ License licenseType fileType
   | otherwise = Nothing
-  where parseLicenseType = readMaybe . T.unpack
+
+-- | Parses 'LicenseType' from the raw string representation.
+--
+-- >>> parseLicenseType "bsd3"
+-- Just BSD3
+parseLicenseType :: Text -> Maybe LicenseType
+parseLicenseType = readMaybe . T.unpack

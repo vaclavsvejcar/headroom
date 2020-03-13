@@ -27,7 +27,7 @@ import           RIO
 data Command
   = Run [FilePath] [FilePath] [Text] RunMode Bool -- ^ /Run/ command
   | Gen Bool (Maybe Text)                         -- ^ /Generator/ command
-  | Init [FilePath]                               -- ^ /Init/ command
+  | Init Text [FilePath]                               -- ^ /Init/ command
     deriving (Show)
 
 -- | Parses command line arguments.
@@ -108,9 +108,15 @@ genOptions =
           )
 
 initOptions :: Parser Command
-initOptions = Init <$> many
-  (strOption
-    (long "source-path" <> short 's' <> metavar "PATH" <> help
-      "path to source code file/directory"
-    )
-  )
+initOptions =
+  Init
+    <$> strOption
+          (long "license-type" <> short 'l' <> metavar "LICENSE_TYPE" <> help
+            "type of open source license"
+          )
+    <*> some
+          (strOption
+            (long "source-path" <> short 's' <> metavar "PATH" <> help
+              "path to source code file/directory"
+            )
+          )

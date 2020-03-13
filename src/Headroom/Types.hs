@@ -18,6 +18,7 @@ module Headroom.Types
   , NewLine(..)
   , Progress(..)
   , RunMode(..)
+  , InitCommandError(..)
   )
 where
 
@@ -44,8 +45,14 @@ data HeadroomError
   | MissingVariables Text [Text]      -- ^ not all variables were filled in template
   | NoGenModeSelected                 -- ^ no mode for /Generator/ command is selected
   | ParseError Text                   -- ^ error parsing template file
-  | NoSupportedFileType
+  | InitCommandError InitCommandError
   deriving (Show, Typeable)
+
+data InitCommandError
+  = AppConfigAlreadyExists
+  | NoSourcePaths
+  | NoSupportedFileType
+  deriving (Show)
 
 -- | Represents newline separator.
 data NewLine
@@ -89,8 +96,11 @@ instance Exception HeadroomError where
       -> "Please select at least one option what to generate (see --help for details)"
     MissingVariables name variables -> mconcat
       ["Missing variables for template '", T.unpack name, "': ", show variables]
-    NoSupportedFileType -> "No supported file type found"
-    ParseError msg -> "Error parsing template: " <> T.unpack msg
+    ParseError       msg     -> "Error parsing template: " <> T.unpack msg
+    InitCommandError icError -> case icError of
+      AppConfigAlreadyExists -> "Config file '.headroom.yaml' already exists"
+      NoSourcePaths          -> "No path to source code files defined"
+      NoSupportedFileType    -> "No supported file type found"
 
 instance Show Progress where
   show (Progress current total) = mconcat ["[", currentS, " of ", totalS, "]"]

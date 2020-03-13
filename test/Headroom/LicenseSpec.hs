@@ -16,3 +16,8 @@ spec = do
     it "parses license from raw input" $ do
       parseLicense "bsd3:haskell" `shouldBe` Just (License BSD3 Haskell)
       parseLicense "foo" `shouldBe` Nothing
+
+  describe "parseLicenseType" $ do
+    it "parses license type from raw input" $ do
+      parseLicenseType "bsd3" `shouldBe` Just BSD3
+      parseLicenseType "foo" `shouldBe` Nothing

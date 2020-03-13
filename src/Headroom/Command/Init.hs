@@ -11,10 +11,13 @@ import           Headroom.FileSystem            ( fileExtension
 import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
                                                 )
+import           Headroom.Types                 ( HeadroomError(..)
+                                                , InitCommandError(..)
+                                                )
 import           RIO
-import           RIO.Directory                  ( doesFileExist
+import           RIO.Directory                  ( createDirectory
+                                                , doesFileExist
                                                 , getCurrentDirectory
-                                                , createDirectory
                                                 )
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.List                      as L
@@ -28,14 +31,19 @@ commandInit opts = bootstrap (env' opts) False $ do
   currentDir <- getCurrentDirectory
   doesAppConfigExist currentDir >>= \case
     False -> do
-      logInfo "Searching supported file types to generate templates for..."
-      fileTypes <- findSupportedFileTypes (ioSourcePaths opts)
-      logInfo $ "Done, found supported file types: " <> displayShow fileTypes
+      fileTypes <- findSupportedFileTypes'
       logInfo "Creating directory for templates 'headroom-templates'..."
       makeTemplatesDir currentDir
-    True -> do
-      logError "Config file '.headroom.yaml' already exists, exiting..."
-      exitFailure
+    True -> throwM $ InitCommandError AppConfigAlreadyExists
+ where
+  findSupportedFileTypes' = do
+    logInfo "Searching supported file types to generate templates for..."
+    fileTypes <- findSupportedFileTypes (ioSourcePaths opts)
+    case fileTypes of
+      [] -> throwM $ InitCommandError NoSourcePaths
+      _  -> do
+        logInfo $ "Done, found supported file types: " <> displayShow fileTypes
+        pure fileTypes
 
 doesAppConfigExist :: MonadIO m => FilePath -> m Bool
 doesAppConfigExist dirPath = doesFileExist $ dirPath </> ".headroom.yaml"
