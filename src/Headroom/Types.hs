@@ -50,6 +50,7 @@ data HeadroomError
 
 data InitCommandError
   = AppConfigAlreadyExists
+  | InvalidLicenseType Text
   | NoSourcePaths
   | NoSupportedFileType
   deriving (Show)
@@ -99,6 +100,7 @@ instance Exception HeadroomError where
     ParseError       msg     -> "Error parsing template: " <> T.unpack msg
     InitCommandError icError -> case icError of
       AppConfigAlreadyExists -> "Config file '.headroom.yaml' already exists"
+      InvalidLicenseType raw -> "Invalid license type: " <> T.unpack raw
       NoSourcePaths          -> "No path to source code files defined"
       NoSupportedFileType    -> "No supported file type found"
 

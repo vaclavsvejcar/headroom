@@ -1,20 +1,28 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.Command.Init where
+module Headroom.Command.Init
+  ( commandInit
+  , doesAppConfigExist
+  , findSupportedFileTypes
+  )
+where
 
 import           Headroom.Command.Init.Env
 import           Headroom.Command.Shared        ( bootstrap )
+import           Headroom.Embedded              ( licenseTemplate )
 import           Headroom.FileSystem            ( fileExtension
                                                 , findFiles
                                                 )
 import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
                                                 )
+import           Headroom.License               ( License(..) )
 import           Headroom.Types                 ( HeadroomError(..)
                                                 , InitCommandError(..)
                                                 )
 import           RIO
+import qualified RIO.Char                      as C
 import           RIO.Directory                  ( createDirectory
                                                 , doesFileExist
                                                 , getCurrentDirectory
@@ -24,35 +32,64 @@ import qualified RIO.List                      as L
 
 
 env' :: InitOptions -> LogFunc -> IO Env
-env' opts logFunc = pure $ Env { envLogFunc = logFunc, envInitOptions = opts }
+env' opts logFunc = do
+  currentDir <- getCurrentDirectory
+  let paths = Paths { pCurrentDir   = currentDir
+                    , pConfigFile   = ".headroom.yaml"
+                    , pTemplatesDir = "headroom-templates"
+                    }
+  pure $ Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
 
 commandInit :: InitOptions -> IO ()
-commandInit opts = bootstrap (env' opts) False $ do
-  currentDir <- getCurrentDirectory
-  doesAppConfigExist currentDir >>= \case
-    False -> do
-      fileTypes <- findSupportedFileTypes'
-      logInfo "Creating directory for templates 'headroom-templates'..."
-      makeTemplatesDir currentDir
-    True -> throwM $ InitCommandError AppConfigAlreadyExists
- where
-  findSupportedFileTypes' = do
-    logInfo "Searching supported file types to generate templates for..."
-    fileTypes <- findSupportedFileTypes (ioSourcePaths opts)
-    case fileTypes of
-      [] -> throwM $ InitCommandError NoSourcePaths
-      _  -> do
-        logInfo $ "Done, found supported file types: " <> displayShow fileTypes
-        pure fileTypes
+commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
+  False -> do
+    fileTypes <- findSupportedFileTypes
+    makeTemplatesDir
+    createTemplates fileTypes
+  True -> throwM $ InitCommandError AppConfigAlreadyExists
 
-doesAppConfigExist :: MonadIO m => FilePath -> m Bool
-doesAppConfigExist dirPath = doesFileExist $ dirPath </> ".headroom.yaml"
+findSupportedFileTypes :: (HasInitOptions env, HasLogFunc env)
+                       => RIO env [FileType]
+findSupportedFileTypes = do
+  opts <- view initOptionsL
+  logInfo "Searching supported file types to generate templates for..."
+  fileTypes <- do
+    allFiles <- mapM (\path -> findFiles path (const True)) (ioSourcePaths opts)
+    let allFileTypes = fmap (fileExtension >=> fileTypeByExt) (concat allFiles)
+    pure $ L.nub . catMaybes $ allFileTypes
+  case fileTypes of
+    [] -> throwM $ InitCommandError NoSourcePaths
+    _  -> do
+      logInfo $ "Done, found supported file types: " <> displayShow fileTypes
+      pure fileTypes
 
-findSupportedFileTypes :: MonadIO m => [FilePath] -> m [FileType]
-findSupportedFileTypes paths = do
-  allFiles <- mapM (\path -> findFiles path (const True)) paths
-  let allFileTypes = fmap (fileExtension >=> fileTypeByExt) (concat allFiles)
-  pure $ L.nub . catMaybes $ allFileTypes
+createTemplates :: (HasLogFunc env, HasInitOptions env, HasPaths env)
+                => [FileType]
+                -> RIO env ()
+createTemplates fileTypes = do
+  opts  <- view initOptionsL
+  paths <- view pathsL
+  let templatesDir = pCurrentDir paths </> pTemplatesDir paths
+  mapM_ (createTemplate templatesDir)
+        (fmap (License (ioLicenseType opts)) fileTypes)
 
-makeTemplatesDir :: MonadIO m => FilePath -> m ()
-makeTemplatesDir path = createDirectory $ path </> "headroom-templates"
+createTemplate :: (HasLogFunc env) => FilePath -> License -> RIO env ()
+createTemplate templatesDir license@(License _ fileType) = do
+  let fileName = (fmap C.toLower . show $ fileType) <> ".mustache"
+      filePath = templatesDir </> fileName
+      template = licenseTemplate license
+  logInfo $ mconcat ["Creating template file in ", fromString filePath]
+  writeFileUtf8 filePath template
+
+doesAppConfigExist :: (HasLogFunc env, HasPaths env) => RIO env Bool
+doesAppConfigExist = do
+  paths <- view pathsL
+  logInfo "Verifying that there's no existing Headroom configuration..."
+  doesFileExist $ pCurrentDir paths </> pConfigFile paths
+
+makeTemplatesDir :: (HasLogFunc env, HasPaths env) => RIO env ()
+makeTemplatesDir = do
+  paths <- view pathsL
+  let templatesDir = pCurrentDir paths </> pTemplatesDir paths
+  logInfo $ "Creating directory for templates in " <> fromString templatesDir
+  createDirectory templatesDir

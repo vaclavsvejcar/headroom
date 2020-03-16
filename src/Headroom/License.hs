@@ -42,12 +42,12 @@ data LicenseType
   | MIT     -- ^ /MIT/ license
   deriving (Bounded, Enum, Eq, Ord, Show)
 
+instance Read LicenseType where
+  readsPrec _ = readEnumCI
+
 -- | License (specified by 'LicenseType' and 'FileType')
 data License = License LicenseType FileType
   deriving (Show, Eq)
-
-instance Read LicenseType where
-  readsPrec _ = readEnumCI
 
 -- | Parses 'License' from the raw string representation, formatted as
 -- @licenseType:fileType@.
