@@ -180,7 +180,7 @@ processHeader progress header path = do
   writeFileUtf8 path (action header fileContent)
   pure skipped
  where
-  log' msg = logInfo $ displayShow progress <> "  " <> msg
+  log' msg = logInfo $ display progress <> " " <> msg
   chooseAction runMode hasHeader = case runMode of
     Add     -> (hasHeader, addHeader, "Adding header to")
     Drop    -> (not hasHeader, dropHeader . hFileType, "Dropping header from")

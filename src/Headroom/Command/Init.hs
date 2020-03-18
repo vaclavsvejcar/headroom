@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Command.Init
+Description : Logic for Init command
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Logic for the @init@ command, used to generate initial configuration boilerplate
+for Headroom.
+-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}

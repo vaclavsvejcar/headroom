@@ -65,7 +65,7 @@ data NewLine
 -- | Progress indication. First argument is current progress, second the maximum
 -- value.
 data Progress = Progress Int Int
-  deriving Eq
+  deriving (Eq, Show)
 
 -- | Mode of the /Run/ command, states how to license headers in source code
 -- files.
@@ -104,8 +104,9 @@ instance Exception HeadroomError where
       NoSourcePaths          -> "No path to source code files defined"
       NoSupportedFileType    -> "No supported file type found"
 
-instance Show Progress where
-  show (Progress current total) = mconcat ["[", currentS, " of ", totalS, "]"]
+instance Display Progress where
+  textDisplay (Progress current total) = T.pack
+    $ mconcat ["[", currentS, " of ", totalS, "]"]
    where
     format   = "%" <> (show . L.length $ totalS) <> "d"
     currentS = printf format current
