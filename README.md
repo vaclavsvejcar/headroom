@@ -39,7 +39,7 @@ __Table of Contents__
 - __Binary Distribution__ - pre-built binaries will be generated for each release for major OS platforms
 
 ## 3. Installation
-> Binary distribution, pre-built packages and installation from Stackage will be available soon.
+> Binary distribution will be available soon, there are also plans to add _Headroom_ to popular package managers.
 
 ### 3.1. From Source Code
 Headroom is written in [Haskell][web:haskell], so you can install it from source code either using [Cabal][web:cabal] or [Stack][web:stack].
@@ -51,8 +51,7 @@ Headroom is written in [Haskell][web:haskell], so you can install it from source
 
 #### 3.1.2. Using Stack
 1. install [Stack][web:stack] for your platform
-1. clone this repository
-1. run `stack install` inside the `headroom/` directory
+1. run `stack install headroom`
 1. add `$HOME/.local/bin` to your `$PATH`
 
 ## 4. Case Example

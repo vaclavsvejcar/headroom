@@ -20,6 +20,9 @@ module Headroom.Command.Init
   )
 where
 
+import           Headroom.AppConfig             ( AppConfig(..)
+                                                , prettyPrintAppConfig
+                                                )
 import           Headroom.Command.Init.Env
 import           Headroom.Command.Shared        ( bootstrap )
 import           Headroom.Embedded              ( licenseTemplate )
@@ -40,6 +43,7 @@ import           RIO.Directory                  ( createDirectory
                                                 , getCurrentDirectory
                                                 )
 import           RIO.FilePath                   ( (</>) )
+import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 
 
@@ -58,6 +62,7 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
     fileTypes <- findSupportedFileTypes
     makeTemplatesDir
     createTemplates fileTypes
+    createConfigFile
   True -> throwM $ InitCommandError AppConfigAlreadyExists
 
 findSupportedFileTypes :: (HasInitOptions env, HasLogFunc env)
@@ -75,7 +80,7 @@ findSupportedFileTypes = do
       logInfo $ "Done, found supported file types: " <> displayShow fileTypes
       pure fileTypes
 
-createTemplates :: (HasLogFunc env, HasInitOptions env, HasPaths env)
+createTemplates :: (HasInitOptions env, HasLogFunc env, HasPaths env)
                 => [FileType]
                 -> RIO env ()
 createTemplates fileTypes = do
@@ -84,6 +89,27 @@ createTemplates fileTypes = do
   let templatesDir = pCurrentDir paths </> pTemplatesDir paths
   mapM_ (createTemplate templatesDir)
         (fmap (License (ioLicenseType opts)) fileTypes)
+
+createConfigFile :: (HasInitOptions env, HasLogFunc env, HasPaths env)
+                 => RIO env ()
+createConfigFile = do
+  opts  <- view initOptionsL
+  paths <- view pathsL
+  let filePath = pCurrentDir paths </> pConfigFile paths
+      content  = prettyPrintAppConfig $ appConfig opts paths
+  logInfo $ "Creating YAML config file in " <> fromString filePath
+  writeFileUtf8 filePath content
+ where
+  variables = HM.fromList
+    [ ("author" , "John Smith")
+    , ("email"  , "john.smith@example.com")
+    , ("project", "My project")
+    , ("year"   , "2020")
+    ]
+  appConfig opts paths = mempty { acSourcePaths   = ioSourcePaths opts
+                                , acTemplatePaths = [pTemplatesDir paths]
+                                , acVariables     = variables
+                                }
 
 createTemplate :: (HasLogFunc env) => FilePath -> License -> RIO env ()
 createTemplate templatesDir license@(License _ fileType) = do

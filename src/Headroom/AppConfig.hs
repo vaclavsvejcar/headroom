@@ -20,16 +20,23 @@ module Headroom.AppConfig
   , makePathsRelativeTo
   , parseAppConfig
   , parseVariables
+  , prettyPrintAppConfig
   , validateAppConfig
   )
 where
 
 import           Control.Lens
 import           Data.Aeson                     ( FromJSON(parseJSON)
+                                                , ToJSON(toJSON)
                                                 , genericParseJSON
+                                                , genericToJSON
                                                 )
 import           Data.Validation
 import qualified Data.Yaml                     as Y
+import           Data.Yaml.Pretty               ( defConfig
+                                                , encodePretty
+                                                , setConfCompare
+                                                )
 import           Headroom.Types                 ( AppConfigError(..)
                                                 , HeadroomError(..)
                                                 , RunMode(..)
@@ -57,6 +64,9 @@ data AppConfig = AppConfig
 -- | Support for reading configuration from /YAML/.
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
+
+instance ToJSON AppConfig where
+  toJSON = genericToJSON customOptions
 
 instance Semigroup AppConfig where
   x <> y = AppConfig (acRunMode x)
@@ -103,6 +113,10 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
   parse input = case T.split (== '=') input of
     [key, value] -> pure (key, value)
     _            -> throwM $ InvalidVariable input
+
+prettyPrintAppConfig :: AppConfig -> Text
+prettyPrintAppConfig = decodeUtf8Lenient . encodePretty prettyConfig
+  where prettyConfig = setConfCompare compare defConfig
 
 -- | Validates whether given 'AppConfig' contains valid data.
 validateAppConfig :: MonadThrow m

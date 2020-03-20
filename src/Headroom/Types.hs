@@ -23,6 +23,7 @@ module Headroom.Types
 where
 
 import           Data.Aeson                     ( FromJSON(parseJSON)
+                                                , ToJSON(toJSON)
                                                 , Value(String)
                                                 )
 import           RIO
@@ -119,3 +120,9 @@ instance FromJSON RunMode where
     "replace" -> pure Replace
     _         -> error $ "Unknown run mode: " <> T.unpack s
   parseJSON other = error $ "Invalid value for run mode: " <> show other
+
+instance ToJSON RunMode where
+  toJSON = \case
+    Add     -> "add"
+    Drop    -> "drop"
+    Replace -> "replace"

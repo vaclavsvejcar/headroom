@@ -49,6 +49,15 @@ spec = do
         ["template1"]
         (HM.fromList [("key1", "value1"), ("key2", "value2")])
 
+  describe "prettyPrintAppConfig" $ do
+    it "can pretty print AppConfig" $ do
+      let result   = prettyPrintAppConfig appConfig2
+          expected = mconcat
+            [ "run-mode: add\nsource-paths:\n- source2\n"
+            , "template-paths:\n- template1\nvariables:\n  key2: value2\n"
+            ]
+      result `shouldBe` expected
+
   describe "validateAppConfig" $ do
     it "validates configuration version" $ do
       let check (Just (InvalidAppConfig [EmptySourcePaths])) = True
@@ -62,4 +71,3 @@ spec = do
   describe "mconcat" $ do
     it "folds a list of AppConfig records" $ do
       mconcat [appConfig1, appConfig2] `shouldBe` expected'
-
