@@ -71,10 +71,10 @@ commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
   startTS <- liftIO getPOSIXTime
   logInfo "Loading source code header templates..."
   templates <- loadTemplates
-  logInfo $ "Done, found " <> displayShow (M.size templates) <> " template(s)"
+  logInfo $ "Done, found " <> display (M.size templates) <> " template(s)"
   logInfo "Searching for source code files..."
   sourceFiles <- findSourceFiles (M.keys templates)
-  let sourceFilesNum = displayShow . L.length $ sourceFiles
+  let sourceFilesNum = display . L.length $ sourceFiles
   logInfo $ mconcat
     ["Done, found ", sourceFilesNum, " sources code files(s) to process"]
   (total, skipped) <- processHeaders templates sourceFiles
@@ -82,11 +82,11 @@ commandRun opts = bootstrap (env' opts) (roDebug opts) $ do
   let (elapsedSeconds, _) = properFraction (endTS - startTS)
   logInfo $ mconcat
     [ "Done: modified "
-    , displayShow (total - skipped)
+    , display (total - skipped)
     , ", skipped "
-    , displayShow skipped
+    , display skipped
     , " files in "
-    , displayShow (elapsedSeconds :: Integer)
+    , display (elapsedSeconds :: Integer)
     , " second(s)."
     ]
 
