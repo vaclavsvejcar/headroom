@@ -43,9 +43,8 @@ import           Headroom.Template              ( Template(..)
                                                 , loadTemplate
                                                 )
 import           Headroom.Template.Mustache     ( Mustache(..) )
-import           Headroom.Types                 ( Progress(..)
-                                                , RunMode(..)
-                                                )
+import           Headroom.Types                 ( RunMode(..) )
+import           Headroom.UI.Progress           ( Progress(..) )
 import           RIO                     hiding ( second )
 import           RIO.Directory
 import           RIO.FilePath                   ( takeBaseName

@@ -16,7 +16,6 @@ module Headroom.Types
   ( AppConfigError(..)
   , HeadroomError(..)
   , NewLine(..)
-  , Progress(..)
   , RunMode(..)
   , InitCommandError(..)
   )
@@ -29,7 +28,7 @@ import           Data.Aeson                     ( FromJSON(parseJSON)
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
-import           Text.Printf                    ( printf )
+
 
 -- | Error occured during validation of application configuration.
 data AppConfigError
@@ -61,11 +60,6 @@ data NewLine
   = CR   -- ^ line ends with @\r@
   | CRLF -- ^ line ends with @\r\n@
   | LF   -- ^ line ends with @\n@
-  deriving (Eq, Show)
-
--- | Progress indication. First argument is current progress, second the maximum
--- value.
-data Progress = Progress Int Int
   deriving (Eq, Show)
 
 -- | Mode of the /Run/ command, states how to license headers in source code
@@ -104,14 +98,6 @@ instance Exception HeadroomError where
       InvalidLicenseType raw -> "Invalid license type: " <> T.unpack raw
       NoSourcePaths          -> "No path to source code files defined"
       NoSupportedFileType    -> "No supported file type found"
-
-instance Display Progress where
-  textDisplay (Progress current total) = T.pack
-    $ mconcat ["[", currentS, " of ", totalS, "]"]
-   where
-    format   = "%" <> (show . L.length $ totalS) <> "d"
-    currentS = printf format current
-    totalS   = show total
 
 instance FromJSON RunMode where
   parseJSON (String s) = case T.toLower s of

@@ -36,6 +36,9 @@ import           Headroom.License               ( License(..) )
 import           Headroom.Types                 ( HeadroomError(..)
                                                 , InitCommandError(..)
                                                 )
+import           Headroom.UI.Progress           ( Progress(..)
+                                                , zipWithProgress
+                                                )
 import           RIO
 import qualified RIO.Char                      as C
 import           RIO.Directory                  ( createDirectory
@@ -87,8 +90,21 @@ createTemplates fileTypes = do
   opts  <- view initOptionsL
   paths <- view pathsL
   let templatesDir = pCurrentDir paths </> pTemplatesDir paths
-  mapM_ (createTemplate templatesDir)
-        (fmap (License (ioLicenseType opts)) fileTypes)
+  mapM_ (\(p, l) -> createTemplate templatesDir l p)
+        (zipWithProgress $ fmap (License (ioLicenseType opts)) fileTypes)
+
+createTemplate :: (HasLogFunc env)
+               => FilePath
+               -> License
+               -> Progress
+               -> RIO env ()
+createTemplate templatesDir license@(License _ fileType) progress = do
+  let fileName = (fmap C.toLower . show $ fileType) <> ".mustache"
+      filePath = templatesDir </> fileName
+      template = licenseTemplate license
+  logInfo $ mconcat
+    [display progress, " Creating template file in ", fromString filePath]
+  writeFileUtf8 filePath template
 
 createConfigFile :: (HasInitOptions env, HasLogFunc env, HasPaths env)
                  => RIO env ()
@@ -110,14 +126,6 @@ createConfigFile = do
                                 , acTemplatePaths = [pTemplatesDir paths]
                                 , acVariables     = variables
                                 }
-
-createTemplate :: (HasLogFunc env) => FilePath -> License -> RIO env ()
-createTemplate templatesDir license@(License _ fileType) = do
-  let fileName = (fmap C.toLower . show $ fileType) <> ".mustache"
-      filePath = templatesDir </> fileName
-      template = licenseTemplate license
-  logInfo $ mconcat ["Creating template file in ", fromString filePath]
-  writeFileUtf8 filePath template
 
 doesAppConfigExist :: (HasLogFunc env, HasPaths env) => RIO env Bool
 doesAppConfigExist = do
