@@ -15,18 +15,22 @@ module Headroom.Command.Init.Env where
 import           Headroom.License               ( LicenseType )
 import           RIO
 
-data InitOptions = InitOptions
-  { ioSourcePaths :: ![FilePath]
-  , ioLicenseType :: !LicenseType
-  }
-  deriving Show
 
+-- | /RIO/ Environment for the /Init/ command.
 data Env = Env
   { envLogFunc     :: !LogFunc
   , envInitOptions :: !InitOptions
   , envPaths       :: !Paths
   }
 
+-- | Options for the /Init/ command.
+data InitOptions = InitOptions
+  { ioSourcePaths :: ![FilePath]
+  , ioLicenseType :: !LicenseType
+  }
+  deriving Show
+
+-- | Paths to various locations of file system.
 data Paths = Paths
   { pCurrentDir   :: !FilePath
   , pConfigFile   :: !FilePath
@@ -36,9 +40,11 @@ data Paths = Paths
 instance HasLogFunc Env where
   logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
 
+-- | Environment value with /Init/ command options.
 class HasInitOptions env where
   initOptionsL :: Lens' env InitOptions
 
+-- | Environment value with 'Paths'.
 class HasPaths env where
   pathsL :: Lens' env Paths
 

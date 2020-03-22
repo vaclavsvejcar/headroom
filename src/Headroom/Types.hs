@@ -45,14 +45,15 @@ data HeadroomError
   | MissingVariables Text [Text]      -- ^ not all variables were filled in template
   | NoGenModeSelected                 -- ^ no mode for /Generator/ command is selected
   | ParseError Text                   -- ^ error parsing template file
-  | InitCommandError InitCommandError
+  | InitCommandError InitCommandError -- ^ error during execution of /Init/ command
   deriving (Show, Typeable)
 
+-- | Errors specific for the /Init/ command.
 data InitCommandError
-  = AppConfigAlreadyExists
-  | InvalidLicenseType Text
-  | NoSourcePaths
-  | NoSupportedFileType
+  = AppConfigAlreadyExists  -- ^ application configuration file already exists
+  | InvalidLicenseType Text -- ^ invalid license type specified
+  | NoSourcePaths           -- ^ no paths to source code files provided
+  | NoSupportedFileType     -- ^ no supported file types found on source paths
   deriving (Show)
 
 -- | Represents newline separator.

@@ -65,6 +65,7 @@ data AppConfig = AppConfig
 instance FromJSON AppConfig where
   parseJSON = genericParseJSON customOptions
 
+-- | Support for writing configuration to /YAML/.
 instance ToJSON AppConfig where
   toJSON = genericToJSON customOptions
 
@@ -114,7 +115,9 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
     [key, value] -> pure (key, value)
     _            -> throwM $ InvalidVariable input
 
-prettyPrintAppConfig :: AppConfig -> Text
+-- | Writes the given 'AppConfig' to /YAML/ text, using the pretty printer.
+prettyPrintAppConfig :: AppConfig -- ^ application config to write to /YAML/
+                     -> Text      -- ^ pretty printed /YAML/ text
 prettyPrintAppConfig = decodeUtf8Lenient . encodePretty prettyConfig
   where prettyConfig = setConfCompare compare defConfig
 

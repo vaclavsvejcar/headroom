@@ -59,7 +59,9 @@ env' opts logFunc = do
                     }
   pure $ Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
 
-commandInit :: InitOptions -> IO ()
+-- | Handler for /Init/ command.
+commandInit :: InitOptions -- ^ /Init/ command options
+            -> IO ()       -- ^ execution result
 commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
   False -> do
     fileTypes <- findSupportedFileTypes
@@ -68,11 +70,12 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
     createConfigFile
   True -> throwM $ InitCommandError AppConfigAlreadyExists
 
+-- | Recursively scans provided source paths for known file types for which
+-- templates can be generated.
 findSupportedFileTypes :: (HasInitOptions env, HasLogFunc env)
                        => RIO env [FileType]
 findSupportedFileTypes = do
-  opts <- view initOptionsL
-  logInfo "Searching supported file types to generate templates for..."
+  opts      <- view initOptionsL
   fileTypes <- do
     allFiles <- mapM (\path -> findFiles path (const True)) (ioSourcePaths opts)
     let allFileTypes = fmap (fileExtension >=> fileTypeByExt) (concat allFiles)
@@ -80,7 +83,7 @@ findSupportedFileTypes = do
   case fileTypes of
     [] -> throwM $ InitCommandError NoSourcePaths
     _  -> do
-      logInfo $ "Done, found supported file types: " <> displayShow fileTypes
+      logInfo $ "Found supported file types: " <> displayShow fileTypes
       pure fileTypes
 
 createTemplates :: (HasInitOptions env, HasLogFunc env, HasPaths env)
@@ -127,12 +130,14 @@ createConfigFile = do
                                 , acVariables     = variables
                                 }
 
+-- | Checks whether application config file already exists.
 doesAppConfigExist :: (HasLogFunc env, HasPaths env) => RIO env Bool
 doesAppConfigExist = do
   paths <- view pathsL
   logInfo "Verifying that there's no existing Headroom configuration..."
   doesFileExist $ pCurrentDir paths </> pConfigFile paths
 
+-- | Creates directory for template files.
 makeTemplatesDir :: (HasLogFunc env, HasPaths env) => RIO env ()
 makeTemplatesDir = do
   paths <- view pathsL

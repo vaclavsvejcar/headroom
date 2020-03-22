@@ -11,20 +11,14 @@ Data types and instances for the /Generator/ command environment.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Gen.Env
-  ( GenMode(..)
+  ( Env(..)
+  , GenMode(..)
   , GenOptions(..)
-  , Env(..)
   )
 where
 
 import           RIO
 
-
--- | Options for the /Generator/ command.
-newtype GenOptions = GenOptions
-  { goGenMode :: GenMode -- ^ used /Generator/ command mode
-  }
-  deriving Show
 
 -- | /RIO/ Environment for the /Generator/ command.
 data Env = Env
@@ -37,6 +31,12 @@ data GenMode
   = GenConfigFile   -- ^ generate /YAML/ config file stub
   | GenLicense Text -- ^ generate license header template
   deriving (Eq, Show)
+
+-- | Options for the /Generator/ command.
+newtype GenOptions = GenOptions
+  { goGenMode :: GenMode -- ^ used /Generator/ command mode
+  }
+  deriving Show
 
 instance HasLogFunc Env where
   logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
