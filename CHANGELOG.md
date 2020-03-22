@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.1.3.0 (TBD)
+- [#24] Added _Init_ command that automatically creates initial _Headroom_ configuration and set of templates.
+- bump _LTS Haskell_ to `15.4`
+
 ## 0.1.2.0 (released 2020-03-06)
 - FIXED: missing `test-data/` folder in dist tarball prevents tests execution
 - bump _LTS Haskell_ to `15.2`

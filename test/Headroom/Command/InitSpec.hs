@@ -19,6 +19,7 @@ spec = do
     it "checks that '.headroom.yaml' exists in selected directory" $ do
       result <- runRIO env doesAppConfigExist
       result `shouldBe` True
+      
   describe "findSupportedFileTypes" $ do
     it "recursively finds all known file types present in given path" $ do
       result <- runRIO env findSupportedFileTypes
