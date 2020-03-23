@@ -27,10 +27,11 @@ __Table of Contents__
     - [5.2. YAML Configuration File](#52-yaml-configuration-file)
     - [5.3. Running Headroom](#53-running-headroom)
 - [6. Command Line Interface Overview](#6-command-line-interface-overview)
-    - [6.1. Run Command](#61-run-command)
-    - [6.2. Generator Command](#62-generator-command)
-        - [6.2.1. Supported License Types](#621-supported-license-types)
-        - [6.2.2. Supported File Types](#622-supported-file-types)
+    - [6.1. Init Command](#61-init-command)
+    - [6.2. Run Command](#62-run-command)
+    - [6.3. Generator Command](#63-generator-command)
+        - [6.3.1. Supported License Types](#631-supported-license-types)
+        - [6.3.2. Supported File Types](#632-supported-file-types)
 
 <!-- /TOC -->
 
@@ -171,7 +172,7 @@ Headroom provides various commands for different use cases. You can check comman
 
 ```
 $ headroom --help
-headroom v0.1.0.0 :: https://github.com/vaclavsvejcar/headroom
+headroom v0.1.3.0 :: https://github.com/vaclavsvejcar/headroom
 
 Usage: headroom COMMAND
   manage your source code license headers
@@ -182,9 +183,25 @@ Available options:
 Available commands:
   run                      add or replace source code headers
   gen                      generate stub configuration and template files
+  init                     initialize current project for Headroom
 ```
 
-### 6.1. Run Command
+### 6.1. Init Command
+Init command is used to initialize Headroom for project by generating all the required files (_YAML_ config file and template files). You can display available options by running following command:
+
+```
+$ headroom init --help
+Usage: headroom init (-l|--license-type LICENSE_TYPE) (-s|--source-path PATH)
+  initialize current project for Headroom
+
+Available options:
+  -l,--license-type LICENSE_TYPE
+                           type of open source license
+  -s,--source-path PATH    path to source code file/directory
+  -h,--help                Show this help text
+```
+
+### 6.2. Run Command
 Run command is used to manipulate (add, replace or drop) license headers in source code files. You can display available options by running following command:
 
 ```
@@ -216,7 +233,7 @@ Note that command line options override options set in the configuration _YAML_ 
 | `template-paths`    | `-t`, `--template-path`   |
 
 
-### 6.2. Generator Command
+### 6.3. Generator Command
 Generator command is used to generate stubs for license header template and _YAML_ configuration file. You can display available options by running following command:
 
 ```
@@ -232,7 +249,7 @@ Available options:
 
 When using the `-l,--license` option, you need to select the _license type_ and _file type_ from the list of supported ones listed bellow. For example to generate template for _Apache 2.0_ license and _Haskell_ file type, you need to use the `headroom gen -l apache2:haskell`.
 
-#### 6.2.1. Supported License Types
+#### 6.3.1. Supported License Types
 Below is the list of supported _open source_ license types. If you miss support for license you use, feel free to [open new issue][meta:new-issue].
 
 | License        | Used Name |
@@ -243,7 +260,7 @@ Below is the list of supported _open source_ license types. If you miss support 
 | _GPLv3_        | `gpl3`    |
 | _MIT_          | `mit`     |
 
-#### 6.2.2. Supported File Types
+#### 6.3.2. Supported File Types
 Below is the list of supported source code file types. If you miss support for programming language you use, feel free to [open new issue][meta:new-issue].
 
 | Language     | Used Name | Supported Extensions |
