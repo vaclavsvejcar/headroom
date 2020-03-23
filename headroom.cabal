@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f2f13f091ee8ba87092588832dc01942694b6da6d7f8890202f6568ef1f5129f
+-- hash: c3ea07b871ecc70653ce576f49c063d4cba973dd6c2c8486990694f3b0794a7c
 
 name:           headroom
 version:        0.1.3.0
@@ -92,6 +92,7 @@ library
       Headroom.Embedded
       Headroom.FileSystem
       Headroom.FileType
+      Headroom.Global
       Headroom.Header
       Headroom.Header.Impl
       Headroom.Header.Impl.CSS

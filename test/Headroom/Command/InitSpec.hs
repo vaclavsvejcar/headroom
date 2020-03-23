@@ -9,9 +9,9 @@ import           Headroom.Command.Init.Env
 import           Headroom.FileType              ( FileType(HTML) )
 import           Headroom.License               ( LicenseType(..) )
 import           RIO
+import           RIO.FilePath                   ( (</>) )
 import qualified RIO.List                      as L
 import           Test.Hspec
-import           RIO.FilePath                   ( (</>) )
 
 
 spec :: Spec

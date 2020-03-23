@@ -33,6 +33,7 @@ import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
                                                 , fileTypeByName
                                                 )
+import           Headroom.Global                ( TemplateType )
 import           Headroom.Header                ( Header(..)
                                                 , addHeader
                                                 , containsHeader
@@ -42,7 +43,6 @@ import           Headroom.Header                ( Header(..)
 import           Headroom.Template              ( Template(..)
                                                 , loadTemplate
                                                 )
-import           Headroom.Template.Mustache     ( Mustache(..) )
 import           Headroom.Types                 ( RunMode(..) )
 import           Headroom.UI.Progress           ( Progress(..) )
 import           RIO                     hiding ( second )
@@ -54,8 +54,6 @@ import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
 
-
-type TemplateType = Mustache
 
 env' :: RunOptions -> LogFunc -> IO Env
 env' opts logFunc = do
