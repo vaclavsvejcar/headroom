@@ -32,7 +32,9 @@ import           Headroom.FileSystem            ( fileExtension
 import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
                                                 )
+import           Headroom.Global                ( TemplateType )
 import           Headroom.License               ( License(..) )
+import           Headroom.Template              ( templateExtensions )
 import           Headroom.Types                 ( HeadroomError(..)
                                                 , InitCommandError(..)
                                                 )
@@ -48,6 +50,8 @@ import           RIO.Directory                  ( createDirectory
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
+import qualified RIO.NonEmpty                  as NE
+import qualified RIO.Text                      as T
 
 
 env' :: InitOptions -> LogFunc -> IO Env
@@ -102,9 +106,10 @@ createTemplate :: (HasLogFunc env)
                -> Progress
                -> RIO env ()
 createTemplate templatesDir license@(License _ fileType) progress = do
-  let fileName = (fmap C.toLower . show $ fileType) <> ".mustache"
-      filePath = templatesDir </> fileName
-      template = licenseTemplate license
+  let extension = NE.head $ templateExtensions (Proxy :: Proxy TemplateType)
+      file = (fmap C.toLower . show $ fileType) <> "." <> T.unpack extension
+      filePath  = templatesDir </> file
+      template  = licenseTemplate license
   logInfo $ mconcat
     [display progress, " Creating template file in ", fromString filePath]
   writeFileUtf8 filePath template

@@ -26,8 +26,8 @@ import qualified RIO.Text                      as T
 -- | Type class representing generic license header template support.
 class Template t where
   -- | Returns list of supported file extensions for this template type.
-  templateExtensions :: proxy t -- ^ phantom parameter, not used
-                     -> [Text]  -- ^ list of supported file extensions
+  templateExtensions :: proxy t        -- ^ phantom parameter, not used
+                     -> NonEmpty Text  -- ^ list of supported file extensions
 
   -- | Parses template from given raw text.
   parseTemplate :: MonadThrow m

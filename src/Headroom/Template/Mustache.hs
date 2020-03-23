@@ -32,7 +32,7 @@ newtype Mustache = Mustache MU.Template deriving (Show)
 
 -- | Support for /Mustache/ templates.
 instance Template Mustache where
-  templateExtensions _ = ["mustache"]
+  templateExtensions _ = "mustache" :| []
   parseTemplate  = parseTemplate'
   renderTemplate = renderTemplate'
 
