@@ -34,13 +34,13 @@ import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
                                                 , fileTypeByName
                                                 )
-import           Headroom.Global                ( TemplateType )
 import           Headroom.Header                ( Header(..)
                                                 , addHeader
                                                 , containsHeader
                                                 , dropHeader
                                                 , replaceHeader
                                                 )
+import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..)
                                                 , loadTemplate
                                                 )

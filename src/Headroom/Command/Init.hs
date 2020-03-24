@@ -33,8 +33,8 @@ import           Headroom.FileSystem            ( fileExtension
 import           Headroom.FileType              ( FileType
                                                 , fileTypeByExt
                                                 )
-import           Headroom.Global                ( TemplateType )
 import           Headroom.License               ( License(..) )
+import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( templateExtensions )
 import           Headroom.Types                 ( HeadroomError(..)
                                                 , InitCommandError(..)
