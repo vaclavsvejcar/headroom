@@ -13,6 +13,7 @@ code files.
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections     #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.Command.Run
   ( commandRun
   )
@@ -129,7 +130,7 @@ loadTemplates = do
     parsed
   pure $ M.fromList rendered
  where
-  extensions = toList $ templateExtensions (Proxy :: Proxy TemplateType)
+  extensions = toList $ templateExtensions @TemplateType
   findPaths path = findFilesByExts path extensions
   filterTemplate (fileType, path) = (\ft -> Just (ft, path)) =<< fileType
 

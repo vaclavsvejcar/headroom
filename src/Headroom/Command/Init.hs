@@ -13,6 +13,7 @@ for Headroom.
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.Command.Init
   ( commandInit
   , doesAppConfigExist
@@ -106,7 +107,7 @@ createTemplate :: (HasLogFunc env)
                -> Progress
                -> RIO env ()
 createTemplate templatesDir license@(License _ fileType) progress = do
-  let extension = NE.head $ templateExtensions (Proxy :: Proxy TemplateType)
+  let extension = NE.head $ templateExtensions @TemplateType
       file = (fmap C.toLower . show $ fileType) <> "." <> T.unpack extension
       filePath  = templatesDir </> file
       template  = licenseTemplate license

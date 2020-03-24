@@ -11,7 +11,8 @@ Provides generic support for the license header templates, represented by the
 'Template' type class. Various implementations can be plugged in by creating
 custom instance of this type class.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
 module Headroom.Template
   ( Template(..)
   , loadTemplate
@@ -26,8 +27,7 @@ import qualified RIO.Text                      as T
 -- | Type class representing generic license header template support.
 class Template t where
   -- | Returns list of supported file extensions for this template type.
-  templateExtensions :: proxy t        -- ^ phantom parameter, not used
-                     -> NonEmpty Text  -- ^ list of supported file extensions
+  templateExtensions :: NonEmpty Text -- ^ list of supported file extensions
 
   -- | Parses template from given raw text.
   parseTemplate :: MonadThrow m
