@@ -70,3 +70,10 @@ licenseTemplate (License licenseType fileType) = case licenseType of
     Java    -> $(embedStringFile "embedded/license/mit/java.mustache")
     JS      -> $(embedStringFile "embedded/license/mit/js.mustache")
     Scala   -> $(embedStringFile "embedded/license/mit/scala.mustache")
+  MPL2 -> case fileType of
+    CSS     -> $(embedStringFile "embedded/license/mpl2/css.mustache")
+    Haskell -> $(embedStringFile "embedded/license/mpl2/haskell.mustache")
+    HTML    -> $(embedStringFile "embedded/license/mpl2/html.mustache")
+    Java    -> $(embedStringFile "embedded/license/mpl2/java.mustache")
+    JS      -> $(embedStringFile "embedded/license/mpl2/js.mustache")
+    Scala   -> $(embedStringFile "embedded/license/mpl2/scala.mustache")

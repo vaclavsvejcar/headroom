@@ -40,6 +40,7 @@ data LicenseType
   | GPL2    -- ^ /GNU GPL v.2/ license
   | GPL3    -- ^ /GNU GPL v.3/ license
   | MIT     -- ^ /MIT/ license
+  | MPL2    -- ^ /MPL 2.0/ license
   deriving (Bounded, Enum, Eq, Ord, Show)
 
 instance Read LicenseType where

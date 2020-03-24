@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f2f13f091ee8ba87092588832dc01942694b6da6d7f8890202f6568ef1f5129f
+-- hash: fc773bd1a3ad58a1d099fd603c15393d025b1bd09f7b00b3225495b165fc1d96
 
 name:           headroom
 version:        0.1.3.0
@@ -54,6 +54,12 @@ extra-source-files:
     embedded/license/mit/java.mustache
     embedded/license/mit/js.mustache
     embedded/license/mit/scala.mustache
+    embedded/license/mpl2/css.mustache
+    embedded/license/mpl2/haskell.mustache
+    embedded/license/mpl2/html.mustache
+    embedded/license/mpl2/java.mustache
+    embedded/license/mpl2/js.mustache
+    embedded/license/mpl2/scala.mustache
     test-data/test-template.mustache
     test-data/code-samples/css/sample1.css
     test-data/code-samples/css/sample2.css
