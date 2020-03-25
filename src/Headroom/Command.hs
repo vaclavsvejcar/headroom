@@ -11,14 +11,17 @@ Data types and functions for parsing command line options.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.Command
   ( Command(..)
   , commandParser
   )
 where
 
+import           Headroom.License               ( LicenseType )
 import           Headroom.Meta                  ( buildVer )
 import           Headroom.Types                 ( RunMode(..) )
+import           Headroom.Types.Utils           ( showEnumValuesLC )
 import           Options.Applicative
 import           RIO
 
@@ -111,8 +114,10 @@ initOptions :: Parser Command
 initOptions =
   Init
     <$> strOption
-          (long "license-type" <> short 'l' <> metavar "LICENSE_TYPE" <> help
-            "type of open source license"
+          (long "license-type" <> short 'l' <> metavar "TYPE" <> help
+            (  "type of open source license, available options: "
+            <> (showEnumValuesLC @LicenseType)
+            )
           )
     <*> some
           (strOption

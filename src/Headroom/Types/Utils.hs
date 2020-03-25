@@ -9,13 +9,17 @@ Portability : POSIX
 
 Utilities related to data types.
 -}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Headroom.Types.Utils
   ( allValues
   , customOptions
   , dropFieldPrefix
   , readEnumCI
+  , showEnumLC
+  , showEnumValuesLC
   , symbolCase
   )
 where
@@ -50,12 +54,27 @@ dropFieldPrefix = \case
   (_ : xs)                   -> dropFieldPrefix xs
   []                         -> []
 
--- | Parses enum value from its string representation.
+-- | Shows all values of the specified enum, lowercase, comma separated.
+--
+-- >>> :set -XTypeApplications
+-- >>> showEnumValuesLC @Bool
+-- "false, true"
+showEnumValuesLC :: forall a . (Bounded a, Enum a, Show a) => String
+showEnumValuesLC = L.intercalate ", " values
+  where values = fmap showEnumLC (allValues :: [a])
+
+-- | Parses enum value from its string representation, case insensitive.
 readEnumCI :: (Bounded a, Enum a, Show a) => ReadS a
 readEnumCI str =
-  let textRepr = fmap C.toLower . show
-      result   = L.find (\item -> textRepr item == fmap C.toLower str) allValues
-  in  maybe [] (\item -> [(item, "")]) result
+  let res = L.find (\item -> showEnumLC item == fmap C.toLower str) allValues
+  in  maybe [] (\item -> [(item, "")]) res
+
+-- | Shows enum value, lowercase.
+--
+-- >>> showEnumLC False
+-- "false"
+showEnumLC :: Show a => a -> String
+showEnumLC = fmap C.toLower . show
 
 -- | Transforms camel-case text into text cased with given symbol.
 --

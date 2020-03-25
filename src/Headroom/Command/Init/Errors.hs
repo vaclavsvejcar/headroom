@@ -12,6 +12,7 @@ Data types representing errors occuring during /Init/ command.
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.Command.Init.Errors
   ( InitCommandError(..)
   , initCommandErrorMessage
@@ -19,7 +20,7 @@ module Headroom.Command.Init.Errors
 where
 
 import           Headroom.License               ( LicenseType )
-import           Headroom.Types.Utils           ( allValues )
+import           Headroom.Types.Utils           ( showEnumValuesLC )
 import           RIO
 import qualified RIO.Text                      as T
 
@@ -49,9 +50,8 @@ invalidLicenseType tried = mconcat
   [ "Invalid license type '"
   , tried
   , "', available options: "
-  , T.pack . show $ available
+  , T.pack $ showEnumValuesLC @LicenseType
   ]
-  where available = allValues :: [LicenseType]
 
 noSourcePaths :: Text
 noSourcePaths = "No source code paths (files or directories) defined"

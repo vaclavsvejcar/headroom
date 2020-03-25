@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.Types.UtilsSpec
   ( spec
   )
@@ -25,6 +26,10 @@ spec = do
 
     it "removes prefix and keeps case for 'prURLField'" $ do
       dropFieldPrefix "prURLField" `shouldBe` "URLField"
+
+  describe "showEnumValuesLC" $ do
+    it "shows all enum values, lowercase, comma separated" $ do
+      showEnumValuesLC @Bool `shouldBe` "false, true"
 
   describe "readEnumCI" $ do
     it "reads enum value from string representation (case insensitive)" $ do
