@@ -6,8 +6,10 @@ module Headroom.AppConfigSpec
 where
 
 import           Headroom.AppConfig
-import           Headroom.Types                 ( AppConfigError(..)
-                                                , HeadroomError(..)
+import           Headroom.AppConfig.Errors      ( AppConfigError(..)
+                                                , ValidationError(..)
+                                                )
+import           Headroom.Types                 ( HeadroomError(..)
                                                 , RunMode(..)
                                                 )
 import           RIO
@@ -60,7 +62,8 @@ spec = do
 
   describe "validateAppConfig" $ do
     it "validates configuration version" $ do
-      let check (Just (InvalidAppConfig [EmptySourcePaths])) = True
+      let check (Just (AppConfigError (ValidationFailed [EmptySourcePaths]))) =
+            True
           check _ = False
       validateAppConfig appConfig3 `shouldSatisfy` matchesException check
 

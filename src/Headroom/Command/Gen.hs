@@ -16,6 +16,7 @@ module Headroom.Command.Gen
 where
 
 import           Headroom.Command.Gen.Env
+import           Headroom.Command.Gen.Errors    ( GenCommandError(..) )
 import           Headroom.Command.Shared        ( bootstrap )
 import           Headroom.Embedded              ( configFileStub
                                                 , licenseTemplate
@@ -42,4 +43,4 @@ printConfigFile = putStrLn configFileStub
 printLicense :: Text -> IO ()
 printLicense license = case parseLicense license of
   Just license' -> putStrLn $ licenseTemplate license'
-  Nothing       -> throwM $ InvalidLicense license
+  Nothing       -> throwM $ GenCommandError (InvalidLicense license)

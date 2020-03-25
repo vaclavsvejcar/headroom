@@ -37,8 +37,10 @@ import           Data.Yaml.Pretty               ( defConfig
                                                 , encodePretty
                                                 , setConfCompare
                                                 )
-import           Headroom.Types                 ( AppConfigError(..)
-                                                , HeadroomError(..)
+import           Headroom.AppConfig.Errors      ( AppConfigError(..)
+                                                , ValidationError(..)
+                                                )
+import           Headroom.Types                 ( HeadroomError(..)
                                                 , RunMode(..)
                                                 )
 import           Headroom.Types.Utils           ( customOptions )
@@ -113,7 +115,7 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
     [key, value] -> pure (key, value)
-    _            -> throwM $ InvalidVariable input
+    _            -> throwM $ AppConfigError (InvalidVariable input)
 
 -- | Writes the given 'AppConfig' to /YAML/ text, using the pretty printer.
 prettyPrintAppConfig :: AppConfig -- ^ application config to write to /YAML/
@@ -127,7 +129,7 @@ validateAppConfig :: MonadThrow m
                   -> m AppConfig -- ^ validated application config (or errors)
 validateAppConfig appConfig = case checked of
   Success ac'    -> pure ac'
-  Failure errors -> throwM $ InvalidAppConfig errors
+  Failure errors -> throwM $ AppConfigError (ValidationFailed errors)
  where
   checked          = appConfig <$ checkSourcePaths <* checkTemplatePaths
   checkSourcePaths = if null (acSourcePaths appConfig)

@@ -32,11 +32,13 @@ spec = do
       rendered `shouldBe` Just "Hello, John"
 
     it "fails if not enough variables is provided" $ do
-      let template  = "Hello, {{ name }} {{ surname }}"
-          variables = HM.fromList [("name", "John")]
-          parsed :: Either SomeException Mustache
-          parsed   = parseTemplate (Just "test") template
-          rendered = parsed >>= renderTemplate variables
-          check (Just (MissingVariables "test" ["surname"])) = True
-          check _ = False
+      let
+        template  = "Hello, {{ name }} {{ surname }}"
+        variables = HM.fromList [("name", "John")]
+        parsed :: Either SomeException Mustache
+        parsed   = parseTemplate (Just "test") template
+        rendered = parsed >>= renderTemplate variables
+        check (Just (TemplateError (MissingVariables "test" ["surname"]))) =
+          True
+        check _ = False
       rendered `shouldSatisfy` matchesException check

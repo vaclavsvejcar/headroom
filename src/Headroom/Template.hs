@@ -12,17 +12,20 @@ Provides generic support for the license header templates, represented by the
 custom instance of this type class.
 -}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
 module Headroom.Template
   ( Template(..)
+  , TemplateError(..)
   , loadTemplate
+  , templateErrorMessage
   )
 where
 
 import           Headroom.FileSystem            ( loadFile )
 import           RIO
 import qualified RIO.Text                      as T
-
 
 -- | Type class representing generic license header template support.
 class Template t where
@@ -41,6 +44,12 @@ class Template t where
                 -> t                    -- ^ parsed template to render
                 -> m Text               -- ^ rendered template text
 
+-- | Error during processing of template
+data TemplateError
+  = MissingVariables Text [Text] -- ^ not all variables were filled in template
+  | ParseError Text              -- ^ error parsing template file
+  deriving Show
+
 -- | Loads and parses template from file.
 loadTemplate :: (MonadIO m, Template t)
              => FilePath -- ^ path to template file
@@ -48,4 +57,15 @@ loadTemplate :: (MonadIO m, Template t)
 loadTemplate path = do
   raw <- loadFile path
   liftIO $ parseTemplate (Just $ T.pack path) raw
+
+-- | User-friendly description of the given error.
+templateErrorMessage :: TemplateError -- ^ error to get message for
+                     -> Text          -- ^ error message
+templateErrorMessage = \case
+  MissingVariables name variables -> missingVariables name variables
+  ParseError msg                  -> parseError msg
+ where
+  missingVariables name variables = mconcat
+    ["Missing variables for template '", name, "': ", T.pack . show $ variables]
+  parseError msg = "Error parsing template: " <> msg
 

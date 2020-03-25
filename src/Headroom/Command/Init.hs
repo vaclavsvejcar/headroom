@@ -25,6 +25,7 @@ import           Headroom.AppConfig             ( AppConfig(..)
                                                 , prettyPrintAppConfig
                                                 )
 import           Headroom.Command.Init.Env
+import           Headroom.Command.Init.Errors   ( InitCommandError(..) )
 import           Headroom.Command.Shared        ( bootstrap )
 import           Headroom.Embedded              ( licenseTemplate )
 import           Headroom.FileSystem            ( fileExtension
@@ -36,9 +37,7 @@ import           Headroom.FileType              ( FileType
 import           Headroom.License               ( License(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( templateExtensions )
-import           Headroom.Types                 ( HeadroomError(..)
-                                                , InitCommandError(..)
-                                                )
+import           Headroom.Types                 ( HeadroomError(..) )
 import           Headroom.UI.Progress           ( Progress(..)
                                                 , zipWithProgress
                                                 )
@@ -73,7 +72,9 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
     makeTemplatesDir
     createTemplates fileTypes
     createConfigFile
-  True -> throwM $ InitCommandError AppConfigAlreadyExists
+  True -> do
+    paths <- view pathsL
+    throwM $ InitCommandError (AppConfigAlreadyExists $ pConfigFile paths)
 
 -- | Recursively scans provided source paths for known file types for which
 -- templates can be generated.

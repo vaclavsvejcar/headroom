@@ -22,16 +22,17 @@ import           Headroom.Command.Gen           ( commandGen )
 import           Headroom.Command.Gen.Env       ( GenMode(..)
                                                 , GenOptions(GenOptions)
                                                 )
+import           Headroom.Command.Gen.Errors    ( GenCommandError(..) )
 import           Headroom.Command.Init          ( commandInit )
 import           Headroom.Command.Init.Env      ( InitOptions(InitOptions) )
+import           Headroom.Command.Init.Errors   ( InitCommandError(..) )
+
 import           Headroom.Command.Run           ( commandRun )
 import           Headroom.Command.Run.Env       ( RunOptions(RunOptions) )
 import           Headroom.License               ( LicenseType
                                                 , parseLicenseType
                                                 )
-import           Headroom.Types                 ( HeadroomError(..)
-                                                , InitCommandError(..)
-                                                )
+import           Headroom.Types                 ( HeadroomError(..) )
 import           Options.Applicative
 import           Prelude                        ( putStrLn )
 import           RIO
@@ -61,9 +62,9 @@ parseGenMode :: MonadThrow m => Command -> m GenMode
 parseGenMode = \case
   Gen True  Nothing        -> pure GenConfigFile
   Gen False (Just license) -> pure $ GenLicense license
-  _                        -> throwM NoGenModeSelected
+  _                        -> throwM $ GenCommandError NoGenModeSelected
 
 parseLicenseType' :: MonadThrow m => Text -> m LicenseType
 parseLicenseType' input = case parseLicenseType input of
   Just licenseType -> pure licenseType
-  Nothing          -> throwM $ InitCommandError $ InvalidLicenseType input
+  Nothing          -> throwM $ InitCommandError (InvalidLicenseType input)

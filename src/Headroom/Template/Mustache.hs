@@ -18,7 +18,9 @@ module Headroom.Template.Mustache
   )
 where
 
-import           Headroom.Template              ( Template(..) )
+import           Headroom.Template              ( Template(..)
+                                                , TemplateError(..)
+                                                )
 import           RIO
 import qualified Text.Mustache                 as MU
 import           Text.Mustache.Render           ( SubstitutionError(..) )
@@ -38,7 +40,7 @@ instance Template Mustache where
 
 parseTemplate' :: MonadThrow m => Maybe Text -> Text -> m Mustache
 parseTemplate' name raw = case MU.compileTemplate templateName raw of
-  Left  err -> throwM $ ParseError (T.pack . show $ err)
+  Left  err -> throwM $ TemplateError (ParseError (T.pack . show $ err))
   Right res -> pure $ Mustache res
   where templateName = T.unpack . fromMaybe "" $ name
 
@@ -49,7 +51,7 @@ renderTemplate' variables (Mustache t@(MU.Template name _ _)) =
     (errs, rendered) ->
       let errs' = missingVariables errs
       in  if length errs == length errs'
-            then throwM $ MissingVariables (T.pack name) errs'
+            then throwM $ TemplateError (MissingVariables (T.pack name) errs')
             else pure rendered
  where
   missingVariables = concatMap
