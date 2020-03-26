@@ -12,13 +12,19 @@ Data types representing errors occuring during /Generator/ command.
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.Command.Gen.Errors
   ( GenCommandError(..)
   , genCommandErrorMessage
   )
 where
 
+import           Headroom.FileType              ( FileType )
+import           Headroom.License               ( LicenseType )
+import           Headroom.Types.Utils           ( showEnumValuesLC )
 import           RIO
+import qualified RIO.Text                      as T
+
 
 
 -- | Errors specific for the /Gen/ command.
@@ -35,7 +41,15 @@ genCommandErrorMessage = \case
   NoGenModeSelected    -> noGenModeSelected
 
 invalidLicense :: Text -> Text
-invalidLicense tried = "Cannot parse license type from: " <> tried
+invalidLicense tried = mconcat
+  [ "Invalid license type '"
+  , tried
+  , "', must be in format licenseType:fileType (e.g. bsd3:haskell). "
+  , "\nAvailable license types: "
+  , T.pack $ showEnumValuesLC @LicenseType
+  , ".\nAvailable file types: "
+  , T.pack $ showEnumValuesLC @FileType
+  ]
 
 noGenModeSelected :: Text
 noGenModeSelected = mconcat
