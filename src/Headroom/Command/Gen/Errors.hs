@@ -42,7 +42,7 @@ genCommandErrorMessage = \case
 
 invalidLicense :: Text -> Text
 invalidLicense tried = mconcat
-  [ "Invalid license type '"
+  [ "Invalid license/file type '"
   , tried
   , "', must be in format licenseType:fileType (e.g. bsd3:haskell). "
   , "\nAvailable license types: "

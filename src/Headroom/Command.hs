@@ -105,8 +105,10 @@ genOptions =
           )
     <*> optional
           (strOption
-            (long "license" <> short 'l' <> metavar "name:type" <> help
-              "generate template for license and file type"
+            (  long "license"
+            <> short 'l'
+            <> metavar "licenseType:fileType"
+            <> help "generate template for license and file type"
             )
           )
 
