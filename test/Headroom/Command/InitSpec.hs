@@ -5,9 +5,10 @@ module Headroom.Command.InitSpec
 where
 
 import           Headroom.Command.Init
-import           Headroom.Command.Init.Env
-import           Headroom.FileType              ( FileType(HTML) )
-import           Headroom.License               ( LicenseType(..) )
+import           Headroom.Types                 ( CommandInitOptions(..)
+                                                , FileType(HTML)
+                                                , LicenseType(..)
+                                                )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.List                      as L
@@ -31,9 +32,10 @@ env :: Env
 env = Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
  where
   logFunc = mkLogFunc (\_ _ _ _ -> pure ())
-  opts    = InitOptions { ioSourcePaths = ["test-data" </> "test-traverse"]
-                        , ioLicenseType = BSD3
-                        }
+  opts    = CommandInitOptions
+    { cioSourcePaths = ["test-data" </> "test-traverse"]
+    , cioLicenseType = BSD3
+    }
   paths = Paths { pCurrentDir   = "."
                 , pConfigFile   = "test-data" </> "configs" </> "full.yaml"
                 , pTemplatesDir = "headroom-templates"

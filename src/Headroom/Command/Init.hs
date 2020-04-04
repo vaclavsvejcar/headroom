@@ -1,52 +1,42 @@
-{-|
-Module      : Headroom.Command.Init
-Description : Logic for Init command
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Logic for the @init@ command, used to generate initial configuration boilerplate
-for Headroom.
--}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections     #-}
 {-# LANGUAGE TypeApplications  #-}
 module Headroom.Command.Init
-  ( commandInit
+  ( Env(..)
+  , Paths(..)
+  , commandInit
   , doesAppConfigExist
   , findSupportedFileTypes
   )
 where
 
-import           Headroom.AppConfig             ( AppConfig(..)
-                                                , prettyPrintAppConfig
-                                                )
-import           Headroom.Command.Init.Env
-import           Headroom.Command.Init.Errors   ( InitCommandError(..) )
-import           Headroom.Command.Shared        ( bootstrap )
+import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Embedded              ( licenseTemplate )
-import           Headroom.FileSystem            ( fileExtension
+import           Headroom.FileSystem            ( createDirectory
+                                                , doesFileExist
+                                                , fileExtension
                                                 , findFiles
+                                                , getCurrentDirectory
                                                 )
-import           Headroom.FileType              ( FileType
-                                                , fileTypeByExt
-                                                )
-import           Headroom.License               ( License(..) )
+import           Headroom.FileType              ( fileTypeByExt )
 import           Headroom.Meta                  ( TemplateType )
-import           Headroom.Template              ( templateExtensions )
-import           Headroom.Types                 ( HeadroomError(..) )
-import           Headroom.UI.Progress           ( Progress(..)
+import           Headroom.Serialization         ( prettyPrintYAML )
+import           Headroom.Template              ( Template(..) )
+import           Headroom.Types                 ( ApplicationError(..)
+                                                , CommandInitError(..)
+                                                , CommandInitOptions(..)
+                                                , Configuration(..)
+                                                , FileType(..)
+                                                , LicenseType(..)
+                                                , RunMode(..)
+                                                )
+import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
                                                 )
 import           RIO
 import qualified RIO.Char                      as C
-import           RIO.Directory                  ( createDirectory
-                                                , doesFileExist
-                                                , getCurrentDirectory
-                                                )
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
@@ -54,7 +44,42 @@ import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
 
 
-env' :: InitOptions -> LogFunc -> IO Env
+
+
+-- | /RIO/ Environment for the /Init/ command.
+data Env = Env
+  { envLogFunc     :: !LogFunc
+  , envInitOptions :: !CommandInitOptions
+  , envPaths       :: !Paths
+  }
+
+-- | Paths to various locations of file system.
+data Paths = Paths
+  { pCurrentDir   :: !FilePath
+  , pConfigFile   :: !FilePath
+  , pTemplatesDir :: !FilePath
+  }
+
+instance HasLogFunc Env where
+  logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
+
+-- | Environment value with /Init/ command options.
+class HasInitOptions env where
+  initOptionsL :: Lens' env CommandInitOptions
+
+-- | Environment value with 'Paths'.
+class HasPaths env where
+  pathsL :: Lens' env Paths
+
+instance HasInitOptions Env where
+  initOptionsL = lens envInitOptions (\x y -> x { envInitOptions = y })
+
+instance HasPaths Env where
+  pathsL = lens envPaths (\x y -> x { envPaths = y })
+
+--------------------------------------------------------------------------------
+
+env' :: CommandInitOptions -> LogFunc -> IO Env
 env' opts logFunc = do
   currentDir <- getCurrentDirectory
   let paths = Paths { pCurrentDir   = currentDir
@@ -64,8 +89,8 @@ env' opts logFunc = do
   pure $ Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
 
 -- | Handler for /Init/ command.
-commandInit :: InitOptions -- ^ /Init/ command options
-            -> IO ()       -- ^ execution result
+commandInit :: CommandInitOptions -- ^ /Init/ command options
+            -> IO ()              -- ^ execution result
 commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
   False -> do
     fileTypes <- findSupportedFileTypes
@@ -74,7 +99,7 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
     createConfigFile
   True -> do
     paths <- view pathsL
-    throwM $ InitCommandError (AppConfigAlreadyExists $ pConfigFile paths)
+    throwM $ CommandInitError (AppConfigAlreadyExists $ pConfigFile paths)
 
 -- | Recursively scans provided source paths for known file types for which
 -- templates can be generated.
@@ -83,11 +108,12 @@ findSupportedFileTypes :: (HasInitOptions env, HasLogFunc env)
 findSupportedFileTypes = do
   opts      <- view initOptionsL
   fileTypes <- do
-    allFiles <- mapM (\path -> findFiles path (const True)) (ioSourcePaths opts)
+    allFiles <- mapM (\path -> findFiles path (const True))
+                     (cioSourcePaths opts)
     let allFileTypes = fmap (fileExtension >=> fileTypeByExt) (concat allFiles)
     pure $ L.nub . catMaybes $ allFileTypes
   case fileTypes of
-    [] -> throwM $ InitCommandError NoSourcePaths
+    [] -> throwM $ CommandInitError NoProvidedSourcePaths
     _  -> do
       logInfo $ "Found supported file types: " <> displayShow fileTypes
       pure fileTypes
@@ -99,19 +125,19 @@ createTemplates fileTypes = do
   opts  <- view initOptionsL
   paths <- view pathsL
   let templatesDir = pCurrentDir paths </> pTemplatesDir paths
-  mapM_ (\(p, l) -> createTemplate templatesDir l p)
-        (zipWithProgress $ fmap (License (ioLicenseType opts)) fileTypes)
+  mapM_ (\(p, lf) -> createTemplate templatesDir lf p)
+        (zipWithProgress $ fmap (cioLicenseType opts, ) fileTypes)
 
 createTemplate :: (HasLogFunc env)
                => FilePath
-               -> License
+               -> (LicenseType, FileType)
                -> Progress
                -> RIO env ()
-createTemplate templatesDir license@(License _ fileType) progress = do
+createTemplate templatesDir (licenseType, fileType) progress = do
   let extension = NE.head $ templateExtensions @TemplateType
       file = (fmap C.toLower . show $ fileType) <> "." <> T.unpack extension
       filePath  = templatesDir </> file
-      template  = licenseTemplate license
+      template  = licenseTemplate licenseType fileType
   logInfo $ mconcat
     [display progress, " Creating template file in ", fromString filePath]
   writeFileUtf8 filePath template
@@ -122,7 +148,7 @@ createConfigFile = do
   opts  <- view initOptionsL
   paths <- view pathsL
   let filePath = pCurrentDir paths </> pConfigFile paths
-      content  = prettyPrintAppConfig $ appConfig opts paths
+      content  = prettyPrintYAML $ configuration opts paths
   logInfo $ "Creating YAML config file in " <> fromString filePath
   writeFileUtf8 filePath content
  where
@@ -132,10 +158,12 @@ createConfigFile = do
     , ("project", "My project")
     , ("year"   , "2020")
     ]
-  appConfig opts paths = mempty { acSourcePaths   = ioSourcePaths opts
-                                , acTemplatePaths = [pTemplatesDir paths]
-                                , acVariables     = variables
-                                }
+  configuration opts paths = Configuration
+    { cRunMode       = Add
+    , cSourcePaths   = cioSourcePaths opts
+    , cTemplatePaths = [pTemplatesDir paths]
+    , cVariables     = variables
+    }
 
 -- | Checks whether application config file already exists.
 doesAppConfigExist :: (HasLogFunc env, HasPaths env) => RIO env Bool

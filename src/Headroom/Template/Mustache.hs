@@ -1,16 +1,5 @@
-{-|
-Module      : Headroom.Template.Mustache
-Description : Support for Mustache templates
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Provides support for <https://mustache.github.io Mustache> templates using the
-'Template' type class.
--}
 {-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE MultiWayIf        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Headroom.Template.Mustache
@@ -18,15 +7,14 @@ module Headroom.Template.Mustache
   )
 where
 
-import           Headroom.Template              ( Template(..)
+import           Headroom.Template              ( Template(..) )
+import           Headroom.Types                 ( ApplicationError(..)
                                                 , TemplateError(..)
                                                 )
 import           RIO
+import qualified RIO.Text                      as T
 import qualified Text.Mustache                 as MU
 import           Text.Mustache.Render           ( SubstitutionError(..) )
-
-import           Headroom.Types                 ( HeadroomError(..) )
-import qualified RIO.Text                      as T
 
 
 -- | The /Mustache/ template.
@@ -59,4 +47,3 @@ renderTemplate' variables (Mustache t@(MU.Template name _ _)) =
       (VariableNotFound ps) -> ps
       _                     -> []
     )
-

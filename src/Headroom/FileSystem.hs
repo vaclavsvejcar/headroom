@@ -1,14 +1,3 @@
-{-|
-Module      : Headroom.FileSystem
-Description : Files/directories manipulation
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Functions for manipulating files and directories.
--}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.FileSystem
   ( fileExtension
@@ -17,14 +6,19 @@ module Headroom.FileSystem
   , findFilesByTypes
   , listFiles
   , loadFile
+  , doesFileExist
+  , getCurrentDirectory
+  , createDirectory
   )
 where
 
-import           Headroom.FileType              ( FileType
-                                                , listExtensions
-                                                )
+import           Headroom.FileType              ( listExtensions )
+import           Headroom.Types                 ( FileType )
 import           RIO
-import           RIO.Directory                  ( doesDirectoryExist
+import           RIO.Directory                  ( createDirectory
+                                                , doesDirectoryExist
+                                                , doesFileExist
+                                                , getCurrentDirectory
                                                 , getDirectoryContents
                                                 )
 import           RIO.FilePath                   ( isExtensionOf

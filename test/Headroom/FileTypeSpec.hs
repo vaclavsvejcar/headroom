@@ -6,6 +6,7 @@ module Headroom.FileTypeSpec
 where
 
 import           Headroom.FileType
+import           Headroom.Types                 ( FileType(..) )
 import           RIO
 import           Test.Hspec
 
@@ -15,9 +16,3 @@ spec = do
   describe "fileTypeByExt" $ do
     it "parses FileType from file extension" $ do
       fileTypeByExt "hs" `shouldBe` Just Haskell
-
-  describe "fileTypeByName" $ do
-    it "reads FileType from string representation" $ do
-      let actual   = fileTypeByName "haskell"
-          expected = Just Haskell
-      actual `shouldBe` expected

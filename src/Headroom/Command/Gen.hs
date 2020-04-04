@@ -1,46 +1,49 @@
-{-|
-Module      : Headroom.Command.Gen
-Description : Logic for Generate command
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Logic for the /Generator/ command, used to generate /stub/ files.
--}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Gen
   ( commandGen
+  , parseGenMode
   )
 where
 
-import           Headroom.Command.Gen.Env
-import           Headroom.Command.Gen.Errors    ( GenCommandError(..) )
-import           Headroom.Command.Shared        ( bootstrap )
+
+import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Embedded              ( configFileStub
                                                 , licenseTemplate
                                                 )
-import           Headroom.License               ( parseLicense )
-import           Headroom.Types                 ( HeadroomError(..) )
+import           Headroom.Types                 ( ApplicationError(..)
+                                                , Command(..)
+                                                , CommandGenError(..)
+                                                , CommandGenOptions(..)
+                                                , GenMode(..)
+                                                )
 import           Prelude                        ( putStrLn )
 import           RIO
 
 
-env' :: GenOptions -> LogFunc -> IO Env
+data Env = Env
+  { envLogFunc    :: !LogFunc           -- ^ logging function
+  , envGenOptions :: !CommandGenOptions -- ^ options
+  }
+
+instance HasLogFunc Env where
+  logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
+
+env' :: CommandGenOptions -> LogFunc -> IO Env
 env' opts logFunc = pure $ Env { envLogFunc = logFunc, envGenOptions = opts }
 
+parseGenMode :: MonadThrow m => Command -> m GenMode
+parseGenMode = \case
+  Gen True  Nothing        -> pure GenConfigFile
+  Gen False (Just license) -> pure $ GenLicense license
+  _                        -> throwM $ CommandGenError NoGenModeSelected
+
 -- | Handler for /Generator/ command.
-commandGen :: GenOptions -- ^ /Generator/ command options
-           -> IO ()      -- ^ execution result
-commandGen opts = bootstrap (env' opts) False $ case goGenMode opts of
-  GenConfigFile      -> liftIO printConfigFile
-  GenLicense license -> liftIO $ printLicense license
+commandGen :: CommandGenOptions -- ^ /Generator/ command options
+           -> IO ()             -- ^ execution result
+commandGen opts = bootstrap (env' opts) False $ case cgoGenMode opts of
+  GenConfigFile             -> liftIO printConfigFile
+  GenLicense (lType, fType) -> liftIO . putStrLn $ licenseTemplate lType fType
 
 printConfigFile :: IO ()
 printConfigFile = putStrLn configFileStub
-
-printLicense :: Text -> IO ()
-printLicense license = case parseLicense license of
-  Just license' -> putStrLn $ licenseTemplate license'
-  Nothing       -> throwM $ GenCommandError (InvalidLicense license)

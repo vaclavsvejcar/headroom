@@ -8,12 +8,13 @@ where
 
 import           Headroom.Template
 import           Headroom.Template.Mustache
-import           Headroom.Types
+import           Headroom.Types                 ( ApplicationError(..)
+                                                , TemplateError(..)
+                                                )
 import           RIO
 import qualified RIO.HashMap                   as HM
 import           Test.Hspec
 import           Test.Utils                     ( matchesException )
-
 
 spec :: Spec
 spec = do

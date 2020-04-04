@@ -1,14 +1,3 @@
-{-|
-Module      : Headroom.UI.Progress
-Description : Console UI component for progress indication
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-UI component that allows to display progress in console line interface.
--}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.UI.Progress
   ( Progress(..)

@@ -1,14 +1,3 @@
-{-|
-Module      : Headroom.Meta
-Description : Application metadata
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Metadata about the application (e.g. build version, application name, etc).
--}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Meta
   ( TemplateType
