@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f569d09ad5d8e2e56fc6b2dd7733832bd5b262bc0e1640882055060b9860613e
+-- hash: 79c792dd269e43071e6e620152b8b172ef9ef5ef1c736f91c66024dc77d8c5e3
 
 name:           headroom
-version:        0.1.3.0
+version:        0.2.0.0
 synopsis:       License Header Manager
 description:    So you are tired of managing license headers in your codebase by hand? Then Headroom is the right tool for you! Now you can define your license header as Mustache template, put all the variables (such as author's name, year, etc.) into the YAML config file and Headroom will take care to add such license headers to all your source code files.
 category:       Utils
@@ -86,37 +86,22 @@ source-repository head
 
 library
   exposed-modules:
-      Headroom.AppConfig
-      Headroom.AppConfig.Errors
       Headroom.Command
       Headroom.Command.Gen
-      Headroom.Command.Gen.Env
-      Headroom.Command.Gen.Errors
       Headroom.Command.Init
-      Headroom.Command.Init.Env
-      Headroom.Command.Init.Errors
-      Headroom.Command.Run
-      Headroom.Command.Run.Env
-      Headroom.Command.Shared
+      Headroom.Command.Readers
+      Headroom.Command.Utils
+      Headroom.Configuration
       Headroom.Embedded
       Headroom.FileSystem
       Headroom.FileType
-      Headroom.Header
-      Headroom.Header.Impl
-      Headroom.Header.Impl.CSS
-      Headroom.Header.Impl.Haskell
-      Headroom.Header.Impl.HTML
-      Headroom.Header.Impl.Java
-      Headroom.Header.Impl.JS
-      Headroom.Header.Impl.Scala
-      Headroom.Header.Utils
-      Headroom.License
       Headroom.Meta
+      Headroom.Serialization
       Headroom.Template
       Headroom.Template.Mustache
-      Headroom.Text
       Headroom.Types
-      Headroom.Types.Utils
+      Headroom.Types.EnumExtra
+      Headroom.UI
       Headroom.UI.Progress
   other-modules:
       Paths_headroom
@@ -174,23 +159,14 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Headroom.AppConfigSpec
       Headroom.Command.InitSpec
+      Headroom.Command.ReadersSpec
+      Headroom.ConfigurationSpec
       Headroom.FileSystemSpec
       Headroom.FileTypeSpec
-      Headroom.Header.Impl.CSSSpec
-      Headroom.Header.Impl.HaskellSpec
-      Headroom.Header.Impl.HTMLSpec
-      Headroom.Header.Impl.JavaSpec
-      Headroom.Header.Impl.JSSpec
-      Headroom.Header.Impl.ScalaSpec
-      Headroom.Header.UtilsSpec
-      Headroom.HeaderSpec
-      Headroom.LicenseSpec
+      Headroom.SerializationSpec
       Headroom.Template.MustacheSpec
-      Headroom.TextSpec
-      Headroom.Types.UtilsSpec
-      Headroom.TypesSpec
+      Headroom.Types.EnumExtraSpec
       Headroom.UI.ProgressSpec
       Test.Utils
       Paths_headroom
@@ -198,7 +174,8 @@ test-suite spec
       test
   ghc-options: -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
   build-depends:
-      aeson
+      QuickCheck
+    , aeson
     , base >=4.7 && <5
     , headroom
     , hspec

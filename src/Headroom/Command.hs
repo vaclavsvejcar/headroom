@@ -1,37 +1,23 @@
-{-|
-Module      : Headroom.Command
-Description : Command line options processing
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Data types and functions for parsing command line options.
--}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
 module Headroom.Command
-  ( Command(..)
-  , commandParser
+  ( commandParser
   )
 where
 
-import           Headroom.License               ( LicenseType )
+import           Headroom.Command.Readers       ( licenseReader
+                                                , licenseTypeReader
+                                                )
 import           Headroom.Meta                  ( buildVer )
-import           Headroom.Types                 ( RunMode(..) )
-import           Headroom.Types.Utils           ( showEnumValuesLC )
+import           Headroom.Types                 ( Command(..)
+                                                , LicenseType
+                                                )
+import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           Options.Applicative
 import           RIO
+import qualified RIO.Text                      as T
 
-
--- | Application command.
-data Command
-  = Run [FilePath] [FilePath] [Text] RunMode Bool -- ^ /Run/ command
-  | Gen Bool (Maybe Text)                         -- ^ /Generator/ command
-  | Init Text [FilePath]                               -- ^ /Init/ command
-    deriving (Show)
 
 -- | Parses command line arguments.
 commandParser :: ParserInfo Command
@@ -62,39 +48,7 @@ commandParser = info
     )
 
 runOptions :: Parser Command
-runOptions =
-  Run
-    <$> many
-          (strOption
-            (long "source-path" <> short 's' <> metavar "PATH" <> help
-              "path to source code file/directory"
-            )
-          )
-    <*> many
-          (strOption
-            (long "template-path" <> short 't' <> metavar "PATH" <> help
-              "path to header template file/directory"
-            )
-          )
-    <*> many
-          (strOption
-            (long "variables" <> short 'v' <> metavar "KEY=VALUE" <> help
-              "values for template variables"
-            )
-          )
-    <*> (   flag'
-            Replace
-            (long "replace-headers" <> short 'r' <> help
-              "force replace existing license headers"
-            )
-        <|> flag'
-              Drop
-              (long "drop-headers" <> short 'd' <> help
-                "drop existing license headers only"
-              )
-        <|> pure Add
-        )
-    <*> switch (long "debug" <> help "produce more verbose output")
+runOptions = undefined
 
 genOptions :: Parser Command
 genOptions =
@@ -104,7 +58,8 @@ genOptions =
             "generate stub YAML config file to stdout"
           )
     <*> optional
-          (strOption
+          (option
+            licenseReader
             (  long "license"
             <> short 'l'
             <> metavar "licenseType:fileType"
@@ -115,10 +70,11 @@ genOptions =
 initOptions :: Parser Command
 initOptions =
   Init
-    <$> strOption
+    <$> option
+          licenseTypeReader
           (long "license-type" <> short 'l' <> metavar "TYPE" <> help
             (  "type of open source license, available options: "
-            <> (showEnumValuesLC @LicenseType)
+            <> T.unpack (allValuesToText @LicenseType)
             )
           )
     <*> some

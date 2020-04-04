@@ -19,8 +19,7 @@ module Headroom.Embedded
 where
 
 import           Data.FileEmbed                 ( embedStringFile )
-import           Headroom.FileType              ( FileType(..) )
-import           Headroom.License               ( License(..)
+import           Headroom.Types                 ( FileType(..)
                                                 , LicenseType(..)
                                                 )
 import           RIO
@@ -32,9 +31,10 @@ configFileStub = $(embedStringFile "embedded/config-file.yaml")
 
 -- | License template for given 'License'.
 licenseTemplate :: IsString a
-                => License -- ^ 'License' for which to return the template
+                => LicenseType -- ^ 'License' for which to return the template
+                -> FileType  -- ^ 'License' for which to return the template
                 -> a       -- ^ template text
-licenseTemplate (License licenseType fileType) = case licenseType of
+licenseTemplate licenseType fileType = case licenseType of
   Apache2 -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/apache2/css.mustache")
     Haskell -> $(embedStringFile "embedded/license/apache2/haskell.mustache")
