@@ -27,15 +27,12 @@ module Headroom.Types
 where
 
 import           Data.Aeson                     ( FromJSON(..)
-                                                , ToJSON(..)
                                                 , Value(String)
-                                                , genericToJSON
                                                 , withObject
                                                 , (.!=)
                                                 , (.:?)
                                                 )
 import           Data.Monoid                    ( Last(..) )
-import           Headroom.Serialization         ( aesonOptions )
 import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           RIO
 import qualified RIO.Text                      as T
@@ -54,12 +51,6 @@ instance FromJSON RunMode where
     "replace" -> pure Replace
     _         -> error $ "Unknown run mode: " <> T.unpack s
   parseJSON other = error $ "Invalid value for run mode: " <> show other
-
-instance ToJSON RunMode where
-  toJSON = \case
-    Add     -> "add"
-    Drop    -> "drop"
-    Replace -> "replace"
 
 -- | Represents what action should the /Generator/ perform.
 data GenMode
@@ -174,16 +165,6 @@ data HeadersConfig = HeadersConfig
   , hscHtml    :: !HeaderConfig
   }
   deriving (Eq, Generic, Show)
-
-instance ToJSON Configuration where
-  toJSON = genericToJSON aesonOptions
-
-instance ToJSON HeaderConfig where
-  toJSON = genericToJSON aesonOptions
-
-instance ToJSON HeadersConfig where
-  toJSON = genericToJSON aesonOptions
-
 
 --------------------------------------------------------------------------------
 

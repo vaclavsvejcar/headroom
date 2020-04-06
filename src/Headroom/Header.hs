@@ -8,6 +8,3 @@ where
 import           Headroom.Header.Haskell
 import           Headroom.Header.HTML
 
-import           RIO
-
-
