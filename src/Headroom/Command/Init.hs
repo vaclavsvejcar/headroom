@@ -158,6 +158,7 @@ createConfigFile = do
     , ("project", "My project")
     , ("year"   , "2020")
     ]
+  -- FIXME: replace with proper configuration file template
   configuration opts paths = Configuration
     { cRunMode       = Add
     , cSourcePaths   = cioSourcePaths opts

@@ -5,8 +5,8 @@ module Headroom.SerializationSpec
   )
 where
 
-import           RIO
 import           Headroom.Serialization
+import           RIO
 import           Test.Hspec
 
 

@@ -6,11 +6,13 @@ module Headroom.ConfigurationSpec
   )
 where
 
-import           Data.Monoid                    ( Last(..) )
 import           Headroom.Configuration
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , Configuration(..)
                                                 , ConfigurationError(..)
+                                                , HeaderConfig(..)
+                                                , HeadersConfig(..)
+                                                , HeadersConfig(..)
                                                 , PartialConfiguration(..)
                                                 , RunMode(..)
                                                 )
@@ -24,16 +26,8 @@ spec :: Spec
 spec = do
   describe "makeConfiguration" $ do
     it "should make Configuration from valid PartialConfiguration" $ do
-      let pc = defaultPartialConfiguration
-            { pcSourcePaths   = Last $ Just ["foo/bar"]
-            , pcTemplatePaths = Last $ Just ["foo/bar"]
-            }
-          expected = Configuration { cRunMode       = Add
-                                   , cSourcePaths   = ["foo/bar"]
-                                   , cTemplatePaths = ["foo/bar"]
-                                   , cVariables     = HM.fromList []
-                                   }
-      makeConfiguration pc `shouldBe` Just expected
+      makeConfiguration testPartialConfiguration
+        `shouldBe` Just testConfiguration
 
     it "should fail for incomplete PartialConfiguration" $ do
       let pc    = defaultPartialConfiguration
@@ -41,3 +35,31 @@ spec = do
             Just (ConfigurationError NoSourcePaths) -> True
             _ -> False
       makeConfiguration pc `shouldSatisfy` matchesException check
+
+testPartialConfiguration :: PartialConfiguration
+testPartialConfiguration = defaultPartialConfiguration
+  { pcSourcePaths    = pure ["foo/bar"]
+  , pcTemplatePaths  = pure ["foo/bar"]
+  , pcLicenseHeaders = defaultPartialHeadersConfig
+  }
+
+testConfiguration :: Configuration
+testConfiguration = Configuration
+  { cRunMode        = Add
+  , cSourcePaths    = ["foo/bar"]
+  , cTemplatePaths  = ["foo/bar"]
+  , cVariables      = HM.fromList []
+  , cLicenseHeaders = HeadersConfig
+                        { hscHaskell = HeaderConfig { hcFileExtensions = ["hs"]
+                                                    , hcPutAfter       = []
+                                                    , hcStartsWith     = "{-"
+                                                    , hcEndsWith       = "-}"
+                                                    }
+                        , hscHtml    = HeaderConfig
+                                         { hcFileExtensions = ["htm", "html"]
+                                         , hcPutAfter       = []
+                                         , hcStartsWith     = "<!--"
+                                         , hcEndsWith       = "-->"
+                                         }
+                        }
+  }
