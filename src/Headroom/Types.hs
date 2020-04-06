@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -15,6 +14,7 @@ module Headroom.Types
   , CommandGenError(..)
   , CommandInitError(..)
   , CommandInitOptions(..)
+  , CommandRunOptions(..)
   , ConfigurationError(..)
   , TemplateError(..)
   , RunMode(..)
@@ -81,7 +81,8 @@ data CommandInitError
   deriving (Eq, Show)
 
 data ConfigurationError
-  = NoEndsWith FileType
+  = InvalidVariable Text
+  | NoEndsWith FileType
   | NoFileExtensions FileType
   | NoPutAfter FileType
   | NoRunMode
@@ -118,6 +119,16 @@ data CommandInitOptions = CommandInitOptions
   , cioLicenseType :: !LicenseType
   }
   deriving Show
+
+-- | Options for the /Run/ command.
+data CommandRunOptions = CommandRunOptions
+  { croRunMode       :: RunMode    -- ^ used /Run/ command mode
+  , croSourcePaths   :: [FilePath] -- ^ source code file paths
+  , croTemplatePaths :: [FilePath] -- ^ template file paths
+  , croVariables     :: [Text]     -- ^ raw variables
+  , croDebug         :: Bool       -- ^ whether to run in debug mode
+  }
+  deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
@@ -197,7 +208,7 @@ instance FromJSON PartialConfiguration where
     pcSourcePaths    <- Last <$> obj .:? "source-paths"
     pcTemplatePaths  <- Last <$> obj .:? "template-paths"
     pcVariables      <- Last <$> obj .:? "variables"
-    pcLicenseHeaders <- obj .:? "template-paths" .!= mempty
+    pcLicenseHeaders <- obj .:? "license-headers" .!= mempty
     pure PartialConfiguration { .. }
 
 instance FromJSON PartialHeaderConfig where
@@ -213,7 +224,6 @@ instance FromJSON PartialHeadersConfig where
     phscHaskell <- obj .:? "haskell" .!= mempty
     phscHTML    <- obj .:? "html" .!= mempty
     pure PartialHeadersConfig { .. }
-
 
 instance Semigroup PartialConfiguration where
   x <> y = PartialConfiguration
@@ -236,7 +246,6 @@ instance Semigroup PartialHeadersConfig where
   x <> y = PartialHeadersConfig { phscHaskell = phscHaskell x <> phscHaskell y
                                 , phscHTML    = phscHTML x <> phscHTML y
                                 }
-
 
 instance Monoid PartialConfiguration where
   mempty = PartialConfiguration mempty mempty mempty mempty mempty

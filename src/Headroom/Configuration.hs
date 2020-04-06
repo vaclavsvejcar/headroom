@@ -4,11 +4,15 @@
 module Headroom.Configuration
   ( defaultPartialConfiguration
   , defaultPartialHeadersConfig
+  , loadConfiguration
   , makeConfiguration
+  , parseVariables
+  , parseConfiguration
   )
 where
 
 import           Data.Monoid                    ( Last(..) )
+import qualified Data.Yaml                     as Y
 import           Headroom.Header                ( haskellHeaderConfig
                                                 , htmlHeaderConfig
                                                 )
@@ -24,7 +28,9 @@ import           Headroom.Types                 ( ApplicationError(..)
                                                 , RunMode(..)
                                                 )
 import           RIO
+import qualified RIO.ByteString                as B
 import qualified RIO.HashMap                   as HM
+import qualified RIO.Text                      as T
 
 
 defaultPartialConfiguration :: PartialConfiguration
@@ -67,3 +73,27 @@ makeHeaderConfig fileType PartialHeaderConfig {..} = do
 lastOrError :: MonadThrow m => ConfigurationError -> Last a -> m a
 lastOrError err (Last x) = maybe (throwM $ ConfigurationError err) pure x
 
+-- | Loads and parses application configuration from given file.
+loadConfiguration :: MonadIO m
+                  => FilePath               -- ^ path to configuration file
+                  -> m PartialConfiguration -- ^ parsed configuration
+loadConfiguration path = liftIO $ B.readFile path >>= parseConfiguration
+
+-- | Parses variables from raw input in @key=value@ format.
+--
+-- >>> parseVariables ["key1=value1"]
+-- fromList [("key1","value1")]
+parseVariables :: MonadThrow m
+               => [Text]                -- ^ list of raw variables
+               -> m (HashMap Text Text) -- ^ parsed variables
+parseVariables variables = fmap HM.fromList (mapM parse variables)
+ where
+  parse input = case T.split (== '=') input of
+    [key, value] -> pure (key, value)
+    _            -> throwM $ ConfigurationError (InvalidVariable input)
+
+-- | Parses application configuration from given raw input.
+parseConfiguration :: MonadThrow m
+                   => B.ByteString           -- ^ raw input to parse
+                   -> m PartialConfiguration -- ^ parsed application configuration
+parseConfiguration = Y.decodeThrow
