@@ -3,9 +3,14 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Headroom.Types
   ( PartialConfiguration(..)
+  , PartialHeaderConfig(..)
+  , PartialHeadersConfig(..)
   , Configuration(..)
+  , HeaderConfig(..)
+  , HeadersConfig(..)
   , ApplicationError(..)
   , CommandGenError(..)
   , CommandInitError(..)
@@ -21,13 +26,19 @@ module Headroom.Types
   )
 where
 
-import           Data.Aeson                     ( ToJSON(..)
+import           Data.Aeson                     ( FromJSON(..)
+                                                , ToJSON(..)
+                                                , Value(String)
                                                 , genericToJSON
+                                                , withObject
+                                                , (.!=)
+                                                , (.:?)
                                                 )
-import           Data.Monoid                    ( Last )
+import           Data.Monoid                    ( Last(..) )
 import           Headroom.Serialization         ( aesonOptions )
 import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           RIO
+import qualified RIO.Text                      as T
 
 
 data RunMode
@@ -35,6 +46,14 @@ data RunMode
   | Drop
   | Replace
   deriving (Eq, Show)
+
+instance FromJSON RunMode where
+  parseJSON (String s) = case T.toLower s of
+    "add"     -> pure Add
+    "drop"    -> pure Drop
+    "replace" -> pure Replace
+    _         -> error $ "Unknown run mode: " <> T.unpack s
+  parseJSON other = error $ "Invalid value for run mode: " <> show other
 
 instance ToJSON RunMode where
   toJSON = \case
@@ -71,8 +90,12 @@ data CommandInitError
   deriving (Eq, Show)
 
 data ConfigurationError
-  = NoRunMode
+  = NoEndsWith FileType
+  | NoFileExtensions FileType
+  | NoPutAfter FileType
+  | NoRunMode
   | NoSourcePaths
+  | NoStartsWith FileType
   | NoTemplatePaths
   | NoVariables
   deriving (Eq, Show)
@@ -87,8 +110,8 @@ data TemplateError
 -- | Application command.
 data Command
   = Run [FilePath] [FilePath] [Text] RunMode Bool -- ^ /Run/ command
-  | Gen Bool (Maybe (LicenseType, FileType))                         -- ^ /Generator/ command
-  | Init LicenseType [FilePath]                          -- ^ /Init/ command
+  | Gen Bool (Maybe (LicenseType, FileType))      -- ^ /Generator/ command
+  | Init LicenseType [FilePath]                   -- ^ /Init/ command
   deriving (Show)
 
 --------------------------------------------------------------------------------
@@ -130,36 +153,117 @@ data LicenseType
 --------------------------------------------------------------------------------
 
 data Configuration = Configuration
-  { cRunMode       :: RunMode
-  , cSourcePaths   :: [FilePath]
-  , cTemplatePaths :: [FilePath]
-  , cVariables     :: HashMap Text Text
+  { cRunMode        :: RunMode
+  , cSourcePaths    :: [FilePath]
+  , cTemplatePaths  :: [FilePath]
+  , cVariables      :: HashMap Text Text
+  , cLicenseHeaders :: HeadersConfig
+  }
+  deriving (Eq, Generic, Show)
+
+data HeaderConfig = HeaderConfig
+  { hcFileExtensions :: ![Text]
+  , hcPutAfter       :: ![Text]
+  , hcStartsWith     :: !Text
+  , hcEndsWith       :: !Text
+  }
+  deriving (Eq, Generic, Show)
+
+data HeadersConfig = HeadersConfig
+  { hscHaskell :: !HeaderConfig
+  , hscHtml    :: !HeaderConfig
   }
   deriving (Eq, Generic, Show)
 
 instance ToJSON Configuration where
   toJSON = genericToJSON aesonOptions
 
+instance ToJSON HeaderConfig where
+  toJSON = genericToJSON aesonOptions
+
+instance ToJSON HeadersConfig where
+  toJSON = genericToJSON aesonOptions
+
 
 --------------------------------------------------------------------------------
 
 data PartialConfiguration = PartialConfiguration
-  { pcRunMode       :: Last RunMode
-  , pcSourcePaths   :: Last [FilePath]
-  , pcTemplatePaths :: Last [FilePath]
-  , pcVariables     :: Last (HashMap Text Text)
+  { pcRunMode        :: Last RunMode
+  , pcSourcePaths    :: Last [FilePath]
+  , pcTemplatePaths  :: Last [FilePath]
+  , pcVariables      :: Last (HashMap Text Text)
+  , pcLicenseHeaders :: PartialHeadersConfig
   }
-  deriving (Eq, Show)
+  deriving (Eq, Generic, Show)
+
+data PartialHeaderConfig = PartialHeaderConfig
+  { phcFileExtensions :: Last [Text]
+  , phcPutAfter       :: Last [Text]
+  , phcStartsWith     :: Last Text
+  , phcEndsWith       :: Last Text
+  }
+  deriving (Eq, Generic, Show)
+
+data PartialHeadersConfig = PartialHeadersConfig
+  { phscHaskell :: PartialHeaderConfig
+  , phscHTML    :: PartialHeaderConfig
+  }
+  deriving (Eq, Generic, Show)
+
+instance FromJSON PartialConfiguration where
+  parseJSON = withObject "PartialConfiguration" $ \obj -> do
+    pcRunMode        <- Last <$> obj .:? "run-mode"
+    pcSourcePaths    <- Last <$> obj .:? "source-paths"
+    pcTemplatePaths  <- Last <$> obj .:? "template-paths"
+    pcVariables      <- Last <$> obj .:? "variables"
+    pcLicenseHeaders <- obj .:? "template-paths" .!= mempty
+    pure PartialConfiguration { .. }
+
+instance FromJSON PartialHeaderConfig where
+  parseJSON = withObject "PartialHeaderConfig" $ \obj -> do
+    phcFileExtensions <- Last <$> obj .:? "file-extensions"
+    phcPutAfter       <- Last <$> obj .:? "put-after"
+    phcStartsWith     <- Last <$> obj .:? "starts-with"
+    phcEndsWith       <- Last <$> obj .:? "ends-with"
+    pure PartialHeaderConfig { .. }
+
+instance FromJSON PartialHeadersConfig where
+  parseJSON = withObject "PartialHeadersConfig" $ \obj -> do
+    phscHaskell <- obj .:? "haskell" .!= mempty
+    phscHTML    <- obj .:? "html" .!= mempty
+    pure PartialHeadersConfig { .. }
+
 
 instance Semigroup PartialConfiguration where
   x <> y = PartialConfiguration
-    { pcRunMode       = pcRunMode x <> pcRunMode y
-    , pcSourcePaths   = pcSourcePaths x <> pcSourcePaths y
-    , pcTemplatePaths = pcTemplatePaths x <> pcTemplatePaths y
-    , pcVariables     = pcVariables x <> pcVariables y
+    { pcRunMode        = pcRunMode x <> pcRunMode y
+    , pcSourcePaths    = pcSourcePaths x <> pcSourcePaths y
+    , pcTemplatePaths  = pcTemplatePaths x <> pcTemplatePaths y
+    , pcVariables      = pcVariables x <> pcVariables y
+    , pcLicenseHeaders = pcLicenseHeaders x <> pcLicenseHeaders y
     }
 
+instance Semigroup PartialHeaderConfig where
+  x <> y = PartialHeaderConfig
+    { phcFileExtensions = phcFileExtensions x <> phcFileExtensions y
+    , phcPutAfter       = phcPutAfter x <> phcPutAfter y
+    , phcStartsWith     = phcStartsWith x <> phcStartsWith y
+    , phcEndsWith       = phcEndsWith x <> phcEndsWith y
+    }
+
+instance Semigroup PartialHeadersConfig where
+  x <> y = PartialHeadersConfig { phscHaskell = phscHaskell x <> phscHaskell y
+                                , phscHTML    = phscHTML x <> phscHTML y
+                                }
+
+
 instance Monoid PartialConfiguration where
-  mempty = PartialConfiguration mempty mempty mempty mempty
+  mempty = PartialConfiguration mempty mempty mempty mempty mempty
+
+instance Monoid PartialHeaderConfig where
+  mempty = PartialHeaderConfig mempty mempty mempty mempty
+
+instance Monoid PartialHeadersConfig where
+  mempty = PartialHeadersConfig mempty mempty
 
 --------------------------------------------------------------------------------
