@@ -13,7 +13,9 @@ module Headroom.Command.Init
 where
 
 import           Headroom.Command.Utils         ( bootstrap )
-import           Headroom.Embedded              ( licenseTemplate )
+import           Headroom.Embedded              ( configFileStub
+                                                , licenseTemplate
+                                                )
 import           Headroom.FileSystem            ( createDirectory
                                                 , doesFileExist
                                                 , fileExtension
@@ -22,15 +24,12 @@ import           Headroom.FileSystem            ( createDirectory
                                                 )
 import           Headroom.FileType              ( fileTypeByExt )
 import           Headroom.Meta                  ( TemplateType )
-import           Headroom.Serialization         ( prettyPrintYAML )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , CommandInitError(..)
                                                 , CommandInitOptions(..)
-                                                , Configuration(..)
                                                 , FileType(..)
                                                 , LicenseType(..)
-                                                , RunMode(..)
                                                 )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
@@ -38,10 +37,10 @@ import           Headroom.UI                    ( Progress(..)
 import           RIO
 import qualified RIO.Char                      as C
 import           RIO.FilePath                   ( (</>) )
-import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
+import qualified RIO.Text.Partial              as TP
 
 
 
@@ -148,23 +147,21 @@ createConfigFile = do
   opts  <- view initOptionsL
   paths <- view pathsL
   let filePath = pCurrentDir paths </> pConfigFile paths
-      content  = prettyPrintYAML $ configuration opts paths
   logInfo $ "Creating YAML config file in " <> fromString filePath
-  writeFileUtf8 filePath content
+  writeFileUtf8 filePath (configuration opts paths)
  where
-  variables = HM.fromList
-    [ ("author" , "John Smith")
-    , ("email"  , "john.smith@example.com")
-    , ("project", "My project")
-    , ("year"   , "2020")
-    ]
-  -- FIXME: replace with proper configuration file template
-  configuration opts paths = Configuration
-    { cRunMode       = Add
-    , cSourcePaths   = cioSourcePaths opts
-    , cTemplatePaths = [pTemplatesDir paths]
-    , cVariables     = variables
-    }
+  configuration opts paths =
+    let withSourcePaths = TP.replace
+          "source-paths: []"
+          ("source-paths: " <> toYamlList (T.pack <$> cioSourcePaths opts))
+          configFileStub
+        withTemplatePaths = TP.replace
+          "template-paths: []"
+          ("template-paths: " <> toYamlList [T.pack $ pTemplatesDir paths])
+          withSourcePaths
+    in  withTemplatePaths
+  toYamlList items = mconcat
+    ["[ ", T.intercalate ", " (fmap (\i -> "\"" <> i <> "\"") items), " ]"]
 
 -- | Checks whether application config file already exists.
 doesAppConfigExist :: (HasLogFunc env, HasPaths env) => RIO env Bool
