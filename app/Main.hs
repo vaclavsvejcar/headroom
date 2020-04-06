@@ -9,14 +9,17 @@ import           Headroom.Command.Gen           ( commandGen
                                                 , parseGenMode
                                                 )
 import           Headroom.Command.Init          ( commandInit )
+import           Headroom.Command.Run           ( commandRun )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , Command(..)
                                                 , CommandGenOptions(..)
                                                 , CommandInitOptions(..)
+                                                , CommandRunOptions(..)
                                                 )
 import           Options.Applicative
 import           Prelude                        ( putStrLn )
 import           RIO
+
 
 main :: IO ()
 main = do
@@ -35,4 +38,5 @@ bootstrap = \case
     commandGen (CommandGenOptions genMode)
   Init licenseType sourcePaths ->
     commandInit (CommandInitOptions sourcePaths licenseType)
-  _ -> undefined
+  Run sourcePaths templatePaths variables runMode debug -> commandRun
+    (CommandRunOptions runMode sourcePaths templatePaths variables debug)

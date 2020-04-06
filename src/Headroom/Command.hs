@@ -12,6 +12,7 @@ import           Headroom.Command.Readers       ( licenseReader
 import           Headroom.Meta                  ( buildVer )
 import           Headroom.Types                 ( Command(..)
                                                 , LicenseType
+                                                , RunMode(..)
                                                 )
 import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           Options.Applicative
@@ -48,7 +49,39 @@ commandParser = info
     )
 
 runOptions :: Parser Command
-runOptions = undefined
+runOptions =
+  Run
+    <$> many
+          (strOption
+            (long "source-path" <> short 's' <> metavar "PATH" <> help
+              "path to source code file/directory"
+            )
+          )
+    <*> many
+          (strOption
+            (long "template-path" <> short 't' <> metavar "PATH" <> help
+              "path to header template file/directory"
+            )
+          )
+    <*> many
+          (strOption
+            (long "variables" <> short 'v' <> metavar "KEY=VALUE" <> help
+              "values for template variables"
+            )
+          )
+    <*> (   flag'
+            Replace
+            (long "replace-headers" <> short 'r' <> help
+              "force replace existing license headers"
+            )
+        <|> flag'
+              Drop
+              (long "drop-headers" <> short 'd' <> help
+                "drop existing license headers only"
+              )
+        <|> pure Add
+        )
+    <*> switch (long "debug" <> help "produce more verbose output")
 
 genOptions :: Parser Command
 genOptions =
