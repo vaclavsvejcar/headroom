@@ -6,11 +6,12 @@ module Headroom.Command.Run
 where
 
 import           Headroom.Command.Utils         ( bootstrap )
-import           Headroom.Configuration         ( defaultPartialConfiguration
-                                                , loadConfiguration
+import           Headroom.Configuration         ( loadConfiguration
                                                 , makeConfiguration
+                                                , parseConfiguration
                                                 , parseVariables
                                                 )
+import           Headroom.Embedded              ( defaultConfig )
 import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , Configuration(..)
                                                 , PartialConfiguration(..)
@@ -78,13 +79,10 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
 mergedConfiguration :: (HasLogFunc env, HasRunOptions env)
                     => RIO env Configuration
 mergedConfiguration = do
-  cmdLineConfig <- optionsToConfiguration
-  yamlConfig    <- loadConfiguration ".headroom.yaml"
-  config        <-
-    makeConfiguration
-    $  defaultPartialConfiguration
-    <> yamlConfig
-    <> cmdLineConfig
+  defaultConfig' <- parseConfiguration defaultConfig
+  cmdLineConfig  <- optionsToConfiguration
+  yamlConfig     <- loadConfiguration ".headroom.yaml"
+  config <- makeConfiguration $ defaultConfig' <> yamlConfig <> cmdLineConfig
   logDebug $ displayShow config
   pure config
 

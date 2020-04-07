@@ -2,9 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 module Headroom.Configuration
-  ( defaultPartialConfiguration
-  , defaultPartialHeadersConfig
-  , loadConfiguration
+  ( loadConfiguration
   , makeConfiguration
   , parseVariables
   , parseConfiguration
@@ -13,9 +11,6 @@ where
 
 import           Data.Monoid                    ( Last(..) )
 import qualified Data.Yaml                     as Y
-import           Headroom.Header                ( haskellHeaderConfig
-                                                , htmlHeaderConfig
-                                                )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , Configuration(..)
                                                 , ConfigurationError(..)
@@ -25,24 +20,12 @@ import           Headroom.Types                 ( ApplicationError(..)
                                                 , PartialConfiguration(..)
                                                 , PartialHeaderConfig(..)
                                                 , PartialHeadersConfig(..)
-                                                , RunMode(..)
                                                 )
 import           RIO
 import qualified RIO.ByteString                as B
 import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
-
-defaultPartialConfiguration :: PartialConfiguration
-defaultPartialConfiguration = mempty
-  { pcRunMode        = pure Add
-  , pcVariables      = pure $ HM.fromList []
-  , pcLicenseHeaders = defaultPartialHeadersConfig
-  }
-
-defaultPartialHeadersConfig :: PartialHeadersConfig
-defaultPartialHeadersConfig =
-  mempty { phscHaskell = haskellHeaderConfig, phscHTML = htmlHeaderConfig }
 
 makeConfiguration :: MonadThrow m => PartialConfiguration -> m Configuration
 makeConfiguration PartialConfiguration {..} = do

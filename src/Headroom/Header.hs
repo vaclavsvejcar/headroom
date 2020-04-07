@@ -1,10 +1,4 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module Headroom.Header
-  ( module Headroom.Header.Haskell
-  , module Headroom.Header.HTML
-  )
-where
+module Headroom.Header where
 
-import           Headroom.Header.Haskell
-import           Headroom.Header.HTML
-
+import           RIO

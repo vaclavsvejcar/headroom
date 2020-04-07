@@ -14,6 +14,7 @@ compile time, using the "Data.FileEmbed" module.
 {-# LANGUAGE TemplateHaskell   #-}
 module Headroom.Embedded
   ( configFileStub
+  , defaultConfig
   , licenseTemplate
   )
 where
@@ -28,6 +29,9 @@ import           RIO
 -- | Content of dummy /YAML/ configuration file for the application.
 configFileStub :: IsString a => a
 configFileStub = $(embedStringFile "embedded/config-file.yaml")
+
+defaultConfig :: IsString a => a
+defaultConfig = $(embedStringFile "embedded/default-config.yaml")
 
 -- | License template for given 'License'.
 licenseTemplate :: IsString a

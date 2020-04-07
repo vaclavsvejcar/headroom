@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cd410f09af2f353ee0c13a3bca3eea064445d4937443df802293c3ee1c6f4902
+-- hash: 8c90de34135f9a78378afe3717caf0decada8b434b1533476af85ee6274e4dd2
 
 name:           headroom
 version:        0.2.0.0
@@ -24,6 +24,7 @@ extra-source-files:
     LICENSE
     README.md
     embedded/config-file.yaml
+    embedded/default-config.yaml
     embedded/license/apache2/css.mustache
     embedded/license/apache2/haskell.mustache
     embedded/license/apache2/html.mustache
@@ -97,8 +98,6 @@ library
       Headroom.FileSystem
       Headroom.FileType
       Headroom.Header
-      Headroom.Header.Haskell
-      Headroom.Header.HTML
       Headroom.Meta
       Headroom.Serialization
       Headroom.Template
