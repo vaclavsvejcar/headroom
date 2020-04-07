@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -45,12 +46,13 @@ data RunMode
   deriving (Eq, Show)
 
 instance FromJSON RunMode where
-  parseJSON (String s) = case T.toLower s of
-    "add"     -> pure Add
-    "drop"    -> pure Drop
-    "replace" -> pure Replace
-    _         -> error $ "Unknown run mode: " <> T.unpack s
-  parseJSON other = error $ "Invalid value for run mode: " <> show other
+  parseJSON = \case
+    String s -> case T.toLower s of
+      "add"     -> pure Add
+      "drop"    -> pure Drop
+      "replace" -> pure Replace
+      _         -> error $ "Unknown run mode: " <> T.unpack s
+    other -> error $ "Invalid value for run mode: " <> show other
 
 -- | Represents what action should the /Generator/ perform.
 data GenMode
