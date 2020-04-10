@@ -9,6 +9,13 @@ run-mode: add
 
 ## Allows to change behaviour of license header detection.
 license-headers:
+  ## CSS configuration
+  css:
+    file-extensions: ["css"]
+    put-after: []
+    starts-with: "/*"
+    ends-with: "*/"
+
   ## Haskell configuration
   haskell:
     file-extensions: ["hs"]
@@ -22,3 +29,24 @@ license-headers:
     put-after: []
     starts-with: "<!--"
     ends-with: "-->"
+
+  ## Java configuration
+  java:
+    file-extensions: ["java"]
+    put-after: []
+    starts-with: "/*"
+    ends-with: "*/"
+
+  ## JS configuration
+  js:
+    file-extensions: ["js"]
+    put-after: []
+    starts-with: "/*"
+    ends-with: "*/"
+
+  ## Scala configuration
+  scala:
+    file-extensions: ["scala"]
+    put-after: []
+    starts-with: "/*"
+    ends-with: "*/"

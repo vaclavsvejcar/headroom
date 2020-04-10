@@ -4,6 +4,7 @@
 module Headroom.Configuration
   ( loadConfiguration
   , makeConfiguration
+  , makeHeadersConfig
   , parseVariables
   , parseConfiguration
   )
@@ -38,8 +39,12 @@ makeConfiguration PartialConfiguration {..} = do
 
 makeHeadersConfig :: MonadThrow m => PartialHeadersConfig -> m HeadersConfig
 makeHeadersConfig PartialHeadersConfig {..} = do
+  hscCss     <- makeHeaderConfig CSS phscCss
   hscHaskell <- makeHeaderConfig Haskell phscHaskell
-  hscHtml    <- makeHeaderConfig HTML phscHTML
+  hscHtml    <- makeHeaderConfig HTML phscHtml
+  hscJava    <- makeHeaderConfig Java phscJava
+  hscJs      <- makeHeaderConfig JS phscJs
+  hscScala   <- makeHeaderConfig Scala phscScala
   pure HeadersConfig { .. }
 
 makeHeaderConfig :: MonadThrow m

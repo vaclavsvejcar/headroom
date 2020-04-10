@@ -13,7 +13,9 @@ module Headroom.FileSystem
 where
 
 import           Headroom.FileType              ( listExtensions )
-import           Headroom.Types                 ( FileType )
+import           Headroom.Types                 ( FileType
+                                                , HeadersConfig(..)
+                                                )
 import           RIO
 import           RIO.Directory                  ( createDirectory
                                                 , doesDirectoryExist
@@ -54,10 +56,12 @@ findFilesByExts path exts = findFiles path predicate
 
 -- | Recursively find files on given path by their file types.
 findFilesByTypes :: MonadIO m
-                 => FilePath     -- ^ path to search
-                 -> [FileType]   -- ^ list of file types
-                 -> m [FilePath] -- ^ list of found files
-findFilesByTypes path types = findFilesByExts path (types >>= listExtensions)
+                 => HeadersConfig -- ^ configuration of license headers
+                 -> [FileType]    -- ^ list of file types
+                 -> FilePath      -- ^ path to search
+                 -> m [FilePath]  -- ^ list of found files
+findFilesByTypes headersConfig types path =
+  findFilesByExts path (types >>= listExtensions headersConfig)
 
 -- | Recursively find all files on given path. If file reference is passed
 -- instead of directory, such file path is returned.

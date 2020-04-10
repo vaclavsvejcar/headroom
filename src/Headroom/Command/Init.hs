@@ -13,7 +13,11 @@ module Headroom.Command.Init
 where
 
 import           Headroom.Command.Utils         ( bootstrap )
+import           Headroom.Configuration         ( makeHeadersConfig
+                                                , parseConfiguration
+                                                )
 import           Headroom.Embedded              ( configFileStub
+                                                , defaultConfig
                                                 , licenseTemplate
                                                 )
 import           Headroom.FileSystem            ( createDirectory
@@ -30,6 +34,7 @@ import           Headroom.Types                 ( ApplicationError(..)
                                                 , CommandInitOptions(..)
                                                 , FileType(..)
                                                 , LicenseType(..)
+                                                , PartialConfiguration(..)
                                                 )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
@@ -105,11 +110,14 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
 findSupportedFileTypes :: (HasInitOptions env, HasLogFunc env)
                        => RIO env [FileType]
 findSupportedFileTypes = do
-  opts      <- view initOptionsL
-  fileTypes <- do
+  opts           <- view initOptionsL
+  pHeadersConfig <- pcLicenseHeaders <$> parseConfiguration defaultConfig
+  headersConfig  <- makeHeadersConfig pHeadersConfig
+  fileTypes      <- do
     allFiles <- mapM (\path -> findFiles path (const True))
                      (cioSourcePaths opts)
-    let allFileTypes = fmap (fileExtension >=> fileTypeByExt) (concat allFiles)
+    let allFileTypes = fmap (fileExtension >=> fileTypeByExt headersConfig)
+                            (concat allFiles)
     pure $ L.nub . catMaybes $ allFileTypes
   case fileTypes of
     [] -> throwM $ CommandInitError NoProvidedSourcePaths

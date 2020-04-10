@@ -185,8 +185,12 @@ data HeaderConfig = HeaderConfig
   deriving (Eq, Generic, Show)
 
 data HeadersConfig = HeadersConfig
-  { hscHaskell :: !HeaderConfig
+  { hscCss     :: !HeaderConfig
+  , hscHaskell :: !HeaderConfig
   , hscHtml    :: !HeaderConfig
+  , hscJava    :: !HeaderConfig
+  , hscJs      :: !HeaderConfig
+  , hscScala   :: !HeaderConfig
   }
   deriving (Eq, Generic, Show)
 
@@ -210,8 +214,12 @@ data PartialHeaderConfig = PartialHeaderConfig
   deriving (Eq, Generic, Show)
 
 data PartialHeadersConfig = PartialHeadersConfig
-  { phscHaskell :: !PartialHeaderConfig
-  , phscHTML    :: !PartialHeaderConfig
+  { phscCss     :: !PartialHeaderConfig
+  , phscHaskell :: !PartialHeaderConfig
+  , phscHtml    :: !PartialHeaderConfig
+  , phscJava    :: !PartialHeaderConfig
+  , phscJs      :: !PartialHeaderConfig
+  , phscScala   :: !PartialHeaderConfig
   }
   deriving (Eq, Generic, Show)
 
@@ -234,8 +242,12 @@ instance FromJSON PartialHeaderConfig where
 
 instance FromJSON PartialHeadersConfig where
   parseJSON = withObject "PartialHeadersConfig" $ \obj -> do
+    phscCss     <- obj .:? "css" .!= mempty
     phscHaskell <- obj .:? "haskell" .!= mempty
-    phscHTML    <- obj .:? "html" .!= mempty
+    phscHtml    <- obj .:? "html" .!= mempty
+    phscJava    <- obj .:? "java" .!= mempty
+    phscJs      <- obj .:? "js" .!= mempty
+    phscScala   <- obj .:? "scala" .!= mempty
     pure PartialHeadersConfig { .. }
 
 instance Semigroup PartialConfiguration where
@@ -256,8 +268,12 @@ instance Semigroup PartialHeaderConfig where
     }
 
 instance Semigroup PartialHeadersConfig where
-  x <> y = PartialHeadersConfig { phscHaskell = phscHaskell x <> phscHaskell y
-                                , phscHTML    = phscHTML x <> phscHTML y
+  x <> y = PartialHeadersConfig { phscCss     = phscCss x <> phscCss y
+                                , phscHaskell = phscHaskell x <> phscHaskell y
+                                , phscHtml    = phscHtml x <> phscHtml y
+                                , phscJava    = phscJava x <> phscJava y
+                                , phscJs      = phscJs x <> phscJs y
+                                , phscScala   = phscScala x <> phscScala y
                                 }
 
 instance Monoid PartialConfiguration where
@@ -267,6 +283,6 @@ instance Monoid PartialHeaderConfig where
   mempty = PartialHeaderConfig mempty mempty mempty mempty
 
 instance Monoid PartialHeadersConfig where
-  mempty = PartialHeadersConfig mempty mempty
+  mempty = PartialHeadersConfig mempty mempty mempty mempty mempty mempty
 
 --------------------------------------------------------------------------------

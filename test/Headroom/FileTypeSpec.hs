@@ -5,8 +5,14 @@ module Headroom.FileTypeSpec
   )
 where
 
+import           Headroom.Configuration         ( makeHeadersConfig
+                                                , parseConfiguration
+                                                )
+import           Headroom.Embedded              ( defaultConfig )
 import           Headroom.FileType
-import           Headroom.Types                 ( FileType(..) )
+import           Headroom.Types                 ( FileType(..)
+                                                , PartialConfiguration(..)
+                                                )
 import           RIO
 import           Test.Hspec
 
@@ -15,4 +21,6 @@ spec :: Spec
 spec = do
   describe "fileTypeByExt" $ do
     it "parses FileType from file extension" $ do
-      fileTypeByExt "hs" `shouldBe` Just Haskell
+      pHeadersConfig <- pcLicenseHeaders <$> parseConfiguration defaultConfig
+      headersConfig  <- makeHeadersConfig pHeadersConfig
+      fileTypeByExt headersConfig "hs" `shouldBe` Just Haskell
