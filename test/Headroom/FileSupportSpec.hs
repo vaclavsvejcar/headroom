@@ -24,6 +24,7 @@ spec = do
 
   describe "addHeader" $ do
     let fileInfo config = FileInfo Haskell config Nothing HM.empty
+
     it "adds header at the beginning of text" $ do
       let info     = fileInfo $ HeaderConfig ["hs"] [] "{-|" "-}"
           header   = "HEADER"
@@ -37,6 +38,13 @@ spec = do
           sample   = "1\n2\nbefore\nafter\n4"
           expected = "1\n2\nbefore\nHEADER\nafter\n4"
       addHeader info header sample `shouldBe` expected
+
+    it "does nothing if header is already present" $ do
+      let config = HeaderConfig ["hs"] ["^before"] "{-|" "-}"
+          header = "HEADER"
+          info   = FileInfo Haskell config (Just (3, 3)) HM.empty
+          sample = "1\n2\nbefore\nOLDHEADER\nafter\n4"
+      addHeader info header sample `shouldBe` sample
 
 
   describe "extractFileInfo" $ do

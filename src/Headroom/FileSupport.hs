@@ -25,10 +25,11 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 
 
 addHeader :: FileInfo -> Text -> Text -> Text
-addHeader FileInfo {..} header text = T.intercalate "\n" withHeader
+addHeader FileInfo {..} _ text | isJust fiHeaderPos = text
+addHeader FileInfo {..} header text                 = withHeader
  where
   (_, before, after) = splitAtHeader (hcPutAfter fiHeaderConfig) text
-  withHeader         = concat [before, [header], after]
+  withHeader         = T.intercalate "\n" $ concat [before, [header], after]
 
 extractFileInfo :: FileType -> HeaderConfig -> Text -> FileInfo
 extractFileInfo fiFileType fiHeaderConfig input =
