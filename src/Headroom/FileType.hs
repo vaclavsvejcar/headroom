@@ -1,13 +1,18 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.FileType
   ( fileTypeByExt
   , listExtensions
   )
 where
 
-import           Headroom.Types                 ( FileType(..) )
+import           Headroom.Types                 ( FileType(..)
+                                                , HeaderConfig(..)
+                                                , HeadersConfig(..)
+                                                )
 import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           RIO
 import qualified RIO.List                      as L
@@ -15,18 +20,18 @@ import qualified RIO.List                      as L
 
 -- | Returns 'FileType' for given file extension (without dot).
 --
--- >>> fileTypeByExt "hs"
+-- fileTypeByExt "hs"
 -- Just Haskell
-fileTypeByExt :: Text           -- ^ file extension to search for
+{-fileTypeByExt :: Text           -- ^ file extension to search for
               -> Maybe FileType -- ^ corresponding 'FileType' (if found)
 fileTypeByExt ext =
-  L.find (elem ext . listExtensions) (allValues :: [FileType])
+  L.find (elem ext . listExtensions) (allValues :: [FileType])-}
 
 -- | Lists all recognized file extensions for given 'FileType'.
 --
--- >>> listExtensions Haskell
+-- listExtensions Haskell
 -- ["hs"]
-listExtensions :: FileType -- ^ 'FileType' to list extensions for
+{-listExtensions :: FileType -- ^ 'FileType' to list extensions for
                -> [Text]   -- ^ list of found file extensions
 listExtensions = \case
   CSS     -> ["css"]
@@ -34,4 +39,17 @@ listExtensions = \case
   HTML    -> ["html", "htm"]
   Java    -> ["java"]
   JS      -> ["js"]
-  Scala   -> ["scala"]
+  Scala   -> ["scala"]-}
+
+fileTypeByExt :: HeadersConfig -> Text -> Maybe FileType
+fileTypeByExt headersConfig ext =
+  L.find (elem ext . listExtensions headersConfig) (allValues @FileType)
+
+listExtensions :: HeadersConfig -> FileType -> [Text]
+listExtensions HeadersConfig {..} fileType = case fileType of
+  CSS     -> hcFileExtensions hscCss
+  Haskell -> hcFileExtensions hscHaskell
+  HTML    -> hcFileExtensions hscHtml
+  Java    -> hcFileExtensions hscJava
+  JS      -> hcFileExtensions hscJs
+  Scala   -> hcFileExtensions hscScala
