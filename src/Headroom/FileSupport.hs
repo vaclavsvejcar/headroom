@@ -3,6 +3,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 module Headroom.FileSupport
   ( addHeader
+  , dropHeader
   , extractFileInfo
   , findHeaderPos
   , lastMatching
@@ -26,10 +27,19 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 
 addHeader :: FileInfo -> Text -> Text -> Text
 addHeader FileInfo {..} _ text | isJust fiHeaderPos = text
-addHeader FileInfo {..} header text                 = withHeader
+addHeader FileInfo {..} header text                 = result
  where
   (_, before, after) = splitAtHeader (hcPutAfter fiHeaderConfig) text
-  withHeader         = T.intercalate "\n" $ concat [before, [header], after]
+  result             = T.intercalate "\n" $ concat [before, [header], after]
+
+dropHeader :: FileInfo -> Text -> Text
+dropHeader (FileInfo _ _ Nothing             _) text = text
+dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
+ where
+  before     = take start inputLines
+  after      = drop (end + 1) inputLines
+  inputLines = T.lines text
+  result     = T.intercalate "\n" (before ++ after)
 
 extractFileInfo :: FileType -> HeaderConfig -> Text -> FileInfo
 extractFileInfo fiFileType fiHeaderConfig input =
