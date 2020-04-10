@@ -120,6 +120,24 @@ spec = do
       lastMatching regex [] `shouldBe` 0
 
 
+  describe "replaceHeader" $ do
+    it "adds header if there's none present" $ do
+      let config   = HeaderConfig ["hs"] ["^before"] "{-|" "-}"
+          info     = FileInfo Haskell config Nothing HM.empty
+          header   = "{-| NEWHEADER -}"
+          sample   = "1\n2\nbefore\nafter\n4"
+          expected = "1\n2\nbefore\n{-| NEWHEADER -}\nafter\n4"
+      replaceHeader info header sample `shouldBe` expected
+
+    it "replaces header if there's existing one" $ do
+      let config   = HeaderConfig ["hs"] ["^before"] "{-|" "-}"
+          info     = FileInfo Haskell config (Just (3, 4)) HM.empty
+          header   = "{-| NEWHEADER -}"
+          sample   = "1\n2\nbefore\n{-| OLD\nHEADER -}\nafter\n4"
+          expected = "1\n2\nbefore\n{-| NEWHEADER -}\nafter\n4"
+      replaceHeader info header sample `shouldBe` expected
+
+
   describe "splitAtHeader" $ do
     it "correctly handles empty input and empty regex" $ do
       splitAtHeader [] "" `shouldBe` (0, [], [])

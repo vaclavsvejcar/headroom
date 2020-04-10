@@ -1,16 +1,19 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module Headroom.FileSupport
   ( addHeader
   , dropHeader
   , extractFileInfo
   , findHeaderPos
   , lastMatching
+  , replaceHeader
   , splitAtHeader
   )
 where
 
+import           Control.Lens.TH                ( makeLensesFor )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
@@ -24,6 +27,8 @@ import           Text.Regex.PCRE.Light          ( Regex
                                                 )
 import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 
+
+makeLensesFor [("fiHeaderPos", "fiHeaderPosL")] ''FileInfo
 
 addHeader :: FileInfo -> Text -> Text -> Text
 addHeader FileInfo {..} _ text | isJust fiHeaderPos = text
@@ -71,6 +76,13 @@ lastMatching regex input = go input 0 0
   go (x : xs) _ i | isJust $ match regex (encodeUtf8 x) [] = go xs i (i + 1)
   go (_ : xs) pos i = go xs pos (i + 1)
   go []       pos _ = pos
+
+replaceHeader :: FileInfo -> Text -> Text -> Text
+replaceHeader fileInfo header = addOp . dropOp
+ where
+  addOp          = addHeader infoWithoutPos header
+  dropOp         = dropHeader fileInfo
+  infoWithoutPos = set fiHeaderPosL Nothing fileInfo
 
 splitAtHeader :: [Text] -> Text -> (Int, [Text], [Text])
 splitAtHeader []       input = (0, [], T.lines input)
