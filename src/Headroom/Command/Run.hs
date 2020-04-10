@@ -83,7 +83,10 @@ mergedConfiguration = do
   cmdLineConfig  <- optionsToConfiguration
   yamlConfig     <- loadConfiguration ".headroom.yaml"
   config <- makeConfiguration $ defaultConfig' <> yamlConfig <> cmdLineConfig
-  logDebug $ displayShow config
+  logDebug $ "Default config: " <> displayShow defaultConfig'
+  logDebug $ "YAML config: " <> displayShow yamlConfig
+  logDebug $ "CMDLine config: " <> displayShow cmdLineConfig
+  logDebug $ "Merged config: " <> displayShow config
   pure config
 
 
