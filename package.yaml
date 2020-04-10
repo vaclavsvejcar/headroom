@@ -80,6 +80,8 @@ tests:
       - aeson
       - headroom
       - hspec
+      - pcre-heavy
+      - pcre-light
       - QuickCheck
   doctest:
     main: Main.hs

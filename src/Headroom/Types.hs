@@ -24,6 +24,7 @@ module Headroom.Types
   , CommandGenOptions(..)
   , LicenseType(..)
   , FileType(..)
+  , FileInfo(..)
   )
 where
 
@@ -124,11 +125,11 @@ data CommandInitOptions = CommandInitOptions
 
 -- | Options for the /Run/ command.
 data CommandRunOptions = CommandRunOptions
-  { croRunMode       :: RunMode    -- ^ used /Run/ command mode
-  , croSourcePaths   :: [FilePath] -- ^ source code file paths
-  , croTemplatePaths :: [FilePath] -- ^ template file paths
-  , croVariables     :: [Text]     -- ^ raw variables
-  , croDebug         :: Bool       -- ^ whether to run in debug mode
+  { croRunMode       :: !RunMode    -- ^ used /Run/ command mode
+  , croSourcePaths   :: ![FilePath] -- ^ source code file paths
+  , croTemplatePaths :: ![FilePath] -- ^ template file paths
+  , croVariables     :: ![Text]     -- ^ raw variables
+  , croDebug         :: !Bool       -- ^ whether to run in debug mode
   }
   deriving (Eq, Show)
 
@@ -156,12 +157,22 @@ data LicenseType
 
 --------------------------------------------------------------------------------
 
+data FileInfo = FileInfo
+  { fiFileType     :: !FileType
+  , fiHeaderConfig :: !HeaderConfig
+  , fiHeaderPos    :: !(Maybe (Int, Int))
+  , fiVariables    :: !(HashMap Text Text)
+  }
+  deriving (Eq, Show)
+
+--------------------------------------------------------------------------------
+
 data Configuration = Configuration
-  { cRunMode        :: RunMode
-  , cSourcePaths    :: [FilePath]
-  , cTemplatePaths  :: [FilePath]
-  , cVariables      :: HashMap Text Text
-  , cLicenseHeaders :: HeadersConfig
+  { cRunMode        :: !RunMode
+  , cSourcePaths    :: ![FilePath]
+  , cTemplatePaths  :: ![FilePath]
+  , cVariables      :: !(HashMap Text Text)
+  , cLicenseHeaders :: !HeadersConfig
   }
   deriving (Eq, Generic, Show)
 
@@ -182,25 +193,25 @@ data HeadersConfig = HeadersConfig
 --------------------------------------------------------------------------------
 
 data PartialConfiguration = PartialConfiguration
-  { pcRunMode        :: Last RunMode
-  , pcSourcePaths    :: Last [FilePath]
-  , pcTemplatePaths  :: Last [FilePath]
-  , pcVariables      :: Last (HashMap Text Text)
-  , pcLicenseHeaders :: PartialHeadersConfig
+  { pcRunMode        :: !(Last RunMode)
+  , pcSourcePaths    :: !(Last [FilePath])
+  , pcTemplatePaths  :: !(Last [FilePath])
+  , pcVariables      :: !(Last (HashMap Text Text))
+  , pcLicenseHeaders :: !PartialHeadersConfig
   }
   deriving (Eq, Generic, Show)
 
 data PartialHeaderConfig = PartialHeaderConfig
-  { phcFileExtensions :: Last [Text]
-  , phcPutAfter       :: Last [Text]
-  , phcStartsWith     :: Last Text
-  , phcEndsWith       :: Last Text
+  { phcFileExtensions :: !(Last [Text])
+  , phcPutAfter       :: !(Last [Text])
+  , phcStartsWith     :: !(Last Text)
+  , phcEndsWith       :: !(Last Text)
   }
   deriving (Eq, Generic, Show)
 
 data PartialHeadersConfig = PartialHeadersConfig
-  { phscHaskell :: PartialHeaderConfig
-  , phscHTML    :: PartialHeaderConfig
+  { phscHaskell :: !PartialHeaderConfig
+  , phscHTML    :: !PartialHeaderConfig
   }
   deriving (Eq, Generic, Show)
 
