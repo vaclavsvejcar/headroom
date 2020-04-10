@@ -30,7 +30,7 @@ extractFileInfo fiFileType fiHeaderConfig input =
 
 -- TODO: https://github.com/vaclavsvejcar/headroom/issues/25
 extractVariables :: FileType -> HeaderConfig -> Text -> HashMap Text Text
-extractVariables fileType headerConfig input = HM.empty
+extractVariables _ _ _ = HM.empty
 
 findHeaderPos :: HeaderConfig -> Text -> Maybe (Int, Int)
 findHeaderPos HeaderConfig {..} input = position
