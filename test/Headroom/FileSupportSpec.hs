@@ -6,9 +6,13 @@ module Headroom.FileSupportSpec
 where
 
 import           Headroom.FileSupport
-import           Headroom.Types                 ( HeaderConfig(..) )
+import           Headroom.Types                 ( FileInfo(..)
+                                                , FileType(..)
+                                                , HeaderConfig(..)
+                                                )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
+import qualified RIO.HashMap                   as HM
 import           Test.Hspec
 import           Text.Regex.PCRE.Light          ( compile )
 import           Text.Regex.PCRE.Light.Char8    ( utf8 )
@@ -17,6 +21,14 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 spec :: Spec
 spec = do
   let samplesDir = "test-data" </> "code-samples"
+
+  describe "extractFileInfo" $ do
+    it "extracts FileInfo from given raw input" $ do
+      let config   = HeaderConfig ["hs"] [] "{-|" "-}"
+          expected = FileInfo Haskell config (Just (1, 13)) HM.empty
+      sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
+      extractFileInfo Haskell config sample `shouldBe` expected
+
 
   describe "findHeaderPos" $ do
     it "finds single line header" $ do
@@ -35,9 +47,9 @@ spec = do
       findHeaderPos config sample `shouldBe` Just (5, 6)
 
     it "finds header in longer example" $ do
-      let hcFull = HeaderConfig ["hs"] [] "{-|" "-}"
-      sampleFull <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      findHeaderPos hcFull sampleFull `shouldBe` Just (1, 13)
+      let config = HeaderConfig ["hs"] [] "{-|" "-}"
+      sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
+      findHeaderPos config sample `shouldBe` Just (1, 13)
 
     it "finds nothing if no header present" $ do
       let sample = "some\nrandom\text without header"
