@@ -22,6 +22,23 @@ spec :: Spec
 spec = do
   let samplesDir = "test-data" </> "code-samples"
 
+  describe "addHeader" $ do
+    let fileInfo config = FileInfo Haskell config Nothing HM.empty
+    it "adds header at the beginning of text" $ do
+      let info     = fileInfo $ HeaderConfig ["hs"] [] "{-|" "-}"
+          header   = "HEADER"
+          sample   = "1\n2\nbefore\nafter\n4"
+          expected = "HEADER\n1\n2\nbefore\nafter\n4"
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header after 'putAfter' position" $ do
+      let info     = fileInfo $ HeaderConfig ["hs"] ["^before"] "{-|" "-}"
+          header   = "HEADER"
+          sample   = "1\n2\nbefore\nafter\n4"
+          expected = "1\n2\nbefore\nHEADER\nafter\n4"
+      addHeader info header sample `shouldBe` expected
+
+
   describe "extractFileInfo" $ do
     it "extracts FileInfo from given raw input" $ do
       let config   = HeaderConfig ["hs"] [] "{-|" "-}"
@@ -71,3 +88,21 @@ spec = do
 
     it "returns 0 if the input is empty" $ do
       lastMatching regex [] `shouldBe` 0
+
+
+  describe "splitAtHeader" $ do
+    it "correctly handles empty input and empty regex" $ do
+      --let sample = "random\ntext\nfoo\n{-| 1 -}\nafter"
+      splitAtHeader [] "" `shouldBe` (0, [], [])
+
+    it "correctly handles input and empty regex" $ do
+      let sample   = "random\ntext\nfoo\n{-| 1 -}\nafter"
+          expected = (0, [], ["random", "text", "foo", "{-| 1 -}", "after"])
+      splitAtHeader [] sample `shouldBe` expected
+
+    it "correctly splits input for valid regex" $ do
+      let sample   = "random\ntext\nfoo\n{-| 1 -}\nafter"
+          regexes  = ["^foo"]
+          expected = (3, ["random", "text", "foo"], ["{-| 1 -}", "after"])
+      splitAtHeader regexes sample `shouldBe` expected
+
