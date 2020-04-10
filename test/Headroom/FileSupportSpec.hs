@@ -34,17 +34,39 @@ spec = do
 
     it "adds header after 'putAfter' position" $ do
       let info     = fileInfo $ HeaderConfig ["hs"] ["^before"] "{-|" "-}"
-          header   = "HEADER"
+          header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore\nafter\n4"
-          expected = "1\n2\nbefore\nHEADER\nafter\n4"
+          expected = "1\n2\nbefore\n{-| HEADER -}\nafter\n4"
       addHeader info header sample `shouldBe` expected
 
     it "does nothing if header is already present" $ do
       let config = HeaderConfig ["hs"] ["^before"] "{-|" "-}"
-          header = "HEADER"
+          header = "{-| HEADER -}"
           info   = FileInfo Haskell config (Just (3, 3)) HM.empty
-          sample = "1\n2\nbefore\nOLDHEADER\nafter\n4"
+          sample = "1\n2\nbefore\n{-| OLDHEADER -}\nafter\n4"
       addHeader info header sample `shouldBe` sample
+
+
+  describe "dropHeader" $ do
+    it "does nothing if no header is present" $ do
+      let config = HeaderConfig ["hs"] [] "{-|" "-}"
+          info   = FileInfo Haskell config Nothing HM.empty
+          sample = "1\n2\nbefore\nafter\n4"
+      dropHeader info sample `shouldBe` sample
+
+    it "drops existing single line header" $ do
+      let config   = HeaderConfig ["hs"] [] "{-|" "-}"
+          info     = FileInfo Haskell config (Just (3, 3)) HM.empty
+          sample   = "1\n2\nbefore\n{-| HEADER -}\nafter\n4"
+          expected = "1\n2\nbefore\nafter\n4"
+      dropHeader info sample `shouldBe` expected
+
+    it "drops existing multi line header" $ do
+      let config   = HeaderConfig ["hs"] [] "{-|" "-}"
+          info     = FileInfo Haskell config (Just (3, 4)) HM.empty
+          sample   = "1\n2\nbefore\n{-| HEADER\nHERE -}\nafter\n4"
+          expected = "1\n2\nbefore\nafter\n4"
+      dropHeader info sample `shouldBe` expected
 
 
   describe "extractFileInfo" $ do
@@ -100,7 +122,6 @@ spec = do
 
   describe "splitAtHeader" $ do
     it "correctly handles empty input and empty regex" $ do
-      --let sample = "random\ntext\nfoo\n{-| 1 -}\nafter"
       splitAtHeader [] "" `shouldBe` (0, [], [])
 
     it "correctly handles input and empty regex" $ do
