@@ -20,7 +20,7 @@ license-headers:
   haskell:
     file-extensions: ["hs"]
     put-after: []
-    starts-with: "{-"
+    starts-with: "{-|"
     ends-with: "-}"
 
   ## HTML configuration

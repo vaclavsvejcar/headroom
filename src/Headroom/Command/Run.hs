@@ -16,19 +16,32 @@ import           Headroom.Configuration         ( loadConfiguration
                                                 , parseVariables
                                                 )
 import           Headroom.Embedded              ( defaultConfig )
-import           Headroom.FileSystem            ( findFilesByExts
+import           Headroom.FileSupport           ( addHeader
+                                                , dropHeader
+                                                , extractFileInfo
+                                                , replaceHeader
+                                                )
+import           Headroom.FileSystem            ( fileExtension
+                                                , findFilesByExts
                                                 , findFilesByTypes
                                                 , loadFile
+                                                )
+import           Headroom.FileType              ( configByFileType
+                                                , fileTypeByExt
                                                 )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , Configuration(..)
+                                                , FileInfo(..)
                                                 , FileType(..)
                                                 , PartialConfiguration(..)
                                                 , RunMode(..)
                                                 )
 import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
+import           Headroom.UI                    ( Progress(..)
+                                                , zipWithProgress
+                                                )
 import           RIO
 import           RIO.FilePath                   ( takeBaseName )
 import qualified RIO.List                      as L
@@ -90,13 +103,21 @@ env' opts logFunc = do
 commandRun :: CommandRunOptions -- ^ /Run/ command options
            -> IO ()             -- ^ execution result
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
-  startTS     <- liftIO getPOSIXTime
-  templates   <- loadTemplates
-  sourceFiles <- findSourceFiles (M.keys templates)
-  endTS       <- liftIO getPOSIXTime
-  let (elapsedSeconds, _) = properFraction (endTS - startTS)
-  logInfo
-    $ mconcat ["Finished in ", display (elapsedSeconds :: Int), " second(s)"]
+  startTS            <- liftIO getPOSIXTime
+  templates          <- loadTemplates
+  sourceFiles        <- findSourceFiles (M.keys templates)
+  (total, processed) <- processSourceFiles templates sourceFiles
+  endTS              <- liftIO getPOSIXTime
+  logInfo "-----"
+  logInfo $ mconcat
+    [ "Done: modified "
+    , display processed
+    , ", skipped "
+    , display (total - processed)
+    , " file(s) in "
+    , displayShow (endTS - startTS)
+    , " second(s)."
+    ]
 
 findSourceFiles :: (HasConfiguration env, HasLogFunc env)
                 => [FileType]
@@ -108,6 +129,60 @@ findSourceFiles fileTypes = do
     mconcat <$> mapM (findFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
   logInfo $ mconcat ["Found ", display $ L.length files, " source file(s)"]
   pure files
+
+processSourceFiles :: (HasConfiguration env, HasLogFunc env)
+                   => Map FileType TemplateType
+                   -> [FilePath]
+                   -> RIO env (Int, Int)
+processSourceFiles templates paths = do
+  Configuration {..} <- view configurationL
+  let withFileType = mapMaybe (findFileType cLicenseHeaders) paths
+      withTemplate = mapMaybe (uncurry findTemplate) withFileType
+  processed <- mapM process (zipWithProgress withTemplate)
+  logDebug "foo"
+  pure (L.length withTemplate, L.length . filter (== True) $ processed)
+ where
+  findFileType conf path =
+    fmap (, path) (fileExtension path >>= fileTypeByExt conf)
+  findTemplate ft p = (, ft, p) <$> M.lookup ft templates
+  process (pr, (tt, ft, p)) = processSourceFile pr tt ft p
+
+processSourceFile :: (HasConfiguration env, HasLogFunc env)
+                  => Progress
+                  -> TemplateType
+                  -> FileType
+                  -> FilePath
+                  -> RIO env Bool
+processSourceFile progress template fileType path = do
+  Configuration {..} <- view configurationL
+  fileContent        <- readFileUtf8 path
+  let fileInfo = extractFileInfo fileType
+                                 (configByFileType cLicenseHeaders fileType)
+                                 fileContent
+      variables = cVariables <> fiVariables fileInfo
+  header                        <- renderTemplate variables template
+  (processed, action, message') <- chooseAction fileInfo header
+  let message = if processed then message' else "Skipping file:        "
+  logDebug $ "File info: " <> displayShow fileInfo
+  logInfo $ mconcat [display progress, " ", display message, fromString path]
+  writeFileUtf8 path (action fileContent)
+  pure processed
+
+chooseAction :: (HasConfiguration env)
+             => FileInfo
+             -> Text
+             -> RIO env (Bool, Text -> Text, Text)
+chooseAction info header = do
+  Configuration {..} <- view configurationL
+  let hasHeader = isJust $ fiHeaderPos info
+  pure $ go cRunMode hasHeader
+ where
+  go runMode hasHeader = case runMode of
+    Add     -> (not hasHeader, addHeader info header, "Adding header to:     ")
+    Drop    -> (hasHeader, dropHeader info, "Dropping header from: ")
+    Replace -> if hasHeader
+      then (True, replaceHeader info header, "Replacing header in:  ")
+      else go Add hasHeader
 
 loadTemplates :: (HasConfiguration env, HasLogFunc env)
               => RIO env (Map FileType TemplateType)

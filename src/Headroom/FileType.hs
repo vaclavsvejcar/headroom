@@ -4,7 +4,8 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}
 module Headroom.FileType
-  ( fileTypeByExt
+  ( configByFileType
+  , fileTypeByExt
   , listExtensions
   )
 where
@@ -46,10 +47,14 @@ fileTypeByExt headersConfig ext =
   L.find (elem ext . listExtensions headersConfig) (allValues @FileType)
 
 listExtensions :: HeadersConfig -> FileType -> [Text]
-listExtensions HeadersConfig {..} fileType = case fileType of
-  CSS     -> hcFileExtensions hscCss
-  Haskell -> hcFileExtensions hscHaskell
-  HTML    -> hcFileExtensions hscHtml
-  Java    -> hcFileExtensions hscJava
-  JS      -> hcFileExtensions hscJs
-  Scala   -> hcFileExtensions hscScala
+listExtensions headersConfig fileType =
+  hcFileExtensions (configByFileType headersConfig fileType)
+
+configByFileType :: HeadersConfig -> FileType -> HeaderConfig
+configByFileType HeadersConfig {..} fileType = case fileType of
+  CSS     -> hscCss
+  Haskell -> hscHaskell
+  HTML    -> hscHtml
+  Java    -> hscJava
+  JS      -> hscJs
+  Scala   -> hscScala
