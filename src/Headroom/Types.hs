@@ -88,6 +88,7 @@ data ConfigurationError
   | NoEndsWith FileType
   | NoFileExtensions FileType
   | NoPutAfter FileType
+  | NoPutBefore FileType
   | NoRunMode
   | NoSourcePaths
   | NoStartsWith FileType
@@ -179,6 +180,7 @@ data Configuration = Configuration
 data HeaderConfig = HeaderConfig
   { hcFileExtensions :: ![Text]
   , hcPutAfter       :: ![Text]
+  , hcPutBefore      :: ![Text]
   , hcStartsWith     :: !Text
   , hcEndsWith       :: !Text
   }
@@ -208,6 +210,7 @@ data PartialConfiguration = PartialConfiguration
 data PartialHeaderConfig = PartialHeaderConfig
   { phcFileExtensions :: !(Last [Text])
   , phcPutAfter       :: !(Last [Text])
+  , phcPutBefore      :: !(Last [Text])
   , phcStartsWith     :: !(Last Text)
   , phcEndsWith       :: !(Last Text)
   }
@@ -236,6 +239,7 @@ instance FromJSON PartialHeaderConfig where
   parseJSON = withObject "PartialHeaderConfig" $ \obj -> do
     phcFileExtensions <- Last <$> obj .:? "file-extensions"
     phcPutAfter       <- Last <$> obj .:? "put-after"
+    phcPutBefore      <- Last <$> obj .:? "put-before"
     phcStartsWith     <- Last <$> obj .:? "starts-with"
     phcEndsWith       <- Last <$> obj .:? "ends-with"
     pure PartialHeaderConfig { .. }
@@ -263,6 +267,7 @@ instance Semigroup PartialHeaderConfig where
   x <> y = PartialHeaderConfig
     { phcFileExtensions = phcFileExtensions x <> phcFileExtensions y
     , phcPutAfter       = phcPutAfter x <> phcPutAfter y
+    , phcPutBefore      = phcPutBefore x <> phcPutBefore y
     , phcStartsWith     = phcStartsWith x <> phcStartsWith y
     , phcEndsWith       = phcEndsWith x <> phcEndsWith y
     }
@@ -280,7 +285,7 @@ instance Monoid PartialConfiguration where
   mempty = PartialConfiguration mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeaderConfig where
-  mempty = PartialHeaderConfig mempty mempty mempty mempty
+  mempty = PartialHeaderConfig mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeadersConfig where
   mempty = PartialHeadersConfig mempty mempty mempty mempty mempty mempty
