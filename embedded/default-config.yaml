@@ -13,6 +13,7 @@ license-headers:
   css:
     file-extensions: ["css"]
     put-after: []
+    put-before: []
     starts-with: "/*"
     ends-with: "*/"
 
@@ -20,6 +21,7 @@ license-headers:
   haskell:
     file-extensions: ["hs"]
     put-after: []
+    put-before: []
     starts-with: "{-|"
     ends-with: "-}"
 
@@ -27,6 +29,7 @@ license-headers:
   html:
     file-extensions: ["htm", "html"]
     put-after: []
+    put-before: []
     starts-with: "<!--"
     ends-with: "-->"
 
@@ -34,6 +37,7 @@ license-headers:
   java:
     file-extensions: ["java"]
     put-after: []
+    put-before: ["^package"]
     starts-with: "/*"
     ends-with: "*/"
 
@@ -41,6 +45,7 @@ license-headers:
   js:
     file-extensions: ["js"]
     put-after: []
+    put-before: []
     starts-with: "/*"
     ends-with: "*/"
 
@@ -48,5 +53,6 @@ license-headers:
   scala:
     file-extensions: ["scala"]
     put-after: []
+    put-before: ["^package"]
     starts-with: "/*"
     ends-with: "*/"

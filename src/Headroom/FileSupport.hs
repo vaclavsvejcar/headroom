@@ -5,11 +5,12 @@
 module Headroom.FileSupport
   ( addHeader
   , dropHeader
+  , replaceHeader
   , extractFileInfo
   , findHeaderPos
+  , firstMatching
   , lastMatching
-  , replaceHeader
-  , splitAtHeader
+  , splitInput
   )
 where
 
@@ -20,6 +21,7 @@ import           Headroom.Types                 ( FileInfo(..)
                                                 )
 import           RIO
 import qualified RIO.HashMap                   as HM
+import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Light          ( Regex
                                                 , compile
@@ -34,8 +36,11 @@ addHeader :: FileInfo -> Text -> Text -> Text
 addHeader FileInfo {..} _ text | isJust fiHeaderPos = text
 addHeader FileInfo {..} header text                 = result
  where
-  (_, before, after) = splitAtHeader (hcPutAfter fiHeaderConfig) text
-  result             = T.intercalate "\n" $ concat [before, [header], after]
+  (before, middle, after) = splitInput hcPutAfter hcPutBefore text
+  result                  = T.unlines $ concat joined
+  joined                  = [before, [header], middle, after]
+  HeaderConfig {..}       = fiHeaderConfig
+
 
 dropHeader :: FileInfo -> Text -> Text
 dropHeader (FileInfo _ _ Nothing             _) text = text
@@ -44,38 +49,8 @@ dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
   before     = take start inputLines
   after      = drop (end + 1) inputLines
   inputLines = T.lines text
-  result     = T.intercalate "\n" (before ++ after)
+  result     = T.unlines (before ++ after)
 
-extractFileInfo :: FileType -> HeaderConfig -> Text -> FileInfo
-extractFileInfo fiFileType fiHeaderConfig input =
-  let fiHeaderPos = findHeaderPos fiHeaderConfig input
-      fiVariables = extractVariables fiFileType fiHeaderConfig input
-  in  FileInfo { .. }
-
--- TODO: https://github.com/vaclavsvejcar/headroom/issues/25
-extractVariables :: FileType -> HeaderConfig -> Text -> HashMap Text Text
-extractVariables _ _ _ = HM.empty
-
-findHeaderPos :: HeaderConfig -> Text -> Maybe (Int, Int)
-findHeaderPos HeaderConfig {..} input = position
- where
-  (splitAt, _, headerArea) = splitAtHeader hcPutAfter input
-  isStart                  = T.isPrefixOf hcStartsWith
-  isEnd                    = T.isSuffixOf hcEndsWith
-  position                 = go (T.strip <$> headerArea) Nothing Nothing splitAt
-   where
-    go (x : _) _ _ i | isStart x && isEnd x = Just (i, i)
-    go (x : xs) _ _ i | isStart x           = go xs (Just i) Nothing (i + 1)
-    go (x : _) (Just start) _ i | isEnd x   = Just (start, i)
-    go (_ : xs) start end i                 = go xs start end (i + 1)
-    go []       _     _   _                 = Nothing
-
-lastMatching :: Regex -> [Text] -> Int
-lastMatching regex input = go input 0 0
- where
-  go (x : xs) _ i | isJust $ match regex (encodeUtf8 x) [] = go xs i (i + 1)
-  go (_ : xs) pos i = go xs pos (i + 1)
-  go []       pos _ = pos
 
 replaceHeader :: FileInfo -> Text -> Text -> Text
 replaceHeader fileInfo header = addOp . dropOp
@@ -84,12 +59,61 @@ replaceHeader fileInfo header = addOp . dropOp
   dropOp         = dropHeader fileInfo
   infoWithoutPos = set fiHeaderPosL Nothing fileInfo
 
-splitAtHeader :: [Text] -> Text -> (Int, [Text], [Text])
-splitAtHeader []       input = (0, [], T.lines input)
-splitAtHeader putAfter input = (splitAt, before, after)
+
+extractFileInfo :: FileType -> HeaderConfig -> Text -> FileInfo
+extractFileInfo fiFileType fiHeaderConfig input =
+  let fiHeaderPos = findHeaderPos fiHeaderConfig input
+      fiVariables = extractVariables fiFileType fiHeaderConfig input
+  in  FileInfo { .. }
+
+
+-- TODO: https://github.com/vaclavsvejcar/headroom/issues/25
+extractVariables :: FileType -> HeaderConfig -> Text -> HashMap Text Text
+extractVariables _ _ _ = HM.empty
+
+
+findHeaderPos :: HeaderConfig -> Text -> Maybe (Int, Int)
+findHeaderPos HeaderConfig {..} input = position
  where
-  before  = take splitAt inLines
-  after   = drop splitAt inLines
+  (before, headerArea, _) = splitInput hcPutAfter hcPutBefore input
+  isStart                 = T.isPrefixOf hcStartsWith
+  isEnd                   = T.isSuffixOf hcEndsWith
+  splitAt                 = L.length before
+  position                = go (T.strip <$> headerArea) Nothing Nothing splitAt
+   where
+    go (x : _) _ _ i | isStart x && isEnd x = Just (i, i)
+    go (x : xs) _ _ i | isStart x           = go xs (Just i) Nothing (i + 1)
+    go (x : _) (Just start) _ i | isEnd x   = Just (start, i)
+    go (_ : xs) start end i                 = go xs start end (i + 1)
+    go []       _     _   _                 = Nothing
+
+
+firstMatching :: Regex -> [Text] -> Int
+firstMatching regex input = go input 0
+ where
+  go (x : _) i | isJust $ match regex (encodeUtf8 x) [] = i
+  go (_ : xs) i = go xs (i + 1)
+  go []       i = i
+
+
+lastMatching :: Regex -> [Text] -> Int
+lastMatching regex input = go input 0 0
+ where
+  go (x : xs) _ i | isJust $ match regex (encodeUtf8 x) [] = go xs i (i + 1)
+  go (_ : xs) pos i = go xs pos (i + 1)
+  go []       pos _ = pos
+
+
+splitInput :: [Text] -> [Text] -> Text -> ([Text], [Text], [Text])
+splitInput []       []        input = ([], T.lines input, [])
+splitInput putAfter putBefore input = (before, middle, after)
+ where
+  before  = take fstSplitAt inLines
+  middle  = drop fstSplitAt . take sndSplitAt $ inLines
+  after   = drop sndSplitAt inLines
   inLines = T.lines input
-  regex   = compile (encodeUtf8 $ T.intercalate "|" putAfter) [utf8]
-  splitAt = lastMatching regex inLines + 1
+  fstSplitAt | null putAfter = 0
+             | otherwise     = lastMatching (compile' putAfter) inLines + 1
+  sndSplitAt | null putBefore = L.length inLines
+             | otherwise      = firstMatching (compile' putBefore) inLines
+  compile' regex = compile (encodeUtf8 $ T.intercalate "|" regex) [utf8]
