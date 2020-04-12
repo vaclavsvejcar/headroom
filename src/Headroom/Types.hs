@@ -4,7 +4,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications   #-}
 module Headroom.Types
   ( PartialConfiguration(..)
   , PartialHeaderConfig(..)
@@ -75,54 +74,6 @@ instance Exception ApplicationError where
     CommandInitError   error' -> T.unpack $ commandInitError error'
     ConfigurationError error' -> T.unpack $ configurationError error'
     TemplateError      error' -> T.unpack $ templateError error'
-
-commandGenError :: CommandGenError -> Text
-commandGenError = \case
-  NoGenModeSelected -> noGenModeSelected
- where
-  noGenModeSelected = mconcat
-    [ "Please select at least one option what to generate "
-    , "(see --help for details)"
-    ]
-
-commandInitError :: CommandInitError -> Text
-commandInitError = \case
-  AppConfigAlreadyExists path -> appConfigAlreadyExists path
-  NoProvidedSourcePaths       -> noProvidedSourcePaths
-  NoSupportedFileType         -> noSupportedFileType
- where
-  appConfigAlreadyExists path =
-    mconcat ["Configuration file '", T.pack path, "' already exists"]
-  noProvidedSourcePaths = "No source code paths (files or directories) defined"
-  noSupportedFileType   = "No supported file type found in scanned source paths"
-
-configurationError :: ConfigurationError -> Text
-configurationError = \case
-  InvalidVariable  input    -> invalidVariable input
-  NoStartsWith     fileType -> noProp "starts-with" fileType
-  NoEndsWith       fileType -> noProp "ends-with" fileType
-  NoFileExtensions fileType -> noProp "file-extensions" fileType
-  NoPutAfter       fileType -> noProp "put-after" fileType
-  NoPutBefore      fileType -> noProp "put-before" fileType
-  NoRunMode                 -> noFlag "run-mode"
-  NoSourcePaths             -> noFlag "source-paths"
-  NoTemplatePaths           -> noFlag "template-paths"
-  NoVariables               -> noFlag "variables"
- where
-  invalidVariable = ("Cannot parse variable key=value from: " <>)
-  noProp prop fileType = T.pack $ mconcat
-    ["Missing '", prop, "' configuration key for file type", show fileType]
-  noFlag flag = mconcat ["Missing configuration key: ", flag]
-
-templateError :: TemplateError -> Text
-templateError = \case
-  MissingVariables name variables -> missingVariables name variables
-  ParseError msg                  -> parseError msg
- where
-  missingVariables name variables = mconcat
-    ["Missing variables for template '", name, "': ", T.pack $ show variables]
-  parseError msg = "Error parsing template: " <> msg
-
 
 -- | Errors specific for the /Gen/ command.
 data CommandGenError = NoGenModeSelected -- ^ no mode of /Gen/ command selected
@@ -342,3 +293,50 @@ instance Monoid PartialHeadersConfig where
   mempty = PartialHeadersConfig mempty mempty mempty mempty mempty mempty
 
 --------------------------------------------------------------------------------
+
+commandGenError :: CommandGenError -> Text
+commandGenError = \case
+  NoGenModeSelected -> noGenModeSelected
+ where
+  noGenModeSelected = mconcat
+    [ "Please select at least one option what to generate "
+    , "(see --help for details)"
+    ]
+
+commandInitError :: CommandInitError -> Text
+commandInitError = \case
+  AppConfigAlreadyExists path -> appConfigAlreadyExists path
+  NoProvidedSourcePaths       -> noProvidedSourcePaths
+  NoSupportedFileType         -> noSupportedFileType
+ where
+  appConfigAlreadyExists path =
+    mconcat ["Configuration file '", T.pack path, "' already exists"]
+  noProvidedSourcePaths = "No source code paths (files or directories) defined"
+  noSupportedFileType   = "No supported file type found in scanned source paths"
+
+configurationError :: ConfigurationError -> Text
+configurationError = \case
+  InvalidVariable  input    -> invalidVariable input
+  NoStartsWith     fileType -> noProp "starts-with" fileType
+  NoEndsWith       fileType -> noProp "ends-with" fileType
+  NoFileExtensions fileType -> noProp "file-extensions" fileType
+  NoPutAfter       fileType -> noProp "put-after" fileType
+  NoPutBefore      fileType -> noProp "put-before" fileType
+  NoRunMode                 -> noFlag "run-mode"
+  NoSourcePaths             -> noFlag "source-paths"
+  NoTemplatePaths           -> noFlag "template-paths"
+  NoVariables               -> noFlag "variables"
+ where
+  invalidVariable = ("Cannot parse variable key=value from: " <>)
+  noProp prop fileType = T.pack $ mconcat
+    ["Missing '", prop, "' configuration key for file type", show fileType]
+  noFlag flag = mconcat ["Missing configuration key: ", flag]
+
+templateError :: TemplateError -> Text
+templateError = \case
+  MissingVariables name variables -> missingVariables name variables
+  ParseError msg                  -> parseError msg
+ where
+  missingVariables name variables = mconcat
+    ["Missing variables for template '", name, "': ", T.pack $ show variables]
+  parseError msg = "Error parsing template: " <> msg
