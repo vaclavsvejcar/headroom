@@ -4,6 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeApplications   #-}
 module Headroom.Types
   ( PartialConfiguration(..)
   , PartialHeaderConfig(..)
@@ -57,7 +58,7 @@ instance FromJSON RunMode where
 
 -- | Represents what action should the /Generator/ perform.
 data GenMode
-  = GenConfigFile   -- ^ generate /YAML/ config file stub
+  = GenConfigFile                      -- ^ generate /YAML/ config file stub
   | GenLicense (LicenseType, FileType) -- ^ generate license header template
   deriving (Eq, Show)
 
@@ -68,30 +69,80 @@ data ApplicationError
   | TemplateError TemplateError
   deriving (Eq, Show)
 
-instance Exception ApplicationError
+instance Exception ApplicationError where
+  displayException = \case
+    CommandGenError    error' -> T.unpack $ commandGenError error'
+    CommandInitError   error' -> T.unpack $ commandInitError error'
+    ConfigurationError error' -> T.unpack $ configurationError error'
+    TemplateError      error' -> T.unpack $ templateError error'
+
+commandGenError :: CommandGenError -> Text
+commandGenError = \case
+  NoGenModeSelected -> noGenModeSelected
+ where
+  noGenModeSelected = mconcat
+    [ "Please select at least one option what to generate "
+    , "(see --help for details)"
+    ]
+
+commandInitError :: CommandInitError -> Text
+commandInitError = \case
+  AppConfigAlreadyExists path -> appConfigAlreadyExists path
+  NoProvidedSourcePaths       -> noProvidedSourcePaths
+  NoSupportedFileType         -> noSupportedFileType
+ where
+  appConfigAlreadyExists path =
+    mconcat ["Configuration file '", T.pack path, "' already exists"]
+  noProvidedSourcePaths = "No source code paths (files or directories) defined"
+  noSupportedFileType   = "No supported file type found in scanned source paths"
+
+configurationError :: ConfigurationError -> Text
+configurationError = \case
+  InvalidVariable  input    -> invalidVariable input
+  NoStartsWith     fileType -> noProp "starts-with" fileType
+  NoEndsWith       fileType -> noProp "ends-with" fileType
+  NoFileExtensions fileType -> noProp "file-extensions" fileType
+  NoPutAfter       fileType -> noProp "put-after" fileType
+  NoPutBefore      fileType -> noProp "put-before" fileType
+  NoRunMode                 -> noFlag "run-mode"
+  NoSourcePaths             -> noFlag "source-paths"
+  NoTemplatePaths           -> noFlag "template-paths"
+  NoVariables               -> noFlag "variables"
+ where
+  invalidVariable = ("Cannot parse variable key=value from: " <>)
+  noProp prop fileType = T.pack $ mconcat
+    ["Missing '", prop, "' configuration key for file type", show fileType]
+  noFlag flag = mconcat ["Missing configuration key: ", flag]
+
+templateError :: TemplateError -> Text
+templateError = \case
+  MissingVariables name variables -> missingVariables name variables
+  ParseError msg                  -> parseError msg
+ where
+  missingVariables name variables = mconcat
+    ["Missing variables for template '", name, "': ", T.pack $ show variables]
+  parseError msg = "Error parsing template: " <> msg
+
 
 -- | Errors specific for the /Gen/ command.
-data CommandGenError
-  = InvalidLicenseOrFileType Text -- ^ invalid license entered by the user
-  | NoGenModeSelected             -- ^ no mode of /Gen/ command selected
+data CommandGenError = NoGenModeSelected -- ^ no mode of /Gen/ command selected
   deriving (Eq, Show)
 
 data CommandInitError
   = AppConfigAlreadyExists FilePath -- ^ application configuration file already exists
-  | InvalidLicenseType Text         -- ^ invalid license type specified
   | NoProvidedSourcePaths           -- ^ no paths to source code files provided
   | NoSupportedFileType             -- ^ no supported file types found on source paths
   deriving (Eq, Show)
 
 data ConfigurationError
-  = InvalidVariable Text
+  = NoStartsWith FileType
+  | InvalidVariable Text
   | NoEndsWith FileType
   | NoFileExtensions FileType
   | NoPutAfter FileType
   | NoPutBefore FileType
   | NoRunMode
   | NoSourcePaths
-  | NoStartsWith FileType
   | NoTemplatePaths
   | NoVariables
   deriving (Eq, Show)
