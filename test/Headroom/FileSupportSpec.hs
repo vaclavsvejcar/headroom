@@ -95,36 +95,54 @@ spec = do
       extractFileInfo Haskell config sample `shouldBe` expected
 
 
-  describe "findHeaderPos" $ do
+  describe "findHeader" $ do
     it "finds single line header" $ do
       let sample = "\n{-| single line -}\n\n"
           config = HeaderConfig ["hs"] [] [] "{-|" "-}"
-      findHeaderPos config sample `shouldBe` Just (1, 1)
+      findHeader config sample `shouldBe` Just (1, 1)
 
     it "finds header put after given regex" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
           config = HeaderConfig ["hs"] ["^foo"] [] "{-|" "-}"
-      findHeaderPos config sample `shouldBe` Just (2, 3)
+      findHeader config sample `shouldBe` Just (2, 3)
 
     it "finds header put after composed regex" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
           config = HeaderConfig ["hs"] ["^bar", "^foo"] [] "{-|" "-}"
-      findHeaderPos config sample `shouldBe` Just (5, 6)
+      findHeader config sample `shouldBe` Just (5, 6)
 
     it "finds header in longer example" $ do
       let config = HeaderConfig ["hs"] [] [] "{-|" "-}"
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      findHeaderPos config sample `shouldBe` Just (1, 13)
+      findHeader config sample `shouldBe` Just (1, 13)
 
     it "finds nothing if no header present" $ do
       let sample = "some\nrandom\text without header"
           config = HeaderConfig ["hs"] [] [] "{-|" "-}"
-      findHeaderPos config sample `shouldBe` Nothing
+      findHeader config sample `shouldBe` Nothing
 
     it "finds nothing if header is present before the 'putAfter' settings" $ do
       let sample = "foo\n{-| 1 -}\nbar\nsome text"
           config = HeaderConfig ["hs"] ["^bar"] [] "{-|" "-}"
-      findHeaderPos config sample `shouldBe` Nothing
+      findHeader config sample `shouldBe` Nothing
+
+
+  describe "findPrefixedHeader" $ do
+    it "finds single line header" $ do
+      let sample = ["-- foo", ""]
+      findPrefixedHeader "--" sample 0 `shouldBe` Just (0, 0)
+
+    it "finds multi line header" $ do
+      let sample = ["", "a", "-- first", "--second", "foo"]
+      findPrefixedHeader "--" sample 0 `shouldBe` Just (2, 3)
+
+    it "finds only the first occurence of header" $ do
+      let sample = ["a", "-- this one", "-- and this", "", "-- not this"]
+      findPrefixedHeader "--" sample 0 `shouldBe` Just (1, 2)
+
+    it "finds nothing if no header is present" $ do
+      let sample = ["foo", "bar"]
+      findPrefixedHeader "--" sample 0 `shouldBe` Nothing
 
 
   describe "lastMatching" $ do

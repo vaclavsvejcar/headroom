@@ -7,7 +7,8 @@ module Headroom.FileSupport
   , dropHeader
   , replaceHeader
   , extractFileInfo
-  , findHeaderPos
+  , findHeader
+  , findPrefixedHeader
   , firstMatching
   , lastMatching
   , splitInput
@@ -62,7 +63,7 @@ replaceHeader fileInfo header = addOp . dropOp
 
 extractFileInfo :: FileType -> HeaderConfig -> Text -> FileInfo
 extractFileInfo fiFileType fiHeaderConfig input =
-  let fiHeaderPos = findHeaderPos fiHeaderConfig input
+  let fiHeaderPos = findHeader fiHeaderConfig input
       fiVariables = extractVariables fiFileType fiHeaderConfig input
   in  FileInfo { .. }
 
@@ -71,21 +72,37 @@ extractFileInfo fiFileType fiHeaderConfig input =
 extractVariables :: FileType -> HeaderConfig -> Text -> HashMap Text Text
 extractVariables _ _ _ = HM.empty
 
-
-findHeaderPos :: HeaderConfig -> Text -> Maybe (Int, Int)
-findHeaderPos HeaderConfig {..} input = position
+findHeader :: HeaderConfig -> Text -> Maybe (Int, Int)
+findHeader HeaderConfig {..} input = findMultiLineHeader hcStartsWith
+                                                         hcEndsWith
+                                                         inLines
+                                                         splitAt
  where
   (before, headerArea, _) = splitInput hcPutAfter hcPutBefore input
-  isStart                 = T.isPrefixOf hcStartsWith
-  isEnd                   = T.isSuffixOf hcEndsWith
   splitAt                 = L.length before
-  position                = go (T.strip <$> headerArea) Nothing Nothing splitAt
-   where
-    go (x : _) _ _ i | isStart x && isEnd x = Just (i, i)
-    go (x : xs) _ _ i | isStart x           = go xs (Just i) Nothing (i + 1)
-    go (x : _) (Just start) _ i | isEnd x   = Just (start, i)
-    go (_ : xs) start end i                 = go xs start end (i + 1)
-    go []       _     _   _                 = Nothing
+  inLines                 = T.strip <$> headerArea
+
+findMultiLineHeader :: Text -> Text -> [Text] -> Int -> Maybe (Int, Int)
+findMultiLineHeader startsWith endsWith = go Nothing Nothing
+ where
+  isStart = T.isPrefixOf startsWith
+  isEnd   = T.isSuffixOf endsWith
+  go _ _ (x : _) i | isStart x && isEnd x = Just (i, i)
+  go _ _ (x : xs) i | isStart x           = go (Just i) Nothing xs (i + 1)
+  go (Just start) _ (x : _) i | isEnd x   = Just (start, i)
+  go start end (_ : xs) i                 = go start end xs (i + 1)
+  go _     _   []       _                 = Nothing
+
+
+findPrefixedHeader :: Text -> [Text] -> Int -> Maybe (Int, Int)
+findPrefixedHeader prefix = go Nothing
+ where
+  isPrefix = T.isPrefixOf prefix
+  go Nothing (x : xs) i | isPrefix x      = go (Just i) xs (i + 1)
+  go Nothing (_ : xs) i                   = go Nothing xs (i + 1)
+  go (Just start) (x : xs) i | isPrefix x = go (Just start) xs (i + 1)
+  go (Just start) (_ : _) i               = Just (start, i - 1)
+  go _            []      _               = Nothing
 
 
 firstMatching :: Regex -> [Text] -> Int
