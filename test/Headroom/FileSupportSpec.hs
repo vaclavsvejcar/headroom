@@ -191,6 +191,10 @@ spec = do
       let sample = ["some text", "hello", "foo bar", "foo baz", "last one"]
       lastMatching regex sample `shouldBe` 3
 
+    it "returns 0 if no matching input found" $ do
+      let sample = ["some text", "hello", "last one"]
+      lastMatching regex sample `shouldBe` 0
+
     it "returns 0 if the input is empty" $ do
       lastMatching regex [] `shouldBe` 0
 
