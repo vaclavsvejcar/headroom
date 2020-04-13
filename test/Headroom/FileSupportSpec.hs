@@ -9,6 +9,7 @@ import           Headroom.FileSupport
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
+                                                , HeaderSyntax(..)
                                                 )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
@@ -21,26 +22,28 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 spec :: Spec
 spec = do
   let samplesDir = "test-data" </> "code-samples"
+      bHeaderConfig b a = HeaderConfig ["hs"] b a (BlockHeader "{-|" "-}")
+      pHeaderConfig b a = HeaderConfig ["hs"] b a (PrefixedHeader "--")
 
   describe "addHeader" $ do
     let fileInfo config = FileInfo Haskell config Nothing HM.empty
 
     it "adds header at the beginning of text" $ do
-      let info     = fileInfo $ HeaderConfig ["hs"] [] [] "{-|" "-}"
+      let info     = fileInfo $ bHeaderConfig [] []
           header   = "HEADER"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "HEADER\n1\n2\nbefore\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
     it "adds header after 'putAfter' position" $ do
-      let info     = fileInfo $ HeaderConfig ["hs"] ["^before"] [] "{-|" "-}"
+      let info     = fileInfo $ bHeaderConfig ["^before"] []
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "1\n2\nbefore\n{-| HEADER -}\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
     it "does nothing if header is already present" $ do
-      let config = HeaderConfig ["hs"] ["^before"] [] "{-|" "-}"
+      let config = bHeaderConfig ["^before"] []
           header = "{-| HEADER -}"
           info   = FileInfo Haskell config (Just (3, 3)) HM.empty
           sample = "1\n2\nbefore\n{-| OLDHEADER -}\nafter\n4"
@@ -49,20 +52,20 @@ spec = do
 
   describe "dropHeader" $ do
     it "does nothing if no header is present" $ do
-      let config = HeaderConfig ["hs"] [] [] "{-|" "-}"
+      let config = bHeaderConfig [] []
           info   = FileInfo Haskell config Nothing HM.empty
           sample = "1\n2\nbefore\nafter\n4\n"
       dropHeader info sample `shouldBe` sample
 
     it "drops existing single line header" $ do
-      let config   = HeaderConfig ["hs"] [] [] "{-|" "-}"
+      let config   = bHeaderConfig [] []
           info     = FileInfo Haskell config (Just (3, 3)) HM.empty
           sample   = "1\n2\nbefore\n{-| HEADER -}\nafter\n4\n"
           expected = "1\n2\nbefore\nafter\n4\n"
       dropHeader info sample `shouldBe` expected
 
     it "drops existing multi line header" $ do
-      let config   = HeaderConfig ["hs"] [] [] "{-|" "-}"
+      let config   = bHeaderConfig [] []
           info     = FileInfo Haskell config (Just (3, 4)) HM.empty
           sample   = "1\n2\nbefore\n{-| HEADER\nHERE -}\nafter\n4\n"
           expected = "1\n2\nbefore\nafter\n4\n"
@@ -71,7 +74,7 @@ spec = do
 
   describe "replaceHeader" $ do
     it "adds header if there's none present" $ do
-      let config   = HeaderConfig ["hs"] ["^before"] [] "{-|" "-}"
+      let config   = bHeaderConfig ["^before"] []
           info     = FileInfo Haskell config Nothing HM.empty
           header   = "{-| NEWHEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
@@ -79,7 +82,7 @@ spec = do
       replaceHeader info header sample `shouldBe` expected
 
     it "replaces header if there's existing one" $ do
-      let config   = HeaderConfig ["hs"] ["^before"] [] "{-|" "-}"
+      let config   = bHeaderConfig ["^before"] []
           info     = FileInfo Haskell config (Just (3, 4)) HM.empty
           header   = "{-| NEWHEADER -}"
           sample   = "1\n2\nbefore\n{-| OLD\nHEADER -}\nafter\n4\n"
@@ -89,48 +92,84 @@ spec = do
 
   describe "extractFileInfo" $ do
     it "extracts FileInfo from given raw input" $ do
-      let config   = HeaderConfig ["hs"] [] [] "{-|" "-}"
+      let config   = bHeaderConfig [] []
           expected = FileInfo Haskell config (Just (1, 13)) HM.empty
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
       extractFileInfo Haskell config sample `shouldBe` expected
 
 
   describe "findHeader" $ do
-    it "finds single line header" $ do
+    it "finds single line block header" $ do
       let sample = "\n{-| single line -}\n\n"
-          config = HeaderConfig ["hs"] [] [] "{-|" "-}"
+          config = bHeaderConfig [] []
       findHeader config sample `shouldBe` Just (1, 1)
 
-    it "finds header put after given regex" $ do
+    it "finds single line prefixed header" $ do
+      let sample = "\n-- single line\n\n"
+          config = pHeaderConfig [] []
+      findHeader config sample `shouldBe` Just (1, 1)
+
+    it "finds block header put after 'putAfter' constraint" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
-          config = HeaderConfig ["hs"] ["^foo"] [] "{-|" "-}"
+          config = bHeaderConfig ["^foo"] []
       findHeader config sample `shouldBe` Just (2, 3)
 
-    it "finds header put after composed regex" $ do
+    it "finds prefixed header put after 'putAfter' constraint" $ do
+      let sample = "-- 1\nfoo\n-- 2\n-- 2\nbar\n-- 3\n-- 3"
+          config = pHeaderConfig ["^foo"] []
+      findHeader config sample `shouldBe` Just (2, 3)
+
+    it "finds block header put after composed constraint" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
-          config = HeaderConfig ["hs"] ["^bar", "^foo"] [] "{-|" "-}"
+          config = bHeaderConfig ["^bar", "^foo"] []
       findHeader config sample `shouldBe` Just (5, 6)
 
-    it "finds header in longer example" $ do
-      let config = HeaderConfig ["hs"] [] [] "{-|" "-}"
-      sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      findHeader config sample `shouldBe` Just (1, 13)
+    it "finds prefixed header put after composed constraint" $ do
+      let sample = "-- 1\nfoo\n-- 2\n-- 2\nbar\n-- 3\n-- 3"
+          config = pHeaderConfig ["^bar", "^foo"] []
+      findHeader config sample `shouldBe` Just (5, 6)
 
     it "finds nothing if no header present" $ do
       let sample = "some\nrandom\text without header"
-          config = HeaderConfig ["hs"] [] [] "{-|" "-}"
+          config = bHeaderConfig [] []
       findHeader config sample `shouldBe` Nothing
 
-    it "finds nothing if header is present before the 'putAfter' settings" $ do
+    it "finds nothing if header is present before 'putAfter' constraint" $ do
       let sample = "foo\n{-| 1 -}\nbar\nsome text"
-          config = HeaderConfig ["hs"] ["^bar"] [] "{-|" "-}"
+          config = bHeaderConfig ["^bar"] []
       findHeader config sample `shouldBe` Nothing
+
+
+  describe "findBlockHeader" $ do
+    it "finds single line header" $ do
+      let sample = ["", "{-| single line -}", "", ""]
+      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Just (1, 1)
+
+    it "finds multi line header" $ do
+      let sample = ["", "{-| multi", "line -}", "", ""]
+      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Just (1, 2)
+
+    it "finds only the first occurence of header" $ do
+      let sample = ["{-| this", "and this -}", "", "{-| no this -}"]
+      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Just (0, 1)
+
+    it "finds nothing if no header is present" $ do
+      let sample = ["foo", "bar"]
+      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Nothing
 
 
   describe "findPrefixedHeader" $ do
     it "finds single line header" $ do
       let sample = ["-- foo", ""]
       findPrefixedHeader "--" sample 0 `shouldBe` Just (0, 0)
+
+    it "finds single line header with nothing surrounding it" $ do
+      let sample = ["-- foo"]
+      findPrefixedHeader "--" sample 0 `shouldBe` Just (0, 0)
+
+    it "finds multi line header with nothing surrounding it" $ do
+      let sample = ["-- 3", "-- 3"]
+      findPrefixedHeader "--" sample 0 `shouldBe` Just (0, 1)
 
     it "finds multi line header" $ do
       let sample = ["", "a", "-- first", "--second", "foo"]

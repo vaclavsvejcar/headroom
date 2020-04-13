@@ -211,10 +211,12 @@ mergedConfiguration = do
   defaultConfig' <- parseConfiguration defaultConfig
   cmdLineConfig  <- optionsToConfiguration
   yamlConfig     <- loadConfiguration ".headroom.yaml"
-  config <- makeConfiguration $ defaultConfig' <> yamlConfig <> cmdLineConfig
+  let combinedConfig = defaultConfig' <> yamlConfig <> cmdLineConfig
+  config <- makeConfiguration combinedConfig
   logDebug $ "Default config: " <> displayShow defaultConfig'
   logDebug $ "YAML config: " <> displayShow yamlConfig
   logDebug $ "CmdLine config: " <> displayShow cmdLineConfig
+  logDebug $ "Combined config: " <> displayShow combinedConfig
   logDebug $ "Merged config: " <> displayShow config
   pure config
 

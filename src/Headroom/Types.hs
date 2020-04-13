@@ -8,6 +8,7 @@ module Headroom.Types
   ( PartialConfiguration(..)
   , PartialHeaderConfig(..)
   , PartialHeadersConfig(..)
+  , HeaderSyntax(..)
   , Configuration(..)
   , HeaderConfig(..)
   , HeadersConfig(..)
@@ -28,6 +29,7 @@ module Headroom.Types
   )
 where
 
+import           Control.Exception              ( throw )
 import           Data.Aeson                     ( FromJSON(..)
                                                 , Value(String)
                                                 , withObject
@@ -86,10 +88,10 @@ data CommandInitError
   deriving (Eq, Show)
 
 data ConfigurationError
-  = NoStartsWith FileType
-  | InvalidVariable Text
-  | NoEndsWith FileType
+  = InvalidVariable Text
+  | MixedHeaderStyle
   | NoFileExtensions FileType
+  | NoHeaderSyntax FileType
   | NoPutAfter FileType
   | NoPutBefore FileType
   | NoRunMode
@@ -170,6 +172,11 @@ data FileInfo = FileInfo
 
 --------------------------------------------------------------------------------
 
+data HeaderSyntax
+  = PrefixedHeader Text
+  | BlockHeader Text Text
+  deriving (Eq, Show)
+
 data Configuration = Configuration
   { cRunMode        :: !RunMode
   , cSourcePaths    :: ![FilePath]
@@ -177,16 +184,15 @@ data Configuration = Configuration
   , cVariables      :: !(HashMap Text Text)
   , cLicenseHeaders :: !HeadersConfig
   }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show)
 
 data HeaderConfig = HeaderConfig
   { hcFileExtensions :: ![Text]
   , hcPutAfter       :: ![Text]
   , hcPutBefore      :: ![Text]
-  , hcStartsWith     :: !Text
-  , hcEndsWith       :: !Text
+  , hcHeaderSyntax   :: !HeaderSyntax
   }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show)
 
 data HeadersConfig = HeadersConfig
   { hscCss     :: !HeaderConfig
@@ -196,7 +202,7 @@ data HeadersConfig = HeadersConfig
   , hscJs      :: !HeaderConfig
   , hscScala   :: !HeaderConfig
   }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
@@ -213,8 +219,7 @@ data PartialHeaderConfig = PartialHeaderConfig
   { phcFileExtensions :: !(Last [Text])
   , phcPutAfter       :: !(Last [Text])
   , phcPutBefore      :: !(Last [Text])
-  , phcStartsWith     :: !(Last Text)
-  , phcEndsWith       :: !(Last Text)
+  , phcHeaderSyntax   :: !(Last HeaderSyntax)
   }
   deriving (Eq, Generic, Show)
 
@@ -242,9 +247,17 @@ instance FromJSON PartialHeaderConfig where
     phcFileExtensions <- Last <$> obj .:? "file-extensions"
     phcPutAfter       <- Last <$> obj .:? "put-after"
     phcPutBefore      <- Last <$> obj .:? "put-before"
-    phcStartsWith     <- Last <$> obj .:? "starts-with"
-    phcEndsWith       <- Last <$> obj .:? "ends-with"
+    startsWith        <- obj .:? "starts-with"
+    endsWith          <- obj .:? "ends-with"
+    prefixedBy        <- obj .:? "prefixed-by"
+    let phcHeaderSyntax = Last $ headerSyntax startsWith endsWith prefixedBy
     pure PartialHeaderConfig { .. }
+   where
+    headerSyntax (Just s) (Just e) Nothing  = Just $ BlockHeader s e
+    headerSyntax Nothing  Nothing  (Just p) = Just $ PrefixedHeader p
+    headerSyntax Nothing  Nothing  Nothing  = Nothing
+    headerSyntax _        _        _        = throw error'
+    error' = ConfigurationError MixedHeaderStyle
 
 instance FromJSON PartialHeadersConfig where
   parseJSON = withObject "PartialHeadersConfig" $ \obj -> do
@@ -270,8 +283,7 @@ instance Semigroup PartialHeaderConfig where
     { phcFileExtensions = phcFileExtensions x <> phcFileExtensions y
     , phcPutAfter       = phcPutAfter x <> phcPutAfter y
     , phcPutBefore      = phcPutBefore x <> phcPutBefore y
-    , phcStartsWith     = phcStartsWith x <> phcStartsWith y
-    , phcEndsWith       = phcEndsWith x <> phcEndsWith y
+    , phcHeaderSyntax   = phcHeaderSyntax x <> phcHeaderSyntax y
     }
 
 instance Semigroup PartialHeadersConfig where
@@ -287,7 +299,7 @@ instance Monoid PartialConfiguration where
   mempty = PartialConfiguration mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeaderConfig where
-  mempty = PartialHeaderConfig mempty mempty mempty mempty mempty
+  mempty = PartialHeaderConfig mempty mempty mempty mempty
 
 instance Monoid PartialHeadersConfig where
   mempty = PartialHeadersConfig mempty mempty mempty mempty mempty mempty
@@ -316,10 +328,10 @@ commandInitError = \case
 
 configurationError :: ConfigurationError -> Text
 configurationError = \case
-  InvalidVariable  input    -> invalidVariable input
-  NoStartsWith     fileType -> noProp "starts-with" fileType
-  NoEndsWith       fileType -> noProp "ends-with" fileType
+  InvalidVariable input     -> invalidVariable input
+  MixedHeaderStyle          -> mixedHeaderStyle
   NoFileExtensions fileType -> noProp "file-extensions" fileType
+  NoHeaderSyntax   fileType -> noProp "startsWith/endsWith/prefixedBy" fileType
   NoPutAfter       fileType -> noProp "put-after" fileType
   NoPutBefore      fileType -> noProp "put-before" fileType
   NoRunMode                 -> noFlag "run-mode"
@@ -331,6 +343,12 @@ configurationError = \case
   noProp prop fileType = T.pack $ mconcat
     ["Missing '", prop, "' configuration key for file type", show fileType]
   noFlag flag = mconcat ["Missing configuration key: ", flag]
+  mixedHeaderStyle = mconcat
+    [ "Invalid configuration, combining 'starts-with' and/or 'ends-with' "
+    , "with 'prefixed-by' is not allowed. Either use 'starts-with' and "
+    , "'ends-with' to define multi-line comment header, or 'prefixed-by' "
+    , "to define header composed of multiple single-line comments."
+    ]
 
 templateError :: TemplateError -> Text
 templateError = \case

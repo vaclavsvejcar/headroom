@@ -8,6 +8,7 @@ module Headroom.FileSupport
   , replaceHeader
   , extractFileInfo
   , findHeader
+  , findBlockHeader
   , findPrefixedHeader
   , firstMatching
   , lastMatching
@@ -19,6 +20,7 @@ import           Control.Lens.TH                ( makeLensesFor )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
+                                                , HeaderSyntax(..)
                                                 )
 import           RIO
 import qualified RIO.HashMap                   as HM
@@ -73,17 +75,17 @@ extractVariables :: FileType -> HeaderConfig -> Text -> HashMap Text Text
 extractVariables _ _ _ = HM.empty
 
 findHeader :: HeaderConfig -> Text -> Maybe (Int, Int)
-findHeader HeaderConfig {..} input = findMultiLineHeader hcStartsWith
-                                                         hcEndsWith
-                                                         inLines
-                                                         splitAt
+findHeader HeaderConfig {..} input = case hcHeaderSyntax of
+  PrefixedHeader prefix -> findPrefixedHeader prefix inLines splitAt
+  BlockHeader start end -> findBlockHeader start end inLines splitAt
  where
   (before, headerArea, _) = splitInput hcPutAfter hcPutBefore input
   splitAt                 = L.length before
   inLines                 = T.strip <$> headerArea
 
-findMultiLineHeader :: Text -> Text -> [Text] -> Int -> Maybe (Int, Int)
-findMultiLineHeader startsWith endsWith = go Nothing Nothing
+
+findBlockHeader :: Text -> Text -> [Text] -> Int -> Maybe (Int, Int)
+findBlockHeader startsWith endsWith = go Nothing Nothing
  where
   isStart = T.isPrefixOf startsWith
   isEnd   = T.isSuffixOf endsWith
@@ -101,8 +103,8 @@ findPrefixedHeader prefix = go Nothing
   go Nothing (x : xs) i | isPrefix x      = go (Just i) xs (i + 1)
   go Nothing (_ : xs) i                   = go Nothing xs (i + 1)
   go (Just start) (x : xs) i | isPrefix x = go (Just start) xs (i + 1)
-  go (Just start) (_ : _) i               = Just (start, i - 1)
-  go _            []      _               = Nothing
+  go (Just start) _  i                    = Just (start, i - 1)
+  go _            [] _                    = Nothing
 
 
 firstMatching :: Regex -> [Text] -> Int
