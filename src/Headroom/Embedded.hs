@@ -1,15 +1,3 @@
-{-|
-Module      : Headroom.Embedded
-Description : Embedded resource files
-Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-Contains resources that were embedded from the @embedded/@ source folder during
-compile time, using the "Data.FileEmbed" module.
--}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell   #-}
 module Headroom.Embedded

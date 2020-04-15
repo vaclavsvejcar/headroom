@@ -32,11 +32,13 @@ where
 import           Control.Exception              ( throw )
 import           Data.Aeson                     ( FromJSON(..)
                                                 , Value(String)
+                                                , genericParseJSON
                                                 , withObject
                                                 , (.!=)
                                                 , (.:?)
                                                 )
 import           Data.Monoid                    ( Last(..) )
+import           Headroom.Serialization         ( aesonOptions )
 import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           RIO
 import qualified RIO.Text                      as T
@@ -71,11 +73,11 @@ data ApplicationError
   deriving (Eq, Show)
 
 instance Exception ApplicationError where
-  displayException = \case
-    CommandGenError    error' -> T.unpack $ commandGenError error'
-    CommandInitError   error' -> T.unpack $ commandInitError error'
-    ConfigurationError error' -> T.unpack $ configurationError error'
-    TemplateError      error' -> T.unpack $ templateError error'
+  displayException = T.unpack . \case
+    CommandGenError    error' -> commandGenError error'
+    CommandInitError   error' -> commandInitError error'
+    ConfigurationError error' -> configurationError error'
+    TemplateError      error' -> templateError error'
 
 -- | Errors specific for the /Gen/ command.
 data CommandGenError = NoGenModeSelected -- ^ no mode of /Gen/ command selected
@@ -89,7 +91,7 @@ data CommandInitError
 
 data ConfigurationError
   = InvalidVariable Text
-  | MixedHeaderStyle
+  | MixedHeaderSyntax
   | NoFileExtensions FileType
   | NoHeaderSyntax FileType
   | NoPutAfter FileType
@@ -173,8 +175,8 @@ data FileInfo = FileInfo
 --------------------------------------------------------------------------------
 
 data HeaderSyntax
-  = PrefixedHeader Text
-  | BlockHeader Text Text
+  = BlockComment !Text !Text
+  | LineComment !Text
   deriving (Eq, Show)
 
 data Configuration = Configuration
@@ -206,6 +208,17 @@ data HeadersConfig = HeadersConfig
 
 --------------------------------------------------------------------------------
 
+data BlockComment' = BlockComment'
+  { bcStartsWith :: !Text
+  , bcEndsWith   :: Text
+  }
+  deriving (Eq, Generic, Show)
+
+newtype LineComment' = LineComment'
+  { lcPrefixedBy :: Text
+  }
+  deriving (Eq, Generic, Show)
+
 data PartialConfiguration = PartialConfiguration
   { pcRunMode        :: !(Last RunMode)
   , pcSourcePaths    :: !(Last [FilePath])
@@ -233,6 +246,12 @@ data PartialHeadersConfig = PartialHeadersConfig
   }
   deriving (Eq, Generic, Show)
 
+instance FromJSON BlockComment' where
+  parseJSON = genericParseJSON aesonOptions
+
+instance FromJSON LineComment' where
+  parseJSON = genericParseJSON aesonOptions
+
 instance FromJSON PartialConfiguration where
   parseJSON = withObject "PartialConfiguration" $ \obj -> do
     pcRunMode        <- Last <$> obj .:? "run-mode"
@@ -247,17 +266,16 @@ instance FromJSON PartialHeaderConfig where
     phcFileExtensions <- Last <$> obj .:? "file-extensions"
     phcPutAfter       <- Last <$> obj .:? "put-after"
     phcPutBefore      <- Last <$> obj .:? "put-before"
-    startsWith        <- obj .:? "starts-with"
-    endsWith          <- obj .:? "ends-with"
-    prefixedBy        <- obj .:? "prefixed-by"
-    let phcHeaderSyntax = Last $ headerSyntax startsWith endsWith prefixedBy
+    blockComment      <- obj .:? "block-comment"
+    lineComment       <- obj .:? "line-comment"
+    let phcHeaderSyntax = Last $ headerSyntax blockComment lineComment
     pure PartialHeaderConfig { .. }
    where
-    headerSyntax (Just s) (Just e) Nothing  = Just $ BlockHeader s e
-    headerSyntax Nothing  Nothing  (Just p) = Just $ PrefixedHeader p
-    headerSyntax Nothing  Nothing  Nothing  = Nothing
-    headerSyntax _        _        _        = throw error'
-    error' = ConfigurationError MixedHeaderStyle
+    headerSyntax (Just (BlockComment' s e)) Nothing = Just $ BlockComment s e
+    headerSyntax Nothing (Just (LineComment' p)) = Just $ LineComment p
+    headerSyntax Nothing Nothing = Nothing
+    headerSyntax _ _ = throw error'
+    error' = ConfigurationError MixedHeaderSyntax
 
 instance FromJSON PartialHeadersConfig where
   parseJSON = withObject "PartialHeadersConfig" $ \obj -> do
@@ -329,9 +347,9 @@ commandInitError = \case
 configurationError :: ConfigurationError -> Text
 configurationError = \case
   InvalidVariable input     -> invalidVariable input
-  MixedHeaderStyle          -> mixedHeaderStyle
+  MixedHeaderSyntax         -> mixedHeaderSyntax
   NoFileExtensions fileType -> noProp "file-extensions" fileType
-  NoHeaderSyntax   fileType -> noProp "startsWith/endsWith/prefixedBy" fileType
+  NoHeaderSyntax   fileType -> noProp "block-comment/line-comment" fileType
   NoPutAfter       fileType -> noProp "put-after" fileType
   NoPutBefore      fileType -> noProp "put-before" fileType
   NoRunMode                 -> noFlag "run-mode"
@@ -343,11 +361,11 @@ configurationError = \case
   noProp prop fileType = T.pack $ mconcat
     ["Missing '", prop, "' configuration key for file type", show fileType]
   noFlag flag = mconcat ["Missing configuration key: ", flag]
-  mixedHeaderStyle = mconcat
-    [ "Invalid configuration, combining 'starts-with' and/or 'ends-with' "
-    , "with 'prefixed-by' is not allowed. Either use 'starts-with' and "
-    , "'ends-with' to define multi-line comment header, or 'prefixed-by' "
-    , "to define header composed of multiple single-line comments."
+  mixedHeaderSyntax = mconcat
+    [ "Invalid configuration, combining 'block-comment' with 'line-comment' "
+    , "is not allowed. Either use 'block-comment' to define multi-line "
+    , "comment header, or 'line-comment' to define header composed of "
+    , "multiple single-line comments."
     ]
 
 templateError :: TemplateError -> Text

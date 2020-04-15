@@ -12,7 +12,7 @@ module Headroom.FileSupport
     -- * License header detection
   , findHeader
   , findBlockHeader
-  , findPrefixedHeader
+  , findLineHeader
   , firstMatching
   , lastMatching
   , splitInput
@@ -98,17 +98,17 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- | Finds header position in given text, where position is represented by
 -- line number of first and last line of the header (numbered from zero).
 -- Based on the 'HeaderSyntax' specified in given 'HeaderConfig', this function
--- delegates its work to either 'findBlockHeader' or 'findPrefixedHeader'.
+-- delegates its work to either 'findBlockHeader' or 'findLineHeader'.
 --
--- >>> let hc = HeaderConfig ["hs"] [] [] (BlockHeader "{-" "-}")
+-- >>> let hc = HeaderConfig ["hs"] [] [] (BlockComment "{-" "-}")
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
 -- Just (2,2)
 findHeader :: HeaderConfig     -- ^ appropriate header configuration
            -> Text             -- ^ text in which to detect the header
            -> Maybe (Int, Int) -- ^ header position @(startLine, endLine)@
 findHeader HeaderConfig {..} input = case hcHeaderSyntax of
-  PrefixedHeader prefix -> findPrefixedHeader prefix inLines splitAt
-  BlockHeader start end -> findBlockHeader start end inLines splitAt
+  BlockComment start end -> findBlockHeader start end inLines splitAt
+  LineComment prefix     -> findLineHeader prefix inLines splitAt
  where
   (before, headerArea, _) = splitInput hcPutAfter hcPutBefore input
   splitAt                 = L.length before
@@ -139,13 +139,13 @@ findBlockHeader startsWith endsWith = go Nothing Nothing
 -- | Finds header in the form of /single-line comment/ syntax, which is
 -- delimited with the prefix pattern.
 --
--- >>> findPrefixedHeader "--" ["", "a", "-- first", "-- second", "foo"] 0
+-- >>> findLineHeader "--" ["", "a", "-- first", "-- second", "foo"] 0
 -- Just (2,3)
-findPrefixedHeader :: Text             -- ^ prefix pattern (e.g. @--@ or @//@)
-                   -> [Text]           -- ^ lines of text in which to detect the header
-                   -> Int              -- ^ line number offset (adds to resulting position)
-                   -> Maybe (Int, Int) -- ^ header position @(startLine + offset, endLine + offset)@
-findPrefixedHeader prefix = go Nothing
+findLineHeader :: Text             -- ^ prefix pattern (e.g. @--@ or @//@)
+               -> [Text]           -- ^ lines of text in which to detect the header
+               -> Int              -- ^ line number offset (adds to resulting position)
+               -> Maybe (Int, Int) -- ^ header position @(startLine + offset, endLine + offset)@
+findLineHeader prefix = go Nothing
  where
   isPrefix = T.isPrefixOf prefix
   go Nothing (x : xs) i | isPrefix x      = go (Just i) xs (i + 1)

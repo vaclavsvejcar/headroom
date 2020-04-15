@@ -22,8 +22,8 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 spec :: Spec
 spec = do
   let samplesDir = "test-data" </> "code-samples"
-      bHeaderConfig b a = HeaderConfig ["hs"] b a (BlockHeader "{-|" "-}")
-      pHeaderConfig b a = HeaderConfig ["hs"] b a (PrefixedHeader "--")
+      lHeaderConfig b a = HeaderConfig ["hs"] b a (LineComment "--")
+      bHeaderConfig b a = HeaderConfig ["hs"] b a (BlockComment "{-|" "-}")
 
   describe "addHeader" $ do
     let fileInfo config = FileInfo Haskell config Nothing HM.empty
@@ -99,34 +99,34 @@ spec = do
 
 
   describe "findHeader" $ do
-    it "finds single line block header" $ do
+    it "finds block header (one line long)" $ do
       let sample = "\n{-| single line -}\n\n"
           config = bHeaderConfig [] []
       findHeader config sample `shouldBe` Just (1, 1)
 
-    it "finds single line prefixed header" $ do
+    it "finds line header (one line long)" $ do
       let sample = "\n-- single line\n\n"
-          config = pHeaderConfig [] []
+          config = lHeaderConfig [] []
       findHeader config sample `shouldBe` Just (1, 1)
 
-    it "finds block header put after 'putAfter' constraint" $ do
+    it "finds block comment header put after 'putAfter' constraint" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
           config = bHeaderConfig ["^foo"] []
       findHeader config sample `shouldBe` Just (2, 3)
 
-    it "finds prefixed header put after 'putAfter' constraint" $ do
+    it "finds line comment header put after 'putAfter' constraint" $ do
       let sample = "-- 1\nfoo\n-- 2\n-- 2\nbar\n-- 3\n-- 3"
-          config = pHeaderConfig ["^foo"] []
+          config = lHeaderConfig ["^foo"] []
       findHeader config sample `shouldBe` Just (2, 3)
 
-    it "finds block header put after composed constraint" $ do
+    it "finds block comment header put after composed constraint" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
           config = bHeaderConfig ["^bar", "^foo"] []
       findHeader config sample `shouldBe` Just (5, 6)
 
-    it "finds prefixed header put after composed constraint" $ do
+    it "finds line comment header put after composed constraint" $ do
       let sample = "-- 1\nfoo\n-- 2\n-- 2\nbar\n-- 3\n-- 3"
-          config = pHeaderConfig ["^bar", "^foo"] []
+          config = lHeaderConfig ["^bar", "^foo"] []
       findHeader config sample `shouldBe` Just (5, 6)
 
     it "finds nothing if no header present" $ do
@@ -158,30 +158,30 @@ spec = do
       findBlockHeader "{-|" "-}" sample 0 `shouldBe` Nothing
 
 
-  describe "findPrefixedHeader" $ do
+  describe "findLineHeader" $ do
     it "finds single line header" $ do
       let sample = ["-- foo", ""]
-      findPrefixedHeader "--" sample 0 `shouldBe` Just (0, 0)
+      findLineHeader "--" sample 0 `shouldBe` Just (0, 0)
 
     it "finds single line header with nothing surrounding it" $ do
       let sample = ["-- foo"]
-      findPrefixedHeader "--" sample 0 `shouldBe` Just (0, 0)
+      findLineHeader "--" sample 0 `shouldBe` Just (0, 0)
 
     it "finds multi line header with nothing surrounding it" $ do
       let sample = ["-- 3", "-- 3"]
-      findPrefixedHeader "--" sample 0 `shouldBe` Just (0, 1)
+      findLineHeader "--" sample 0 `shouldBe` Just (0, 1)
 
     it "finds multi line header" $ do
       let sample = ["", "a", "-- first", "--second", "foo"]
-      findPrefixedHeader "--" sample 0 `shouldBe` Just (2, 3)
+      findLineHeader "--" sample 0 `shouldBe` Just (2, 3)
 
     it "finds only the first occurence of header" $ do
       let sample = ["a", "-- this one", "-- and this", "", "-- not this"]
-      findPrefixedHeader "--" sample 0 `shouldBe` Just (1, 2)
+      findLineHeader "--" sample 0 `shouldBe` Just (1, 2)
 
     it "finds nothing if no header is present" $ do
       let sample = ["foo", "bar"]
-      findPrefixedHeader "--" sample 0 `shouldBe` Nothing
+      findLineHeader "--" sample 0 `shouldBe` Nothing
 
 
   describe "lastMatching" $ do
