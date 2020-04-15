@@ -156,33 +156,33 @@ findLineHeader prefix = go Nothing
 
 
 -- | Finds very first line that matches the given /regex/ (numbered from zero).
--- If no such line exists or input is empty, @0@ is returned.
 --
 -- >>> firstMatching (compile "^foo" [utf8]) ["some text", "foo bar", "foo baz", "last"]
--- 1
-firstMatching :: Regex  -- /regex/ used for matching
-              -> [Text] -- input lines
-              -> Int    -- matching line number or @0@
+-- Just 1
+firstMatching :: Regex        -- /regex/ used for matching
+              -> [Text]       -- input lines
+              -> Maybe Int    -- matching line number
 firstMatching regex input = go input 0
  where
-  go (x : _) i | isJust $ match regex (encodeUtf8 x) [] = i
-  go (_ : xs) i = go xs (i + 1)
-  go []       i = i
+  cond x = isJust $ match regex (encodeUtf8 x) []
+  go (x : _) i | cond x = Just i
+  go (_ : xs) i         = go xs (i + 1)
+  go []       _         = Nothing
 
 
 -- | Finds very last line that matches the given /regex/ (numbered from zero).
--- If no such line exists or input is empty, @0@ is returned.
 --
 -- >>> lastMatching (compile "^foo" [utf8]) ["some text", "foo bar", "foo baz", "last"]
--- 2
-lastMatching :: Regex  -- /regex/ used for matching
-             -> [Text] -- input lines
-             -> Int    -- matching line number or @0@
-lastMatching regex input = go input 0 0
+-- Just 2
+lastMatching :: Regex        -- /regex/ used for matching
+             -> [Text]       -- input lines
+             -> Maybe Int    -- matching line number
+lastMatching regex input = go input 0 Nothing
  where
-  go (x : xs) _ i | isJust $ match regex (encodeUtf8 x) [] = go xs i (i + 1)
-  go (_ : xs) pos i = go xs pos (i + 1)
-  go []       pos _ = pos
+  cond x = isJust $ match regex (encodeUtf8 x) []
+  go (x : xs) i _ | cond x = go xs (i + 1) (Just i)
+  go (_ : xs) i pos        = go xs (i + 1) pos
+  go []       _ pos        = pos
 
 
 -- | Splits input lines into three parts:
@@ -207,19 +207,19 @@ lastMatching regex input = go input 0 0
 splitInput :: [Text]                   -- ^ list of first confitions
            -> [Text]                   -- ^ list of second conditions
            -> Text                     -- ^ text to split
-           -> ([Text], [Text], [Text]) -- ^ split test
+           -> ([Text], [Text], [Text]) -- ^ split text
 splitInput []       []        input = ([], T.lines input, [])
 splitInput putAfter putBefore input = (before, middle, after)
  where
-  before  = take fstSplitAt inLines
-  middle  = drop fstSplitAt . take sndSplitAt $ inLines
-  after   = drop sndSplitAt inLines
-  inLines = T.lines input
-  fstSplitAt | null putAfter = 0
-             | otherwise     = lastMatching (compile' putAfter) inLines + 1
-  sndSplitAt | null putBefore = L.length inLines
-             | otherwise      = firstMatching (compile' putBefore) inLines
-  compile' regex = compile (encodeUtf8 $ T.intercalate "|" regex) [utf8]
+  before     = take fstSplitAt inLines
+  middle     = drop fstSplitAt . take sndSplitAt $ inLines
+  after      = drop sndSplitAt inLines
+  inLines    = T.lines input
+  fstSplitAt = maybe 0 (+ 1) (findSplit lastMatching putAfter)
+  sndSplitAt = fromMaybe (L.length inLines) (findSplit firstMatching putBefore)
+  compile' [] = Nothing
+  compile' ps = Just $ compile (encodeUtf8 $ T.intercalate "|" ps) [utf8]
+  findSplit f v = compile' v >>= (`f` inLines)
 
 
 -- TODO: https://github.com/vaclavsvejcar/headroom/issues/25

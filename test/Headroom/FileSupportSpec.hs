@@ -189,14 +189,14 @@ spec = do
 
     it "finds very last line that matches given regex" $ do
       let sample = ["some text", "hello", "foo bar", "foo baz", "last one"]
-      lastMatching regex sample `shouldBe` 3
+      lastMatching regex sample `shouldBe` Just 3
 
-    it "returns 0 if no matching input found" $ do
+    it "returns Nothing if no matching input found" $ do
       let sample = ["some text", "hello", "last one"]
-      lastMatching regex sample `shouldBe` 0
+      lastMatching regex sample `shouldBe` Nothing
 
-    it "returns 0 if the input is empty" $ do
-      lastMatching regex [] `shouldBe` 0
+    it "returns Nothing the input is empty" $ do
+      lastMatching regex [] `shouldBe` Nothing
 
 
   describe "firstMatching" $ do
@@ -204,10 +204,10 @@ spec = do
 
     it "finds very first line that matches given regex" $ do
       let sample = ["some text", "hello", "foo bar", "foo baz", "last one"]
-      firstMatching regex sample `shouldBe` 2
+      firstMatching regex sample `shouldBe` Just 2
 
-    it "returns 0 if the input is empty" $ do
-      firstMatching regex [] `shouldBe` 0
+    it "returns Nothing if the input is empty" $ do
+      firstMatching regex [] `shouldBe` Nothing
 
 
   describe "splitInput" $ do
@@ -232,3 +232,16 @@ spec = do
     it "splits input with both conditions" $ do
       let expected = (["text", "->"], ["RESULT"], ["<-", "foo"])
       splitInput putAfter putBefore sample `shouldBe` expected
+
+    it "splits input when nothing matches the 'putAfter' condition" $ do
+      let expected = ([], ["text", "RESULT", "<-", "foo"], [])
+      splitInput putAfter [] "text\nRESULT\n<-\nfoo" `shouldBe` expected
+
+    it "splits input when nothing matches the 'putBefore' condition" $ do
+      let expected = ([], ["text", "->", "RESULT", "foo"], [])
+      splitInput [] putBefore "text\n->\nRESULT\nfoo" `shouldBe` expected
+
+    it "splits input when nothing matches both conditions" $ do
+      let expected = ([], ["text", "RESULT", "foo"], [])
+      splitInput putAfter putBefore "text\nRESULT\nfoo" `shouldBe` expected
+
