@@ -22,7 +22,7 @@ license-headers:
   haskell:
     file-extensions: ["hs"]
     put-after: []
-    put-before: []
+    put-before: ["^module"]
     block-comment:
       starts-with: "{-|"
       ends-with: "-}"

@@ -63,7 +63,7 @@ addHeader FileInfo {..} header text                 = result
  where
   (before, middle, after) = splitInput hcPutAfter hcPutBefore text
   result                  = T.unlines $ concat joined
-  joined                  = [before, [header], middle, after]
+  joined = [stripLinesEnd before, [header], stripLinesStart middle, after]
   HeaderConfig {..}       = fiHeaderConfig
 
 
@@ -78,7 +78,7 @@ dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
   before     = take start inputLines
   after      = drop (end + 1) inputLines
   inputLines = T.lines text
-  result     = T.unlines (before ++ after)
+  result     = T.unlines (stripLinesEnd before ++ stripLinesStart after)
 
 
 -- | Replaces existing header at position specified by the 'FileInfo' in the
@@ -215,13 +215,22 @@ splitInput putAfter putBefore input = (before, middle, after)
   middle     = drop fstSplitAt . take sndSplitAt $ inLines
   after      = drop sndSplitAt inLines
   inLines    = T.lines input
-  fstSplitAt = maybe 0 (+ 1) (findSplit lastMatching putAfter)
+  fstSplitAt = maybe 0 guardRange (findSplit lastMatching putAfter)
   sndSplitAt = fromMaybe (L.length inLines) (findSplit firstMatching putBefore)
   compile' [] = Nothing
   compile' ps = Just $ compile (encodeUtf8 $ T.intercalate "|" ps) [utf8]
   findSplit f v = compile' v >>= (`f` inLines)
+  guardRange x = if x > sndSplitAt then 0 else x + 1
 
 
 -- TODO: https://github.com/vaclavsvejcar/headroom/issues/25
 extractVariables :: FileType -> HeaderConfig -> Text -> HashMap Text Text
 extractVariables _ _ _ = HM.empty
+
+
+stripLinesEnd :: [Text] -> [Text]
+stripLinesEnd = takeWhile (not . T.null . T.strip)
+
+
+stripLinesStart :: [Text] -> [Text]
+stripLinesStart = dropWhile (T.null . T.strip)

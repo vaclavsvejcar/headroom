@@ -211,9 +211,9 @@ spec = do
 
 
   describe "splitInput" $ do
-    let sample    = "text\n->\nRESULT\n<-\nfoo"
-        putAfter  = ["->"]
-        putBefore = ["<-"]
+    let sample   = "text\n->\nRESULT\n<-\nfoo"
+        fstSplit = ["->"]
+        sndSplit = ["<-"]
 
     it "handles empty input and conditions" $ do
       splitInput [] [] "" `shouldBe` ([], [], [])
@@ -221,27 +221,31 @@ spec = do
     it "handles input and empty conditions" $ do
       splitInput [] [] "one\ntwo" `shouldBe` ([], ["one", "two"], [])
 
-    it "splits input with 'putAfter' condition" $ do
+    it "splits input with 1st split condition" $ do
       let expected = (["text", "->"], ["RESULT", "<-", "foo"], [])
-      splitInput putAfter [] sample `shouldBe` expected
+      splitInput fstSplit [] sample `shouldBe` expected
 
-    it "splits input with 'putBefore' condition" $ do
+    it "splits input with 2nd split condition" $ do
       let expected = ([], ["text", "->", "RESULT"], ["<-", "foo"])
-      splitInput [] putBefore sample `shouldBe` expected
+      splitInput [] sndSplit sample `shouldBe` expected
 
     it "splits input with both conditions" $ do
       let expected = (["text", "->"], ["RESULT"], ["<-", "foo"])
-      splitInput putAfter putBefore sample `shouldBe` expected
+      splitInput fstSplit sndSplit sample `shouldBe` expected
 
-    it "splits input when nothing matches the 'putAfter' condition" $ do
+    it "splits input when nothing matches the 1st split condition" $ do
       let expected = ([], ["text", "RESULT", "<-", "foo"], [])
-      splitInput putAfter [] "text\nRESULT\n<-\nfoo" `shouldBe` expected
+      splitInput fstSplit [] "text\nRESULT\n<-\nfoo" `shouldBe` expected
 
-    it "splits input when nothing matches the 'putBefore' condition" $ do
+    it "splits input when nothing matches the 2nd split condition" $ do
       let expected = ([], ["text", "->", "RESULT", "foo"], [])
-      splitInput [] putBefore "text\n->\nRESULT\nfoo" `shouldBe` expected
+      splitInput [] sndSplit "text\n->\nRESULT\nfoo" `shouldBe` expected
 
     it "splits input when nothing matches both conditions" $ do
       let expected = ([], ["text", "RESULT", "foo"], [])
-      splitInput putAfter putBefore "text\nRESULT\nfoo" `shouldBe` expected
+      splitInput fstSplit sndSplit "text\nRESULT\nfoo" `shouldBe` expected
+
+    it "handles case when 2nd split is found before 1st split" $ do
+      let expected = ([], ["text"], ["->", "RESULT", "<-", "foo"])
+      splitInput sndSplit fstSplit sample `shouldBe` expected
 
