@@ -1,15 +1,23 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Headroom.FileSupportSpec
   ( spec
   )
 where
 
+import           Headroom.Configuration         ( makeHeadersConfig
+                                                , parseConfiguration
+                                                )
+import           Headroom.Embedded              ( defaultConfig )
 import           Headroom.FileSupport
+import           Headroom.FileSystem            ( loadFile )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
+                                                , HeadersConfig(..)
+                                                , PartialConfiguration(..)
                                                 )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
@@ -161,6 +169,33 @@ spec = do
       let sample = "foo\n{-| 1 -}\nbar\nsome text"
           config = bHeaderConfig ["^bar"] []
       findHeader config sample `shouldBe` Nothing
+
+    it "correctly detects headers using default YAML configuration" $ do
+      let path = "test-data" </> "code-samples"
+      defaultConfig'     <- parseConfiguration defaultConfig
+      HeadersConfig {..} <- makeHeadersConfig (pcLicenseHeaders defaultConfig')
+      sampleCss1         <- loadFile $ path </> "css" </> "sample1.css"
+      sampleCss2         <- loadFile $ path </> "css" </> "sample2.css"
+      sampleHs1          <- loadFile $ path </> "haskell" </> "sample1.hs"
+      sampleHs2          <- loadFile $ path </> "haskell" </> "sample2.hs"
+      sampleHtml1        <- loadFile $ path </> "html" </> "sample1.html"
+      sampleHtml2        <- loadFile $ path </> "html" </> "sample2.html"
+      sampleJava1        <- loadFile $ path </> "java" </> "sample1.java"
+      sampleJava2        <- loadFile $ path </> "java" </> "sample2.java"
+      sampleJs1          <- loadFile $ path </> "js" </> "sample1.js"
+      sampleScala1       <- loadFile $ path </> "scala" </> "sample1.scala"
+      sampleScala2       <- loadFile $ path </> "scala" </> "sample2.scala"
+      findHeader hscCss sampleCss1 `shouldBe` Just (1, 4)
+      findHeader hscCss sampleCss2 `shouldBe` Nothing
+      findHeader hscHaskell sampleHs1 `shouldBe` Just (1, 3)
+      findHeader hscHaskell sampleHs2 `shouldBe` Nothing
+      findHeader hscHtml sampleHtml1 `shouldBe` Just (1, 4)
+      findHeader hscHtml sampleHtml2 `shouldBe` Nothing
+      findHeader hscJava sampleJava1 `shouldBe` Just (0, 2)
+      findHeader hscJava sampleJava2 `shouldBe` Nothing
+      findHeader hscJs sampleJs1 `shouldBe` Just (0, 2)
+      findHeader hscScala sampleScala1 `shouldBe` Just (0, 2)
+      findHeader hscScala sampleScala2 `shouldBe` Nothing
 
 
   describe "findBlockHeader" $ do

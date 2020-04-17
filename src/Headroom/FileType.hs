@@ -1,6 +1,4 @@
-{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}
 module Headroom.FileType
@@ -19,38 +17,29 @@ import           RIO
 import qualified RIO.List                      as L
 
 
--- | Returns 'FileType' for given file extension (without dot).
---
--- fileTypeByExt "hs"
--- Just Haskell
-{-fileTypeByExt :: Text           -- ^ file extension to search for
-              -> Maybe FileType -- ^ corresponding 'FileType' (if found)
-fileTypeByExt ext =
-  L.find (elem ext . listExtensions) (allValues :: [FileType])-}
+-- | Returns 'FileType' for given file extension (without dot), using configured
+-- values from the 'HeadersConfig'.
+fileTypeByExt :: HeadersConfig  -- ^ license headers configuration
+              -> Text           -- ^ file extension (without dot)
+              -> Maybe FileType -- ^ found 'FileType'
+fileTypeByExt config ext =
+  L.find (elem ext . listExtensions config) (allValues @FileType)
 
--- | Lists all recognized file extensions for given 'FileType'.
---
--- listExtensions Haskell
--- ["hs"]
-{-listExtensions :: FileType -- ^ 'FileType' to list extensions for
-               -> [Text]   -- ^ list of found file extensions
-listExtensions = \case
-  CSS     -> ["css"]
-  Haskell -> ["hs"]
-  HTML    -> ["html", "htm"]
-  Java    -> ["java"]
-  JS      -> ["js"]
-  Scala   -> ["scala"]-}
 
-fileTypeByExt :: HeadersConfig -> Text -> Maybe FileType
-fileTypeByExt headersConfig ext =
-  L.find (elem ext . listExtensions headersConfig) (allValues @FileType)
+-- | Lists all recognized file extensions for given 'FileType', using configured
+-- values from the 'HeadersConfig'.
+listExtensions :: HeadersConfig -- ^ license headers configuration
+               -> FileType      -- ^ 'FileType' for which to list extensions
+               -> [Text]        -- ^ list of appropriate file extensions
+listExtensions config fileType =
+  hcFileExtensions (configByFileType config fileType)
 
-listExtensions :: HeadersConfig -> FileType -> [Text]
-listExtensions headersConfig fileType =
-  hcFileExtensions (configByFileType headersConfig fileType)
 
-configByFileType :: HeadersConfig -> FileType -> HeaderConfig
+-- | Returns the proper 'HeaderConfig' for the given 'FileType', selected
+-- from the 'HeadersConfig'.
+configByFileType :: HeadersConfig -- ^ license headers configuration
+                 -> FileType      -- ^ selected 'FileType'
+                 -> HeaderConfig  -- ^ appropriate 'HeaderConfig'
 configByFileType HeadersConfig {..} fileType = case fileType of
   CSS     -> hscCss
   Haskell -> hscHaskell

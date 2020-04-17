@@ -15,7 +15,7 @@ license-headers:
     margin-after: 0
     margin-before: 0
     put-after: []
-    put-before: []
+    put-before: ['([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)']
     block-comment:
       starts-with: "/*"
       ends-with: "*/"
@@ -37,7 +37,7 @@ license-headers:
     margin-after: 0
     margin-before: 0
     put-after: []
-    put-before: []
+    put-before: ['^(<!DOCTYPE|<[a-zA-Z])']
     block-comment:
       starts-with: "<!--"
       ends-with: "-->"

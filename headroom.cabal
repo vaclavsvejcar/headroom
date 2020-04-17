@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 086b42e7c7e305dde747a2ac3cb1cc04eb909633a42411164aa70fc37912aa0b
+-- hash: 8421cfeb460ecf50ca12724baf8986a0ae8acb61a91d140b73aa994507fbff0a
 
 name:           headroom
 version:        0.2.0.0
@@ -64,17 +64,17 @@ extra-source-files:
     test-data/test-template.mustache
     test-data/code-samples/css/sample1.css
     test-data/code-samples/css/sample2.css
-    test-data/code-samples/css/sample3.css
     test-data/code-samples/haskell/full.hs
-    test-data/code-samples/haskell/replaced-simple.hs
-    test-data/code-samples/haskell/stripped.hs
-    test-data/code-samples/html/with-doctype.html
-    test-data/code-samples/html/without-doctype.html
-    test-data/code-samples/java/full.java
+    test-data/code-samples/haskell/sample1.hs
+    test-data/code-samples/haskell/sample2.hs
+    test-data/code-samples/html/sample1.html
+    test-data/code-samples/html/sample2.html
+    test-data/code-samples/java/sample1.java
+    test-data/code-samples/java/sample2.java
     test-data/code-samples/js/sample1.js
     test-data/code-samples/js/sample2.js
-    test-data/code-samples/js/sample3.js
-    test-data/code-samples/scala/full.scala
+    test-data/code-samples/scala/sample1.scala
+    test-data/code-samples/scala/sample2.scala
     test-data/configs/full.yaml
     test-data/test-traverse/a.html
     test-data/test-traverse/foo/b.html
