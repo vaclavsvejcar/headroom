@@ -22,8 +22,8 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 spec :: Spec
 spec = do
   let samplesDir = "test-data" </> "code-samples"
-      lHeaderConfig b a = HeaderConfig ["hs"] 0 0 b a (LineComment "--")
-      bHeaderConfig pb pa = bHeaderConfigM 0 0 pb pa
+      lHeaderConfig pb pa = HeaderConfig ["hs"] 0 0 pb pa (LineComment "--")
+      bHeaderConfig = bHeaderConfigM 0 0
       bHeaderConfigM mb ma pb pa =
         HeaderConfig ["hs"] mb ma pb pa (BlockComment "{-|" "-}")
 
