@@ -22,8 +22,10 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 spec :: Spec
 spec = do
   let samplesDir = "test-data" </> "code-samples"
-      lHeaderConfig b a = HeaderConfig ["hs"] b a (LineComment "--")
-      bHeaderConfig b a = HeaderConfig ["hs"] b a (BlockComment "{-|" "-}")
+      lHeaderConfig b a = HeaderConfig ["hs"] 0 0 b a (LineComment "--")
+      bHeaderConfig pb pa = bHeaderConfigM 0 0 pb pa
+      bHeaderConfigM mb ma pb pa =
+        HeaderConfig ["hs"] mb ma pb pa (BlockComment "{-|" "-}")
 
   describe "addHeader" $ do
     let fileInfo config = FileInfo Haskell config Nothing HM.empty
@@ -35,11 +37,32 @@ spec = do
           expected = "HEADER\n1\n2\nbefore\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
-    it "adds header after 'putAfter' position" $ do
-      let info     = fileInfo $ bHeaderConfig ["^before"] []
+    it "adds header at the beginning of text (with correct margins)" $ do
+      let info     = fileInfo $ bHeaderConfigM 2 2 [] []
+          header   = "HEADER"
+          sample   = "1\n2\nbefore\nafter\n4\n"
+          expected = "HEADER\n\n\n1\n2\nbefore\nafter\n4\n"
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at correct position" $ do
+      let info     = fileInfo $ bHeaderConfig ["^before"] ["^after"]
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "1\n2\nbefore\n{-| HEADER -}\nafter\n4\n"
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at correct position (with correct margins)" $ do
+      let info     = fileInfo $ bHeaderConfigM 2 2 ["^before"] ["^after"]
+          header   = "{-| HEADER -}"
+          sample   = "1\n2\nbefore\nafter\n4\n"
+          expected = "1\n2\nbefore\n\n\n{-| HEADER -}\n\n\nafter\n4\n"
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at the end of text (with correct margins)" $ do
+      let info     = fileInfo $ bHeaderConfigM 2 2 ["^before"] []
+          header   = "{-| HEADER -}"
+          sample   = "1\n2\nbefore"
+          expected = "1\n2\nbefore\n\n\n{-| HEADER -}\n"
       addHeader info header sample `shouldBe` expected
 
     it "does nothing if header is already present" $ do
@@ -248,4 +271,9 @@ spec = do
     it "handles case when 2nd split is found before 1st split" $ do
       let expected = ([], ["text"], ["->", "RESULT", "<-", "foo"])
       splitInput sndSplit fstSplit sample `shouldBe` expected
+
+    it "handles case when 1st split is also after 2nd split" $ do
+      let expected = (["foo", "->"], ["RESULT"], ["<-", "bar", "->", "end"])
+          sample'  = "foo\n->\nRESULT\n<-\nbar\n->\nend"
+      splitInput fstSplit sndSplit sample' `shouldBe` expected
 

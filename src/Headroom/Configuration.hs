@@ -53,6 +53,8 @@ makeHeaderConfig :: MonadThrow m
                  -> m HeaderConfig
 makeHeaderConfig fileType PartialHeaderConfig {..} = do
   hcFileExtensions <- lastOrError (NoFileExtensions fileType) phcFileExtensions
+  hcMarginAfter    <- lastOrError (NoMarginAfter fileType) phcMarginAfter
+  hcMarginBefore   <- lastOrError (NoMarginBefore fileType) phcMarginBefore
   hcPutAfter       <- lastOrError (NoPutAfter fileType) phcPutAfter
   hcPutBefore      <- lastOrError (NoPutBefore fileType) phcPutBefore
   hcHeaderSyntax   <- lastOrError (NoHeaderSyntax fileType) phcHeaderSyntax

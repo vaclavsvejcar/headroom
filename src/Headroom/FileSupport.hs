@@ -62,9 +62,15 @@ addHeader FileInfo {..} _ text | isJust fiHeaderPos = text
 addHeader FileInfo {..} header text                 = result
  where
   (before, middle, after) = splitInput hcPutAfter hcPutBefore text
-  result                  = T.unlines $ concat joined
-  joined = [stripLinesEnd before, [header], stripLinesStart middle, after]
   HeaderConfig {..}       = fiHeaderConfig
+  before'                 = stripLinesEnd before
+  middle'                 = stripLinesStart middle
+  margin [] _    = []
+  margin _  size = replicate size ""
+  marginBefore = margin before' hcMarginBefore
+  marginAfter  = margin (middle' <> after) hcMarginAfter
+  result       = T.unlines $ concat joined
+  joined       = [before', marginBefore, [header], marginAfter, middle', after]
 
 
 -- | Drops header at position specified by the 'FileInfo' from the given text.
@@ -100,7 +106,7 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- Based on the 'HeaderSyntax' specified in given 'HeaderConfig', this function
 -- delegates its work to either 'findBlockHeader' or 'findLineHeader'.
 --
--- >>> let hc = HeaderConfig ["hs"] [] [] (BlockComment "{-" "-}")
+-- >>> let hc = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-" "-}")
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
 -- Just (2,2)
 findHeader :: HeaderConfig     -- ^ appropriate header configuration
@@ -204,23 +210,19 @@ lastMatching regex input = go input 0 Nothing
 --
 -- >>> splitInput [] [] "one\ntwo"
 -- ([],["one","two"],[])
-splitInput :: [Text]                   -- ^ list of first confitions
-           -> [Text]                   -- ^ list of second conditions
-           -> Text                     -- ^ text to split
-           -> ([Text], [Text], [Text]) -- ^ split text
-splitInput []       []        input = ([], T.lines input, [])
-splitInput putAfter putBefore input = (before, middle, after)
+splitInput :: [Text] -> [Text] -> Text -> ([Text], [Text], [Text])
+splitInput []       []       input = ([], T.lines input, [])
+splitInput fstSplit sndSplit input = (before, middle, after)
  where
-  before     = take fstSplitAt inLines
-  middle     = drop fstSplitAt . take sndSplitAt $ inLines
-  after      = drop sndSplitAt inLines
-  inLines    = T.lines input
-  fstSplitAt = maybe 0 guardRange (findSplit lastMatching putAfter)
-  sndSplitAt = fromMaybe (L.length inLines) (findSplit firstMatching putBefore)
+  (middle', after ) = L.splitAt sndSplitAt inLines
+  (before , middle) = L.splitAt fstSplitAt middle'
+  fstSplitAt        = maybe 0 (+ 1) (findSplit lastMatching fstSplit middle')
+  sndSplitAt        = fromMaybe len (findSplit firstMatching sndSplit inLines)
+  inLines           = T.lines input
+  len               = L.length inLines
+  findSplit f r i = compile' r >>= (`f` i)
   compile' [] = Nothing
   compile' ps = Just $ compile (encodeUtf8 $ T.intercalate "|" ps) [utf8]
-  findSplit f v = compile' v >>= (`f` inLines)
-  guardRange x = if x > sndSplitAt then 0 else x + 1
 
 
 -- TODO: https://github.com/vaclavsvejcar/headroom/issues/25

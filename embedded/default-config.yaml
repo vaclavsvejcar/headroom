@@ -12,6 +12,8 @@ license-headers:
   ## CSS configuration
   css:
     file-extensions: ["css"]
+    margin-after: 0
+    margin-before: 0
     put-after: []
     put-before: []
     block-comment:
@@ -21,6 +23,8 @@ license-headers:
   ## Haskell configuration
   haskell:
     file-extensions: ["hs"]
+    margin-after: 0
+    margin-before: 0
     put-after: []
     put-before: ["^module"]
     block-comment:
@@ -30,6 +34,8 @@ license-headers:
   ## HTML configuration
   html:
     file-extensions: ["htm", "html"]
+    margin-after: 0
+    margin-before: 0
     put-after: []
     put-before: []
     block-comment:
@@ -39,6 +45,8 @@ license-headers:
   ## Java configuration
   java:
     file-extensions: ["java"]
+    margin-after: 0
+    margin-before: 0
     put-after: []
     put-before: ["^package"]
     block-comment:
@@ -48,6 +56,8 @@ license-headers:
   ## JS configuration
   js:
     file-extensions: ["js"]
+    margin-after: 0
+    margin-before: 0
     put-after: []
     put-before: []
     block-comment:
@@ -57,6 +67,8 @@ license-headers:
   ## Scala configuration
   scala:
     file-extensions: ["scala"]
+    margin-after: 0
+    margin-before: 0
     put-after: []
     put-before: ["^package"]
     block-comment:

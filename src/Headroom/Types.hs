@@ -94,6 +94,8 @@ data ConfigurationError
   | MixedHeaderSyntax
   | NoFileExtensions FileType
   | NoHeaderSyntax FileType
+  | NoMarginAfter FileType
+  | NoMarginBefore FileType
   | NoPutAfter FileType
   | NoPutBefore FileType
   | NoRunMode
@@ -190,6 +192,8 @@ data Configuration = Configuration
 
 data HeaderConfig = HeaderConfig
   { hcFileExtensions :: ![Text]
+  , hcMarginAfter    :: !Int
+  , hcMarginBefore   :: !Int
   , hcPutAfter       :: ![Text]
   , hcPutBefore      :: ![Text]
   , hcHeaderSyntax   :: !HeaderSyntax
@@ -230,6 +234,8 @@ data PartialConfiguration = PartialConfiguration
 
 data PartialHeaderConfig = PartialHeaderConfig
   { phcFileExtensions :: !(Last [Text])
+  , phcMarginAfter    :: !(Last Int)
+  , phcMarginBefore   :: !(Last Int)
   , phcPutAfter       :: !(Last [Text])
   , phcPutBefore      :: !(Last [Text])
   , phcHeaderSyntax   :: !(Last HeaderSyntax)
@@ -264,6 +270,8 @@ instance FromJSON PartialConfiguration where
 instance FromJSON PartialHeaderConfig where
   parseJSON = withObject "PartialHeaderConfig" $ \obj -> do
     phcFileExtensions <- Last <$> obj .:? "file-extensions"
+    phcMarginAfter    <- Last <$> obj .:? "margin-after"
+    phcMarginBefore   <- Last <$> obj .:? "margin-before"
     phcPutAfter       <- Last <$> obj .:? "put-after"
     phcPutBefore      <- Last <$> obj .:? "put-before"
     blockComment      <- obj .:? "block-comment"
@@ -299,6 +307,8 @@ instance Semigroup PartialConfiguration where
 instance Semigroup PartialHeaderConfig where
   x <> y = PartialHeaderConfig
     { phcFileExtensions = phcFileExtensions x <> phcFileExtensions y
+    , phcMarginAfter    = phcMarginAfter x <> phcMarginAfter y
+    , phcMarginBefore   = phcMarginBefore x <> phcMarginBefore y
     , phcPutAfter       = phcPutAfter x <> phcPutAfter y
     , phcPutBefore      = phcPutBefore x <> phcPutBefore y
     , phcHeaderSyntax   = phcHeaderSyntax x <> phcHeaderSyntax y
@@ -317,7 +327,7 @@ instance Monoid PartialConfiguration where
   mempty = PartialConfiguration mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeaderConfig where
-  mempty = PartialHeaderConfig mempty mempty mempty mempty
+  mempty = PartialHeaderConfig mempty mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeadersConfig where
   mempty = PartialHeadersConfig mempty mempty mempty mempty mempty mempty
@@ -350,6 +360,8 @@ configurationError = \case
   MixedHeaderSyntax         -> mixedHeaderSyntax
   NoFileExtensions fileType -> noProp "file-extensions" fileType
   NoHeaderSyntax   fileType -> noProp "block-comment/line-comment" fileType
+  NoMarginAfter    fileType -> noProp "margin-after" fileType
+  NoMarginBefore   fileType -> noProp "margin-before" fileType
   NoPutAfter       fileType -> noProp "put-after" fileType
   NoPutBefore      fileType -> noProp "put-before" fileType
   NoRunMode                 -> noFlag "run-mode"

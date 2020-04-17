@@ -196,7 +196,8 @@ loadTemplates = do
   pure $ M.fromList parsed
  where
   extensions = toList $ templateExtensions @TemplateType
-  load path = liftIO $ loadFile path >>= parseTemplate (Just $ T.pack path)
+  load path =
+    liftIO $ (T.strip <$> loadFile path) >>= parseTemplate (Just $ T.pack path)
 
 typeOfTemplate :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
 typeOfTemplate path = do
