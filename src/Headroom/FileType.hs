@@ -46,4 +46,5 @@ configByFileType HeadersConfig {..} fileType = case fileType of
   HTML    -> hscHtml
   Java    -> hscJava
   JS      -> hscJs
+  Rust    -> hscRust
   Scala   -> hscScala

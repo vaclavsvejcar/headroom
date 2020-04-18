@@ -44,6 +44,7 @@ makeHeadersConfig PartialHeadersConfig {..} = do
   hscHtml    <- makeHeaderConfig HTML phscHtml
   hscJava    <- makeHeaderConfig Java phscJava
   hscJs      <- makeHeaderConfig JS phscJs
+  hscRust    <- makeHeaderConfig Rust phscRust
   hscScala   <- makeHeaderConfig Scala phscScala
   pure HeadersConfig { .. }
 

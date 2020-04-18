@@ -33,6 +33,7 @@ licenseTemplate licenseType fileType = case licenseType of
     HTML    -> $(embedStringFile "embedded/license/apache2/html.mustache")
     Java    -> $(embedStringFile "embedded/license/apache2/java.mustache")
     JS      -> $(embedStringFile "embedded/license/apache2/js.mustache")
+    Rust    -> $(embedStringFile "embedded/license/apache2/rust.mustache")
     Scala   -> $(embedStringFile "embedded/license/apache2/scala.mustache")
   BSD3 -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/bsd3/css.mustache")
@@ -40,6 +41,7 @@ licenseTemplate licenseType fileType = case licenseType of
     HTML    -> $(embedStringFile "embedded/license/bsd3/html.mustache")
     Java    -> $(embedStringFile "embedded/license/bsd3/java.mustache")
     JS      -> $(embedStringFile "embedded/license/bsd3/js.mustache")
+    Rust    -> $(embedStringFile "embedded/license/bsd3/rust.mustache")
     Scala   -> $(embedStringFile "embedded/license/bsd3/scala.mustache")
   GPL2 -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/gpl2/css.mustache")
@@ -47,6 +49,7 @@ licenseTemplate licenseType fileType = case licenseType of
     HTML    -> $(embedStringFile "embedded/license/gpl2/html.mustache")
     Java    -> $(embedStringFile "embedded/license/gpl2/java.mustache")
     JS      -> $(embedStringFile "embedded/license/gpl2/js.mustache")
+    Rust    -> $(embedStringFile "embedded/license/gpl2/rust.mustache")
     Scala   -> $(embedStringFile "embedded/license/gpl2/scala.mustache")
   GPL3 -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/gpl3/css.mustache")
@@ -54,6 +57,7 @@ licenseTemplate licenseType fileType = case licenseType of
     HTML    -> $(embedStringFile "embedded/license/gpl3/html.mustache")
     Java    -> $(embedStringFile "embedded/license/gpl3/java.mustache")
     JS      -> $(embedStringFile "embedded/license/gpl3/js.mustache")
+    Rust    -> $(embedStringFile "embedded/license/gpl3/rust.mustache")
     Scala   -> $(embedStringFile "embedded/license/gpl3/scala.mustache")
   MIT -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/mit/css.mustache")
@@ -61,6 +65,7 @@ licenseTemplate licenseType fileType = case licenseType of
     HTML    -> $(embedStringFile "embedded/license/mit/html.mustache")
     Java    -> $(embedStringFile "embedded/license/mit/java.mustache")
     JS      -> $(embedStringFile "embedded/license/mit/js.mustache")
+    Rust    -> $(embedStringFile "embedded/license/mit/rust.mustache")
     Scala   -> $(embedStringFile "embedded/license/mit/scala.mustache")
   MPL2 -> case fileType of
     CSS     -> $(embedStringFile "embedded/license/mpl2/css.mustache")
@@ -68,4 +73,5 @@ licenseTemplate licenseType fileType = case licenseType of
     HTML    -> $(embedStringFile "embedded/license/mpl2/html.mustache")
     Java    -> $(embedStringFile "embedded/license/mpl2/java.mustache")
     JS      -> $(embedStringFile "embedded/license/mpl2/js.mustache")
+    Rust    -> $(embedStringFile "embedded/license/mpl2/rust.mustache")
     Scala   -> $(embedStringFile "embedded/license/mpl2/scala.mustache")

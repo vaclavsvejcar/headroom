@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8421cfeb460ecf50ca12724baf8986a0ae8acb61a91d140b73aa994507fbff0a
+-- hash: 63fc592c3de77921eeaaa7824cdd47ff6961ce20d8af422535791b6a969c1d61
 
 name:           headroom
 version:        0.2.0.0
@@ -30,36 +30,42 @@ extra-source-files:
     embedded/license/apache2/html.mustache
     embedded/license/apache2/java.mustache
     embedded/license/apache2/js.mustache
+    embedded/license/apache2/rust.mustache
     embedded/license/apache2/scala.mustache
     embedded/license/bsd3/css.mustache
     embedded/license/bsd3/haskell.mustache
     embedded/license/bsd3/html.mustache
     embedded/license/bsd3/java.mustache
     embedded/license/bsd3/js.mustache
+    embedded/license/bsd3/rust.mustache
     embedded/license/bsd3/scala.mustache
     embedded/license/gpl2/css.mustache
     embedded/license/gpl2/haskell.mustache
     embedded/license/gpl2/html.mustache
     embedded/license/gpl2/java.mustache
     embedded/license/gpl2/js.mustache
+    embedded/license/gpl2/rust.mustache
     embedded/license/gpl2/scala.mustache
     embedded/license/gpl3/css.mustache
     embedded/license/gpl3/haskell.mustache
     embedded/license/gpl3/html.mustache
     embedded/license/gpl3/java.mustache
     embedded/license/gpl3/js.mustache
+    embedded/license/gpl3/rust.mustache
     embedded/license/gpl3/scala.mustache
     embedded/license/mit/css.mustache
     embedded/license/mit/haskell.mustache
     embedded/license/mit/html.mustache
     embedded/license/mit/java.mustache
     embedded/license/mit/js.mustache
+    embedded/license/mit/rust.mustache
     embedded/license/mit/scala.mustache
     embedded/license/mpl2/css.mustache
     embedded/license/mpl2/haskell.mustache
     embedded/license/mpl2/html.mustache
     embedded/license/mpl2/java.mustache
     embedded/license/mpl2/js.mustache
+    embedded/license/mpl2/rust.mustache
     embedded/license/mpl2/scala.mustache
     test-data/test-template.mustache
     test-data/code-samples/css/sample1.css
@@ -73,6 +79,7 @@ extra-source-files:
     test-data/code-samples/java/sample2.java
     test-data/code-samples/js/sample1.js
     test-data/code-samples/js/sample2.js
+    test-data/code-samples/rust/sample1.rs
     test-data/code-samples/scala/sample1.scala
     test-data/code-samples/scala/sample2.scala
     test-data/configs/full.yaml

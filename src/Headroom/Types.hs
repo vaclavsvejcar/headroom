@@ -150,6 +150,7 @@ data FileType
   | HTML
   | Java
   | JS
+  | Rust
   | Scala
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
 
@@ -206,6 +207,7 @@ data HeadersConfig = HeadersConfig
   , hscHtml    :: !HeaderConfig
   , hscJava    :: !HeaderConfig
   , hscJs      :: !HeaderConfig
+  , hscRust    :: !HeaderConfig
   , hscScala   :: !HeaderConfig
   }
   deriving (Eq, Show)
@@ -248,6 +250,7 @@ data PartialHeadersConfig = PartialHeadersConfig
   , phscHtml    :: !PartialHeaderConfig
   , phscJava    :: !PartialHeaderConfig
   , phscJs      :: !PartialHeaderConfig
+  , phscRust    :: !PartialHeaderConfig
   , phscScala   :: !PartialHeaderConfig
   }
   deriving (Eq, Generic, Show)
@@ -292,6 +295,7 @@ instance FromJSON PartialHeadersConfig where
     phscHtml    <- obj .:? "html" .!= mempty
     phscJava    <- obj .:? "java" .!= mempty
     phscJs      <- obj .:? "js" .!= mempty
+    phscRust    <- obj .:? "rust" .!= mempty
     phscScala   <- obj .:? "scala" .!= mempty
     pure PartialHeadersConfig { .. }
 
@@ -320,6 +324,7 @@ instance Semigroup PartialHeadersConfig where
                                 , phscHtml    = phscHtml x <> phscHtml y
                                 , phscJava    = phscJava x <> phscJava y
                                 , phscJs      = phscJs x <> phscJs y
+                                , phscRust    = phscRust x <> phscRust y
                                 , phscScala   = phscScala x <> phscScala y
                                 }
 
@@ -330,7 +335,8 @@ instance Monoid PartialHeaderConfig where
   mempty = PartialHeaderConfig mempty mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeadersConfig where
-  mempty = PartialHeadersConfig mempty mempty mempty mempty mempty mempty
+  mempty =
+    PartialHeadersConfig mempty mempty mempty mempty mempty mempty mempty
 
 --------------------------------------------------------------------------------
 

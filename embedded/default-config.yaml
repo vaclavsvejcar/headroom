@@ -37,7 +37,7 @@ license-headers:
     margin-after: 0
     margin-before: 0
     put-after: []
-    put-before: ['^(<!DOCTYPE|<[a-zA-Z])']
+    put-before: ["^(<!DOCTYPE|<[a-zA-Z])"]
     block-comment:
       starts-with: "<!--"
       ends-with: "-->"
@@ -56,6 +56,17 @@ license-headers:
   ## JS configuration
   js:
     file-extensions: ["js"]
+    margin-after: 0
+    margin-before: 0
+    put-after: []
+    put-before: []
+    block-comment:
+      starts-with: "/*"
+      ends-with: "*/"
+
+  ## Rust configuration
+  rust:
+    file-extensions: ["rs"]
     margin-after: 0
     margin-before: 0
     put-after: []
