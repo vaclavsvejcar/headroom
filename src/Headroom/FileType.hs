@@ -41,6 +41,8 @@ configByFileType :: HeadersConfig -- ^ license headers configuration
                  -> FileType      -- ^ selected 'FileType'
                  -> HeaderConfig  -- ^ appropriate 'HeaderConfig'
 configByFileType HeadersConfig {..} fileType = case fileType of
+  C       -> hscC
+  CPP     -> hscCpp
   CSS     -> hscCss
   Haskell -> hscHaskell
   HTML    -> hscHtml
@@ -48,3 +50,4 @@ configByFileType HeadersConfig {..} fileType = case fileType of
   JS      -> hscJs
   Rust    -> hscRust
   Scala   -> hscScala
+  Shell   -> hscShell

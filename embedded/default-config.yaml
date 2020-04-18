@@ -9,6 +9,28 @@ run-mode: add
 
 ## Allows to change behaviour of license header detection.
 license-headers:
+  ## C configuration
+  c:
+    file-extensions: ["c"]
+    margin-after: 0
+    margin-before: 0
+    put-after: []
+    put-before: ["^#include"]
+    block-comment:
+      starts-with: "/*"
+      ends-with: "*/"
+
+  ## C++ configuration
+  cpp:
+    file-extensions: ["cpp"]
+    margin-after: 0
+    margin-before: 0
+    put-after: []
+    put-before: ["^#include"]
+    block-comment:
+      starts-with: "/*"
+      ends-with: "*/"
+
   ## CSS configuration
   css:
     file-extensions: ["css"]
@@ -70,7 +92,7 @@ license-headers:
     margin-after: 0
     margin-before: 0
     put-after: []
-    put-before: []
+    put-before: ["^use"]
     block-comment:
       starts-with: "/*"
       ends-with: "*/"
@@ -85,3 +107,13 @@ license-headers:
     block-comment:
       starts-with: "/*"
       ends-with: "*/"
+
+  ## Shell configuration
+  shell:
+    file-extensions: ["sh"]
+    margin-after: 1
+    margin-before: 1
+    put-after: ["^#!"]
+    put-before: []
+    line-comment:
+      prefixed-by: "#"

@@ -174,6 +174,10 @@ spec = do
       let path = "test-data" </> "code-samples"
       defaultConfig'     <- parseConfiguration defaultConfig
       HeadersConfig {..} <- makeHeadersConfig (pcLicenseHeaders defaultConfig')
+      sampleC1           <- loadFile $ path </> "c" </> "sample1.c"
+      sampleC2           <- loadFile $ path </> "c" </> "sample2.c"
+      sampleCpp1           <- loadFile $ path </> "cpp" </> "sample1.cpp"
+      sampleCpp2           <- loadFile $ path </> "cpp" </> "sample2.cpp"
       sampleCss1         <- loadFile $ path </> "css" </> "sample1.css"
       sampleCss2         <- loadFile $ path </> "css" </> "sample2.css"
       sampleHs1          <- loadFile $ path </> "haskell" </> "sample1.hs"
@@ -186,6 +190,11 @@ spec = do
       sampleRust1        <- loadFile $ path </> "rust" </> "sample1.rs"
       sampleScala1       <- loadFile $ path </> "scala" </> "sample1.scala"
       sampleScala2       <- loadFile $ path </> "scala" </> "sample2.scala"
+      sampleShell1       <- loadFile $ path </> "shell" </> "sample1.sh"
+      findHeader hscC sampleC1 `shouldBe` Just (1, 3)
+      findHeader hscC sampleC2 `shouldBe` Nothing
+      findHeader hscCpp sampleCpp1 `shouldBe` Just (1, 3)
+      findHeader hscCpp sampleCpp2 `shouldBe` Nothing
       findHeader hscCss sampleCss1 `shouldBe` Just (1, 4)
       findHeader hscCss sampleCss2 `shouldBe` Nothing
       findHeader hscHaskell sampleHs1 `shouldBe` Just (1, 3)
@@ -198,6 +207,7 @@ spec = do
       findHeader hscRust sampleRust1 `shouldBe` Just (0, 2)
       findHeader hscScala sampleScala1 `shouldBe` Just (0, 2)
       findHeader hscScala sampleScala2 `shouldBe` Nothing
+      findHeader hscShell sampleShell1 `shouldBe` Just (2, 3)
 
 
   describe "findBlockHeader" $ do

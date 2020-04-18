@@ -39,6 +39,8 @@ makeConfiguration PartialConfiguration {..} = do
 
 makeHeadersConfig :: MonadThrow m => PartialHeadersConfig -> m HeadersConfig
 makeHeadersConfig PartialHeadersConfig {..} = do
+  hscC       <- makeHeaderConfig C phscC
+  hscCpp     <- makeHeaderConfig CPP phscCpp
   hscCss     <- makeHeaderConfig CSS phscCss
   hscHaskell <- makeHeaderConfig Haskell phscHaskell
   hscHtml    <- makeHeaderConfig HTML phscHtml
@@ -46,6 +48,7 @@ makeHeadersConfig PartialHeadersConfig {..} = do
   hscJs      <- makeHeaderConfig JS phscJs
   hscRust    <- makeHeaderConfig Rust phscRust
   hscScala   <- makeHeaderConfig Scala phscScala
+  hscShell   <- makeHeaderConfig Shell phscShell
   pure HeadersConfig { .. }
 
 makeHeaderConfig :: MonadThrow m

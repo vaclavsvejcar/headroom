@@ -145,13 +145,16 @@ data CommandRunOptions = CommandRunOptions
 --------------------------------------------------------------------------------
 
 data FileType
-  = CSS
+  = C
+  | CPP
+  | CSS
   | Haskell
   | HTML
   | Java
   | JS
   | Rust
   | Scala
+  | Shell
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
 
 --------------------------------------------------------------------------------
@@ -202,13 +205,16 @@ data HeaderConfig = HeaderConfig
   deriving (Eq, Show)
 
 data HeadersConfig = HeadersConfig
-  { hscCss     :: !HeaderConfig
+  { hscC       :: !HeaderConfig
+  , hscCpp     :: !HeaderConfig
+  , hscCss     :: !HeaderConfig
   , hscHaskell :: !HeaderConfig
   , hscHtml    :: !HeaderConfig
   , hscJava    :: !HeaderConfig
   , hscJs      :: !HeaderConfig
   , hscRust    :: !HeaderConfig
   , hscScala   :: !HeaderConfig
+  , hscShell   :: !HeaderConfig
   }
   deriving (Eq, Show)
 
@@ -245,13 +251,16 @@ data PartialHeaderConfig = PartialHeaderConfig
   deriving (Eq, Generic, Show)
 
 data PartialHeadersConfig = PartialHeadersConfig
-  { phscCss     :: !PartialHeaderConfig
+  { phscC       :: !PartialHeaderConfig
+  , phscCpp     :: !PartialHeaderConfig
+  , phscCss     :: !PartialHeaderConfig
   , phscHaskell :: !PartialHeaderConfig
   , phscHtml    :: !PartialHeaderConfig
   , phscJava    :: !PartialHeaderConfig
   , phscJs      :: !PartialHeaderConfig
   , phscRust    :: !PartialHeaderConfig
   , phscScala   :: !PartialHeaderConfig
+  , phscShell   :: !PartialHeaderConfig
   }
   deriving (Eq, Generic, Show)
 
@@ -290,6 +299,8 @@ instance FromJSON PartialHeaderConfig where
 
 instance FromJSON PartialHeadersConfig where
   parseJSON = withObject "PartialHeadersConfig" $ \obj -> do
+    phscC       <- obj .:? "c" .!= mempty
+    phscCpp     <- obj .:? "cpp" .!= mempty
     phscCss     <- obj .:? "css" .!= mempty
     phscHaskell <- obj .:? "haskell" .!= mempty
     phscHtml    <- obj .:? "html" .!= mempty
@@ -297,6 +308,7 @@ instance FromJSON PartialHeadersConfig where
     phscJs      <- obj .:? "js" .!= mempty
     phscRust    <- obj .:? "rust" .!= mempty
     phscScala   <- obj .:? "scala" .!= mempty
+    phscShell   <- obj .:? "shell" .!= mempty
     pure PartialHeadersConfig { .. }
 
 instance Semigroup PartialConfiguration where
@@ -319,13 +331,16 @@ instance Semigroup PartialHeaderConfig where
     }
 
 instance Semigroup PartialHeadersConfig where
-  x <> y = PartialHeadersConfig { phscCss     = phscCss x <> phscCss y
+  x <> y = PartialHeadersConfig { phscC       = phscC x <> phscC y
+                                , phscCpp     = phscCpp x <> phscCpp y
+                                , phscCss     = phscCss x <> phscCss y
                                 , phscHaskell = phscHaskell x <> phscHaskell y
                                 , phscHtml    = phscHtml x <> phscHtml y
                                 , phscJava    = phscJava x <> phscJava y
                                 , phscJs      = phscJs x <> phscJs y
                                 , phscRust    = phscRust x <> phscRust y
                                 , phscScala   = phscScala x <> phscScala y
+                                , phscShell   = phscShell x <> phscShell y
                                 }
 
 instance Monoid PartialConfiguration where
@@ -335,8 +350,16 @@ instance Monoid PartialHeaderConfig where
   mempty = PartialHeaderConfig mempty mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeadersConfig where
-  mempty =
-    PartialHeadersConfig mempty mempty mempty mempty mempty mempty mempty
+  mempty = PartialHeadersConfig mempty
+                                mempty
+                                mempty
+                                mempty
+                                mempty
+                                mempty
+                                mempty
+                                mempty
+                                mempty
+                                mempty
 
 --------------------------------------------------------------------------------
 
