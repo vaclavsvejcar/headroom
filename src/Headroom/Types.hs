@@ -113,7 +113,7 @@ data TemplateError
 
 -- | Application command.
 data Command
-  = Run [FilePath] [FilePath] [Text] RunMode Bool -- ^ /Run/ command
+  = Run [FilePath] [FilePath] [Text] (Maybe RunMode) Bool -- ^ /Run/ command
   | Gen Bool (Maybe (LicenseType, FileType))      -- ^ /Generator/ command
   | Init LicenseType [FilePath]                   -- ^ /Init/ command
   deriving (Show)
@@ -134,7 +134,7 @@ data CommandInitOptions = CommandInitOptions
 
 -- | Options for the /Run/ command.
 data CommandRunOptions = CommandRunOptions
-  { croRunMode       :: !RunMode    -- ^ used /Run/ command mode
+  { croRunMode       :: !(Maybe RunMode)    -- ^ used /Run/ command mode
   , croSourcePaths   :: ![FilePath] -- ^ source code file paths
   , croTemplatePaths :: ![FilePath] -- ^ template file paths
   , croVariables     :: ![Text]     -- ^ raw variables

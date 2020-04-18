@@ -96,8 +96,9 @@ instance HasRunOptions Env where
 env' :: CommandRunOptions -> LogFunc -> IO Env
 env' opts logFunc = do
   let startupEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
-  merged <- runRIO startupEnv mergedConfiguration
+  merged <- runRIO startupEnv finalConfiguration
   pure $ Env { envEnv = startupEnv, envConfiguration = merged }
+
 
 -- | Handler for /Run/ command.
 commandRun :: CommandRunOptions -- ^ /Run/ command options
@@ -119,6 +120,7 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
     , " second(s)."
     ]
 
+
 findSourceFiles :: (HasConfiguration env, HasLogFunc env)
                 => [FileType]
                 -> RIO env [FilePath]
@@ -129,6 +131,7 @@ findSourceFiles fileTypes = do
     mconcat <$> mapM (findFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
   logInfo $ mconcat ["Found ", display $ L.length files, " source file(s)"]
   pure files
+
 
 processSourceFiles :: (HasConfiguration env, HasLogFunc env)
                    => Map FileType TemplateType
@@ -146,6 +149,7 @@ processSourceFiles templates paths = do
     fmap (, path) (fileExtension path >>= fileTypeByExt conf)
   findTemplate ft p = (, ft, p) <$> M.lookup ft templates
   process (pr, (tt, ft, p)) = processSourceFile pr tt ft p
+
 
 processSourceFile :: (HasConfiguration env, HasLogFunc env)
                   => Progress
@@ -168,6 +172,7 @@ processSourceFile progress template fileType path = do
   writeFileUtf8 path (action fileContent)
   pure processed
 
+
 chooseAction :: (HasConfiguration env)
              => FileInfo
              -> Text
@@ -184,6 +189,7 @@ chooseAction info header = do
       then (True, replaceHeader info header, "Replacing header in:  ")
       else go Add hasHeader
 
+
 loadTemplates :: (HasConfiguration env, HasLogFunc env)
               => RIO env (Map FileType TemplateType)
 loadTemplates = do
@@ -199,6 +205,7 @@ loadTemplates = do
   load path =
     liftIO $ (T.strip <$> loadFile path) >>= parseTemplate (Just $ T.pack path)
 
+
 typeOfTemplate :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
 typeOfTemplate path = do
   let fileType = textToEnum . T.pack . takeBaseName $ path
@@ -206,31 +213,32 @@ typeOfTemplate path = do
        (logWarn $ "Skipping unrecognized template type: " <> fromString path)
   pure fileType
 
-mergedConfiguration :: (HasLogFunc env, HasRunOptions env)
-                    => RIO env Configuration
-mergedConfiguration = do
+
+finalConfiguration :: (HasLogFunc env, HasRunOptions env)
+                   => RIO env Configuration
+finalConfiguration = do
   defaultConfig' <- parseConfiguration defaultConfig
   cmdLineConfig  <- optionsToConfiguration
   yamlConfig     <- loadConfiguration ".headroom.yaml"
-  let combinedConfig = defaultConfig' <> yamlConfig <> cmdLineConfig
-  config <- makeConfiguration combinedConfig
+  let mergedConfig = defaultConfig' <> yamlConfig <> cmdLineConfig
+  config <- makeConfiguration mergedConfig
   logDebug $ "Default config: " <> displayShow defaultConfig'
   logDebug $ "YAML config: " <> displayShow yamlConfig
   logDebug $ "CmdLine config: " <> displayShow cmdLineConfig
-  logDebug $ "Combined config: " <> displayShow combinedConfig
-  logDebug $ "Merged config: " <> displayShow config
+  logDebug $ "Merged config: " <> displayShow mergedConfig
+  logDebug $ "Final config: " <> displayShow config
   pure config
+
 
 optionsToConfiguration :: (HasRunOptions env) => RIO env PartialConfiguration
 optionsToConfiguration = do
   runOptions <- view runOptionsL
   variables  <- parseVariables $ croVariables runOptions
   pure PartialConfiguration
-    { pcRunMode        = ifNot (== Add) (croRunMode runOptions)
+    { pcRunMode        = maybe mempty pure (croRunMode runOptions)
     , pcSourcePaths    = ifNot null (croSourcePaths runOptions)
     , pcTemplatePaths  = ifNot null (croTemplatePaths runOptions)
     , pcVariables      = ifNot null variables
     , pcLicenseHeaders = mempty
     }
   where ifNot cond value = if cond value then mempty else pure value
-

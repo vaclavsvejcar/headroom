@@ -69,18 +69,23 @@ runOptions =
               "values for template variables"
             )
           )
-    <*> (   flag'
-            Replace
-            (long "replace-headers" <> short 'r' <> help
-              "force replace existing license headers"
-            )
-        <|> flag'
-              Drop
-              (long "drop-headers" <> short 'd' <> help
-                "drop existing license headers only"
+    <*> optional
+          (   flag'
+              Add
+              (long "add-headers" <> short 'a' <> help
+                "only adds missing license headers"
               )
-        <|> pure Add
-        )
+          <|> flag'
+                Replace
+                (long "replace-headers" <> short 'r' <> help
+                  "force replace existing license headers"
+                )
+          <|> flag'
+                Drop
+                (long "drop-headers" <> short 'd' <> help
+                  "drop existing license headers only"
+                )
+          )
     <*> switch (long "debug" <> help "produce more verbose output")
 
 genOptions :: Parser Command

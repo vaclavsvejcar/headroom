@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#34] Support for [Rust](https://www.rust-lang.org/)
 - [#35] Support for [Bash](https://www.gnu.org/software/bash/)
 - [#36] Support for _C/C++_
+- [#38] Add `-a|--add-headers` command-line option
 - bump _LTS Haskell_ to `15.8`
 
 ## 0.1.3.0 (released 2020-03-23)

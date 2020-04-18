@@ -176,8 +176,8 @@ spec = do
       HeadersConfig {..} <- makeHeadersConfig (pcLicenseHeaders defaultConfig')
       sampleC1           <- loadFile $ path </> "c" </> "sample1.c"
       sampleC2           <- loadFile $ path </> "c" </> "sample2.c"
-      sampleCpp1           <- loadFile $ path </> "cpp" </> "sample1.cpp"
-      sampleCpp2           <- loadFile $ path </> "cpp" </> "sample2.cpp"
+      sampleCpp1         <- loadFile $ path </> "cpp" </> "sample1.cpp"
+      sampleCpp2         <- loadFile $ path </> "cpp" </> "sample2.cpp"
       sampleCss1         <- loadFile $ path </> "css" </> "sample1.css"
       sampleCss2         <- loadFile $ path </> "css" </> "sample2.css"
       sampleHs1          <- loadFile $ path </> "haskell" </> "sample1.hs"
