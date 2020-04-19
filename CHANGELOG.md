@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#35] Support for [Bash](https://www.gnu.org/software/bash/)
 - [#36] Support for _C/C++_
 - [#38] Add `-a|--add-headers` command-line option
-- bump _LTS Haskell_ to `15.8`
+- bump _LTS Haskell_ to `15.9`
 
 ## 0.1.3.0 (released 2020-03-23)
 - [#24] Added _Init_ command that automatically creates initial _Headroom_ configuration and set of templates.
