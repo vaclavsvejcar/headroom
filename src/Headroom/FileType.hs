@@ -17,6 +17,7 @@ import           RIO
 import qualified RIO.List                      as L
 
 
+
 -- | Returns 'FileType' for given file extension (without dot), using configured
 -- values from the 'HeadersConfig'.
 fileTypeByExt :: HeadersConfig  -- ^ license headers configuration

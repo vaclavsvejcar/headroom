@@ -30,6 +30,7 @@ import           RIO.FilePath                   ( isExtensionOf
 import qualified RIO.Text                      as T
 
 
+
 -- | Returns file extension for given path (if file), or nothing otherwise.
 --
 -- >>> fileExtension "path/to/some/file.txt"
@@ -39,12 +40,14 @@ fileExtension path = case takeExtension path of
   '.' : xs -> Just $ T.pack xs
   _        -> Nothing
 
+
 -- | Recursively finds files on given path whose filename matches the predicate.
 findFiles :: MonadIO m
           => FilePath           -- ^ path to search
           -> (FilePath -> Bool) -- ^ predicate to match filename
           -> m [FilePath]       -- ^ found files
 findFiles path predicate = fmap (filter predicate) (listFiles path)
+
 
 -- | Recursively finds files on given path by file extensions.
 findFilesByExts :: MonadIO m
@@ -54,6 +57,7 @@ findFilesByExts :: MonadIO m
 findFilesByExts path exts = findFiles path predicate
   where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 
+
 -- | Recursively find files on given path by their file types.
 findFilesByTypes :: MonadIO m
                  => HeadersConfig -- ^ configuration of license headers
@@ -62,6 +66,7 @@ findFilesByTypes :: MonadIO m
                  -> m [FilePath]  -- ^ list of found files
 findFilesByTypes headersConfig types path =
   findFilesByExts path (types >>= listExtensions headersConfig)
+
 
 -- | Recursively find all files on given path. If file reference is passed
 -- instead of directory, such file path is returned.
@@ -80,6 +85,7 @@ listFiles fileOrDir = do
       isDirectory <- doesDirectoryExist path
       if isDirectory then listFiles path else pure [path]
     pure $ concat paths
+
 
 -- | Loads file content in UTF8 encoding.
 loadFile :: MonadIO m

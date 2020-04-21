@@ -14,13 +14,16 @@ import           Headroom.Types                 ( FileType(..)
 import           RIO
 
 
+
 -- | Content of dummy /YAML/ configuration file for the application.
 configFileStub :: IsString a => a
 configFileStub = $(embedStringFile "embedded/config-file.yaml")
 
+
 -- | Default /YAML/ configuration.
 defaultConfig :: IsString a => a
 defaultConfig = $(embedStringFile "embedded/default-config.yaml")
+
 
 -- | License template for given 'License'.
 licenseTemplate :: IsString a

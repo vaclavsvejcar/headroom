@@ -2,11 +2,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 module Headroom.Configuration
-  ( loadConfiguration
+  ( -- * Loading & Parsing Configuration
+    loadConfiguration
+  , parseConfiguration
+  , parseVariables
+    -- * Processing Partial Configuration
   , makeConfiguration
   , makeHeadersConfig
-  , parseVariables
-  , parseConfiguration
+  , makeHeaderConfig
   )
 where
 
@@ -28,50 +31,20 @@ import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
 
-makeConfiguration :: MonadThrow m => PartialConfiguration -> m Configuration
-makeConfiguration PartialConfiguration {..} = do
-  cRunMode        <- lastOrError NoRunMode pcRunMode
-  cSourcePaths    <- lastOrError NoSourcePaths pcSourcePaths
-  cTemplatePaths  <- lastOrError NoTemplatePaths pcTemplatePaths
-  cVariables      <- lastOrError NoVariables pcVariables
-  cLicenseHeaders <- makeHeadersConfig pcLicenseHeaders
-  pure Configuration { .. }
 
-makeHeadersConfig :: MonadThrow m => PartialHeadersConfig -> m HeadersConfig
-makeHeadersConfig PartialHeadersConfig {..} = do
-  hscC       <- makeHeaderConfig C phscC
-  hscCpp     <- makeHeaderConfig CPP phscCpp
-  hscCss     <- makeHeaderConfig CSS phscCss
-  hscHaskell <- makeHeaderConfig Haskell phscHaskell
-  hscHtml    <- makeHeaderConfig HTML phscHtml
-  hscJava    <- makeHeaderConfig Java phscJava
-  hscJs      <- makeHeaderConfig JS phscJs
-  hscRust    <- makeHeaderConfig Rust phscRust
-  hscScala   <- makeHeaderConfig Scala phscScala
-  hscShell   <- makeHeaderConfig Shell phscShell
-  pure HeadersConfig { .. }
-
-makeHeaderConfig :: MonadThrow m
-                 => FileType
-                 -> PartialHeaderConfig
-                 -> m HeaderConfig
-makeHeaderConfig fileType PartialHeaderConfig {..} = do
-  hcFileExtensions <- lastOrError (NoFileExtensions fileType) phcFileExtensions
-  hcMarginAfter    <- lastOrError (NoMarginAfter fileType) phcMarginAfter
-  hcMarginBefore   <- lastOrError (NoMarginBefore fileType) phcMarginBefore
-  hcPutAfter       <- lastOrError (NoPutAfter fileType) phcPutAfter
-  hcPutBefore      <- lastOrError (NoPutBefore fileType) phcPutBefore
-  hcHeaderSyntax   <- lastOrError (NoHeaderSyntax fileType) phcHeaderSyntax
-  pure HeaderConfig { .. }
-
-lastOrError :: MonadThrow m => ConfigurationError -> Last a -> m a
-lastOrError err (Last x) = maybe (throwM $ ConfigurationError err) pure x
-
--- | Loads and parses application configuration from given file.
+-- | Loads and parses application configuration from given /YAML/ file.
 loadConfiguration :: MonadIO m
                   => FilePath               -- ^ path to configuration file
                   -> m PartialConfiguration -- ^ parsed configuration
 loadConfiguration path = liftIO $ B.readFile path >>= parseConfiguration
+
+
+-- | Parses application configuration from given raw input in /YAML/ format.
+parseConfiguration :: MonadThrow m
+                   => B.ByteString           -- ^ raw input to parse
+                   -> m PartialConfiguration -- ^ parsed application configuration
+parseConfiguration = Y.decodeThrow
+
 
 -- | Parses variables from raw input in @key=value@ format.
 --
@@ -86,8 +59,52 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
     [key, value] -> pure (key, value)
     _            -> throwM $ ConfigurationError (InvalidVariable input)
 
--- | Parses application configuration from given raw input.
-parseConfiguration :: MonadThrow m
-                   => B.ByteString           -- ^ raw input to parse
-                   -> m PartialConfiguration -- ^ parsed application configuration
-parseConfiguration = Y.decodeThrow
+
+-- | Makes full 'Configuration' from provided 'PartialConfiguration' (if valid).
+makeConfiguration :: MonadThrow m
+                  => PartialConfiguration -- ^ source 'PartialConfiguration'
+                  -> m Configuration      -- ^ full 'Configuration'
+makeConfiguration PartialConfiguration {..} = do
+  cRunMode        <- lastOrError NoRunMode pcRunMode
+  cSourcePaths    <- lastOrError NoSourcePaths pcSourcePaths
+  cTemplatePaths  <- lastOrError NoTemplatePaths pcTemplatePaths
+  cVariables      <- lastOrError NoVariables pcVariables
+  cLicenseHeaders <- makeHeadersConfig pcLicenseHeaders
+  pure Configuration { .. }
+
+
+-- | Makes full 'HeadersConfig' from provided 'PartialHeadersConfig' (if valid).
+makeHeadersConfig :: MonadThrow m
+                  => PartialHeadersConfig -- ^ source 'PartialHeadersConfig'
+                  -> m HeadersConfig      -- ^ full 'HeadersConfig'
+makeHeadersConfig PartialHeadersConfig {..} = do
+  hscC       <- makeHeaderConfig C phscC
+  hscCpp     <- makeHeaderConfig CPP phscCpp
+  hscCss     <- makeHeaderConfig CSS phscCss
+  hscHaskell <- makeHeaderConfig Haskell phscHaskell
+  hscHtml    <- makeHeaderConfig HTML phscHtml
+  hscJava    <- makeHeaderConfig Java phscJava
+  hscJs      <- makeHeaderConfig JS phscJs
+  hscRust    <- makeHeaderConfig Rust phscRust
+  hscScala   <- makeHeaderConfig Scala phscScala
+  hscShell   <- makeHeaderConfig Shell phscShell
+  pure HeadersConfig { .. }
+
+
+-- | Makes full 'HeaderConfig' from provided 'PartialHeaderConfig' (if valid).
+makeHeaderConfig :: MonadThrow m
+                 => FileType             -- ^ determines for which file type this configuration is
+                 -> PartialHeaderConfig  -- ^ source 'PartialHeaderConfig'
+                 -> m HeaderConfig       -- ^ full 'HeaderConfig'
+makeHeaderConfig fileType PartialHeaderConfig {..} = do
+  hcFileExtensions <- lastOrError (NoFileExtensions fileType) phcFileExtensions
+  hcMarginAfter    <- lastOrError (NoMarginAfter fileType) phcMarginAfter
+  hcMarginBefore   <- lastOrError (NoMarginBefore fileType) phcMarginBefore
+  hcPutAfter       <- lastOrError (NoPutAfter fileType) phcPutAfter
+  hcPutBefore      <- lastOrError (NoPutBefore fileType) phcPutBefore
+  hcHeaderSyntax   <- lastOrError (NoHeaderSyntax fileType) phcHeaderSyntax
+  pure HeaderConfig { .. }
+
+
+lastOrError :: MonadThrow m => ConfigurationError -> Last a -> m a
+lastOrError err (Last x) = maybe (throwM $ ConfigurationError err) pure x

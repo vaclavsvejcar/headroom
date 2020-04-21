@@ -32,7 +32,10 @@ instance HasLogFunc Env where
 env' :: CommandGenOptions -> LogFunc -> IO Env
 env' opts logFunc = pure $ Env { envLogFunc = logFunc, envGenOptions = opts }
 
-parseGenMode :: MonadThrow m => Command -> m GenMode
+-- | Parses 'GenMode' from combination of options from given 'Command'.
+parseGenMode :: MonadThrow m
+             => Command      -- ^ command from which to parse the 'GenMode'
+             -> m GenMode    -- ^ parsed 'GenMode'
 parseGenMode = \case
   Gen True  Nothing        -> pure GenConfigFile
   Gen False (Just license) -> pure $ GenLicense license

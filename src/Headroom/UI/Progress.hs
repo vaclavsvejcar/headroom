@@ -13,8 +13,9 @@ import           Text.Printf                    ( printf )
 
 -- | Progress indication. First argument is current progress, second the maximum
 -- value.
-data Progress = Progress Int Int
+data Progress = Progress !Int !Int
   deriving (Eq, Show)
+
 
 instance Display Progress where
   textDisplay (Progress current total) = T.pack
@@ -23,6 +24,7 @@ instance Display Progress where
     format   = "%" <> (show . L.length $ totalS) <> "d"
     currentS = printf format current
     totalS   = show total
+
 
 -- | Zips given list with the progress info.
 --

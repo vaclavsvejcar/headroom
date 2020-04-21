@@ -1,10 +1,12 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Serialization
-  ( aesonOptions
+  ( -- * JSON/YAML Serialization
+    aesonOptions
   , dropFieldPrefix
-  , prettyPrintYAML
   , symbolCase
+  -- * Pretty Printing
+  , prettyPrintYAML
   )
 where
 
@@ -19,10 +21,14 @@ import qualified RIO.Char                      as C
 
 
 
--- | Custom /Aeson/ options.
+-- | Custom /Aeson/ encoding options used for generic mapping between data
+-- records and /JSON/ or /YAML/ values. Expects the fields in input to be
+-- without the prefix and with words formated in /symbol case/
+-- (example: record field @uUserName@, /JSON/ field @user-name@).
 aesonOptions :: Options
 aesonOptions =
   defaultOptions { fieldLabelModifier = symbolCase '-' . dropFieldPrefix }
+
 
 -- | Drops prefix from camel-case text.
 --
@@ -35,9 +41,6 @@ dropFieldPrefix = \case
   (_ : xs)                   -> dropFieldPrefix xs
   []                         -> []
 
-prettyPrintYAML :: ToJSON a => a -> Text
-prettyPrintYAML = decodeUtf8Lenient . YP.encodePretty prettyConfig
-  where prettyConfig = YP.setConfCompare compare YP.defConfig
 
 -- | Transforms camel-case text into text cased with given symbol.
 --
@@ -50,3 +53,11 @@ symbolCase sym = \case
   [] -> []
   (x : xs) | C.isUpper x -> sym : C.toLower x : symbolCase sym xs
            | otherwise   -> x : symbolCase sym xs
+
+
+-- | Pretty prints given data as /YAML/.
+prettyPrintYAML :: ToJSON a
+                => a    -- ^ data to pretty print
+                -> Text -- ^ pretty printed /YAML/ output
+prettyPrintYAML = decodeUtf8Lenient . YP.encodePretty prettyConfig
+  where prettyConfig = YP.setConfCompare compare YP.defConfig
