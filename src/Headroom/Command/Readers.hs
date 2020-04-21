@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Command.Readers
+Description : Custom readers for /optparse-applicative/ library
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module contains custom readers required by the /optparse-applicative/
+library to parse data types such as 'LicenseType' or 'FileType'.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
@@ -19,6 +31,8 @@ import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
 
 
+
+-- | Reader for tuple of 'LicenseType' and 'FileType'.
 licenseReader :: ReadM (LicenseType, FileType)
 licenseReader = eitherReader parseLicense
  where
@@ -32,6 +46,8 @@ licenseReader = eitherReader parseLicense
     , T.toLower (allValuesToText @FileType)
     ]
 
+
+-- | Reader for 'LicenseType'.
 licenseTypeReader :: ReadM LicenseType
 licenseTypeReader = eitherReader parseLicenseType
  where
@@ -42,6 +58,11 @@ licenseTypeReader = eitherReader parseLicenseType
     ]
 
 
+-- | Parses 'LicenseType' and 'FileType' from the input string,
+-- formatted as @licenseType:fileType@.
+--
+-- >>> parseLicenseAndFileType "bsd3:haskell"
+-- Just (BSD3,Haskell)
 parseLicenseAndFileType :: Text -> Maybe (LicenseType, FileType)
 parseLicenseAndFileType raw
   | [rawLicenseType, rawFileType] <- TP.splitOn ":" raw = do

@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Command.Utils
+Description : Shared code for individual command handlers
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Contains shared code common to all command handlers.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Utils
   ( bootstrap

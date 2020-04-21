@@ -1,3 +1,15 @@
+{-|
+Module      : Main
+Description : Main application launcher
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Code responsible for booting up the application and parsing command line
+arguments.
+-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}

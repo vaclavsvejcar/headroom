@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Command.Run
+Description : Handler for the @run@ command.
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Module representing the @run@ command, the core command of /Headroom/, which is
+responsible for license header management.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}

@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.FileType
+Description : Logic for handlig supported file types
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Module providing functions for working with the 'FileType', such as performing
+detection based on the file extension, etc.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}

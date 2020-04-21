@@ -1,14 +1,29 @@
+{-|
+Module      : Headroom.FileSystem
+Description : Operations related to files and file system
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Module providing functions for working with the local file system, its file and
+directories.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.FileSystem
-  ( fileExtension
-  , findFiles
+  ( -- * Traversing the File System
+    findFiles
   , findFilesByExts
   , findFilesByTypes
   , listFiles
   , loadFile
+    -- * Working with Files/Directories
   , doesFileExist
   , getCurrentDirectory
   , createDirectory
+    -- * Working with Files Metadata
+  , fileExtension
   )
 where
 

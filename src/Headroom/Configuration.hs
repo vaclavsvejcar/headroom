@@ -1,3 +1,18 @@
+{-|
+Module      : Headroom.Configuration
+Description : Configuration handling (loading, parsing, validating)
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module provides logic for working with the cofiguration data types.
+Headroom uses the
+<https://medium.com/@jonathangfischoff/the-partial-options-monoid-pattern-31914a71fc67 partial options monoid>
+pattern for the configuration, where the 'Configuration' is the data type for
+total configuration and 'PartialConfiguration' for the partial one.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -34,7 +49,7 @@ import qualified RIO.Text                      as T
 
 -- | Loads and parses application configuration from given /YAML/ file.
 loadConfiguration :: MonadIO m
-                  => FilePath               -- ^ path to configuration file
+                  => FilePath               -- ^ path to /YAML/ configuration file
                   -> m PartialConfiguration -- ^ parsed configuration
 loadConfiguration path = liftIO $ B.readFile path >>= parseConfiguration
 

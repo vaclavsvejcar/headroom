@@ -1,3 +1,16 @@
+{-|
+Module      : Headroom.Command.Init
+Description : Handler for the @init@ command
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Module representing the @init@ command, responsible for generating all the
+required files (configuration, templates) for the given project, which are then
+required by the @run@ or @gen@ commands.
+-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -6,6 +19,8 @@
 module Headroom.Command.Init
   ( Env(..)
   , Paths(..)
+  , HasPaths(..)
+  , HasInitOptions(..)
   , commandInit
   , doesAppConfigExist
   , findSupportedFileTypes
@@ -49,8 +64,7 @@ import qualified RIO.Text.Partial              as TP
 
 
 
-
--- | /RIO/ Environment for the /Init/ command.
+-- | /RIO/ Environment for the @init@ command.
 data Env = Env
   { envLogFunc     :: !LogFunc
   , envInitOptions :: !CommandInitOptions
@@ -67,7 +81,7 @@ data Paths = Paths
 instance HasLogFunc Env where
   logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
 
--- | Environment value with /Init/ command options.
+-- | Environment value with @init@ command options.
 class HasInitOptions env where
   initOptionsL :: Lens' env CommandInitOptions
 
@@ -92,8 +106,8 @@ env' opts logFunc = do
                     }
   pure $ Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
 
--- | Handler for /Init/ command.
-commandInit :: CommandInitOptions -- ^ /Init/ command options
+-- | Handler for @init@ command.
+commandInit :: CommandInitOptions -- ^ @init@ command options
             -> IO ()              -- ^ execution result
 commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
   False -> do

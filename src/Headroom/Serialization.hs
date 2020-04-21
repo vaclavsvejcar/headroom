@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Serialization
+Description : Various functions for data (de)serialization
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Module providing support for data (de)serialization, mainly from/to /JSON/
+and /YAML/.
+-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Serialization

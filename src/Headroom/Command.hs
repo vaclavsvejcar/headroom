@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Command
+Description : Support for parsing command line arguments
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module contains code responsible for parsing command line arguments, using
+the /optparse-applicative/ library.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}

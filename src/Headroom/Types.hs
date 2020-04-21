@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Types
+Description : Application data types
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Module containing most of the data types used by the application.
+-}
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE LambdaCase        #-}
@@ -5,24 +16,32 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 module Headroom.Types
-  ( PartialConfiguration(..)
-  , PartialHeaderConfig(..)
-  , PartialHeadersConfig(..)
-  , HeaderSyntax(..)
-  , Configuration(..)
+  (
+    -- * Configuration Data Types
+    -- ** Total Configuration
+    Configuration(..)
   , HeaderConfig(..)
   , HeadersConfig(..)
-  , ApplicationError(..)
-  , CommandGenError(..)
-  , CommandInitError(..)
+    -- ** Partial Configuration
+  , PartialConfiguration(..)
+  , PartialHeaderConfig(..)
+  , PartialHeadersConfig(..)
+    -- ** Other Configuration Data Types
+  , HeaderSyntax(..)
+    -- * Command Data Types
+  , Command(..)
+  , CommandGenOptions(..)
   , CommandInitOptions(..)
   , CommandRunOptions(..)
   , ConfigurationError(..)
-  , TemplateError(..)
   , RunMode(..)
   , GenMode(..)
-  , Command(..)
-  , CommandGenOptions(..)
+    -- * Error Data Types
+  , ApplicationError(..)
+  , CommandGenError(..)
+  , CommandInitError(..)
+  , TemplateError(..)
+    -- * Other Data Types
   , LicenseType(..)
   , FileType(..)
   , FileInfo(..)
@@ -44,6 +63,7 @@ import           RIO
 import qualified RIO.Text                      as T
 
 
+-- | Represents what action should the @run@ command perform.
 data RunMode
   = Add
   | Drop
@@ -59,17 +79,18 @@ instance FromJSON RunMode where
       _         -> error $ "Unknown run mode: " <> T.unpack s
     other -> error $ "Invalid value for run mode: " <> show other
 
--- | Represents what action should the /Generator/ perform.
+-- | Represents what action should the @gen@ command perform.
 data GenMode
-  = GenConfigFile                      -- ^ generate /YAML/ config file stub
-  | GenLicense (LicenseType, FileType) -- ^ generate license header template
+  = GenConfigFile                       -- ^ generate /YAML/ config file stub
+  | GenLicense !(LicenseType, FileType) -- ^ generate license header template
   deriving (Eq, Show)
 
+-- | Represents error that can occur during the application execution.
 data ApplicationError
-  = CommandGenError CommandGenError
-  | CommandInitError CommandInitError
-  | ConfigurationError ConfigurationError
-  | TemplateError TemplateError
+  = CommandGenError !CommandGenError       -- ^ error specific for the @gen@ command
+  | CommandInitError !CommandInitError     -- ^ error specific for the @init@ command
+  | ConfigurationError !ConfigurationError -- ^ error processing configuration
+  | TemplateError !TemplateError           -- ^ error processing template
   deriving (Eq, Show)
 
 instance Exception ApplicationError where
@@ -79,188 +100,204 @@ instance Exception ApplicationError where
     ConfigurationError error' -> configurationError error'
     TemplateError      error' -> templateError error'
 
--- | Errors specific for the /Gen/ command.
+-- | Error specific for the @gen@ command.
 data CommandGenError = NoGenModeSelected -- ^ no mode of /Gen/ command selected
   deriving (Eq, Show)
 
+-- | Error specific for the @init@ command.
 data CommandInitError
-  = AppConfigAlreadyExists FilePath -- ^ application configuration file already exists
-  | NoProvidedSourcePaths           -- ^ no paths to source code files provided
-  | NoSupportedFileType             -- ^ no supported file types found on source paths
+  = AppConfigAlreadyExists !FilePath -- ^ application configuration file already exists
+  | NoProvidedSourcePaths            -- ^ no paths to source code files provided
+  | NoSupportedFileType              -- ^ no supported file types found on source paths
   deriving (Eq, Show)
 
+-- | Error during processing configuration.
 data ConfigurationError
-  = InvalidVariable Text
-  | MixedHeaderSyntax
-  | NoFileExtensions FileType
-  | NoHeaderSyntax FileType
-  | NoMarginAfter FileType
-  | NoMarginBefore FileType
-  | NoPutAfter FileType
-  | NoPutBefore FileType
-  | NoRunMode
-  | NoSourcePaths
-  | NoTemplatePaths
-  | NoVariables
+  = InvalidVariable !Text      -- ^ invalid variable input (as @key=value@)
+  | MixedHeaderSyntax          -- ^ illegal configuration for 'HeaderSyntax'
+  | NoFileExtensions !FileType -- ^ no configuration for @file-extensions@
+  | NoHeaderSyntax !FileType   -- ^ no configuration for header syntax
+  | NoMarginAfter !FileType    -- ^ no configuration for @margin-after@
+  | NoMarginBefore !FileType   -- ^ no configuration for @margin-before@
+  | NoPutAfter !FileType       -- ^ no configuration for @put-after@
+  | NoPutBefore !FileType      -- ^ no configuration for @put-before@
+  | NoRunMode                  -- ^ no configuration for @run-mode@
+  | NoSourcePaths              -- ^ no configuration for @source-paths@
+  | NoTemplatePaths            -- ^ no configuration for @template-paths@
+  | NoVariables                -- ^ no configuration for @variables@
   deriving (Eq, Show)
 
+-- | Error during processing template.
 data TemplateError
-  = MissingVariables Text [Text]
-  | ParseError Text
+  = MissingVariables !Text ![Text] -- ^ missing variable values
+  | ParseError !Text               -- ^ error parsing raw template text
   deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
 -- | Application command.
 data Command
-  = Run [FilePath] [FilePath] [Text] (Maybe RunMode) Bool -- ^ /Run/ command
-  | Gen Bool (Maybe (LicenseType, FileType))      -- ^ /Generator/ command
-  | Init LicenseType [FilePath]                   -- ^ /Init/ command
+  = Run [FilePath] [FilePath] [Text] (Maybe RunMode) Bool -- ^ @run@ command
+  | Gen Bool (Maybe (LicenseType, FileType))              -- ^ @gen@ command
+  | Init LicenseType [FilePath]                           -- ^ @init@ command
   deriving (Show)
 
 --------------------------------------------------------------------------------
 
+-- | Options for the @gen@ command.
 newtype CommandGenOptions = CommandGenOptions
-  { cgoGenMode :: GenMode
+  { cgoGenMode :: GenMode -- ^ selected mode
   }
   deriving (Show)
 
--- | Options for the /Init/ command.
+-- | Options for the @init@ command.
 data CommandInitOptions = CommandInitOptions
-  { cioSourcePaths :: ![FilePath]
-  , cioLicenseType :: !LicenseType
+  { cioSourcePaths :: ![FilePath]  -- ^ paths to source code files
+  , cioLicenseType :: !LicenseType -- ^ license type
   }
   deriving Show
 
--- | Options for the /Run/ command.
+-- | Options for the @run@ command.
 data CommandRunOptions = CommandRunOptions
-  { croRunMode       :: !(Maybe RunMode)    -- ^ used /Run/ command mode
-  , croSourcePaths   :: ![FilePath] -- ^ source code file paths
-  , croTemplatePaths :: ![FilePath] -- ^ template file paths
-  , croVariables     :: ![Text]     -- ^ raw variables
-  , croDebug         :: !Bool       -- ^ whether to run in debug mode
+  { croRunMode       :: !(Maybe RunMode) -- ^ used /Run/ command mode
+  , croSourcePaths   :: ![FilePath]      -- ^ source code file paths
+  , croTemplatePaths :: ![FilePath]      -- ^ template file paths
+  , croVariables     :: ![Text]          -- ^ raw variables
+  , croDebug         :: !Bool            -- ^ whether to run in debug mode
   }
   deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
+-- | Supported type of source code file.
 data FileType
-  = C
-  | CPP
-  | CSS
-  | Haskell
-  | HTML
-  | Java
-  | JS
-  | Rust
-  | Scala
-  | Shell
+  = C       -- ^ support for /C/ programming language
+  | CPP     -- ^ support for /C++/ programming language
+  | CSS     -- ^ support for /CSS/
+  | Haskell -- ^ support for /Haskell/ programming language
+  | HTML    -- ^ support for /HTML/
+  | Java    -- ^ support for /Java/ programming language
+  | JS      -- ^ support for /JavaScript/ programming language
+  | Rust    -- ^ support for /Rust/ programming language
+  | Scala   -- ^ support for /Scala/ programming language
+  | Shell   -- ^ support for /Shell/
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
 
 --------------------------------------------------------------------------------
 
+-- | Supported type of open source license.
 data LicenseType
-  = Apache2
-  | BSD3
-  | GPL2
-  | GPL3
-  | MIT
-  | MPL2
+  = Apache2 -- ^ support for /Apache-2.0/ license
+  | BSD3    -- ^ support for /BSD-3-Clause/ license
+  | GPL2    -- ^ support for /GNU GPL2/ license
+  | GPL3    -- ^ support for /GNU GPL3/ license
+  | MIT     -- ^ support for /MIT/ license
+  | MPL2    -- ^ support for /MPL2/ license
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
 
 --------------------------------------------------------------------------------
 
+-- | Info extracted about the concrete source code file.
 data FileInfo = FileInfo
-  { fiFileType     :: !FileType
-  , fiHeaderConfig :: !HeaderConfig
-  , fiHeaderPos    :: !(Maybe (Int, Int))
-  , fiVariables    :: !(HashMap Text Text)
+  { fiFileType     :: !FileType            -- ^ type of the file
+  , fiHeaderConfig :: !HeaderConfig        -- ^ configuration for license header
+  , fiHeaderPos    :: !(Maybe (Int, Int))  -- ^ position of existing license header
+  , fiVariables    :: !(HashMap Text Text) -- ^ additional extracted variables
   }
   deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
+-- | Syntax of the license header comment.
 data HeaderSyntax
-  = BlockComment !Text !Text
-  | LineComment !Text
+  = BlockComment !Text !Text -- ^ block (multi-line) comment syntax (e.g. @/* */@)
+  | LineComment !Text        -- ^ single line comment syntax (e.g. @//@)
   deriving (Eq, Show)
 
+-- | Application configuration.
 data Configuration = Configuration
-  { cRunMode        :: !RunMode
-  , cSourcePaths    :: ![FilePath]
-  , cTemplatePaths  :: ![FilePath]
-  , cVariables      :: !(HashMap Text Text)
-  , cLicenseHeaders :: !HeadersConfig
+  { cRunMode        :: !RunMode             -- ^ mode of the @run@ command
+  , cSourcePaths    :: ![FilePath]          -- ^ paths to source code files
+  , cTemplatePaths  :: ![FilePath]          -- ^ paths to template files
+  , cVariables      :: !(HashMap Text Text) -- ^ variable values for templates
+  , cLicenseHeaders :: !HeadersConfig       -- ^ configuration of license headers
   }
   deriving (Eq, Show)
 
+-- | Configuration for specific license header.
 data HeaderConfig = HeaderConfig
-  { hcFileExtensions :: ![Text]
-  , hcMarginAfter    :: !Int
-  , hcMarginBefore   :: !Int
-  , hcPutAfter       :: ![Text]
-  , hcPutBefore      :: ![Text]
-  , hcHeaderSyntax   :: !HeaderSyntax
+  { hcFileExtensions :: ![Text]       -- ^ list of file extensions (without dot)
+  , hcMarginAfter    :: !Int          -- ^ number of empty lines to put after header
+  , hcMarginBefore   :: !Int          -- ^ number of empty lines to put before header
+  , hcPutAfter       :: ![Text]       -- ^ /regexp/ patterns after which to put the header
+  , hcPutBefore      :: ![Text]       -- ^ /regexp/ patterns before which to put the header
+  , hcHeaderSyntax   :: !HeaderSyntax -- ^ syntax of the license header comment
   }
   deriving (Eq, Show)
 
+-- | Group of 'HeaderConfig' configurations for supported file types.
 data HeadersConfig = HeadersConfig
-  { hscC       :: !HeaderConfig
-  , hscCpp     :: !HeaderConfig
-  , hscCss     :: !HeaderConfig
-  , hscHaskell :: !HeaderConfig
-  , hscHtml    :: !HeaderConfig
-  , hscJava    :: !HeaderConfig
-  , hscJs      :: !HeaderConfig
-  , hscRust    :: !HeaderConfig
-  , hscScala   :: !HeaderConfig
-  , hscShell   :: !HeaderConfig
+  { hscC       :: !HeaderConfig -- ^ configuration for /C/ programming language
+  , hscCpp     :: !HeaderConfig -- ^ configuration for /C++/ programming language
+  , hscCss     :: !HeaderConfig -- ^ configuration for /CSS/
+  , hscHaskell :: !HeaderConfig -- ^ configuration for /Haskell/ programming language
+  , hscHtml    :: !HeaderConfig -- ^ configuration for /HTML/
+  , hscJava    :: !HeaderConfig -- ^ configuration for /Java/ programming language
+  , hscJs      :: !HeaderConfig -- ^ configuration for /JavaScript/ programming language
+  , hscRust    :: !HeaderConfig -- ^ configuration for /Rust/ programming language
+  , hscScala   :: !HeaderConfig -- ^ configuration for /Scala/ programming language
+  , hscShell   :: !HeaderConfig -- ^ configuration for /Shell/
   }
   deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
+-- | Internal representation of block comment style of 'HeaderSyntax'.
 data BlockComment' = BlockComment'
-  { bcStartsWith :: !Text
-  , bcEndsWith   :: Text
+  { bcStartsWith :: !Text -- ^ starting pattern (e.g. @/*@)
+  , bcEndsWith   :: !Text -- ^ ending pattern (e.g. @*/@)
   }
   deriving (Eq, Generic, Show)
 
+-- | Internal representation of the line style of 'HeaderSyntax'.
 newtype LineComment' = LineComment'
-  { lcPrefixedBy :: Text
+  { lcPrefixedBy :: Text -- ^ prefix of the comment line (e.g. @//@)
   }
   deriving (Eq, Generic, Show)
 
+-- | Partial (possibly incomplete) version of 'Configuration'.
 data PartialConfiguration = PartialConfiguration
-  { pcRunMode        :: !(Last RunMode)
-  , pcSourcePaths    :: !(Last [FilePath])
-  , pcTemplatePaths  :: !(Last [FilePath])
-  , pcVariables      :: !(Last (HashMap Text Text))
-  , pcLicenseHeaders :: !PartialHeadersConfig
+  { pcRunMode        :: !(Last RunMode)             -- ^ mode of the @run@ command
+  , pcSourcePaths    :: !(Last [FilePath])          -- ^ paths to source code files
+  , pcTemplatePaths  :: !(Last [FilePath])          -- ^ paths to template files
+  , pcVariables      :: !(Last (HashMap Text Text)) -- ^ variable values for templates
+  , pcLicenseHeaders :: !PartialHeadersConfig       -- ^ configuration of license headers
   }
   deriving (Eq, Generic, Show)
 
+-- | Partial (possibly incomplete) version of 'HeaderConfig'.
 data PartialHeaderConfig = PartialHeaderConfig
-  { phcFileExtensions :: !(Last [Text])
-  , phcMarginAfter    :: !(Last Int)
-  , phcMarginBefore   :: !(Last Int)
-  , phcPutAfter       :: !(Last [Text])
-  , phcPutBefore      :: !(Last [Text])
-  , phcHeaderSyntax   :: !(Last HeaderSyntax)
+  { phcFileExtensions :: !(Last [Text])       -- ^ list of file extensions (without dot)
+  , phcMarginAfter    :: !(Last Int)          -- ^ number of empty lines to put after header
+  , phcMarginBefore   :: !(Last Int)          -- ^ number of empty lines to put before header
+  , phcPutAfter       :: !(Last [Text])       -- ^ /regexp/ patterns after which to put the header
+  , phcPutBefore      :: !(Last [Text])       -- ^ /regexp/ patterns before which to put the header
+  , phcHeaderSyntax   :: !(Last HeaderSyntax) -- ^ syntax of the license header comment
   }
   deriving (Eq, Generic, Show)
 
+-- | Partial (possibly incomplete) version of 'HeadersConfig'.
 data PartialHeadersConfig = PartialHeadersConfig
-  { phscC       :: !PartialHeaderConfig
-  , phscCpp     :: !PartialHeaderConfig
-  , phscCss     :: !PartialHeaderConfig
-  , phscHaskell :: !PartialHeaderConfig
-  , phscHtml    :: !PartialHeaderConfig
-  , phscJava    :: !PartialHeaderConfig
-  , phscJs      :: !PartialHeaderConfig
-  , phscRust    :: !PartialHeaderConfig
-  , phscScala   :: !PartialHeaderConfig
-  , phscShell   :: !PartialHeaderConfig
+  { phscC       :: !PartialHeaderConfig -- ^ configuration for /C/ programming language
+  , phscCpp     :: !PartialHeaderConfig -- ^ configuration for /C++/ programming language
+  , phscCss     :: !PartialHeaderConfig -- ^ configuration for /CSS/
+  , phscHaskell :: !PartialHeaderConfig -- ^ configuration for /Haskell/ programming language
+  , phscHtml    :: !PartialHeaderConfig -- ^ configuration for /HTML/
+  , phscJava    :: !PartialHeaderConfig -- ^ configuration for /Java/ programming language
+  , phscJs      :: !PartialHeaderConfig -- ^ configuration for /JavaScript/ programming language
+  , phscRust    :: !PartialHeaderConfig -- ^ configuration for /Rust/ programming language
+  , phscScala   :: !PartialHeaderConfig -- ^ configuration for /Scala/ programming language
+  , phscShell   :: !PartialHeaderConfig -- ^ configuration for /Shell/
   }
   deriving (Eq, Generic, Show)
 

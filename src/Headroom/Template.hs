@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.Template
+Description : Generic representation of supported template type
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Module providing generic representation of supported template type, using
+the 'Template' /type class/.
+-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE NoImplicitPrelude   #-}
 module Headroom.Template where

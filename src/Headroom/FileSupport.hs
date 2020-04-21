@@ -1,3 +1,15 @@
+{-|
+Module      : Headroom.FileSupport
+Description : License header manipulation
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module is the heart of /Headroom/ as it contains functions for working with
+the /license headers/ and the /source code files/.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}

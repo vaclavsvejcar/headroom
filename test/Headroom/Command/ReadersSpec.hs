@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude   #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
 module Headroom.Command.ReadersSpec
   ( spec
   )
@@ -25,8 +26,8 @@ spec = do
          prop_parseLicenseAndFileType
 
  where
-  licenseTypes = fmap (T.toLower . enumToText) (allValues :: [LicenseType])
-  fileTypes = fmap (T.toLower . enumToText) (allValues :: [FileType])
+  licenseTypes = fmap (T.toLower . enumToText) (allValues @LicenseType)
+  fileTypes = fmap (T.toLower . enumToText) (allValues @FileType)
   licenseAndFileTypesGen = elements
     $ concatMap (\lt -> fmap (\ft -> lt <> ":" <> ft) fileTypes) licenseTypes
   prop_parseLicenseAndFileType =

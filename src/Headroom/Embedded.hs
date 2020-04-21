@@ -1,3 +1,14 @@
+{-|
+Module      : Headroom.Embedded
+Description : Embedded files
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+Contains contents of files embedded using the "Data.FileEmbed" module.
+-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell   #-}
 module Headroom.Embedded
@@ -25,10 +36,10 @@ defaultConfig :: IsString a => a
 defaultConfig = $(embedStringFile "embedded/default-config.yaml")
 
 
--- | License template for given 'License'.
+-- | License template for given license.
 licenseTemplate :: IsString a
-                => LicenseType -- ^ 'License' for which to return the template
-                -> FileType    -- ^ 'License' for which to return the template
+                => LicenseType -- ^ license for which to return the template
+                -> FileType    -- ^ license for which to return the template
                 -> a           -- ^ template text
 licenseTemplate licenseType fileType = case licenseType of
   Apache2 -> case fileType of

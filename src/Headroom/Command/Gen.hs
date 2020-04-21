@@ -1,3 +1,16 @@
+{-|
+Module      : Headroom.Command.Gen
+Description : Handler for the @gen@ command.
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+The @gen@ command is responsible for generating various files requied by
+/Headroom/, such as /YAML/ configuration stubs or /Mustache/ license templates.
+Run /Headroom/ using the @headroom gen --help@ to see available options.
+-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.Command.Gen
