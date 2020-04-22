@@ -1,13 +1,13 @@
 {-|
-Module      : MODULE_NAME
-Description : SHORT_DESC
+Module      : Headroom.UI
+Description : UI Components
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-LONG_DESC
+Various UI components.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Headroom.UI

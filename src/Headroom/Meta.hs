@@ -11,9 +11,14 @@ Module providing application metadata, such as application name, vendor,
 version, etc.
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Headroom.Meta
   ( TemplateType
-  , buildVer
+  , buildVersion
+  , productDesc
+  , productInfo
+  , productName
+  , website
   )
 where
 
@@ -21,6 +26,7 @@ import           Data.Version                   ( showVersion )
 import           Headroom.Template.Mustache     ( Mustache )
 import           Paths_headroom                 ( version )
 import           RIO
+import qualified RIO.Text                      as T
 
 
 
@@ -28,6 +34,26 @@ import           RIO
 type TemplateType = Mustache
 
 
--- | Returns application version, as specified in @headroom.cabal@ file.
-buildVer :: String
-buildVer = showVersion version
+-- | Application version, as specified in @headroom.cabal@ file.
+buildVersion :: Text
+buildVersion = T.pack . showVersion $ version
+
+
+-- | Full product description.
+productDesc :: Text
+productDesc = "manage your source code license headers"
+
+
+-- | Product info.
+productInfo :: Text
+productInfo = mconcat [productName, ", v", buildVersion, " :: ", website]
+
+
+-- | Product name.
+productName :: Text
+productName = "headroom"
+
+
+-- | Homepage website of the product.
+website :: Text
+website = "https://github.com/vaclavsvejcar/headroom"

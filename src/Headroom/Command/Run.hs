@@ -41,7 +41,9 @@ import           Headroom.FileSystem            ( fileExtension
 import           Headroom.FileType              ( configByFileType
                                                 , fileTypeByExt
                                                 )
-import           Headroom.Meta                  ( TemplateType )
+import           Headroom.Meta                  ( TemplateType
+                                                , productInfo
+                                                )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , Configuration(..)
@@ -116,6 +118,7 @@ env' opts logFunc = do
 commandRun :: CommandRunOptions -- ^ /Run/ command options
            -> IO ()             -- ^ execution result
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
+  logInfo $ display productInfo
   startTS            <- liftIO getPOSIXTime
   templates          <- loadTemplates
   sourceFiles        <- findSourceFiles (M.keys templates)
@@ -181,7 +184,7 @@ processSourceFile progress template fileType path = do
   let message = if processed then message' else "Skipping file:        "
   logDebug $ "File info: " <> displayShow fileInfo
   logInfo $ mconcat [display progress, " ", display message, fromString path]
-  writeFileUtf8 path (action fileContent)
+  -- writeFileUtf8 path (action fileContent)
   pure processed
 
 

@@ -21,7 +21,9 @@ where
 import           Headroom.Command.Readers       ( licenseReader
                                                 , licenseTypeReader
                                                 )
-import           Headroom.Meta                  ( buildVer )
+import           Headroom.Meta                  ( productDesc
+                                                , productInfo
+                                                )
 import           Headroom.Types                 ( Command(..)
                                                 , LicenseType
                                                 , RunMode(..)
@@ -36,13 +38,8 @@ import qualified RIO.Text                      as T
 commandParser :: ParserInfo Command
 commandParser = info
   (commands <**> helper)
-  (  fullDesc
-  <> progDesc "manage your source code license headers"
-  <> header header'
-  )
+  (fullDesc <> progDesc (T.unpack productDesc) <> header (T.unpack productInfo))
  where
-  header' =
-    "headroom v" <> buildVer <> " :: https://github.com/vaclavsvejcar/headroom"
   commands   = subparser (runCommand <> genCommand <> initCommand)
   runCommand = command
     "run"
