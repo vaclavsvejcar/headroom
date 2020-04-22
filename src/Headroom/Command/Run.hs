@@ -184,7 +184,7 @@ processSourceFile progress template fileType path = do
   let message = if processed then message' else "Skipping file:        "
   logDebug $ "File info: " <> displayShow fileInfo
   logInfo $ mconcat [display progress, " ", display message, fromString path]
-  -- writeFileUtf8 path (action fileContent)
+  writeFileUtf8 path (action fileContent)
   pure processed
 
 
