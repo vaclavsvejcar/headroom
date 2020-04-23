@@ -1,4 +1,4 @@
-{-|
+(fixit) {-|
 Module      : Headroom.Serialization
 Description : Various functions for data (de)serialization
 Copyright   : (c) 2019-2020 Vaclav Svejcar

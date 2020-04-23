@@ -74,8 +74,8 @@ runOptions =
           )
     <*> many
           (strOption
-            (long "variables" <> short 'v' <> metavar "KEY=VALUE" <> help
-              "values for template variables"
+            (long "variable" <> short 'v' <> metavar "KEY=VALUE" <> help
+              "value for template variable"
             )
           )
     <*> optional
@@ -121,7 +121,7 @@ initOptions =
           licenseTypeReader
           (long "license-type" <> short 'l' <> metavar "TYPE" <> help
             (  "type of open source license, available options: "
-            <> T.unpack (allValuesToText @LicenseType)
+            <> T.unpack (T.toLower (allValuesToText @LicenseType))
             )
           )
     <*> some
