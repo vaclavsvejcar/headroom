@@ -10,11 +10,12 @@ github: vaclavsvejcar/headroom
 category: Utils
 synopsis: License Header Manager
 description: >
-  So you are tired of managing license headers in your codebase by hand? Then
-  Headroom is the right tool for you! Now you can define your license header as
-  Mustache template, put all the variables (such as author's name, year, etc.)
-  into the YAML config file and Headroom will take care to add such license
-  headers to all your source code files.
+  Would you like to have nice, up-to-date license/copyright headers in your
+  source code files but hate to manage them by hand? Then Headroom is the right
+  tool for you! Now you can define your license header as Mustache template,
+  put all the variables (such as author's name, year, etc.) into the YAML config
+  file and Headroom will take care to add such license headers to all your
+  source code files.
 
 extra-source-files:
   - CHANGELOG.md
