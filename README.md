@@ -286,7 +286,7 @@ Below is the list of supported source code file types. If you miss support for p
 | _HTML_       | `html`    | `.html`, `.htm`      |
 | _Java_       | `java`    | `.java`              |
 | _JavaScript_ | `js`      | `.js`                |
-| _Rust_       | `rust`    | `.rst`               |
+| _Rust_       | `rust`    | `.rs`                |
 | _Scala_      | `scala`   | `.scala`             |
 | _Shell_      | `shell`   | `.sh`                |
 
