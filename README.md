@@ -26,10 +26,8 @@ __Table of Contents__
         - [5.1.2. Manual Initialization](#512-manual-initialization)
     - [5.2. Running Headroom](#52-running-headroom)
 - [6. Headroom Configuration](#6-headroom-configuration)
-    - [6.1. Default Configuration](#61-default-configuration)
-    - [6.2. YAML Configuration](#62-yaml-configuration)
-        - [6.2.1. Top-level Configuration](#621-top-level-configuration)
-        - [6.2.2. License Headers Configuration](#622-license-headers-configuration)
+    - [6.1. YAML configuration file](#61-yaml-configuration-file)
+    - [6.2. Command Line Arguments](#62-command-line-arguments)
 - [7. Command Line Interface Overview](#7-command-line-interface-overview)
     - [7.1. Init Command](#71-init-command)
     - [7.2. Run Command](#72-run-command)
@@ -150,43 +148,25 @@ headroom run -d   # drops existing license headers from files
 ```
 
 ## 6. Headroom Configuration
-There are multiple sources of configuration as shown below, where the latter one eventually overrides the previous one:
+Headroom uses three different sources of configuration, where the next one eventually overrides the previous one:
 
-1. default (embedded) configuration
-1. `.headroom.yaml` configuration file
+1. default configuration in [embedded/default-config.yaml][file:embedded/default-config.yaml]
+1. custom configuration in `.headroom.yaml`
 1. command line arguments
 
-Later in this chapter you can find relations between command line arguments and keys from _YAML_ configuration (note that not all configuration options are available as command line arguments).
+### 6.1. YAML configuration file
+To check available configuration options for `.headroom.yaml`, see the [embedded/default-config.yaml][file:embedded/default-config.yaml] file, which is well documented and then override/define configuration you need in your project `.headroom.yaml`.
 
-### 6.1. Default Configuration
-_Headroom_ contains its own version of `.headroom.yaml` that contains the defaul configuration. You can check that one in [embedded/default-config.yaml][file:embedded/default-config.yaml]. See the next chapter for detail explanation of individual fields.
+### 6.2. Command Line Arguments
+Not all configuration options can be set/overridden using the command line arguments, but below is the list of matching _YAML_ options and command line options:
 
-### 6.2. YAML Configuration
-Configuration placed in the `.headroom.yaml` is the main place where the custom user configuration is placed. Below is the overview of all currently supported keys.
-
-#### 6.2.1. Top-level Configuration
-
-| Key                           | Mandatory?                                       | Description                         | Command Line Option |
-|-------------------------------|--------------------------------------------------|-------------------------------------|---------------------|
-| `run-mode`                    | _no_                                             | Default mode for the `run` command. | `-a`, `-d` or `-r`  |
-| `source-paths`                | __yes__                                          | Path(s) to the source code files.    | `-s`                |
-| `template-paths`              | __yes__                                          | Path(s) to the template files.       | `-t`                |
-| `license-headers`             | _no_                                           | Configuration for license headers.   | _n/a_               |
-| `license-headers.<FILE_TYPE>` |_no_| License header configuration for given file type | _n/a_                               |                     |
-
-
-#### 6.2.2. License Headers Configuration
-The configuration for license headers can set for each supported file type and available keys for each `license-headers.<FILE_TYPE>` are following:
-
-| Key               | Description                                                                                                                                                             |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `file-extensions` | List of all file extensions valid for this file type.                                                                                                                   |
-| `margin-after`    | Specifies how many blank lines should be put __after__ the license header and another content.                                                                          |
-| `margin-before`   | Specifies how many blank lines should be put __before__ another content and the license header.                                                                         |
-| `put-after`       | List of _regexes_ (`OR` relation) specifying __after__ which pattern to render the license header. Last matching one is used.                                           |
-| `put-before`      | List of _regexes_ (`OR` relation) specifying __before__ which pattern to render the license header. First matching one is used.                                         |
-| `block-comment`   | Specifies that block (multi-line) comment syntax is used for license header. Expects `starts-with` and `ends-with` subkeys. Mutually exclusive with the `line-comment`. |
-| `line-comment`    | Specifies that line (single-line) comment syntax is used for license headers. Expects `prefixed-by` subkey. Mutually exclusive with the `block-comment`.                |
+| YAML option         | Command Line Option       |		
+|---------------------|---------------------------|		
+| `run-mode: add`     | `-a`, `--add-headers`     |		
+| `run-mode: drop`    | `-d`, `--drop-headers`    |		
+| `run-mode: replace` | `-r`, `--replace-headers` |		
+| `source-paths`      | `-s`, `--source-path`     |		
+| `template-paths`    | `-t`, `--template-path`   |
 
 ## 7. Command Line Interface Overview
 Headroom provides various commands for different use cases. You can check commands overview by performing following command:
