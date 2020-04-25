@@ -28,12 +28,17 @@ __Table of Contents__
 - [6. Headroom Configuration](#6-headroom-configuration)
     - [6.1. YAML configuration file](#61-yaml-configuration-file)
     - [6.2. Command Line Arguments](#62-command-line-arguments)
-- [7. Command Line Interface Overview](#7-command-line-interface-overview)
-    - [7.1. Init Command](#71-init-command)
-    - [7.2. Run Command](#72-run-command)
-    - [7.3. Generator Command](#73-generator-command)
-        - [7.3.1. Supported License Types](#731-supported-license-types)
-        - [7.3.2. Supported File Types](#732-supported-file-types)
+- [7. Configuration Tips](#7-configuration-tips)
+    - [7.1. Adding blank lines before/after license header](#71-adding-blank-lines-beforeafter-license-header)
+    - [7.2. Putting license header before/after selected pattern](#72-putting-license-header-beforeafter-selected-pattern)
+        - [7.2.1. put-before option](#721-put-before-option)
+        - [7.2.2. put-after option](#722-put-after-option)
+- [8. Command Line Interface Overview](#8-command-line-interface-overview)
+    - [8.1. Init Command](#81-init-command)
+    - [8.2. Run Command](#82-run-command)
+    - [8.3. Generator Command](#83-generator-command)
+        - [8.3.1. Supported License Types](#831-supported-license-types)
+        - [8.3.2. Supported File Types](#832-supported-file-types)
 
 <!-- /TOC -->
 
@@ -171,7 +176,59 @@ Not all configuration options can be set/overridden using the command line argum
 
 Where `source-path`, `template-path` and `variable` command line arguments can be used multiple times to set more values.
 
-## 7. Command Line Interface Overview
+## 7. Configuration Tips
+This chapter contains tips on the most common configuration changes you may want to use in your project.
+
+### 7.1. Adding blank lines before/after license header
+If you want to configure Headroom to put blank lines before or after (or both) the license header, you can use following _YAML_ configuration:
+
+```yaml
+license-headers:
+  <FILE_TYPE>:
+    margin-after: 1   # number of blank lines to put after license header
+    margin-before: 1  # number of blank lines to put before license header
+```
+
+### 7.2. Putting license header before/after selected pattern
+If you need to put the license header before, after (or both) selected patterns, e.g. before the `package foo.bar` line in _Java_ files or after the _language pragmas_ in _Haskell_ files, you can use the `put-before` and/or `put-after` configuration keys.
+
+#### 7.2.1. put-before option
+`put-before` accepts list of regular expressions and the license header is placed before the very first line matching one of the given expressions.
+
+__Example configuration:__
+```yaml
+license-headers:
+  c:
+    put-before: ["^#include"]
+```
+
+__Result:__
+```c
+/* >>> header is placed here <<< */
+#include <stdio.h>
+#include <foo.h>
+int main() { ... }
+```
+
+#### 7.2.2. put-after option
+`put-after` accepts list of regular expressions and the license header is placed after the very last line matching one of the given expressions.
+
+__Example configuration:__
+```yaml
+license-headers:
+  c:
+    put-after: ["^#include"]
+```
+
+__Result:__
+```c
+#include <stdio.h>
+#include <foo.h>
+/* >>> header is placed here <<< */
+int main() { ... }
+```
+
+## 8. Command Line Interface Overview
 Headroom provides various commands for different use cases. You can check commands overview by performing following command:
 
 ```
@@ -190,7 +247,7 @@ Available commands:
   init                     initialize current project for Headroom
 ```
 
-### 7.1. Init Command
+### 8.1. Init Command
 Init command is used to initialize Headroom for project by generating all the required files (_YAML_ config file and template files). You can display available options by running following command:
 
 ```
@@ -205,7 +262,7 @@ Available options:
   -h,--help                Show this help text
 ```
 
-### 7.2. Run Command
+### 8.2. Run Command
 Run command is used to manipulate (add, replace or drop) license headers in source code files. You can display available options by running following command:
 
 ```
@@ -227,7 +284,7 @@ Available options:
   -h,--help                Show this help text
 ```
 
-### 7.3. Generator Command
+### 8.3. Generator Command
 Generator command is used to generate stubs for license header template and _YAML_ configuration file. You can display available options by running following command:
 
 ```
@@ -245,7 +302,7 @@ Available options:
 
 When using the `-l,--license` option, you need to select the _license type_ and _file type_ from the list of supported ones listed bellow. For example to generate template for _Apache 2.0_ license and _Haskell_ file type, you need to use the `headroom gen -l apache2:haskell`.
 
-#### 7.3.1. Supported License Types
+#### 8.3.1. Supported License Types
 Below is the list of supported _open source_ license types. If you miss support for license you use, feel free to [open new issue][meta:new-issue].
 
 | License        | Used Name |
@@ -257,7 +314,7 @@ Below is the list of supported _open source_ license types. If you miss support 
 | _MIT_          | `mit`     |
 | _MPL2_         | `mpl2`    |
 
-#### 7.3.2. Supported File Types
+#### 8.3.2. Supported File Types
 Below is the list of supported source code file types. If you miss support for programming language you use, feel free to [open new issue][meta:new-issue].
 
 | Language     | Used Name | Supported Extensions |
