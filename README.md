@@ -160,13 +160,16 @@ To check available configuration options for `.headroom.yaml`, see the [embedded
 ### 6.2. Command Line Arguments
 Not all configuration options can be set/overridden using the command line arguments, but below is the list of matching _YAML_ options and command line options:
 
-| YAML option         | Command Line Option       |		
-|---------------------|---------------------------|		
-| `run-mode: add`     | `-a`, `--add-headers`     |		
-| `run-mode: drop`    | `-d`, `--drop-headers`    |		
-| `run-mode: replace` | `-r`, `--replace-headers` |		
-| `source-paths`      | `-s`, `--source-path`     |		
-| `template-paths`    | `-t`, `--template-path`   |
+| YAML option         | Command Line Option            |		
+|---------------------|--------------------------------|		
+| `run-mode: add`     | `-a`, `--add-headers`          |		
+| `run-mode: drop`    | `-d`, `--drop-headers`         |		
+| `run-mode: replace` | `-r`, `--replace-headers`      |		
+| `source-paths`      | `-s`, `--source-path=PATH`     |		
+| `template-paths`    | `-t`, `--template-path=PATH`   |
+| `variables`         | `-v`, `--variable="KEY=VALUE"` |
+
+Where `source-path`, `template-path` and `variable` command line arguments can be used multiple times to set more values.
 
 ## 7. Command Line Interface Overview
 Headroom provides various commands for different use cases. You can check commands overview by performing following command:
