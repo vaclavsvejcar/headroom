@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.2.1.0 (unreleased, TBD)
+- bump _LTS Haskell_ to `15.10`
+
 ## 0.2.0.0 (released 2020-04-25)
 - [#28] Allow license headers to be anywhere in the file, not only at the very beginning.
 - [#31] Render templates for each source file instead of once (blocker for [#25])
