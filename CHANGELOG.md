@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.2.1.0 (unreleased, TBD)
+- [#44] Don't touch files whose contents have not changed.
 - bump _LTS Haskell_ to `15.10`
 
 ## 0.2.0.0 (released 2020-04-25)
