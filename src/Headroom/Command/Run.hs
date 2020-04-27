@@ -181,11 +181,13 @@ processSourceFile progress template fileType path = do
       variables = cVariables <> fiVariables fileInfo
   header                        <- renderTemplate variables template
   (processed, action, message') <- chooseAction fileInfo header
-  let message = if processed then message' else "Skipping file:        "
+  let result  = action fileContent
+      changed = processed && (fileContent /= result)
+      message = if changed then message' else "Skipping file:        "
   logDebug $ "File info: " <> displayShow fileInfo
   logInfo $ mconcat [display progress, " ", display message, fromString path]
-  writeFileUtf8 path (action fileContent)
-  pure processed
+  when changed (writeFileUtf8 path result)
+  pure changed
 
 
 chooseAction :: (HasConfiguration env)
