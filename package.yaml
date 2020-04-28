@@ -65,12 +65,10 @@ library:
     - file-embed
     - lens
     - mustache
-    - pcre-heavy
     - pcre-light
     - template-haskell
     - text
     - time
-    - validation
     - yaml
 
 tests:
@@ -81,7 +79,6 @@ tests:
       - aeson
       - headroom
       - hspec
-      - pcre-heavy
       - pcre-light
       - QuickCheck
   doctest:

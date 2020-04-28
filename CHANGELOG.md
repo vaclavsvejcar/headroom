@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#44] Don't touch files whose contents have not changed.
 - [#46] Add `-e|--excluded-path=REGEX` option to exclude source paths.
 - Bump _LTS Haskell_ to `15.10`.
+- Remove unused dependencies.
 
 ## 0.2.0.0 (released 2020-04-25)
 - [#28] Allow license headers to be anywhere in the file, not only at the very beginning.
