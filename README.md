@@ -170,7 +170,8 @@ Not all configuration options can be set/overridden using the command line argum
 | `run-mode: add`     | `-a`, `--add-headers`          |		
 | `run-mode: drop`    | `-d`, `--drop-headers`         |		
 | `run-mode: replace` | `-r`, `--replace-headers`      |		
-| `source-paths`      | `-s`, `--source-path=PATH`     |		
+| `source-paths`      | `-s`, `--source-path=PATH`     |	
+| `excluded-paths`    | `-e`, `--excluded-path=REGEX`  |	
 | `template-paths`    | `-t`, `--template-path=PATH`   |
 | `variables`         | `-v`, `--variable="KEY=VALUE"` |
 
