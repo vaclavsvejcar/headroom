@@ -267,21 +267,22 @@ Run command is used to manipulate (add, replace or drop) license headers in sour
 
 ```
 $ headroom run --help
-Usage: headroom run [-s|--source-path PATH] [-e|--excluded-path PATH] 
+Usage: headroom run [-s|--source-path PATH] [-e|--excluded-path REGEX] 
                     [-t|--template-path PATH] [-v|--variable KEY=VALUE] 
                     [(-a|--add-headers) | (-r|--replace-headers) | 
-                      (-d|--drop-headers)] [--debug]
+                      (-d|--drop-headers)] [--debug] [--dry-run]
   add or replace source code headers
 
 Available options:
   -s,--source-path PATH    path to source code file/directory
-  -e,--excluded-path PATH  path to exclude from source code file paths
+  -e,--excluded-path REGEX path to exclude from source code file paths
   -t,--template-path PATH  path to header template file/directory
   -v,--variable KEY=VALUE  value for template variable
   -a,--add-headers         only adds missing license headers
   -r,--replace-headers     force replace existing license headers
   -d,--drop-headers        drop existing license headers only
   --debug                  produce more verbose output
+  --dry-run                execute dry run (no changes to files)
   -h,--help                Show this help text
 ```
 

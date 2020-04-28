@@ -68,7 +68,7 @@ runOptions =
           )
     <*> many
           (strOption
-            (long "excluded-path" <> short 'e' <> metavar "PATH" <> help
+            (long "excluded-path" <> short 'e' <> metavar "REGEX" <> help
               "path to exclude from source code file paths"
             )
           )
