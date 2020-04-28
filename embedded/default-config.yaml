@@ -19,6 +19,12 @@ run-mode: add
 ## the user.
 # source-paths: []
 
+## Allows to define list of regular expressions that will be matched against
+## 'source-paths' and such paths will be excluded from processing. Same as
+## '-e|--excluded-path=PATH' command line argument (can be used multiple times
+## for more than one path).
+excluded-paths: []
+
 ## Paths to template files (either files or directories),
 ## same as '-t|--template-path=PATH' command line argument (can be used multiple
 ## times for more than one path).

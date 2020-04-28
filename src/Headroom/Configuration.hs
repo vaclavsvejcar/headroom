@@ -82,6 +82,7 @@ makeConfiguration :: MonadThrow m
 makeConfiguration PartialConfiguration {..} = do
   cRunMode        <- lastOrError NoRunMode pcRunMode
   cSourcePaths    <- lastOrError NoSourcePaths pcSourcePaths
+  cExcludedPaths  <- lastOrError NoExcludedPaths pcExcludedPaths
   cTemplatePaths  <- lastOrError NoTemplatePaths pcTemplatePaths
   cVariables      <- lastOrError NoVariables pcVariables
   cLicenseHeaders <- makeHeadersConfig pcLicenseHeaders

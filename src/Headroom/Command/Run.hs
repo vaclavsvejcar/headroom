@@ -33,7 +33,8 @@ import           Headroom.FileSupport           ( addHeader
                                                 , extractFileInfo
                                                 , replaceHeader
                                                 )
-import           Headroom.FileSystem            ( fileExtension
+import           Headroom.FileSystem            ( excludePaths
+                                                , fileExtension
                                                 , findFilesByExts
                                                 , findFilesByTypes
                                                 , loadFile
@@ -142,10 +143,11 @@ findSourceFiles :: (HasConfiguration env, HasLogFunc env)
 findSourceFiles fileTypes = do
   Configuration {..} <- view configurationL
   logDebug $ "Using source paths: " <> displayShow cSourcePaths
-  files <-
-    mconcat <$> mapM (findFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
-  logInfo $ mconcat ["Found ", display $ L.length files, " source file(s)"]
-  pure files
+  files <- mconcat <$> mapM (findFiles' cLicenseHeaders) cSourcePaths
+  let files' = excludePaths cExcludedPaths files
+  logInfo $ mconcat ["Found ", display $ L.length files', " source file(s)"]
+  pure files'
+  where findFiles' licenseHeaders = findFilesByTypes licenseHeaders fileTypes
 
 
 processSourceFiles :: (HasConfiguration env, HasLogFunc env)
@@ -254,6 +256,7 @@ optionsToConfiguration = do
   pure PartialConfiguration
     { pcRunMode        = maybe mempty pure (croRunMode runOptions)
     , pcSourcePaths    = ifNot null (croSourcePaths runOptions)
+    , pcExcludedPaths  = ifNot null (croExcludedPaths runOptions)
     , pcTemplatePaths  = ifNot null (croTemplatePaths runOptions)
     , pcVariables      = ifNot null variables
     , pcLicenseHeaders = mempty

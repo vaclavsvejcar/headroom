@@ -68,6 +68,12 @@ runOptions =
           )
     <*> many
           (strOption
+            (long "excluded-path" <> short 'e' <> metavar "PATH" <> help
+              "path to exclude from source code file paths"
+            )
+          )
+    <*> many
+          (strOption
             (long "template-path" <> short 't' <> metavar "PATH" <> help
               "path to header template file/directory"
             )

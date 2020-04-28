@@ -47,3 +47,15 @@ spec = do
       filePaths <- listFiles "test-data/test-traverse/a.html"
       let expected = ["test-data/test-traverse/a.html"]
       sort filePaths `shouldBe` sort expected
+
+  describe "excludePaths" $ do
+    it "excludes paths matching selected pattern from input list" $ do
+      let patterns = ["\\.stack-work", "remove\\.txt"]
+          sample =
+            [ "/foo/bar/.stack-work/xx"
+            , "/hello/world"
+            , "foo/bar/remove.txt"
+            , "xx/yy"
+            ]
+          expected = ["/hello/world", "xx/yy"]
+      excludePaths patterns sample `shouldBe` expected

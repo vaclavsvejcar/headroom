@@ -13,7 +13,7 @@ arguments.
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-
+{-# LANGUAGE RecordWildCards   #-}
 module Main where
 
 import           Headroom.Command               ( commandParser )
@@ -46,9 +46,8 @@ main = do
 bootstrap :: Command -> IO ()
 bootstrap = \case
   c@(Gen _ _) -> do
-    genMode <- parseGenMode c
-    commandGen (CommandGenOptions genMode)
-  Init licenseType sourcePaths ->
-    commandInit (CommandInitOptions sourcePaths licenseType)
-  Run sourcePaths templatePaths variables runMode debug -> commandRun
-    (CommandRunOptions runMode sourcePaths templatePaths variables debug)
+    cgoGenMode <- parseGenMode c
+    commandGen CommandGenOptions { .. }
+  Init cioLicenseType cioSourcePaths -> commandInit CommandInitOptions { .. }
+  Run croSourcePaths croExcludedPaths croTemplatePaths croVariables croRunMode croDebug
+    -> commandRun CommandRunOptions { .. }

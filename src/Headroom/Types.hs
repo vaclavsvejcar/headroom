@@ -123,6 +123,7 @@ data ConfigurationError
   | NoPutBefore !FileType      -- ^ no configuration for @put-before@
   | NoRunMode                  -- ^ no configuration for @run-mode@
   | NoSourcePaths              -- ^ no configuration for @source-paths@
+  | NoExcludedPaths            -- ^ no configuration for @excluded-paths@
   | NoTemplatePaths            -- ^ no configuration for @template-paths@
   | NoVariables                -- ^ no configuration for @variables@
   deriving (Eq, Show)
@@ -137,9 +138,9 @@ data TemplateError
 
 -- | Application command.
 data Command
-  = Run [FilePath] [FilePath] [Text] (Maybe RunMode) Bool -- ^ @run@ command
-  | Gen Bool (Maybe (LicenseType, FileType))              -- ^ @gen@ command
-  | Init LicenseType [FilePath]                           -- ^ @init@ command
+  = Run [FilePath] [Text] [FilePath] [Text] (Maybe RunMode) Bool -- ^ @run@ command
+  | Gen Bool (Maybe (LicenseType, FileType))                         -- ^ @gen@ command
+  | Init LicenseType [FilePath]                                      -- ^ @init@ command
   deriving (Show)
 
 --------------------------------------------------------------------------------
@@ -161,6 +162,7 @@ data CommandInitOptions = CommandInitOptions
 data CommandRunOptions = CommandRunOptions
   { croRunMode       :: !(Maybe RunMode) -- ^ used /Run/ command mode
   , croSourcePaths   :: ![FilePath]      -- ^ source code file paths
+  , croExcludedPaths :: ![Text]          -- ^ source paths to exclude
   , croTemplatePaths :: ![FilePath]      -- ^ template file paths
   , croVariables     :: ![Text]          -- ^ raw variables
   , croDebug         :: !Bool            -- ^ whether to run in debug mode
@@ -218,6 +220,7 @@ data HeaderSyntax
 data Configuration = Configuration
   { cRunMode        :: !RunMode             -- ^ mode of the @run@ command
   , cSourcePaths    :: ![FilePath]          -- ^ paths to source code files
+  , cExcludedPaths  :: ![Text]              -- ^ excluded source paths
   , cTemplatePaths  :: ![FilePath]          -- ^ paths to template files
   , cVariables      :: !(HashMap Text Text) -- ^ variable values for templates
   , cLicenseHeaders :: !HeadersConfig       -- ^ configuration of license headers
@@ -269,6 +272,7 @@ newtype LineComment' = LineComment'
 data PartialConfiguration = PartialConfiguration
   { pcRunMode        :: !(Last RunMode)             -- ^ mode of the @run@ command
   , pcSourcePaths    :: !(Last [FilePath])          -- ^ paths to source code files
+  , pcExcludedPaths  :: !(Last [Text])              -- ^ excluded source paths
   , pcTemplatePaths  :: !(Last [FilePath])          -- ^ paths to template files
   , pcVariables      :: !(Last (HashMap Text Text)) -- ^ variable values for templates
   , pcLicenseHeaders :: !PartialHeadersConfig       -- ^ configuration of license headers
@@ -311,6 +315,7 @@ instance FromJSON PartialConfiguration where
   parseJSON = withObject "PartialConfiguration" $ \obj -> do
     pcRunMode        <- Last <$> obj .:? "run-mode"
     pcSourcePaths    <- Last <$> obj .:? "source-paths"
+    pcExcludedPaths  <- Last <$> obj .:? "excluded-paths"
     pcTemplatePaths  <- Last <$> obj .:? "template-paths"
     pcVariables      <- Last <$> obj .:? "variables"
     pcLicenseHeaders <- obj .:? "license-headers" .!= mempty
@@ -352,6 +357,7 @@ instance Semigroup PartialConfiguration where
   x <> y = PartialConfiguration
     { pcRunMode        = pcRunMode x <> pcRunMode y
     , pcSourcePaths    = pcSourcePaths x <> pcSourcePaths y
+    , pcExcludedPaths  = pcExcludedPaths x <> pcExcludedPaths y
     , pcTemplatePaths  = pcTemplatePaths x <> pcTemplatePaths y
     , pcVariables      = pcVariables x <> pcVariables y
     , pcLicenseHeaders = pcLicenseHeaders x <> pcLicenseHeaders y
@@ -381,7 +387,7 @@ instance Semigroup PartialHeadersConfig where
                                 }
 
 instance Monoid PartialConfiguration where
-  mempty = PartialConfiguration mempty mempty mempty mempty mempty
+  mempty = PartialConfiguration mempty mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeaderConfig where
   mempty = PartialHeaderConfig mempty mempty mempty mempty mempty mempty
@@ -432,6 +438,7 @@ configurationError = \case
   NoPutBefore      fileType -> noProp "put-before" fileType
   NoRunMode                 -> noFlag "run-mode"
   NoSourcePaths             -> noFlag "source-paths"
+  NoExcludedPaths           -> noFlag "excluded-paths"
   NoTemplatePaths           -> noFlag "template-paths"
   NoVariables               -> noFlag "variables"
  where

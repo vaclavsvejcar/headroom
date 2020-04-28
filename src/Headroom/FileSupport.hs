@@ -32,6 +32,10 @@ module Headroom.FileSupport
 where
 
 import           Control.Lens.TH                ( makeLensesFor )
+import           Headroom.Regex                 ( compile'
+                                                , joinPatterns
+                                                , match'
+                                                )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
@@ -41,11 +45,7 @@ import           RIO
 import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Light          ( Regex
-                                                , compile
-                                                , match
-                                                )
-import           Text.Regex.PCRE.Light.Char8    ( utf8 )
+import           Text.Regex.PCRE.Light          ( Regex )
 
 
 makeLensesFor [("fiHeaderPos", "fiHeaderPosL")] ''FileInfo
@@ -175,14 +175,14 @@ findLineHeader prefix = go Nothing
 
 -- | Finds very first line that matches the given /regex/ (numbered from zero).
 --
--- >>> firstMatching (compile "^foo" [utf8]) ["some text", "foo bar", "foo baz", "last"]
+-- >>> firstMatching (compile' "^foo") ["some text", "foo bar", "foo baz", "last"]
 -- Just 1
 firstMatching :: Regex        -- /regex/ used for matching
               -> [Text]       -- input lines
               -> Maybe Int    -- matching line number
 firstMatching regex input = go input 0
  where
-  cond x = isJust $ match regex (encodeUtf8 x) []
+  cond x = isJust $ match' regex x
   go (x : _) i | cond x = Just i
   go (_ : xs) i         = go xs (i + 1)
   go []       _         = Nothing
@@ -190,14 +190,14 @@ firstMatching regex input = go input 0
 
 -- | Finds very last line that matches the given /regex/ (numbered from zero).
 --
--- >>> lastMatching (compile "^foo" [utf8]) ["some text", "foo bar", "foo baz", "last"]
+-- >>> lastMatching (compile' "^foo") ["some text", "foo bar", "foo baz", "last"]
 -- Just 2
 lastMatching :: Regex        -- /regex/ used for matching
              -> [Text]       -- input lines
              -> Maybe Int    -- matching line number
 lastMatching regex input = go input 0 Nothing
  where
-  cond x = isJust $ match regex (encodeUtf8 x) []
+  cond x = isJust $ match' regex x
   go (x : xs) i _ | cond x = go xs (i + 1) (Just i)
   go (_ : xs) i pos        = go xs (i + 1) pos
   go []       _ pos        = pos
@@ -232,9 +232,7 @@ splitInput fstSplit sndSplit input = (before, middle, after)
   sndSplitAt        = fromMaybe len (findSplit firstMatching sndSplit inLines)
   inLines           = T.lines input
   len               = L.length inLines
-  findSplit f r i = compile' r >>= (`f` i)
-  compile' [] = Nothing
-  compile' ps = Just $ compile (encodeUtf8 $ T.intercalate "|" ps) [utf8]
+  findSplit f ps i = compile' <$> joinPatterns ps >>= (`f` i)
 
 
 -- TODO: https://github.com/vaclavsvejcar/headroom/issues/25

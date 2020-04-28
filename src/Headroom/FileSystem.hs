@@ -24,10 +24,16 @@ module Headroom.FileSystem
   , createDirectory
     -- * Working with Files Metadata
   , fileExtension
+    -- * Other
+  , excludePaths
   )
 where
 
 import           Headroom.FileType              ( listExtensions )
+import           Headroom.Regex                 ( compile'
+                                                , joinPatterns
+                                                , match'
+                                                )
 import           Headroom.Types                 ( FileType
                                                 , HeadersConfig(..)
                                                 )
@@ -42,18 +48,9 @@ import           RIO.FilePath                   ( isExtensionOf
                                                 , takeExtension
                                                 , (</>)
                                                 )
+import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 
-
-
--- | Returns file extension for given path (if file), or nothing otherwise.
---
--- >>> fileExtension "path/to/some/file.txt"
--- Just "txt"
-fileExtension :: FilePath -> Maybe Text
-fileExtension path = case takeExtension path of
-  '.' : xs -> Just $ T.pack xs
-  _        -> Nothing
 
 
 -- | Recursively finds files on given path whose filename matches the predicate.
@@ -102,8 +99,34 @@ listFiles fileOrDir = do
     pure $ concat paths
 
 
+-- | Returns file extension for given path (if file), or nothing otherwise.
+--
+-- >>> fileExtension "path/to/some/file.txt"
+-- Just "txt"
+fileExtension :: FilePath -> Maybe Text
+fileExtension path = case takeExtension path of
+  '.' : xs -> Just $ T.pack xs
+  _        -> Nothing
+
+
 -- | Loads file content in UTF8 encoding.
 loadFile :: MonadIO m
          => FilePath -- ^ file path
          -> m Text   -- ^ file content
 loadFile = readFileUtf8
+
+
+-- | Takes list of patterns and file paths and returns list of file paths where
+-- those matching the given patterns are excluded.
+--
+-- >>> excludePaths ["\\.hidden", "zzz"] ["foo/.hidden", "test/bar", "x/zzz/e"]
+-- ["test/bar"]
+excludePaths :: [Text]     -- ^ patterns describing paths to exclude
+             -> [FilePath] -- ^ list of file paths
+             -> [FilePath] -- ^ resulting list of file paths
+excludePaths _        []    = []
+excludePaths []       paths = paths
+excludePaths patterns paths = go $ compile' <$> joinPatterns patterns
+ where
+  go Nothing      = paths
+  go (Just regex) = L.filter (isNothing . match' regex . T.pack) paths
