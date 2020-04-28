@@ -13,7 +13,6 @@ the /license headers/ and the /source code files/.
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TemplateHaskell   #-}
 module Headroom.FileSupport
   ( -- * File info extraction
     extractFileInfo
@@ -31,7 +30,6 @@ module Headroom.FileSupport
   )
 where
 
-import           Control.Lens.TH                ( makeLensesFor )
 import           Headroom.Regex                 ( compile'
                                                 , joinPatterns
                                                 , match'
@@ -47,8 +45,6 @@ import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Light          ( Regex )
 
-
-makeLensesFor [("fiHeaderPos", "fiHeaderPosL")] ''FileInfo
 
 
 -- | Extracts info about the processed file to be later used by the header
@@ -246,3 +242,6 @@ stripLinesEnd = takeWhile (not . T.null . T.strip)
 
 stripLinesStart :: [Text] -> [Text]
 stripLinesStart = dropWhile (T.null . T.strip)
+
+fiHeaderPosL :: Lens' FileInfo (Maybe (Int, Int))
+fiHeaderPosL = lens fiHeaderPos (\x y -> x { fiHeaderPos = y })
