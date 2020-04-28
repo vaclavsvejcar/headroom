@@ -138,9 +138,9 @@ data TemplateError
 
 -- | Application command.
 data Command
-  = Run [FilePath] [Text] [FilePath] [Text] (Maybe RunMode) Bool -- ^ @run@ command
-  | Gen Bool (Maybe (LicenseType, FileType))                         -- ^ @gen@ command
-  | Init LicenseType [FilePath]                                      -- ^ @init@ command
+  = Run [FilePath] [Text] [FilePath] [Text] (Maybe RunMode) Bool Bool -- ^ @run@ command
+  | Gen Bool (Maybe (LicenseType, FileType))                          -- ^ @gen@ command
+  | Init LicenseType [FilePath]                                       -- ^ @init@ command
   deriving (Show)
 
 --------------------------------------------------------------------------------
@@ -166,6 +166,7 @@ data CommandRunOptions = CommandRunOptions
   , croTemplatePaths :: ![FilePath]      -- ^ template file paths
   , croVariables     :: ![Text]          -- ^ raw variables
   , croDebug         :: !Bool            -- ^ whether to run in debug mode
+  , croDryRun        :: !Bool            -- ^ whether to perform dry run
   }
   deriving (Eq, Show)
 

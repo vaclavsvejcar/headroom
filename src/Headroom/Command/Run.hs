@@ -120,6 +120,7 @@ commandRun :: CommandRunOptions -- ^ /Run/ command options
            -> IO ()             -- ^ execution result
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   logInfo $ display productInfo
+  warnOnDryRun
   startTS            <- liftIO getPOSIXTime
   templates          <- loadTemplates
   sourceFiles        <- findSourceFiles (M.keys templates)
@@ -135,6 +136,12 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
     , displayShow (endTS - startTS)
     , " second(s)."
     ]
+  warnOnDryRun
+
+warnOnDryRun :: (HasLogFunc env, HasRunOptions env) => RIO env ()
+warnOnDryRun = do
+  CommandRunOptions {..} <- view runOptionsL
+  when croDryRun $ logWarn "[!] Running with '--dry-run', no files are changed!"
 
 
 findSourceFiles :: (HasConfiguration env, HasLogFunc env)
@@ -150,7 +157,7 @@ findSourceFiles fileTypes = do
   where findFiles' licenseHeaders = findFilesByTypes licenseHeaders fileTypes
 
 
-processSourceFiles :: (HasConfiguration env, HasLogFunc env)
+processSourceFiles :: (HasConfiguration env, HasLogFunc env, HasRunOptions env)
                    => Map FileType TemplateType
                    -> [FilePath]
                    -> RIO env (Int, Int)
@@ -168,15 +175,16 @@ processSourceFiles templates paths = do
   process (pr, (tt, ft, p)) = processSourceFile pr tt ft p
 
 
-processSourceFile :: (HasConfiguration env, HasLogFunc env)
+processSourceFile :: (HasConfiguration env, HasLogFunc env, HasRunOptions env)
                   => Progress
                   -> TemplateType
                   -> FileType
                   -> FilePath
                   -> RIO env Bool
 processSourceFile progress template fileType path = do
-  Configuration {..} <- view configurationL
-  fileContent        <- readFileUtf8 path
+  Configuration {..}     <- view configurationL
+  CommandRunOptions {..} <- view runOptionsL
+  fileContent            <- readFileUtf8 path
   let fileInfo = extractFileInfo fileType
                                  (configByFileType cLicenseHeaders fileType)
                                  fileContent
@@ -188,7 +196,7 @@ processSourceFile progress template fileType path = do
       message = if changed then message' else "Skipping file:        "
   logDebug $ "File info: " <> displayShow fileInfo
   logInfo $ mconcat [display progress, " ", display message, fromString path]
-  when changed (writeFileUtf8 path result)
+  when (not croDryRun && changed) (writeFileUtf8 path result)
   pure changed
 
 

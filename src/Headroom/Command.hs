@@ -102,6 +102,7 @@ runOptions =
                 )
           )
     <*> switch (long "debug" <> help "produce more verbose output")
+    <*> switch (long "dry-run" <> help "execute dry run (no changes to files)")
 
 genOptions :: Parser Command
 genOptions =
