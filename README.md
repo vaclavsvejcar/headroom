@@ -14,9 +14,10 @@ __Table of Contents__
 - [1. Main Features](#1-main-features)
 - [2. Planned Features](#2-planned-features)
 - [3. Installation](#3-installation)
-    - [3.1. From Source Code](#31-from-source-code)
-        - [3.1.1. Using Cabal](#311-using-cabal)
-        - [3.1.2. Using Stack](#312-using-stack)
+    - [3.1. From Pre-built Binaries](#31-from-pre-built-binaries)
+    - [3.2. From Source Code](#32-from-source-code)
+        - [3.2.1. Using Cabal](#321-using-cabal)
+        - [3.2.2. Using Stack](#322-using-stack)
 - [4. Basic Overview](#4-basic-overview)
     - [4.1. Main Concepts](#41-main-concepts)
     - [4.2. License Header Detection](#42-license-header-detection)
@@ -52,20 +53,22 @@ Headroom, as they are automatically detected from source code files, not from te
 
 ## 2. Planned Features
 - [[#25]][i25] __Content-aware Templates__ - license header templates will be able to extract some template variables from source code file for which the template is rendered
-- __Binary Distribution__ - pre-built binaries will be generated for each release for major OS platforms
 
 ## 3. Installation
-> Binary distribution will be available soon, there are also plans to add _Headroom_ to popular package managers.
+> Distribution via popular package managers (for _Linux_ and _macOS_) is planned and will be available soon.
 
-### 3.1. From Source Code
+### 3.1. From Pre-built Binaries
+Pre-built binaries _(64bit)_ are available for _Linux_ and _macOS_ and can be downloaded for selected release from [releases page][meta:releases].
+
+### 3.2. From Source Code
 Headroom is written in [Haskell][web:haskell], so you can install it from source code either using [Cabal][web:cabal] or [Stack][web:stack].
 
-#### 3.1.1. Using Cabal
+#### 3.2.1. Using Cabal
 1. install [Cabal][web:cabal] for your platform
 1. run `cabal install headroom`
 1. add `$HOME/.cabal/bin` to your `$PATH`
 
-#### 3.1.2. Using Stack
+#### 3.2.2. Using Stack
 1. install [Stack][web:stack] for your platform
 1. clone this repository
 1. run `stack install` in the project directory
@@ -337,6 +340,7 @@ Below is the list of supported source code file types. If you miss support for p
 [i25]: https://github.com/vaclavsvejcar/headroom/issues/25
 [file:embedded/default-config.yaml]: https://github.com/vaclavsvejcar/headroom/blob/master/embedded/default-config.yaml
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
+[meta:releases]: https://github.com/vaclavsvejcar/headroom/releases
 [web:bsd-3]: https://opensource.org/licenses/BSD-3-Clause
 [web:cabal]: https://www.haskell.org/cabal/
 [web:haskell]: https://haskell.org
