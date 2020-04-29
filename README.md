@@ -53,6 +53,7 @@ Headroom, as they are automatically detected from source code files, not from te
 
 ## 2. Planned Features
 - [[#25]][i25] __Content-aware Templates__ - license header templates will be able to extract some template variables from source code file for which the template is rendered
+- [[#30]][i30] __Workflow without .headroom.yaml__ - add option to run Headroom without the `.headroom.yaml` and template files
 
 ## 3. Installation
 > Distribution via popular package managers (for _Linux_ and _macOS_) is planned and will be available soon.
@@ -338,6 +339,7 @@ Below is the list of supported source code file types. If you miss support for p
 
 
 [i25]: https://github.com/vaclavsvejcar/headroom/issues/25
+[i30]: https://github.com/vaclavsvejcar/headroom/issues/30
 [file:embedded/default-config.yaml]: https://github.com/vaclavsvejcar/headroom/blob/master/embedded/default-config.yaml
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
 [meta:releases]: https://github.com/vaclavsvejcar/headroom/releases
