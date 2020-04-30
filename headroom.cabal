@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6be2fc7b728d5c60daba7e11a4144a64c6d7aba8a0d336485fd33d5e8f1af4d6
+-- hash: c810fcbd23351bdc35b2e32713ddf8e66e46ca19c382be8e1ab263a02a763715
 
 name:           headroom
 version:        0.2.1.0
@@ -152,7 +152,6 @@ library
     , pcre-light
     , rio
     , template-haskell
-    , text
     , time
     , yaml
   default-language: Haskell2010

@@ -66,7 +66,6 @@ library:
     - mustache
     - pcre-light
     - template-haskell
-    - text
     - time
     - yaml
 
