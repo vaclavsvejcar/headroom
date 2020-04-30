@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.2.1.1 (released 2020-04-30)
+- [#47] Make possible to build Headroom with GHC 8.10
+- Remove unused dependency on `text` package.
+
 ## 0.2.1.0 (released 2020-04-29)
 - [#41] Add `--dry-run` option to allow test run without changing files.
 - [#44] Don't touch files whose contents have not changed.
