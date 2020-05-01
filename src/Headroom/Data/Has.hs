@@ -3,7 +3,7 @@
 {-# LANGUAGE RankNTypes            #-}
 
 {-|
-Module      : Headroom.Has
+Module      : Headroom.Data.Has
 Description : Simplified variant of @Data.Has@
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -15,7 +15,7 @@ This module provides 'Has' /type class/, adapted to the needs of this
 application.
 -}
 
-module Headroom.Has
+module Headroom.Data.Has
   ( Has(..)
   )
 where

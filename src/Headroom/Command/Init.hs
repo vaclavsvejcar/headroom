@@ -33,6 +33,7 @@ import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( makeHeadersConfig
                                                 , parseConfiguration
                                                 )
+import           Headroom.Data.Has              ( Has(..) )
 import           Headroom.Embedded              ( configFileStub
                                                 , defaultConfig
                                                 , licenseTemplate
@@ -44,7 +45,6 @@ import           Headroom.FileSystem            ( createDirectory
                                                 , getCurrentDirectory
                                                 )
 import           Headroom.FileType              ( fileTypeByExt )
-import           Headroom.Has                   ( Has(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( ApplicationError(..)

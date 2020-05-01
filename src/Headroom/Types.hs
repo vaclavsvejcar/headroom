@@ -59,8 +59,8 @@ import           Data.Aeson                     ( FromJSON(..)
                                                 , (.:?)
                                                 )
 import           Data.Monoid                    ( Last(..) )
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Serialization         ( aesonOptions )
-import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           RIO
 import qualified RIO.Text                      as T
 

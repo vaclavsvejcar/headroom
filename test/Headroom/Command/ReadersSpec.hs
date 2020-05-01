@@ -8,10 +8,10 @@ module Headroom.Command.ReadersSpec
 where
 
 import           Headroom.Command.Readers
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Types                 ( FileType
                                                 , LicenseType
                                                 )
-import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           RIO
 import qualified RIO.Text                      as T
 import           Test.Hspec

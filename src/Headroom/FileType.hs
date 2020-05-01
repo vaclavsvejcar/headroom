@@ -22,11 +22,11 @@ module Headroom.FileType
   )
 where
 
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Types                 ( FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeadersConfig(..)
                                                 )
-import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           RIO
 import qualified RIO.List                      as L
 

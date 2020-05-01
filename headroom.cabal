@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 56196842142bb1b5746ca82e54354b0664e43d19dadefd22f21c60ec5fad0714
+-- hash: e6b0e2d0deedb879487a5f109bf11aab3be3dcecbd1888c46b2cc1b8da0ea190
 
 name:           headroom
 version:        0.2.2.0
@@ -124,18 +124,18 @@ library
       Headroom.Command.Run
       Headroom.Command.Utils
       Headroom.Configuration
+      Headroom.Data.EnumExtra
+      Headroom.Data.Has
       Headroom.Embedded
       Headroom.FileSupport
       Headroom.FileSystem
       Headroom.FileType
-      Headroom.Has
       Headroom.Meta
       Headroom.Regex
       Headroom.Serialization
       Headroom.Template
       Headroom.Template.Mustache
       Headroom.Types
-      Headroom.Types.EnumExtra
       Headroom.UI
       Headroom.UI.Progress
   other-modules:
@@ -193,13 +193,13 @@ test-suite spec
       Headroom.Command.InitSpec
       Headroom.Command.ReadersSpec
       Headroom.ConfigurationSpec
+      Headroom.Data.EnumExtraSpec
       Headroom.FileSupportSpec
       Headroom.FileSystemSpec
       Headroom.FileTypeSpec
       Headroom.RegexSpec
       Headroom.SerializationSpec
       Headroom.Template.MustacheSpec
-      Headroom.Types.EnumExtraSpec
       Headroom.UI.ProgressSpec
       Test.Utils
       Paths_headroom

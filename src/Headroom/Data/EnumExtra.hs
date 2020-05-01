@@ -16,7 +16,7 @@ Provides extended functionality for enum-like types, e.g. reading/writing
 from/to textual representation, etc.
 -}
 
-module Headroom.Types.EnumExtra where
+module Headroom.Data.EnumExtra where
 
 import           RIO
 import qualified RIO.List                      as L

@@ -23,6 +23,7 @@ where
 import           Headroom.Command.Readers       ( licenseReader
                                                 , licenseTypeReader
                                                 )
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Meta                  ( productDesc
                                                 , productInfo
                                                 )
@@ -30,7 +31,6 @@ import           Headroom.Types                 ( Command(..)
                                                 , LicenseType
                                                 , RunMode(..)
                                                 )
-import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           Options.Applicative
 import           RIO
 import qualified RIO.Text                      as T

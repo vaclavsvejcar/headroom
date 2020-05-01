@@ -31,6 +31,8 @@ import           Headroom.Configuration         ( loadConfiguration
                                                 , parseConfiguration
                                                 , parseVariables
                                                 )
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.Data.Has              ( Has(..) )
 import           Headroom.Embedded              ( defaultConfig )
 import           Headroom.FileSupport           ( addHeader
                                                 , dropHeader
@@ -46,7 +48,6 @@ import           Headroom.FileSystem            ( excludePaths
 import           Headroom.FileType              ( configByFileType
                                                 , fileTypeByExt
                                                 )
-import           Headroom.Has                   ( Has(..) )
 import           Headroom.Meta                  ( TemplateType
                                                 , productInfo
                                                 )
@@ -58,7 +59,6 @@ import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , PartialConfiguration(..)
                                                 , RunMode(..)
                                                 )
-import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
                                                 )

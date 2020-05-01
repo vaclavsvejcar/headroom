@@ -23,10 +23,10 @@ module Headroom.Command.Readers
 where
 
 import           Data.Either.Combinators        ( maybeToRight )
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Types                 ( FileType
                                                 , LicenseType
                                                 )
-import           Headroom.Types.EnumExtra       ( EnumExtra(..) )
 import           Options.Applicative
 import           RIO
 import qualified RIO.Text                      as T

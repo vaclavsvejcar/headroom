@@ -2,12 +2,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
-module Headroom.Types.EnumExtraSpec
+module Headroom.Data.EnumExtraSpec
   ( spec
   )
 where
 
-import           Headroom.Types.EnumExtra
+import           Headroom.Data.EnumExtra
 import           RIO
 import           Test.Hspec
 
