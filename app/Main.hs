@@ -1,3 +1,8 @@
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+
 {-|
 Module      : Main
 Description : Main application launcher
@@ -10,10 +15,7 @@ Portability : POSIX
 Code responsible for booting up the application and parsing command line
 arguments.
 -}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+
 module Main where
 
 import           Headroom.Command               ( commandParser )

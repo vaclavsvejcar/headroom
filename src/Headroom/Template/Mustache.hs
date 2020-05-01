@@ -1,3 +1,8 @@
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE MultiWayIf        #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 {-|
 Module      : Headroom.Template.Mustache
 Description : Implementation of /Mustache/ template support
@@ -9,10 +14,7 @@ Portability : POSIX
 
 This module provides support for <https://mustache.github.io Mustache> templates.
 -}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE MultiWayIf        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
+
 module Headroom.Template.Mustache
   ( Mustache(..)
   )

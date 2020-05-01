@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 {-|
 Module      : Headroom.FileSystem
 Description : Operations related to files and file system
@@ -10,7 +12,7 @@ Portability : POSIX
 Module providing functions for working with the local file system, its file and
 directories.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
+
 module Headroom.FileSystem
   ( -- * Traversing the File System
     findFiles

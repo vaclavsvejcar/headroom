@@ -22,3 +22,11 @@ variables:
   license: BSD-3
   email: vaclav.svejcar@gmail.com
   year: 2019-2020
+
+license-headers:
+  haskell:
+    file-extensions: ["hs"]
+    put-after: ["^{-#"]
+    put-before: ["^module"]
+    margin-after: 1
+    margin-before: 1

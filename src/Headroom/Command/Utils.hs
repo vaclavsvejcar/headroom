@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 {-|
 Module      : Headroom.Command.Utils
 Description : Shared code for individual command handlers
@@ -9,7 +11,7 @@ Portability : POSIX
 
 Contains shared code common to all command handlers.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
+
 module Headroom.Command.Utils
   ( bootstrap
   )

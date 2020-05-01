@@ -1,3 +1,11 @@
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE LambdaCase            #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TupleSections         #-}
+{-# LANGUAGE TypeApplications      #-}
+
 {-|
 Module      : Headroom.Command.Init
 Description : Handler for the @init@ command
@@ -11,16 +19,10 @@ Module representing the @init@ command, responsible for generating all the
 required files (configuration, templates) for the given project, which are then
 required by the @run@ or @gen@ commands.
 -}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TupleSections     #-}
-{-# LANGUAGE TypeApplications  #-}
+
 module Headroom.Command.Init
   ( Env(..)
   , Paths(..)
-  , HasPaths(..)
-  , HasInitOptions(..)
   , commandInit
   , doesAppConfigExist
   , findSupportedFileTypes
@@ -42,6 +44,7 @@ import           Headroom.FileSystem            ( createDirectory
                                                 , getCurrentDirectory
                                                 )
 import           Headroom.FileType              ( fileTypeByExt )
+import           Headroom.Has                   ( Has(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( ApplicationError(..)
@@ -81,19 +84,11 @@ data Paths = Paths
 instance HasLogFunc Env where
   logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
 
--- | Environment value with @init@ command options.
-class HasInitOptions env where
-  initOptionsL :: Lens' env CommandInitOptions
+instance Has CommandInitOptions Env where
+  hasLens = lens envInitOptions (\x y -> x { envInitOptions = y })
 
--- | Environment value with 'Paths'.
-class HasPaths env where
-  pathsL :: Lens' env Paths
-
-instance HasInitOptions Env where
-  initOptionsL = lens envInitOptions (\x y -> x { envInitOptions = y })
-
-instance HasPaths Env where
-  pathsL = lens envPaths (\x y -> x { envPaths = y })
+instance Has Paths Env where
+  hasLens = lens envPaths (\x y -> x { envPaths = y })
 
 --------------------------------------------------------------------------------
 
@@ -116,15 +111,15 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
     createTemplates fileTypes
     createConfigFile
   True -> do
-    paths <- view pathsL
+    paths <- viewL
     throwM $ CommandInitError (AppConfigAlreadyExists $ pConfigFile paths)
 
 -- | Recursively scans provided source paths for known file types for which
 -- templates can be generated.
-findSupportedFileTypes :: (HasInitOptions env, HasLogFunc env)
+findSupportedFileTypes :: (Has CommandInitOptions env, HasLogFunc env)
                        => RIO env [FileType]
 findSupportedFileTypes = do
-  opts           <- view initOptionsL
+  opts           <- viewL
   pHeadersConfig <- pcLicenseHeaders <$> parseConfiguration defaultConfig
   headersConfig  <- makeHeadersConfig pHeadersConfig
   fileTypes      <- do
@@ -139,12 +134,12 @@ findSupportedFileTypes = do
       logInfo $ "Found supported file types: " <> displayShow fileTypes
       pure fileTypes
 
-createTemplates :: (HasInitOptions env, HasLogFunc env, HasPaths env)
+createTemplates :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
                 => [FileType]
                 -> RIO env ()
 createTemplates fileTypes = do
-  opts  <- view initOptionsL
-  paths <- view pathsL
+  opts  <- viewL
+  paths <- viewL
   let templatesDir = pCurrentDir paths </> pTemplatesDir paths
   mapM_ (\(p, lf) -> createTemplate templatesDir lf p)
         (zipWithProgress $ fmap (cioLicenseType opts, ) fileTypes)
@@ -163,11 +158,11 @@ createTemplate templatesDir (licenseType, fileType) progress = do
     [display progress, " Creating template file in ", fromString filePath]
   writeFileUtf8 filePath template
 
-createConfigFile :: (HasInitOptions env, HasLogFunc env, HasPaths env)
+createConfigFile :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
                  => RIO env ()
 createConfigFile = do
-  opts  <- view initOptionsL
-  paths <- view pathsL
+  opts  <- viewL
+  paths <- viewL
   let filePath = pCurrentDir paths </> pConfigFile paths
   logInfo $ "Creating YAML config file in " <> fromString filePath
   writeFileUtf8 filePath (configuration opts paths)
@@ -186,16 +181,16 @@ createConfigFile = do
     ["[ ", T.intercalate ", " (fmap (\i -> "\"" <> i <> "\"") items), " ]"]
 
 -- | Checks whether application config file already exists.
-doesAppConfigExist :: (HasLogFunc env, HasPaths env) => RIO env Bool
+doesAppConfigExist :: (HasLogFunc env, Has Paths env) => RIO env Bool
 doesAppConfigExist = do
-  paths <- view pathsL
+  paths <- viewL
   logInfo "Verifying that there's no existing Headroom configuration..."
   doesFileExist $ pCurrentDir paths </> pConfigFile paths
 
 -- | Creates directory for template files.
-makeTemplatesDir :: (HasLogFunc env, HasPaths env) => RIO env ()
+makeTemplatesDir :: (HasLogFunc env, Has Paths env) => RIO env ()
 makeTemplatesDir = do
-  paths <- view pathsL
+  paths <- viewL
   let templatesDir = pCurrentDir paths </> pTemplatesDir paths
   logInfo $ "Creating directory for templates in " <> fromString templatesDir
   createDirectory templatesDir

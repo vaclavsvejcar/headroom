@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 {-|
 Module      : Headroom.UI
 Description : UI Components
@@ -9,7 +11,7 @@ Portability : POSIX
 
 Various UI components.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
+
 module Headroom.UI
   ( module Headroom.UI.Progress
   )

@@ -1,3 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+
 {-|
 Module      : Headroom.FileSupport
 Description : License header manipulation
@@ -10,9 +14,7 @@ Portability : POSIX
 This module is the heart of /Headroom/ as it contains functions for working with
 the /license headers/ and the /source code files/.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+
 module Headroom.FileSupport
   ( -- * File info extraction
     extractFileInfo

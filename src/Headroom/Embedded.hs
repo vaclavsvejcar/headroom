@@ -1,3 +1,6 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell   #-}
+
 {-|
 Module      : Headroom.Embedded
 Description : Embedded files
@@ -9,8 +12,7 @@ Portability : POSIX
 
 Contains contents of files embedded using the "Data.FileEmbed" module.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE TemplateHaskell   #-}
+
 module Headroom.Embedded
   ( configFileStub
   , defaultConfig

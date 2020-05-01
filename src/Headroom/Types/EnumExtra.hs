@@ -1,3 +1,8 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 {-|
 Module      : Headroom.Types.EnumExtra
 Description : Extra functionality for enum types
@@ -10,10 +15,6 @@ Portability : POSIX
 Provides extended functionality for enum-like types, e.g. reading/writing
 from/to textual representation, etc.
 -}
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 
 module Headroom.Types.EnumExtra where
 

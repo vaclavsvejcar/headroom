@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 {-|
 Module      : Headroom.UI.Progress
 Description : UI component for displaying progress
@@ -9,7 +11,7 @@ Portability : POSIX
 
 This component displays progress in format @[CURR of TOTAL]@.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
+
 module Headroom.UI.Progress
   ( Progress(..)
   , zipWithProgress

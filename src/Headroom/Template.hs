@@ -1,3 +1,6 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+
 {-|
 Module      : Headroom.Template
 Description : Generic representation of supported template type
@@ -10,8 +13,7 @@ Portability : POSIX
 Module providing generic representation of supported template type, using
 the 'Template' /type class/.
 -}
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE NoImplicitPrelude   #-}
+
 module Headroom.Template where
 
 import           RIO

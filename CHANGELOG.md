@@ -1,6 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.2.2.0 (not released yet, TBD)
+
 ## 0.2.1.1 (released 2020-04-30)
 - [#47] Make possible to build Headroom with GHC 8.10
 - Remove unused dependency on `text` package.

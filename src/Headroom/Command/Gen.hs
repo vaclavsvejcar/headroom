@@ -1,3 +1,7 @@
+{-# LANGUAGE LambdaCase            #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+
 {-|
 Module      : Headroom.Command.Gen
 Description : Handler for the @gen@ command.
@@ -11,8 +15,7 @@ The @gen@ command is responsible for generating various files requied by
 /Headroom/, such as /YAML/ configuration stubs or /Mustache/ license templates.
 Run /Headroom/ using the @headroom gen --help@ to see available options.
 -}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+
 module Headroom.Command.Gen
   ( commandGen
   , parseGenMode

@@ -1,3 +1,6 @@
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 {-|
 Module      : Headroom.Serialization
 Description : Various functions for data (de)serialization
@@ -10,8 +13,7 @@ Portability : POSIX
 Module providing support for data (de)serialization, mainly from/to /JSON/
 and /YAML/.
 -}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+
 module Headroom.Serialization
   ( -- * JSON/YAML Serialization
     aesonOptions

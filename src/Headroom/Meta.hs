@@ -1,3 +1,6 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 {-|
 Module      : Headroom.Meta
 Description : Application metadata (name, vendor, etc.)
@@ -10,8 +13,7 @@ Portability : POSIX
 Module providing application metadata, such as application name, vendor,
 version, etc.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
+
 module Headroom.Meta
   ( TemplateType
   , buildVersion

@@ -1,3 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
+
 {-|
 Module      : Headroom.Command
 Description : Support for parsing command line arguments
@@ -10,9 +14,7 @@ Portability : POSIX
 This module contains code responsible for parsing command line arguments, using
 the /optparse-applicative/ library.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications  #-}
+
 module Headroom.Command
   ( commandParser
   )

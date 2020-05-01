@@ -1,3 +1,6 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 {-|
 Module      : Headroom.Regex
 Description : Helper functions for regular expressions
@@ -10,8 +13,7 @@ Portability : POSIX
 Provides wrappers mainly around functions from "Text.Regex.PCRE.Light" that more
 suits the needs of this application.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
+
 module Headroom.Regex
   ( compile'
   , joinPatterns

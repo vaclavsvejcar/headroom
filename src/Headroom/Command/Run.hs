@@ -1,3 +1,11 @@
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE TupleSections         #-}
+{-# LANGUAGE TypeApplications      #-}
+
 {-|
 Module      : Headroom.Command.Run
 Description : Handler for the @run@ command.
@@ -10,11 +18,7 @@ Portability : POSIX
 Module representing the @run@ command, the core command of /Headroom/, which is
 responsible for license header management.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TupleSections     #-}
-{-# LANGUAGE TypeApplications  #-}
+
 module Headroom.Command.Run
   ( commandRun
   )
@@ -42,6 +46,7 @@ import           Headroom.FileSystem            ( excludePaths
 import           Headroom.FileType              ( configByFileType
                                                 , fileTypeByExt
                                                 )
+import           Headroom.Has                   ( Has(..) )
 import           Headroom.Meta                  ( TemplateType
                                                 , productInfo
                                                 )
@@ -64,6 +69,7 @@ import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
 
 
+
 -- | Initial /RIO/ startup environment for the /Run/ command.
 data StartupEnv = StartupEnv
   { envLogFunc    :: !LogFunc           -- ^ logging function
@@ -76,36 +82,26 @@ data Env = Env
   , envConfiguration :: !Configuration  -- ^ application configuration
   }
 
-class HasConfiguration env where
-  configurationL :: Lens' env Configuration
+instance Has Configuration Env where
+  hasLens = lens envConfiguration (\x y -> x { envConfiguration = y })
 
--- | Environment value with /Init/ command options.
-class HasRunOptions env where
-  runOptionsL :: Lens' env CommandRunOptions
+instance Has StartupEnv StartupEnv where
+  hasLens = id
 
-class (HasLogFunc env, HasRunOptions env) => HasEnv env where
-  envL :: Lens' env StartupEnv
-
-instance HasConfiguration Env where
-  configurationL = lens envConfiguration (\x y -> x { envConfiguration = y })
-
-instance HasEnv StartupEnv where
-  envL = id
-
-instance HasEnv Env where
-  envL = lens envEnv (\x y -> x { envEnv = y })
+instance Has StartupEnv Env where
+  hasLens = lens envEnv (\x y -> x { envEnv = y })
 
 instance HasLogFunc StartupEnv where
   logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
 
 instance HasLogFunc Env where
-  logFuncL = envL . logFuncL
+  logFuncL = hasLens @StartupEnv . logFuncL
 
-instance HasRunOptions StartupEnv where
-  runOptionsL = lens envRunOptions (\x y -> x { envRunOptions = y })
+instance Has CommandRunOptions StartupEnv where
+  hasLens = lens envRunOptions (\x y -> x { envRunOptions = y })
 
-instance HasRunOptions Env where
-  runOptionsL = envL . runOptionsL
+instance Has CommandRunOptions Env where
+  hasLens = hasLens @StartupEnv . hasLens
 
 
 env' :: CommandRunOptions -> LogFunc -> IO Env
@@ -138,17 +134,17 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
     ]
   warnOnDryRun
 
-warnOnDryRun :: (HasLogFunc env, HasRunOptions env) => RIO env ()
+warnOnDryRun :: (HasLogFunc env, Has CommandRunOptions env) => RIO env ()
 warnOnDryRun = do
-  CommandRunOptions {..} <- view runOptionsL
+  CommandRunOptions {..} <- viewL
   when croDryRun $ logWarn "[!] Running with '--dry-run', no files are changed!"
 
 
-findSourceFiles :: (HasConfiguration env, HasLogFunc env)
+findSourceFiles :: (Has Configuration env, HasLogFunc env)
                 => [FileType]
                 -> RIO env [FilePath]
 findSourceFiles fileTypes = do
-  Configuration {..} <- view configurationL
+  Configuration {..} <- viewL
   logDebug $ "Using source paths: " <> displayShow cSourcePaths
   files <- mconcat <$> mapM (findFiles' cLicenseHeaders) cSourcePaths
   let files' = excludePaths cExcludedPaths files
@@ -157,12 +153,15 @@ findSourceFiles fileTypes = do
   where findFiles' licenseHeaders = findFilesByTypes licenseHeaders fileTypes
 
 
-processSourceFiles :: (HasConfiguration env, HasLogFunc env, HasRunOptions env)
+processSourceFiles :: ( Has Configuration env
+                      , HasLogFunc env
+                      , Has CommandRunOptions env
+                      )
                    => Map FileType TemplateType
                    -> [FilePath]
                    -> RIO env (Int, Int)
 processSourceFiles templates paths = do
-  Configuration {..} <- view configurationL
+  Configuration {..} <- viewL
   let withFileType = mapMaybe (findFileType cLicenseHeaders) paths
       withTemplate = mapMaybe (uncurry findTemplate) withFileType
   processed <- mapM process (zipWithProgress withTemplate)
@@ -175,15 +174,18 @@ processSourceFiles templates paths = do
   process (pr, (tt, ft, p)) = processSourceFile pr tt ft p
 
 
-processSourceFile :: (HasConfiguration env, HasLogFunc env, HasRunOptions env)
+processSourceFile :: ( Has Configuration env
+                     , HasLogFunc env
+                     , Has CommandRunOptions env
+                     )
                   => Progress
                   -> TemplateType
                   -> FileType
                   -> FilePath
                   -> RIO env Bool
 processSourceFile progress template fileType path = do
-  Configuration {..}     <- view configurationL
-  CommandRunOptions {..} <- view runOptionsL
+  Configuration {..}     <- viewL
+  CommandRunOptions {..} <- viewL
   fileContent            <- readFileUtf8 path
   let fileInfo = extractFileInfo fileType
                                  (configByFileType cLicenseHeaders fileType)
@@ -200,12 +202,12 @@ processSourceFile progress template fileType path = do
   pure changed
 
 
-chooseAction :: (HasConfiguration env)
+chooseAction :: (Has Configuration env)
              => FileInfo
              -> Text
              -> RIO env (Bool, Text -> Text, Text)
 chooseAction info header = do
-  Configuration {..} <- view configurationL
+  Configuration {..} <- viewL
   let hasHeader = isJust $ fiHeaderPos info
   pure $ go cRunMode hasHeader
  where
@@ -217,10 +219,10 @@ chooseAction info header = do
       else go Add hasHeader
 
 
-loadTemplates :: (HasConfiguration env, HasLogFunc env)
+loadTemplates :: (Has Configuration env, HasLogFunc env)
               => RIO env (Map FileType TemplateType)
 loadTemplates = do
-  Configuration {..} <- view configurationL
+  Configuration {..} <- viewL
   paths <- mconcat <$> mapM (`findFilesByExts` extensions) cTemplatePaths
   logDebug $ "Using template paths: " <> displayShow paths
   withTypes <- catMaybes <$> mapM (\p -> fmap (, p) <$> typeOfTemplate p) paths
@@ -241,7 +243,7 @@ typeOfTemplate path = do
   pure fileType
 
 
-finalConfiguration :: (HasLogFunc env, HasRunOptions env)
+finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
                    => RIO env Configuration
 finalConfiguration = do
   defaultConfig' <- parseConfiguration defaultConfig
@@ -257,9 +259,10 @@ finalConfiguration = do
   pure config
 
 
-optionsToConfiguration :: (HasRunOptions env) => RIO env PartialConfiguration
+optionsToConfiguration :: (Has CommandRunOptions env)
+                       => RIO env PartialConfiguration
 optionsToConfiguration = do
-  runOptions <- view runOptionsL
+  runOptions <- viewL
   variables  <- parseVariables $ croVariables runOptions
   pure PartialConfiguration
     { pcRunMode        = maybe mempty pure (croRunMode runOptions)

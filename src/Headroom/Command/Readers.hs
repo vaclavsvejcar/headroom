@@ -1,3 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
+
 {-|
 Module      : Headroom.Command.Readers
 Description : Custom readers for /optparse-applicative/ library
@@ -10,9 +14,7 @@ Portability : POSIX
 This module contains custom readers required by the /optparse-applicative/
 library to parse data types such as 'LicenseType' or 'FileType'.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications  #-}
+
 module Headroom.Command.Readers
   ( licenseReader
   , licenseTypeReader

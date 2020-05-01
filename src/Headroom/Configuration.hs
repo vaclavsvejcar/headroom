@@ -1,3 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+
 {-|
 Module      : Headroom.Configuration
 Description : Configuration handling (loading, parsing, validating)
@@ -13,9 +17,7 @@ Headroom uses the
 pattern for the configuration, where the 'Configuration' is the data type for
 total configuration and 'PartialConfiguration' for the partial one.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+
 module Headroom.Configuration
   ( -- * Loading & Parsing Configuration
     loadConfiguration

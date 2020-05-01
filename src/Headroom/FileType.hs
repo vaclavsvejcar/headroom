@@ -1,3 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeApplications  #-}
+
 {-|
 Module      : Headroom.FileType
 Description : Logic for handlig supported file types
@@ -10,9 +14,7 @@ Portability : POSIX
 Module providing functions for working with the 'FileType', such as performing
 detection based on the file extension, etc.
 -}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications  #-}
+
 module Headroom.FileType
   ( configByFileType
   , fileTypeByExt
