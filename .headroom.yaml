@@ -19,7 +19,7 @@ template-paths:
 ## Variables (key-value) to replace in templates.
 variables:
   author: Vaclav Svejcar
-  license: BSD-3
+  license: BSD-3-Clause
   email: vaclav.svejcar@gmail.com
   year: 2019-2020
 

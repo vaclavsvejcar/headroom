@@ -4,7 +4,7 @@
 Module      : Headroom.FileSystem
 Description : Operations related to files and file system
 Copyright   : (c) 2019-2020 Vaclav Svejcar
-License     : BSD-3
+License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
