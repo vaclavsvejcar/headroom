@@ -337,30 +337,32 @@ When using the `-l,--license` option, you need to select the _license type_ and 
 #### 8.3.1. Supported License Types
 Below is the list of supported _open source_ license types. If you miss support for license you use, feel free to [open new issue][meta:new-issue].
 
-| License        | Used Name |
-|----------------|-----------|
-| _Apache 2.0_   | `apache2` |
-| _BSD 3-Clause_ | `bsd3`    |
-| _GPLv2_        | `gpl2`    |
-| _GPLv3_        | `gpl3`    |
-| _MIT_          | `mit`     |
-| _MPL2_         | `mpl2`    |
+| License        | Name in configuration |
+|----------------|-----------------------|
+| _Apache 2.0_   | `apache2`             |
+| _BSD 3-Clause_ | `bsd3`                |
+| _GPLv2_        | `gpl2`                |
+| _GPLv3_        | `gpl3`                |
+| _MIT_          | `mit`                 |
+| _MPL2_         | `mpl2`                |
+
 
 #### 8.3.2. Supported File Types
 Below is the list of supported source code file types. If you miss support for programming language you use, feel free to [open new issue][meta:new-issue].
 
-| Language     | Used Name | Supported Extensions |
-|--------------|-----------|----------------------|
-| _C_          | `c`       | `.c`                 |
-| _C++_        | `cpp`     | `.cpp`               |
-| _CSS_        | `css`     | `.css`               |
-| _Haskell_    | `haskell` | `.hs`                |
-| _HTML_       | `html`    | `.html`, `.htm`      |
-| _Java_       | `java`    | `.java`              |
-| _JavaScript_ | `js`      | `.js`                |
-| _Rust_       | `rust`    | `.rs`                |
-| _Scala_      | `scala`   | `.scala`             |
-| _Shell_      | `shell`   | `.sh`                |
+| Language     | Name in configuration | Default extensions |
+|--------------|-----------------------|--------------------|
+| _C_          | `c`                   | `.c`               |
+| _C++_        | `cpp`                 | `.cpp`             |
+| _CSS_        | `css`                 | `.css`             |
+| _Haskell_    | `haskell`             | `.hs`              |
+| _HTML_       | `html`                | `.html`, `.htm`    |
+| _Java_       | `java`                | `.java`            |
+| _JavaScript_ | `js`                  | `.js`              |
+| _Rust_       | `rust`                | `.rs`              |
+| _Scala_      | `scala`               | `.scala`           |
+| _Shell_      | `shell`               | `.sh`              |
+
 
 
 [i25]: https://github.com/vaclavsvejcar/headroom/issues/25

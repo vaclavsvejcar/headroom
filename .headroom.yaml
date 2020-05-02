@@ -25,7 +25,6 @@ variables:
 
 license-headers:
   haskell:
-    file-extensions: ["hs"]
     put-after: ["^{-#"]
     put-before: ["^module"]
     margin-after: 1
