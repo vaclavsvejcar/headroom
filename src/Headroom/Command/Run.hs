@@ -57,6 +57,7 @@ import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , FileInfo(..)
                                                 , FileType(..)
                                                 , PartialConfiguration(..)
+                                                , RunAction(..)
                                                 , RunMode(..)
                                                 )
 import           Headroom.UI                    ( Progress(..)
@@ -115,7 +116,10 @@ env' opts logFunc = do
 commandRun :: CommandRunOptions -- ^ /Run/ command options
            -> IO ()             -- ^ execution result
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
+  CommandRunOptions {..} <- viewL
+  Configuration {..}     <- viewL
   logInfo $ display productInfo
+  let isCheck = cRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
   templates          <- loadTemplates
@@ -124,15 +128,18 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   endTS              <- liftIO getPOSIXTime
   logInfo "-----"
   logInfo $ mconcat
-    [ "Done: modified "
+    [ "Done: "
+    , if isCheck then "outdated " else "modified "
     , display processed
-    , ", skipped "
+    , if isCheck then ", up-to-date " else ", skipped "
     , display (total - processed)
     , " file(s) in "
     , displayShow (endTS - startTS)
     , " second(s)."
     ]
   warnOnDryRun
+  when (not croDryRun && isCheck && processed > 0) (exitWith $ ExitFailure 1)
+
 
 warnOnDryRun :: (HasLogFunc env, Has CommandRunOptions env) => RIO env ()
 warnOnDryRun = do
@@ -191,32 +198,47 @@ processSourceFile progress template fileType path = do
                                  (configByFileType cLicenseHeaders fileType)
                                  fileContent
       variables = cVariables <> fiVariables fileInfo
-  header                        <- renderTemplate variables template
-  (processed, action, message') <- chooseAction fileInfo header
-  let result  = action fileContent
-      changed = processed && (fileContent /= result)
-      message = if changed then message' else "Skipping file:        "
+  header         <- renderTemplate variables template
+  RunAction {..} <- chooseAction fileInfo header
+  let result  = raFunc fileContent
+      changed = raProcessed && (fileContent /= result)
+      message = if changed then raProcessedMsg else raSkippedMsg
+      isCheck = cRunMode == Check
   logDebug $ "File info: " <> displayShow fileInfo
-  logInfo $ mconcat [display progress, " ", display message, fromString path]
-  when (not croDryRun && changed) (writeFileUtf8 path result)
+  logInfo $ mconcat [display progress, "  ", display message, fromString path]
+  when (not croDryRun && not isCheck && changed) (writeFileUtf8 path result)
   pure changed
 
 
-chooseAction :: (Has Configuration env)
-             => FileInfo
-             -> Text
-             -> RIO env (Bool, Text -> Text, Text)
+chooseAction :: (Has Configuration env) => FileInfo -> Text -> RIO env RunAction
 chooseAction info header = do
   Configuration {..} <- viewL
   let hasHeader = isJust $ fiHeaderPos info
   pure $ go cRunMode hasHeader
  where
   go runMode hasHeader = case runMode of
-    Add     -> (not hasHeader, addHeader info header, "Adding header to:     ")
-    Drop    -> (hasHeader, dropHeader info, "Dropping header from: ")
-    Replace -> if hasHeader
-      then (True, replaceHeader info header, "Replacing header in:  ")
-      else go Add hasHeader
+    Add     -> aAction hasHeader
+    Check   -> cAction hasHeader
+    Drop    -> dAction hasHeader
+    Replace -> rAction hasHeader
+  aAction hasHeader = RunAction (not hasHeader)
+                                (addHeader info header)
+                                (justify "Adding header to:")
+                                (justify "Header already exists in:")
+  cAction hasHeader = (rAction hasHeader)
+    { raProcessedMsg = justify "Outdated header found in:"
+    , raSkippedMsg   = justify "Header up-to-date in:"
+    }
+  dAction hasHeader = RunAction hasHeader
+                                (dropHeader info)
+                                (justify "Dropping header from:")
+                                (justify "No header exists in:")
+  rAction hasHeader = if hasHeader then rAction' else go Add hasHeader
+  rAction' = RunAction True
+                       (replaceHeader info header)
+                       (justify "Replacing header in:")
+                       (justify "Header up-to-date in:")
+  justify = T.justifyLeft 30 ' '
 
 
 loadTemplates :: (Has Configuration env, HasLogFunc env)

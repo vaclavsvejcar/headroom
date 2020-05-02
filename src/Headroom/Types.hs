@@ -36,6 +36,7 @@ module Headroom.Types
   , CommandInitOptions(..)
   , CommandRunOptions(..)
   , ConfigurationError(..)
+  , RunAction(..)
   , RunMode(..)
   , GenMode(..)
     -- * Error Data Types
@@ -65,17 +66,27 @@ import           RIO
 import qualified RIO.Text                      as T
 
 
+-- | Action to be performed based on the selected 'RunMode'.
+data RunAction = RunAction
+  { raProcessed    :: !Bool           -- ^ whether the given file was processed
+  , raFunc         :: !(Text -> Text) -- ^ function to process the file
+  , raProcessedMsg :: !Text           -- ^ message to show when file was processed
+  , raSkippedMsg   :: !Text           -- ^ message to show when file was skipped
+  }
+
 -- | Represents what action should the @run@ command perform.
 data RunMode
-  = Add
-  | Drop
-  | Replace
+  = Add     -- ^ /add mode/ for @run@ command
+  | Check   -- ^ /check mode/ for @run@ command
+  | Drop    -- ^ /drop mode/ for @run@ command
+  | Replace -- ^ /replace mode/ for @run@ command
   deriving (Eq, Show)
 
 instance FromJSON RunMode where
   parseJSON = \case
     String s -> case T.toLower s of
       "add"     -> pure Add
+      "check"   -> pure Check
       "drop"    -> pure Drop
       "replace" -> pure Replace
       _         -> error $ "Unknown run mode: " <> T.unpack s

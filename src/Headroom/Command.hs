@@ -46,7 +46,7 @@ commandParser = info
   runCommand = command
     "run"
     (info (runOptions <**> helper)
-          (progDesc "add or replace source code headers")
+          (progDesc "add, replace, drop or check source code headers")
     )
   genCommand = command
     "gen"
@@ -92,6 +92,11 @@ runOptions =
               (long "add-headers" <> short 'a' <> help
                 "only adds missing license headers"
               )
+          <|> flag'
+                Check
+                (long "check-headers" <> short 'c' <> help
+                  "check whether existing headers are up-to-date"
+                )
           <|> flag'
                 Replace
                 (long "replace-headers" <> short 'r' <> help

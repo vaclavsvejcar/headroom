@@ -38,6 +38,10 @@ __Table of Contents__
 - [8. Command Line Interface Overview](#8-command-line-interface-overview)
     - [8.1. Init Command](#81-init-command)
     - [8.2. Run Command](#82-run-command)
+        - [8.2.1. Add Headers Mode](#821-add-headers-mode)
+        - [8.2.2. Replace Headers Mode](#822-replace-headers-mode)
+        - [8.2.3. Check Headers Mode](#823-check-headers-mode)
+        - [8.2.4. Drop Headers Mode](#824-drop-headers-mode)
     - [8.3. Generator Command](#83-generator-command)
         - [8.3.1. Supported License Types](#831-supported-license-types)
         - [8.3.2. Supported File Types](#832-supported-file-types)
@@ -275,15 +279,16 @@ Available options:
 ```
 
 ### 8.2. Run Command
-Run command is used to manipulate (add, replace or drop) license headers in source code files. You can display available options by running following command:
+Run command is used to manipulate (add, replace or drop) or check license headers in source code files. You can display available options by running following command:
 
 ```
 $ headroom run --help
 Usage: headroom run [-s|--source-path PATH] [-e|--excluded-path REGEX] 
                     [-t|--template-path PATH] [-v|--variable KEY=VALUE] 
-                    [(-a|--add-headers) | (-r|--replace-headers) | 
-                      (-d|--drop-headers)] [--debug] [--dry-run]
-  add or replace source code headers
+                    [(-a|--add-headers) | (-c|--check-headers) | 
+                      (-r|--replace-headers) | (-d|--drop-headers)] [--debug] 
+                    [--dry-run]
+  add, replace, drop or check source code headers
 
 Available options:
   -s,--source-path PATH    path to source code file/directory
@@ -291,12 +296,25 @@ Available options:
   -t,--template-path PATH  path to header template file/directory
   -v,--variable KEY=VALUE  value for template variable
   -a,--add-headers         only adds missing license headers
+  -c,--check-headers       check whether existing headers are up-to-date
   -r,--replace-headers     force replace existing license headers
   -d,--drop-headers        drop existing license headers only
   --debug                  produce more verbose output
   --dry-run                execute dry run (no changes to files)
   -h,--help                Show this help text
 ```
+
+#### 8.2.1. Add Headers Mode
+_Add Headers Mode_ is the default mode. When executing the `run` command with this mode, Headroom will add license headers to file without them, but won't replace any existing header. You can also run this mode by using the `-a|--add-headers` command line option or `run-mode: add` option in `.headroom.yaml`.
+
+#### 8.2.2. Replace Headers Mode
+_Replace Headers Mode_ is similar to _Add Headers Mode_, but will replace any existing header with new one. Run this mode using the `-r|--replace-headers` command line option or `run-mode: replace` option in `.headroom.yaml`.
+
+#### 8.2.3. Check Headers Mode
+_Check Headers Mode_ checks that all your source code files have up-to-date license headers, without actually touching any files. When any file with outdated license header is detected, Headroom execution will result in return code `1`, so you can easily use this mode in your _CI_ pipelines, etc. Run this mode using the `-c|--check-headers` command line option or `run-mode: check` option in `.headroom.yaml`.
+
+#### 8.2.4. Drop Headers Mode
+_Drop Headers Mode_ will only drop any existing license headers from source code files, without replacing them. Run this mode using the `-d|--drop-headers` command line option or `run-mode: drop` option in `.headroom.yaml`.
 
 ### 8.3. Generator Command
 Generator command is used to generate stubs for license header template and _YAML_ configuration file. You can display available options by running following command:
