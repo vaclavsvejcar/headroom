@@ -19,7 +19,7 @@ module Headroom.Serialization
     aesonOptions
   , dropFieldPrefix
   , symbolCase
-  -- * Pretty Printing
+    -- * Pretty Printing
   , prettyPrintYAML
   )
 where
