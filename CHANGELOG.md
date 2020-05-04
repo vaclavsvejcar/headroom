@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.2.2.0 (not released yet, TBD)
+## 0.2.2.0 (released 2020-05-04)
 - [#45] Add `-c|--check-headers` command line option
 - Bump _LTS Haskell_ to `15.11`
 

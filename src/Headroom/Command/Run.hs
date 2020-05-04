@@ -211,7 +211,7 @@ processSourceFile progress template fileType path = do
       message = if changed then raProcessedMsg else raSkippedMsg
       isCheck = cRunMode == Check
   logDebug $ "File info: " <> displayShow fileInfo
-  logInfo $ mconcat [display progress, "  ", display message, fromString path]
+  logInfo $ mconcat [display progress, " ", display message, fromString path]
   when (not croDryRun && not isCheck && changed) (writeFileUtf8 path result)
   pure changed
 

@@ -59,6 +59,7 @@ executables:
 
 library:
   source-dirs: src
+  generated-other-modules: Paths_headroom
   dependencies:
     - aeson
     - either
