@@ -155,7 +155,13 @@ findSourceFiles fileTypes = do
   logDebug $ "Using source paths: " <> displayShow cSourcePaths
   files <- mconcat <$> mapM (findFiles' cLicenseHeaders) cSourcePaths
   let files' = excludePaths cExcludedPaths files
-  logInfo $ mconcat ["Found ", display $ L.length files', " source file(s)"]
+  logInfo $ mconcat
+    [ "Found "
+    , display $ L.length files'
+    , " source file(s) (excluded "
+    , display $ L.length files - L.length files'
+    , " file(s))"
+    ]
   pure files'
   where findFiles' licenseHeaders = findFilesByTypes licenseHeaders fileTypes
 
@@ -249,7 +255,8 @@ loadTemplates = do
   logDebug $ "Using template paths: " <> displayShow paths
   withTypes <- catMaybes <$> mapM (\p -> fmap (, p) <$> typeOfTemplate p) paths
   parsed    <- mapM (\(t, p) -> (t, ) <$> load p) withTypes
-  logInfo $ mconcat ["Found ", display $ L.length parsed, " template(s)"]
+  logInfo
+    $ mconcat ["Found ", display $ L.length parsed, " license template(s)"]
   pure $ M.fromList parsed
  where
   extensions = toList $ templateExtensions @TemplateType

@@ -230,7 +230,7 @@ splitInput fstSplit sndSplit input = (before, middle, after)
   sndSplitAt        = fromMaybe len (findSplit firstMatching sndSplit inLines)
   inLines           = T.lines input
   len               = L.length inLines
-  findSplit f ps i = compile' <$> joinPatterns ps >>= (`f` i)
+  findSplit f ps i = joinPatterns ps >>= (`f` i) . compile'
 
 
 -- TODO: https://github.com/vaclavsvejcar/headroom/issues/25
