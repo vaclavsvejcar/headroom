@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.2.2.0 (not released yet, TBD)
 - [#45] Add `-c|--check-headers` command line option
+- Bump _LTS Haskell_ to `15.11`
 
 ## 0.2.1.1 (released 2020-04-30)
 - [#47] Make possible to build Headroom with GHC 8.10

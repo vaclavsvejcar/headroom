@@ -1,10 +1,10 @@
-cabal-version: 1.12
+cabal-version: 2.2
 
 -- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e6b0e2d0deedb879487a5f109bf11aab3be3dcecbd1888c46b2cc1b8da0ea190
+-- hash: 3fa85dd1ed1a805db44587f3dfbcd58a10fd600f71018bc64f6fdeb71b9b9c56
 
 name:           headroom
 version:        0.2.2.0
@@ -16,7 +16,7 @@ bug-reports:    https://github.com/vaclavsvejcar/headroom/issues
 author:         Vaclav Svejcar
 maintainer:     vaclav.svejcar@gmail.com
 copyright:      Copyright (c) 2019-2020 Vaclav Svejcar
-license:        BSD3
+license:        BSD-3-Clause
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:

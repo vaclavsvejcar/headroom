@@ -1,7 +1,7 @@
 name: headroom
 version: 0.2.2.0
 homepage: https://github.com/vaclavsvejcar/headroom
-license: BSD3
+license: BSD-3-Clause
 license-file: LICENSE
 author: Vaclav Svejcar
 maintainer: vaclav.svejcar@gmail.com
