@@ -7,6 +7,7 @@ where
 
 import           Headroom.Serialization
 import           RIO
+import qualified RIO.Map                       as M
 import           Test.Hspec
 
 
@@ -19,8 +20,16 @@ spec = do
     it "removes prefix and keeps case for 'prURLField'" $ do
       dropFieldPrefix "prURLField" `shouldBe` "URLField"
 
+
   describe "symbolCase" $ do
     it "replaces camel cased string into symbol cased" $ do
       let input    = "camelCasedValue"
           expected = "camel-cased-value"
       symbolCase '-' input `shouldBe` expected
+
+
+  describe "prettyPrintYAML" $ do
+    it "pretty prints YAML" $ do
+      let input    = M.fromList [("foo" :: Text, ["bar"] :: [Text])]
+          expected = "foo:\n- bar\n"
+      prettyPrintYAML input `shouldBe` expected

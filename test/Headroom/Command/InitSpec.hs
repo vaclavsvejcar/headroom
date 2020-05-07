@@ -36,7 +36,6 @@ env = Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
     { cioSourcePaths = ["test-data" </> "test-traverse"]
     , cioLicenseType = BSD3
     }
-  paths = Paths { pCurrentDir   = "."
-                , pConfigFile   = "test-data" </> "configs" </> "full.yaml"
+  paths = Paths { pConfigFile   = "test-data" </> "configs" </> "full.yaml"
                 , pTemplatesDir = "headroom-templates"
                 }

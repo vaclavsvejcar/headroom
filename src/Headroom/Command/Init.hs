@@ -3,6 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE TypeApplications      #-}
 
@@ -42,10 +43,10 @@ import           Headroom.FileSystem            ( createDirectory
                                                 , doesFileExist
                                                 , fileExtension
                                                 , findFiles
-                                                , getCurrentDirectory
                                                 )
 import           Headroom.FileType              ( fileTypeByExt )
 import           Headroom.Meta                  ( TemplateType )
+import           Headroom.Serialization         ( prettyPrintYAML )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , CommandInitError(..)
@@ -61,6 +62,7 @@ import           RIO
 import qualified RIO.Char                      as C
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.List                      as L
+import qualified RIO.Map                       as M
 import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
@@ -76,8 +78,7 @@ data Env = Env
 
 -- | Paths to various locations of file system.
 data Paths = Paths
-  { pCurrentDir   :: !FilePath
-  , pConfigFile   :: !FilePath
+  { pConfigFile   :: !FilePath
   , pTemplatesDir :: !FilePath
   }
 
@@ -94,9 +95,7 @@ instance Has Paths Env where
 
 env' :: CommandInitOptions -> LogFunc -> IO Env
 env' opts logFunc = do
-  currentDir <- getCurrentDirectory
-  let paths = Paths { pCurrentDir   = currentDir
-                    , pConfigFile   = ".headroom.yaml"
+  let paths = Paths { pConfigFile   = ".headroom.yaml"
                     , pTemplatesDir = "headroom-templates"
                     }
   pure $ Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
@@ -138,10 +137,9 @@ createTemplates :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
                 => [FileType]
                 -> RIO env ()
 createTemplates fileTypes = do
-  opts  <- viewL
-  paths <- viewL
-  let templatesDir = pCurrentDir paths </> pTemplatesDir paths
-  mapM_ (\(p, lf) -> createTemplate templatesDir lf p)
+  opts       <- viewL
+  Paths {..} <- viewL
+  mapM_ (\(p, lf) -> createTemplate pTemplatesDir lf p)
         (zipWithProgress $ fmap (cioLicenseType opts, ) fileTypes)
 
 createTemplate :: (HasLogFunc env)
@@ -161,36 +159,32 @@ createTemplate templatesDir (licenseType, fileType) progress = do
 createConfigFile :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
                  => RIO env ()
 createConfigFile = do
-  opts  <- viewL
-  paths <- viewL
-  let filePath = pCurrentDir paths </> pConfigFile paths
-  logInfo $ "Creating YAML config file in " <> fromString filePath
-  writeFileUtf8 filePath (configuration opts paths)
+  opts         <- viewL
+  p@Paths {..} <- viewL
+  logInfo $ "Creating YAML config file in " <> fromString pConfigFile
+  writeFileUtf8 pConfigFile (configuration opts p)
  where
   configuration opts paths =
     let withSourcePaths = TP.replace
           "source-paths: []"
-          ("source-paths: " <> toYamlList (T.pack <$> cioSourcePaths opts))
-          configFileStub
+          (toYamlList "source-paths" $ cioSourcePaths opts)
         withTemplatePaths = TP.replace
           "template-paths: []"
-          ("template-paths: " <> toYamlList [T.pack $ pTemplatesDir paths])
-          withSourcePaths
-    in  withTemplatePaths
-  toYamlList items = mconcat
-    ["[ ", T.intercalate ", " (fmap (\i -> "\"" <> i <> "\"") items), " ]"]
+          (toYamlList "template-paths" [pTemplatesDir paths])
+    in  withTemplatePaths . withSourcePaths $ configFileStub
+  toYamlList field list =
+    T.stripEnd . prettyPrintYAML $ M.fromList [(field :: Text, list)]
 
 -- | Checks whether application config file already exists.
 doesAppConfigExist :: (HasLogFunc env, Has Paths env) => RIO env Bool
 doesAppConfigExist = do
-  paths <- viewL
+  Paths {..} <- viewL
   logInfo "Verifying that there's no existing Headroom configuration..."
-  doesFileExist $ pCurrentDir paths </> pConfigFile paths
+  doesFileExist pConfigFile
 
 -- | Creates directory for template files.
 makeTemplatesDir :: (HasLogFunc env, Has Paths env) => RIO env ()
 makeTemplatesDir = do
-  paths <- viewL
-  let templatesDir = pCurrentDir paths </> pTemplatesDir paths
-  logInfo $ "Creating directory for templates in " <> fromString templatesDir
-  createDirectory templatesDir
+  Paths {..} <- viewL
+  logInfo $ "Creating directory for templates in " <> fromString pTemplatesDir
+  createDirectory pTemplatesDir
