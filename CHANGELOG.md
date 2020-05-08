@@ -1,8 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.2.3.0 (not released yet, TBD)
+
 ## 0.2.2.1 (released 2020-05-08)
-- Minor improves in generated `.headroom.config` in `init` mode
+- Minor improves in generated `.headroom.yaml` in `init` mode
 
 ## 0.2.2.0 (released 2020-05-04)
 - [#45] Add `-c|--check-headers` command line option
