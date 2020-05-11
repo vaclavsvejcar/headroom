@@ -1,0 +1,19 @@
+site_name: Headroom
+copyright: Copyright (c) 2020 norcane 
+
+
+theme:
+  name: material
+  logo: "images/norcane-logo.png"
+
+  features:
+    - tabs
+
+  custom_dir: overrides
+
+nav:
+  - Home: index.md
+  - Documentation:
+    - Installation: documentation/installation.md
+    - Basic Concepts: documentation/basic-concepts.md
+    - Configuration: documentation/configuration.md
