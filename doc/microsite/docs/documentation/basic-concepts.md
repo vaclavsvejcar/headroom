@@ -6,17 +6,15 @@ It's good to have copyright/license headers at the very top of each source code 
 ## How it works?
 Simply said, _Headroom_ takes [Mustache][web:mustache] templates of license headers, fills any variables by values taken from `.headroom.yaml` configuration file, renders them and puts them onto specified position in your source code files. And that's pretty much all. It has some advanced configuration options and another fancy features, but we'll get back to them in later chapters.
 
-### Configuration
-Main source of configuration is the `.headroom.yaml` file that you put into your project directory. This is the place where _Headroom_ looks for things such as where are source code files stored, where are license template files and what variables should be replaced in templates. It also offers some more advanced options such as to specify before/after which pattern to put the license headers, define blank lines as margin around the license header, etc. See more details in [Configuration][rel:Configuration] chapter.
+Before continuing to next chapters, here's the overview of key parts of _Headroom_. They will be described in more depth in [Configuration][rel:Configuration] chapter.
 
-### Source Code Files
-Those are the files in which the license headers should be managed by _Headroom_. You can specify multiple different locations and also paths that should be excluded. See [Configuration][rel:Configuration] chapter for more details.
+- __Configuration__ - Main source of configuration is the `.headroom.yaml` file that you put into your project directory. This is the place where _Headroom_ looks for things such as where are source code files stored, where are license template files and what variables should be replaced in templates. It also offers some more advanced options such as to specify before/after which pattern to put the license headers, define blank lines as margin around the license header, etc.
 
-### License Templates
-Those are the templates from which the final license headers are generated. _Headroom_ uses [Mustache][web:mustache] as lightweight and easy templating system. Values for variables used in templates are then defined either in the `.headroom.yaml` file or using command line arguments. See [Configuration][rel:Configuration] chapter for more details.
+- __Source Code Files__ - Those are the files in which the license headers should be managed by _Headroom_. You can specify multiple different locations and also paths that should be excluded.
 
-### Variables
-todo
+- __License Templates__ - _Headroom_ uses [Mustache][web:mustache] templates to define the license headers. These templates are then compiled, variables are filled with actual and such rendered license headers are put into source code files.
+
+- __Variables__ - Changing parts of license headers (such as year, author, e-mail, etc.) can be represented by variables and the actual values are then loaded from either `.headroom.yaml` or command line arguments and filled in during template rendering.
 
 
 [rel:Configuration]: configuration.md
