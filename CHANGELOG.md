@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.2.3.0 (not released yet, TBD)
+- [#30] Allow workflow without configuration and template files
 - Bump _LTS Haskell_ to `15.12`
 
 ## 0.2.2.1 (released 2020-05-08)

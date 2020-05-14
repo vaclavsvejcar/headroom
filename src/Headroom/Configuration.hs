@@ -85,7 +85,7 @@ makeConfiguration PartialConfiguration {..} = do
   cRunMode        <- lastOrError NoRunMode pcRunMode
   cSourcePaths    <- lastOrError NoSourcePaths pcSourcePaths
   cExcludedPaths  <- lastOrError NoExcludedPaths pcExcludedPaths
-  cTemplatePaths  <- lastOrError NoTemplatePaths pcTemplatePaths
+  cTemplateSource <- lastOrError NoTemplateSource pcTemplateSource
   cVariables      <- lastOrError NoVariables pcVariables
   cLicenseHeaders <- makeHeadersConfig pcLicenseHeaders
   pure Configuration { .. }

@@ -26,6 +26,7 @@ extra-source-files:
   - test-data/*
   - test-data/code-samples/*/*
   - test-data/configs/*
+  - test-data/templates/*
   - test-data/test-traverse/*
   - test-data/test-traverse/foo/*
   - test-data/test-traverse/foo/bar/*

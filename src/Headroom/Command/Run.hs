@@ -21,6 +21,8 @@ responsible for license header management.
 
 module Headroom.Command.Run
   ( commandRun
+  , loadBuiltInTemplates
+  , loadTemplateFiles
   )
 where
 
@@ -33,7 +35,9 @@ import           Headroom.Configuration         ( loadConfiguration
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Embedded              ( defaultConfig )
+import           Headroom.Embedded              ( defaultConfig
+                                                , licenseTemplate
+                                                )
 import           Headroom.FileSupport           ( addHeader
                                                 , dropHeader
                                                 , extractFileInfo
@@ -56,9 +60,11 @@ import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , Configuration(..)
                                                 , FileInfo(..)
                                                 , FileType(..)
+                                                , LicenseType(..)
                                                 , PartialConfiguration(..)
                                                 , RunAction(..)
                                                 , RunMode(..)
+                                                , TemplateSource(..)
                                                 )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
@@ -68,7 +74,6 @@ import           RIO.FilePath                   ( takeBaseName )
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
-
 
 
 -- | Initial /RIO/ startup environment for the /Run/ command.
@@ -247,11 +252,12 @@ chooseAction info header = do
   justify = T.justifyLeft 30 ' '
 
 
-loadTemplates :: (Has Configuration env, HasLogFunc env)
-              => RIO env (Map FileType TemplateType)
-loadTemplates = do
-  Configuration {..} <- viewL
-  paths <- mconcat <$> mapM (`findFilesByExts` extensions) cTemplatePaths
+-- | Loads templates from the given paths.
+loadTemplateFiles :: (HasLogFunc env)
+                  => [FilePath]                          -- ^ paths to template files
+                  -> RIO env (Map FileType TemplateType) -- ^ map of file types and templates
+loadTemplateFiles paths' = do
+  paths <- mconcat <$> mapM (`findFilesByExts` extensions) paths'
   logDebug $ "Using template paths: " <> displayShow paths
   withTypes <- catMaybes <$> mapM (\p -> fmap (, p) <$> typeOfTemplate p) paths
   parsed    <- mapM (\(t, p) -> (t, ) <$> load p) withTypes
@@ -264,6 +270,29 @@ loadTemplates = do
     liftIO $ (T.strip <$> loadFile path) >>= parseTemplate (Just $ T.pack path)
 
 
+-- | Loads built-in templates, stored in "Headroom.Embedded", for the given
+-- 'LicenseType'.
+loadBuiltInTemplates :: (HasLogFunc env)
+                     => LicenseType                         -- ^ license type for which to selected templates
+                     -> RIO env (Map FileType TemplateType) -- ^ map of file types and templates
+loadBuiltInTemplates licenseType = do
+  logInfo $ "Using built-in templates for license: " <> displayShow licenseType
+  parsed <- mapM (\(t, r) -> (t, ) <$> parseTemplate Nothing r) rawTemplates
+  pure $ M.fromList parsed
+ where
+  rawTemplates = fmap (\ft -> (ft, template ft)) (allValues @FileType)
+  template     = licenseTemplate licenseType
+
+
+loadTemplates :: (Has Configuration env, HasLogFunc env)
+              => RIO env (Map FileType TemplateType)
+loadTemplates = do
+  Configuration {..} <- viewL
+  case cTemplateSource of
+    TemplateFiles    paths       -> loadTemplateFiles paths
+    BuiltInTemplates licenseType -> loadBuiltInTemplates licenseType
+
+
 typeOfTemplate :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
 typeOfTemplate path = do
   let fileType = textToEnum . T.pack . takeBaseName $ path
@@ -272,13 +301,32 @@ typeOfTemplate path = do
   pure fileType
 
 
+loadConfigurationSafe :: (HasLogFunc env)
+                      => FilePath
+                      -> RIO env (Maybe PartialConfiguration)
+loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
+ where
+  onError err = do
+    logDebug $ displayShow (err :: IOException)
+    logInfo $ mconcat
+      [ "Configuration file '"
+      , fromString path
+      , "' not found. You can either specify all required parameter by "
+      , "command line arguments, or generate one using "
+      , "'headroom gen -c >.headroom.yaml'. See official documentation "
+      , "for more details."
+      ]
+    pure Nothing
+
+
 finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
                    => RIO env Configuration
 finalConfiguration = do
-  defaultConfig' <- parseConfiguration defaultConfig
-  cmdLineConfig  <- optionsToConfiguration
-  yamlConfig     <- loadConfiguration ".headroom.yaml"
-  let mergedConfig = defaultConfig' <> yamlConfig <> cmdLineConfig
+  defaultConfig' <- Just <$> parseConfiguration defaultConfig
+  cmdLineConfig  <- Just <$> optionsToConfiguration
+  yamlConfig     <- loadConfigurationSafe ".headroom.yaml"
+  let mergedConfig =
+        mconcat . catMaybes $ [defaultConfig', yamlConfig, cmdLineConfig]
   config <- makeConfiguration mergedConfig
   logDebug $ "Default config: " <> displayShow defaultConfig'
   logDebug $ "YAML config: " <> displayShow yamlConfig
@@ -297,7 +345,7 @@ optionsToConfiguration = do
     { pcRunMode        = maybe mempty pure (croRunMode runOptions)
     , pcSourcePaths    = ifNot null (croSourcePaths runOptions)
     , pcExcludedPaths  = ifNot null (croExcludedPaths runOptions)
-    , pcTemplatePaths  = ifNot null (croTemplatePaths runOptions)
+    , pcTemplateSource = maybe mempty pure (croTemplateSource runOptions)
     , pcVariables      = ifNot null variables
     , pcLicenseHeaders = mempty
     }

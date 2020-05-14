@@ -39,6 +39,7 @@ module Headroom.Types
   , RunAction(..)
   , RunMode(..)
   , GenMode(..)
+  , TemplateSource(..)
     -- * Error Data Types
   , ApplicationError(..)
   , CommandGenError(..)
@@ -73,6 +74,12 @@ data RunAction = RunAction
   , raProcessedMsg :: !Text           -- ^ message to show when file was processed
   , raSkippedMsg   :: !Text           -- ^ message to show when file was skipped
   }
+
+-- | Source of license templates
+data TemplateSource
+  = TemplateFiles [FilePath]     -- ^ templates are stored as local files
+  | BuiltInTemplates LicenseType -- ^ use built-in templates for selected license
+  deriving (Eq, Show)
 
 -- | Represents what action should the @run@ command perform.
 data RunMode
@@ -137,7 +144,7 @@ data ConfigurationError
   | NoRunMode                  -- ^ no configuration for @run-mode@
   | NoSourcePaths              -- ^ no configuration for @source-paths@
   | NoExcludedPaths            -- ^ no configuration for @excluded-paths@
-  | NoTemplatePaths            -- ^ no configuration for @template-paths@
+  | NoTemplateSource           -- ^ no configuration for template source
   | NoVariables                -- ^ no configuration for @variables@
   deriving (Eq, Show)
 
@@ -151,9 +158,9 @@ data TemplateError
 
 -- | Application command.
 data Command
-  = Run [FilePath] [Text] [FilePath] [Text] (Maybe RunMode) Bool Bool -- ^ @run@ command
-  | Gen Bool (Maybe (LicenseType, FileType))                          -- ^ @gen@ command
-  | Init LicenseType [FilePath]                                       -- ^ @init@ command
+  = Run [FilePath] [Text] (Maybe TemplateSource) [Text] (Maybe RunMode) Bool Bool -- ^ @run@ command
+  | Gen Bool (Maybe (LicenseType, FileType))                                      -- ^ @gen@ command
+  | Init LicenseType [FilePath]                                                   -- ^ @init@ command
   deriving (Show)
 
 --------------------------------------------------------------------------------
@@ -173,13 +180,13 @@ data CommandInitOptions = CommandInitOptions
 
 -- | Options for the @run@ command.
 data CommandRunOptions = CommandRunOptions
-  { croRunMode       :: !(Maybe RunMode) -- ^ used /Run/ command mode
-  , croSourcePaths   :: ![FilePath]      -- ^ source code file paths
-  , croExcludedPaths :: ![Text]          -- ^ source paths to exclude
-  , croTemplatePaths :: ![FilePath]      -- ^ template file paths
-  , croVariables     :: ![Text]          -- ^ raw variables
-  , croDebug         :: !Bool            -- ^ whether to run in debug mode
-  , croDryRun        :: !Bool            -- ^ whether to perform dry run
+  { croRunMode        :: !(Maybe RunMode)         -- ^ used /Run/ command mode
+  , croSourcePaths    :: ![FilePath]              -- ^ source code file paths
+  , croExcludedPaths  :: ![Text]                  -- ^ source paths to exclude
+  , croTemplateSource :: !(Maybe TemplateSource)  -- ^ source of license templates
+  , croVariables      :: ![Text]                  -- ^ raw variables
+  , croDebug          :: !Bool                    -- ^ whether to run in debug mode
+  , croDryRun         :: !Bool                    -- ^ whether to perform dry run
   }
   deriving (Eq, Show)
 
@@ -235,7 +242,7 @@ data Configuration = Configuration
   { cRunMode        :: !RunMode             -- ^ mode of the @run@ command
   , cSourcePaths    :: ![FilePath]          -- ^ paths to source code files
   , cExcludedPaths  :: ![Text]              -- ^ excluded source paths
-  , cTemplatePaths  :: ![FilePath]          -- ^ paths to template files
+  , cTemplateSource :: !TemplateSource      -- ^ source of license templates
   , cVariables      :: !(HashMap Text Text) -- ^ variable values for templates
   , cLicenseHeaders :: !HeadersConfig       -- ^ configuration of license headers
   }
@@ -287,7 +294,7 @@ data PartialConfiguration = PartialConfiguration
   { pcRunMode        :: !(Last RunMode)             -- ^ mode of the @run@ command
   , pcSourcePaths    :: !(Last [FilePath])          -- ^ paths to source code files
   , pcExcludedPaths  :: !(Last [Text])              -- ^ excluded source paths
-  , pcTemplatePaths  :: !(Last [FilePath])          -- ^ paths to template files
+  , pcTemplateSource :: !(Last TemplateSource)      -- ^ paths to template files
   , pcVariables      :: !(Last (HashMap Text Text)) -- ^ variable values for templates
   , pcLicenseHeaders :: !PartialHeadersConfig       -- ^ configuration of license headers
   }
@@ -330,10 +337,11 @@ instance FromJSON PartialConfiguration where
     pcRunMode        <- Last <$> obj .:? "run-mode"
     pcSourcePaths    <- Last <$> obj .:? "source-paths"
     pcExcludedPaths  <- Last <$> obj .:? "excluded-paths"
-    pcTemplatePaths  <- Last <$> obj .:? "template-paths"
+    pcTemplateSource <- Last <$> get TemplateFiles (obj .:? "template-paths")
     pcVariables      <- Last <$> obj .:? "variables"
     pcLicenseHeaders <- obj .:? "license-headers" .!= mempty
     pure PartialConfiguration { .. }
+    where get = fmap . fmap
 
 instance FromJSON PartialHeaderConfig where
   parseJSON = withObject "PartialHeaderConfig" $ \obj -> do
@@ -372,7 +380,7 @@ instance Semigroup PartialConfiguration where
     { pcRunMode        = pcRunMode x <> pcRunMode y
     , pcSourcePaths    = pcSourcePaths x <> pcSourcePaths y
     , pcExcludedPaths  = pcExcludedPaths x <> pcExcludedPaths y
-    , pcTemplatePaths  = pcTemplatePaths x <> pcTemplatePaths y
+    , pcTemplateSource = pcTemplateSource x <> pcTemplateSource y
     , pcVariables      = pcVariables x <> pcVariables y
     , pcLicenseHeaders = pcLicenseHeaders x <> pcLicenseHeaders y
     }
@@ -453,7 +461,7 @@ configurationError = \case
   NoRunMode                 -> noFlag "run-mode"
   NoSourcePaths             -> noFlag "source-paths"
   NoExcludedPaths           -> noFlag "excluded-paths"
-  NoTemplatePaths           -> noFlag "template-paths"
+  NoTemplateSource          -> noFlag "template-source"
   NoVariables               -> noFlag "variables"
  where
   invalidVariable = ("Cannot parse variable key=value from: " <>)

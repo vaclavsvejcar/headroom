@@ -1,6 +1,5 @@
 site_name: Headroom
-copyright: Copyright (c) 2020 norcane 
-
+copyright: Copyright (c) 2020 norcane
 
 theme:
   name: material
@@ -11,9 +10,16 @@ theme:
 
   custom_dir: overrides
 
+markdown_extensions:
+  - codehilite:
+      guess_lang: false
+      use_pygments: true
+
 nav:
   - Home: index.md
   - Documentation:
-    - Installation: documentation/installation.md
-    - Basic Concepts: documentation/basic-concepts.md
-    - Configuration: documentation/configuration.md
+      - Installation: documentation/installation.md
+      - Basic Concepts: documentation/basic-concepts.md
+      - Project Setup Guide: documentation/project-setup-guide.md
+      - Running Headroom: documentation/running-headroom.md
+      - Configuration: documentation/configuration.md

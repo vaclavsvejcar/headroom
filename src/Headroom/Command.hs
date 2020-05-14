@@ -30,6 +30,7 @@ import           Headroom.Meta                  ( productDesc
 import           Headroom.Types                 ( Command(..)
                                                 , LicenseType
                                                 , RunMode(..)
+                                                , TemplateSource(..)
                                                 )
 import           Options.Applicative
 import           RIO
@@ -74,11 +75,22 @@ runOptions =
               "path to exclude from source code file paths"
             )
           )
-    <*> many
-          (strOption
-            (long "template-path" <> short 't' <> metavar "PATH" <> help
-              "path to header template file/directory"
-            )
+    <*> optional
+          (   BuiltInTemplates
+          <$> option
+                licenseTypeReader
+                (long "builtin-templates" <> metavar "TYPE" <> help
+                  ("use built-in templates for license type, available options: "
+                  <> T.unpack (T.toLower (allValuesToText @LicenseType))
+                  )
+                )
+          <|> TemplateFiles
+          <$> some
+                (strOption
+                  (long "template-path" <> short 't' <> metavar "PATH" <> help
+                    "path to license template file/directory"
+                  )
+                )
           )
     <*> many
           (strOption

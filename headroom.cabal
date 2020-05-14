@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b030b4214af38930576989d4e1c1565dc3b1d6f6aed2fc1d8f0c77dcc6523f95
+-- hash: 65aac93fbb631714998cb1d0847192ca1ddbb5534401588ec631c930e6c8f89f
 
 name:           headroom
 version:        0.2.3.0
@@ -106,6 +106,7 @@ extra-source-files:
     test-data/code-samples/scala/sample2.scala
     test-data/code-samples/shell/sample1.sh
     test-data/configs/full.yaml
+    test-data/templates/haskell.mustache
     test-data/test-traverse/a.html
     test-data/test-traverse/foo/b.html
     test-data/test-traverse/foo/test.xml
@@ -193,6 +194,7 @@ test-suite spec
   other-modules:
       Headroom.Command.InitSpec
       Headroom.Command.ReadersSpec
+      Headroom.Command.RunSpec
       Headroom.ConfigurationSpec
       Headroom.Data.EnumExtraSpec
       Headroom.FileSupportSpec
