@@ -1,17 +1,28 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
 module Headroom.Command.RunSpec
   ( spec
   )
 where
 
 import           Headroom.Command.Run
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.Meta                  ( TemplateType )
+import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( FileType(..)
                                                 , LicenseType(..)
                                                 )
-import           RIO
+import           RIO                     hiding ( assert )
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.Map                       as M
+import qualified RIO.NonEmpty                  as NE
+import qualified RIO.Text                      as T
 import           Test.Hspec
+import           Test.Hspec.QuickCheck          ( prop )
+import           Test.QuickCheck
+import           Test.QuickCheck.Monadic
 
 
 spec :: Spec
@@ -27,6 +38,18 @@ spec = do
       templates <- runRIO env $ loadTemplateFiles ["test-data" </> "templates"]
       M.size templates `shouldBe` 1
       M.member Haskell templates `shouldBe` True
+
+
+  describe "typeOfTemplate" $ do
+    let fileTypes = fmap (T.toLower . enumToText) (allValues @FileType)
+        templateExt         = NE.head $ templateExtensions @TemplateType
+        pathGen             = elements $ fmap (<> "." <> templateExt) fileTypes
+        prop_typeOfTemplate = monadicIO $ do
+          path   <- T.unpack <$> pick pathGen
+          result <- run (runRIO env $ typeOfTemplate path)
+          assert $ isJust result
+
+    prop "should detect type of template from template path" prop_typeOfTemplate
 
 
 env :: TestEnv

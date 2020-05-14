@@ -23,6 +23,7 @@ module Headroom.Command.Run
   ( commandRun
   , loadBuiltInTemplates
   , loadTemplateFiles
+  , typeOfTemplate
   )
 where
 
@@ -293,7 +294,10 @@ loadTemplates = do
     BuiltInTemplates licenseType -> loadBuiltInTemplates licenseType
 
 
-typeOfTemplate :: HasLogFunc env => FilePath -> RIO env (Maybe FileType)
+-- | Takes path to the template file and returns detected type of the template.
+typeOfTemplate :: HasLogFunc env
+               => FilePath                 -- ^ path to the template file
+               -> RIO env (Maybe FileType) -- ^ detected template type
 typeOfTemplate path = do
   let fileType = textToEnum . T.pack . takeBaseName $ path
   when (isNothing fileType)
