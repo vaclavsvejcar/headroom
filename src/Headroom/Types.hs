@@ -452,28 +452,63 @@ configurationError :: ConfigurationError -> Text
 configurationError = \case
   InvalidVariable input     -> invalidVariable input
   MixedHeaderSyntax         -> mixedHeaderSyntax
-  NoFileExtensions fileType -> noProp "file-extensions" fileType
-  NoHeaderSyntax   fileType -> noProp "block-comment/line-comment" fileType
-  NoMarginAfter    fileType -> noProp "margin-after" fileType
-  NoMarginBefore   fileType -> noProp "margin-before" fileType
-  NoPutAfter       fileType -> noProp "put-after" fileType
-  NoPutBefore      fileType -> noProp "put-before" fileType
-  NoRunMode                 -> noFlag "run-mode"
-  NoSourcePaths             -> noFlag "source-paths"
-  NoExcludedPaths           -> noFlag "excluded-paths"
-  NoTemplateSource          -> noFlag "template-source"
-  NoVariables               -> noFlag "variables"
+  NoFileExtensions fileType -> missingConfig
+    (withFT "file-extensions" fileType)
+    (Just "file-extensions")
+    Nothing
+  NoHeaderSyntax fileType -> missingConfig
+    (withFT "comment-syntax" fileType)
+    (Just "block-comment|line-comment")
+    Nothing
+  NoMarginAfter fileType ->
+    missingConfig (withFT "margin-after" fileType) (Just "margin-after") Nothing
+  NoMarginBefore fileType -> missingConfig (withFT "margin-before" fileType)
+                                           (Just "margin-before")
+                                           Nothing
+  NoPutAfter fileType ->
+    missingConfig (withFT "put-after" fileType) (Just "put-after") Nothing
+  NoPutBefore fileType ->
+    missingConfig (withFT "put-before" fileType) (Just "put-before") Nothing
+  NoRunMode -> missingConfig
+    "mode of the run command"
+    (Just "run-mode")
+    (Just
+      "(-a|--add-headers)|(-c|--check-header)|(-d|--drop-header)|(-r|--replace-headers)"
+    )
+  NoSourcePaths -> missingConfig "paths to source code files"
+                                 (Just "source-paths")
+                                 (Just "-s|--source-path")
+  NoExcludedPaths -> missingConfig "excluded paths"
+                                   (Just "excluded-paths")
+                                   (Just "-e|--excluded-path")
+  NoTemplateSource -> missingConfig
+    "template files source"
+    (Just "template-paths")
+    (Just "(-t|--template-path)|--builtin-templates")
+  NoVariables ->
+    missingConfig "template variables" (Just "variables") (Just "-v|--variable")
  where
-  invalidVariable = ("Cannot parse variable key=value from: " <>)
-  noProp prop fileType = T.pack $ mconcat
-    ["Missing '", prop, "' configuration key for file type", show fileType]
-  noFlag flag = mconcat ["Missing configuration key: ", flag]
+  withFT msg fileType = msg <> " (" <> T.pack (show fileType) <> ")"
+  invalidVariable   = ("Cannot parse variable key=value from: " <>)
   mixedHeaderSyntax = mconcat
     [ "Invalid configuration, combining 'block-comment' with 'line-comment' "
     , "is not allowed. Either use 'block-comment' to define multi-line "
     , "comment header, or 'line-comment' to define header composed of "
     , "multiple single-line comments."
     ]
+
+missingConfig :: Text -> Maybe Text -> Maybe Text -> Text
+missingConfig desc yaml cli = mconcat
+  [ "Missing configuration for '"
+  , desc
+  , "' ("
+  , options
+  , "). See official documentation for more details."
+  ]
+ where
+  cliText  = fmap (\c -> "command line option '" <> c <> "'") cli
+  yamlText = fmap (\y -> "YAML option '" <> y <> "'") yaml
+  options  = T.intercalate " or " . catMaybes $ [cliText, yamlText]
 
 templateError :: TemplateError -> Text
 templateError = \case

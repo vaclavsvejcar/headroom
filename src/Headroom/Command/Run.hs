@@ -124,7 +124,6 @@ commandRun :: CommandRunOptions -- ^ /Run/ command options
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   CommandRunOptions {..} <- viewL
   Configuration {..}     <- viewL
-  logInfo $ display productInfo
   let isCheck = cRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
@@ -326,6 +325,7 @@ loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
 finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
                    => RIO env Configuration
 finalConfiguration = do
+  logInfo $ display productInfo
   defaultConfig' <- Just <$> parseConfiguration defaultConfig
   cmdLineConfig  <- Just <$> optionsToConfiguration
   yamlConfig     <- loadConfigurationSafe ".headroom.yaml"
