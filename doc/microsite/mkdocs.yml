@@ -25,3 +25,5 @@ nav:
       - Project Setup Guide: documentation/project-setup-guide.md
       - Running Headroom: documentation/running-headroom.md
       - Configuration: documentation/configuration.md
+  - License:
+      - BSD-3-Clause License: license.md

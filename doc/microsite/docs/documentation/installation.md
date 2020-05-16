@@ -22,7 +22,7 @@ Headroom is written in [Haskell][web:haskell], so you can install it from source
 1. install [Stack][web:stack] for your platform
 1. clone this repository
 1. run `stack install` in the project directory
-1. add `$HOME/.local/bin` to your `$PATH`st
+1. add `$HOME/.local/bin` to your `$PATH`
 
 
 [meta:releases]: https://github.com/vaclavsvejcar/headroom/releases
