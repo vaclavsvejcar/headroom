@@ -1,4 +1,4 @@
-<p align="center"><img src ="https://github.com/vaclavsvejcar/headroom/blob/master/doc/assets/logo.png?raw=true" width="200" /></p>
+<p align="center"><img src ="images/logo.png" width="200" /></p>
 
 Would you like to have nice, up-to-date license/copyright headers in your source code files but hate to manage them by hand? Then __Headroom__ is the right tool for you! Now you can define your license header as [Mustache][web:mustache] template, put all the variables (such as author's name, year, etc.) into the [YAML][wiki:yaml] config file and Headroom will take care to add such license headers to all your source code files.
 

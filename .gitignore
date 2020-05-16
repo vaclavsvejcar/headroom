@@ -25,3 +25,6 @@ stack.yaml.lock
 
 ## macOS specific
 .DS_Store
+
+## Exclude built mkdocs website
+doc/microsite/site
