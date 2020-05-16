@@ -1,6 +1,17 @@
 site_name: Headroom
 copyright: Copyright (c) 2020 norcane
 
+nav:
+  - Home: index.md
+  - Documentation:
+      - Installation: documentation/installation.md
+      - Basic Concepts: documentation/basic-concepts.md
+      - Project Setup Guide: documentation/project-setup-guide.md
+      - Running Headroom: documentation/running-headroom.md
+      - Configuration: documentation/configuration.md
+  - License:
+      - BSD-3-Clause License: license.md
+
 theme:
   name: material
   logo: "images/norcane-logo.png"
@@ -17,13 +28,11 @@ markdown_extensions:
   - toc:
       permalink: true
 
-nav:
-  - Home: index.md
-  - Documentation:
-      - Installation: documentation/installation.md
-      - Basic Concepts: documentation/basic-concepts.md
-      - Project Setup Guide: documentation/project-setup-guide.md
-      - Running Headroom: documentation/running-headroom.md
-      - Configuration: documentation/configuration.md
-  - License:
-      - BSD-3-Clause License: license.md
+repo_name: vaclavsvejcar/headroom
+repo_url: https://github.com/vaclavsvejcar/headroom
+edit_uri: ""
+
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/vaclavsvejcar
