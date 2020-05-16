@@ -14,6 +14,8 @@ markdown_extensions:
   - codehilite:
       guess_lang: false
       use_pygments: true
+  - toc:
+      permalink: true
 
 nav:
   - Home: index.md

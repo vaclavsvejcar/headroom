@@ -7,6 +7,31 @@ Headroom uses three different sources of configuration, where the next one event
 ## YAML configuration file
 To check available configuration options for `.headroom.yaml`, see the [embedded/default-config.yaml][file:embedded/default-config.yaml] file, which is well documented and then override/define configuration you need in your project `.headroom.yaml`.
 
+Below are some examples of common things you might want to configure for your project.
+
+### Configuring License Headers
+_Headroom_ contains default configuration for how _license header_ should look for selected _file type_ (e.g. to use _block comments_ `/* */` for `C++` source code files). You can check this default configuration under the `license-headers` key in [embedded/default-config.yaml][file:embedded/default-config.yaml]. For example default configuration for _Haskell file type_ looks like this:
+
+```yaml
+## Haskell configuration
+haskell:
+  file-extensions: ["hs"]
+  margin-after: 0
+  margin-before: 0
+  put-after: []
+  put-before: ["^module"]
+  block-comment:
+    starts-with: "{-|"
+    ends-with: "-}"
+```
+
+If the default configuration for selected _file type_ doesn't suit your needs, you can override following settings:
+
+1. __list of file extensions__ - if you need to match selected _file type_ with different set of file extensions, override the `file-extensions` option.
+1. __margin before/after license header__ - if you want to put blank lines before and/or after license headers, use the `margin-after` or `margin-before` option, where the value is number of blank lines.
+1. __put header before/after pattern__ - you can define before and/or after which pattern _Headroom_ will put the license header (such as before the line starting with `module` in _Haskell_ code).
+1. __syntax of header comment__ - you can decided if your license header will be defined using multiple single-line comments (such as `//` in _C/C++_ or `--` in _Haskell_) or block comment (such as `{- -}` in Haskell). To define block comment, use the `block-comment` option with `starts-with` and `ends-with` sub-options, to use single-line comment, use `line-comment` option with `prefixed-by` sub-option.
+
 ## Command Line Arguments
 Not all configuration options can be set/overridden using the command line arguments, but below is the list of matching _YAML_ options and command line options:
 
@@ -16,64 +41,46 @@ Not all configuration options can be set/overridden using the command line argum
 | `run-mode: drop`    | `-d`, `--drop-headers`         |		
 | `run-mode: replace` | `-r`, `--replace-headers`      |	
 | `run-mode: check`   | `-c`, `--check-headers`        |		
-| `source-paths`      | `-s`, `--source-path=PATH`     |	
-| `excluded-paths`    | `-e`, `--excluded-path=REGEX`  |	
-| `template-paths`    | `-t`, `--template-path=PATH`   |
-| `variables`         | `-v`, `--variable="KEY=VALUE"` |
+| `source-paths`      | `-s`, `--source-path PATH`     |	
+| `excluded-paths`    | `-e`, `--excluded-path REGEX`  |	
+| `template-paths`    | `-t`, `--template-path PATH`   |
+| `variables`         | `-v`, `--variable "KEY=VALUE"` |
 
 Where `source-path`, `template-path` and `variable` command line arguments can be used multiple times to set more values.
 
-## Configuration Tips
-This chapter contains tips on the most common configuration changes you may want to use in your project.
+## Supported License Types
+_Headroom_ provides built-it license templates for major _OSS_ licenses. Whenever you need to specify the _license type_ in `.headroom.yaml` or command line arguments, use one of the values below:
 
-### Adding blank lines before/after license header
-If you want to configure Headroom to put blank lines before or after (or both) the license header, you can use following _YAML_ configuration:
+| License        | Name in configuration |
+|----------------|-----------------------|
+| _Apache 2.0_   | `apache2`             |
+| _BSD 3-Clause_ | `bsd3`                |
+| _GPLv2_        | `gpl2`                |
+| _GPLv3_        | `gpl3`                |
+| _MIT_          | `mit`                 |
+| _MPL2_         | `mpl2`                |
 
-```yaml
-license-headers:
-  <FILE_TYPE>:
-    margin-after: 1   # number of blank lines to put after license header
-    margin-before: 1  # number of blank lines to put before license header
-```
+If you miss support for license type you use, feel free to [open new issue][meta:new-issue].
 
-### Putting license header before/after selected pattern
-If you need to put the license header before, after (or both) selected patterns, e.g. before the `package foo.bar` line in _Java_ files or after the _language pragmas_ in _Haskell_ files, you can use the `put-before` and/or `put-after` configuration keys.
+## Supported File Types
+_Headroom_ can manage license headers only for supported types of source code files. Whenever you need to specify the _license type_ in `.headroom.yaml` or command line arguments, use one of the values below:
 
-#### put-before option
-`put-before` accepts list of regular expressions and the license header is placed before the very first line matching one of the given expressions.
+| Language     | Name in configuration | Default extensions |
+|--------------|-----------------------|--------------------|
+| _C_          | `c`                   | `.c`               |
+| _C++_        | `cpp`                 | `.cpp`             |
+| _CSS_        | `css`                 | `.css`             |
+| _Haskell_    | `haskell`             | `.hs`              |
+| _HTML_       | `html`                | `.html`, `.htm`    |
+| _Java_       | `java`                | `.java`            |
+| _JavaScript_ | `js`                  | `.js`              |
+| _Rust_       | `rust`                | `.rs`              |
+| _Scala_      | `scala`               | `.scala`           |
+| _Shell_      | `shell`               | `.sh`              |
 
-__Example configuration:__
-```yaml
-license-headers:
-  c:
-    put-before: ["^#include"]
-```
-
-__Result:__
-```c
-/* >>> header is placed here <<< */
-#include <stdio.h>
-#include <foo.h>
-int main() { ... }
-```
-
-#### put-after option
-`put-after` accepts list of regular expressions and the license header is placed after the very last line matching one of the given expressions.
-
-__Example configuration:__
-```yaml
-license-headers:
-  c:
-    put-after: ["^#include"]
-```
-
-__Result:__
-```c
-#include <stdio.h>
-#include <foo.h>
-/* >>> header is placed here <<< */
-int main() { ... }
-```
+If you miss support for file type you use, feel free to [open new issue][meta:new-issue].
 
 
 [file:embedded/default-config.yaml]: https://github.com/vaclavsvejcar/headroom/blob/master/embedded/default-config.yaml
+[meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
+
