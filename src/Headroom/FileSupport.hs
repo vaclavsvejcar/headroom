@@ -51,10 +51,14 @@ import           Text.Regex.PCRE.Light          ( Regex )
 
 -- | Extracts info about the processed file to be later used by the header
 -- detection/manipulation functions.
-extractFileInfo :: FileType     -- ^ type of the detected file
-                -> HeaderConfig -- ^ appropriate header configuration
-                -> Text         -- ^ text used for detection
-                -> FileInfo     -- ^ resulting file info
+extractFileInfo :: FileType
+                -- ^ type of the detected file
+                -> HeaderConfig
+                -- ^ appropriate header configuration
+                -> Text
+                -- ^ text used for detection
+                -> FileInfo
+                -- ^ resulting file info
 extractFileInfo fiFileType fiHeaderConfig input =
   let fiHeaderPos = findHeader fiHeaderConfig input
       fiVariables = extractVariables fiFileType fiHeaderConfig input
@@ -64,10 +68,14 @@ extractFileInfo fiFileType fiHeaderConfig input =
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if
 -- any header is already present, use 'replaceHeader' if you need to
 -- override it.
-addHeader :: FileInfo -- ^ info about file where header is added
-          -> Text     -- ^ text of the new header
-          -> Text     -- ^ text of the file where to add the header
-          -> Text     -- ^ resulting text with added header
+addHeader :: FileInfo
+          -- ^ info about file where header is added
+          -> Text
+          -- ^ text of the new header
+          -> Text
+          -- ^ text of the file where to add the header
+          -> Text
+          -- ^ resulting text with added header
 addHeader FileInfo {..} _ text | isJust fiHeaderPos = text
 addHeader FileInfo {..} header text                 = result
  where
@@ -85,9 +93,12 @@ addHeader FileInfo {..} header text                 = result
 
 -- | Drops header at position specified by the 'FileInfo' from the given text.
 -- Does nothing if no header is present.
-dropHeader :: FileInfo -- ^ info about the file from which the header will be dropped
-           -> Text     -- ^ text of the file from which to drop the header
-           -> Text     -- ^ resulting text with dropped header
+dropHeader :: FileInfo
+           -- ^ info about the file from which the header will be dropped
+           -> Text
+           -- ^ text of the file from which to drop the header
+           -> Text
+           -- ^ resulting text with dropped header
 dropHeader (FileInfo _ _ Nothing             _) text = text
 dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
  where
@@ -100,10 +111,14 @@ dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
 -- | Replaces existing header at position specified by the 'FileInfo' in the
 -- given text. Basically combines 'addHeader' with 'dropHeader'. If no header
 -- is present, then the given one is added to the text.
-replaceHeader :: FileInfo -- ^ info about the file in which to replace the header
-              -> Text     -- ^ text of the new header
-              -> Text     -- ^ text of the file where to replace the header
-              -> Text     -- ^ resulting text with replaced header
+replaceHeader :: FileInfo
+              -- ^ info about the file in which to replace the header
+              -> Text
+              -- ^ text of the new header
+              -> Text
+              -- ^ text of the file where to replace the header
+              -> Text
+              -- ^ resulting text with replaced header
 replaceHeader fileInfo header = addHeader' . dropHeader'
  where
   addHeader'     = addHeader infoWithoutPos header
@@ -119,9 +134,12 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- >>> let hc = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-" "-}")
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
 -- Just (2,2)
-findHeader :: HeaderConfig     -- ^ appropriate header configuration
-           -> Text             -- ^ text in which to detect the header
-           -> Maybe (Int, Int) -- ^ header position @(startLine, endLine)@
+findHeader :: HeaderConfig
+           -- ^ appropriate header configuration
+           -> Text
+           -- ^ text in which to detect the header
+           -> Maybe (Int, Int)
+           -- ^ header position @(startLine, endLine)@
 findHeader HeaderConfig {..} input = case hcHeaderSyntax of
   BlockComment start end -> findBlockHeader start end inLines splitAt
   LineComment prefix     -> findLineHeader prefix inLines splitAt
@@ -136,11 +154,16 @@ findHeader HeaderConfig {..} input = case hcHeaderSyntax of
 --
 -- >>> findBlockHeader "{-" "-}" ["", "{- HEADER -}", "", ""] 0
 -- Just (1,1)
-findBlockHeader :: Text             -- ^ starting pattern (e.g. @{-@ or @/*@)
-                -> Text             -- ^ ending pattern (e.g. @-}@ or @*/@)
-                -> [Text]           -- ^ lines of text in which to detect the header
-                -> Int              -- ^ line number offset (adds to resulting position)
-                -> Maybe (Int, Int) -- ^ header position @(startLine + offset, endLine + offset)@
+findBlockHeader :: Text
+                -- ^ starting pattern (e.g. @{-@ or @/*@)
+                -> Text
+                -- ^ ending pattern (e.g. @-}@ or @*/@)
+                -> [Text]
+                -- ^ lines of text in which to detect the header
+                -> Int
+                -- ^ line number offset (adds to resulting position)
+                -> Maybe (Int, Int)
+                -- ^ header position @(startLine + offset, endLine + offset)@
 findBlockHeader startsWith endsWith = go Nothing Nothing
  where
   isStart = T.isPrefixOf startsWith
@@ -157,10 +180,14 @@ findBlockHeader startsWith endsWith = go Nothing Nothing
 --
 -- >>> findLineHeader "--" ["", "a", "-- first", "-- second", "foo"] 0
 -- Just (2,3)
-findLineHeader :: Text             -- ^ prefix pattern (e.g. @--@ or @//@)
-               -> [Text]           -- ^ lines of text in which to detect the header
-               -> Int              -- ^ line number offset (adds to resulting position)
-               -> Maybe (Int, Int) -- ^ header position @(startLine + offset, endLine + offset)@
+findLineHeader :: Text
+               -- ^ prefix pattern (e.g. @--@ or @//@)
+               -> [Text]
+               -- ^ lines of text in which to detect the header
+               -> Int
+               -- ^ line number offset (adds to resulting position)
+               -> Maybe (Int, Int)
+               -- ^ header position @(startLine + offset, endLine + offset)@
 findLineHeader prefix = go Nothing
  where
   isPrefix = T.isPrefixOf prefix
@@ -175,9 +202,12 @@ findLineHeader prefix = go Nothing
 --
 -- >>> firstMatching (compile' "^foo") ["some text", "foo bar", "foo baz", "last"]
 -- Just 1
-firstMatching :: Regex        -- /regex/ used for matching
-              -> [Text]       -- input lines
-              -> Maybe Int    -- matching line number
+firstMatching :: Regex
+              -- ^ /regex/ used for matching
+              -> [Text]
+              -- ^ input lines
+              -> Maybe Int
+              -- ^ matching line number
 firstMatching regex input = go input 0
  where
   cond x = isJust $ match' regex x
@@ -190,9 +220,12 @@ firstMatching regex input = go input 0
 --
 -- >>> lastMatching (compile' "^foo") ["some text", "foo bar", "foo baz", "last"]
 -- Just 2
-lastMatching :: Regex        -- /regex/ used for matching
-             -> [Text]       -- input lines
-             -> Maybe Int    -- matching line number
+lastMatching :: Regex
+             -- ^ /regex/ used for matching
+             -> [Text]
+             -- ^ input lines
+             -> Maybe Int
+             -- ^ matching line number
 lastMatching regex input = go input 0 Nothing
  where
   cond x = isJust $ match' regex x
@@ -220,7 +253,14 @@ lastMatching regex input = go input 0 Nothing
 --
 -- >>> splitInput [] [] "one\ntwo"
 -- ([],["one","two"],[])
-splitInput :: [Text] -> [Text] -> Text -> ([Text], [Text], [Text])
+splitInput :: [Text]
+           -- ^ pattern for first split
+           -> [Text]
+           -- ^ pattern for second split
+           -> Text
+           -- ^ text to split
+           -> ([Text], [Text], [Text])
+           -- ^ result lines as @([before1stSplit], [middle], [after2ndSplit])@
 splitInput []       []       input = ([], T.lines input, [])
 splitInput fstSplit sndSplit input = (before, middle, after)
  where

@@ -60,9 +60,12 @@ dropFieldPrefix = \case
 --
 -- >>> symbolCase '-' "fooBar"
 -- "foo-bar"
-symbolCase :: Char   -- ^ word separator symbol
-           -> String -- ^ input text
-           -> String -- ^ processed text
+symbolCase :: Char
+           -- ^ word separator symbol
+           -> String
+           -- ^ input text
+           -> String
+           -- ^ processed text
 symbolCase sym = \case
   [] -> []
   (x : xs) | C.isUpper x -> sym : C.toLower x : symbolCase sym xs
@@ -71,7 +74,9 @@ symbolCase sym = \case
 
 -- | Pretty prints given data as /YAML/.
 prettyPrintYAML :: ToJSON a
-                => a    -- ^ data to pretty print
-                -> Text -- ^ pretty printed /YAML/ output
+                => a
+                -- ^ data to pretty print
+                -> Text
+                -- ^ pretty printed /YAML/ output
 prettyPrintYAML = decodeUtf8Lenient . YP.encodePretty prettyConfig
   where prettyConfig = YP.setConfCompare compare YP.defConfig

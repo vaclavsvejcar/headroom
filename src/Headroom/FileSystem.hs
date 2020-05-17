@@ -57,27 +57,37 @@ import qualified RIO.Text                      as T
 
 -- | Recursively finds files on given path whose filename matches the predicate.
 findFiles :: MonadIO m
-          => FilePath           -- ^ path to search
-          -> (FilePath -> Bool) -- ^ predicate to match filename
-          -> m [FilePath]       -- ^ found files
+          => FilePath
+          -- ^ path to search
+          -> (FilePath -> Bool)
+          -- ^ predicate to match filename
+          -> m [FilePath]
+          -- ^ found files
 findFiles path predicate = fmap (filter predicate) (listFiles path)
 
 
 -- | Recursively finds files on given path by file extensions.
 findFilesByExts :: MonadIO m
-                => FilePath     -- ^ path to search
-                -> [Text]       -- ^ list of file extensions (without dot)
-                -> m [FilePath] -- ^ list of found files
+                => FilePath
+                -- ^ path to search
+                -> [Text]
+                -- ^ list of file extensions (without dot)
+                -> m [FilePath]
+                -- ^ list of found files
 findFilesByExts path exts = findFiles path predicate
   where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 
 
 -- | Recursively find files on given path by their file types.
 findFilesByTypes :: MonadIO m
-                 => HeadersConfig -- ^ configuration of license headers
-                 -> [FileType]    -- ^ list of file types
-                 -> FilePath      -- ^ path to search
-                 -> m [FilePath]  -- ^ list of found files
+                 => HeadersConfig
+                 -- ^ configuration of license headers
+                 -> [FileType]
+                 -- ^ list of file types
+                 -> FilePath
+                 -- ^ path to search
+                 -> m [FilePath]
+                 -- ^ list of found files
 findFilesByTypes headersConfig types path =
   findFilesByExts path (types >>= listExtensions headersConfig)
 
@@ -85,8 +95,10 @@ findFilesByTypes headersConfig types path =
 -- | Recursively find all files on given path. If file reference is passed
 -- instead of directory, such file path is returned.
 listFiles :: MonadIO m
-          => FilePath     -- ^ path to search
-          -> m [FilePath] -- ^ list of found files
+          => FilePath
+          -- ^ path to search
+          -> m [FilePath]
+          -- ^ list of found files
 listFiles fileOrDir = do
   isDir <- doesDirectoryExist fileOrDir
   if isDir then listDirectory fileOrDir else pure [fileOrDir]
@@ -113,8 +125,10 @@ fileExtension path = case takeExtension path of
 
 -- | Loads file content in UTF8 encoding.
 loadFile :: MonadIO m
-         => FilePath -- ^ file path
-         -> m Text   -- ^ file content
+         => FilePath
+         -- ^ file path
+         -> m Text
+         -- ^ file content
 loadFile = readFileUtf8
 
 
@@ -123,9 +137,12 @@ loadFile = readFileUtf8
 --
 -- >>> excludePaths ["\\.hidden", "zzz"] ["foo/.hidden", "test/bar", "x/zzz/e"]
 -- ["test/bar"]
-excludePaths :: [Text]     -- ^ patterns describing paths to exclude
-             -> [FilePath] -- ^ list of file paths
-             -> [FilePath] -- ^ resulting list of file paths
+excludePaths :: [Text]
+             -- ^ patterns describing paths to exclude
+             -> [FilePath]
+             -- ^ list of file paths
+             -> [FilePath]
+             -- ^ resulting list of file paths
 excludePaths _        []    = []
 excludePaths []       paths = paths
 excludePaths patterns paths = go $ compile' <$> joinPatterns patterns

@@ -38,8 +38,10 @@ import           RIO
 
 
 data Env = Env
-  { envLogFunc    :: !LogFunc           -- ^ logging function
-  , envGenOptions :: !CommandGenOptions -- ^ options
+  { envLogFunc    :: !LogFunc
+  -- ^ logging function
+  , envGenOptions :: !CommandGenOptions
+  -- ^ options
   }
 
 instance HasLogFunc Env where
@@ -50,16 +52,20 @@ env' opts logFunc = pure $ Env { envLogFunc = logFunc, envGenOptions = opts }
 
 -- | Parses 'GenMode' from combination of options from given 'Command'.
 parseGenMode :: MonadThrow m
-             => Command      -- ^ command from which to parse the 'GenMode'
-             -> m GenMode    -- ^ parsed 'GenMode'
+             => Command
+             -- ^ command from which to parse the 'GenMode'
+             -> m GenMode
+             -- ^ parsed 'GenMode'
 parseGenMode = \case
   Gen True  Nothing        -> pure GenConfigFile
   Gen False (Just license) -> pure $ GenLicense license
   _                        -> throwM $ CommandGenError NoGenModeSelected
 
 -- | Handler for /Generator/ command.
-commandGen :: CommandGenOptions -- ^ /Generator/ command options
-           -> IO ()             -- ^ execution result
+commandGen :: CommandGenOptions
+           -- ^ /Generator/ command options
+           -> IO ()
+           -- ^ execution result
 commandGen opts = bootstrap (env' opts) False $ case cgoGenMode opts of
   GenConfigFile             -> liftIO printConfigFile
   GenLicense (lType, fType) -> liftIO . putStrLn $ licenseTemplate lType fType

@@ -43,8 +43,10 @@ instance Display Progress where
 --
 -- >>> zipWithProgress ["a", "b"]
 -- [(Progress 1 2,"a"),(Progress 2 2,"b")]
-zipWithProgress :: [a]             -- ^ list to zip with progress
-                -> [(Progress, a)] -- ^ zipped result
+zipWithProgress :: [a]
+                -- ^ list to zip with progress
+                -> [(Progress, a)]
+                -- ^ zipped result
 zipWithProgress list = zip progresses list
  where
   listLength = L.length list

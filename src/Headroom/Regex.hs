@@ -34,8 +34,10 @@ import           Text.Regex.PCRE.Light.Char8    ( match
 
 -- | Same as 'compile', but takes 'Text' on input and enables 'utf8' option
 -- by default.
-compile' :: Text  -- ^ regular expression to be compiled
-         -> Regex -- ^ compiled regular expression
+compile' :: Text
+         -- ^ regular expression to be compiled
+         -> Regex
+         -- ^ compiled regular expression
 compile' regex = compile (encodeUtf8 regex) [utf8]
 
 
@@ -44,14 +46,19 @@ compile' regex = compile (encodeUtf8 regex) [utf8]
 --
 -- >>> joinPatterns ["^foo", "^bar"]
 -- Just "^foo|^bar"
-joinPatterns :: [Text]     -- ^ list of patterns to join
-             -> Maybe Text -- ^ joined patterns
+joinPatterns :: [Text]
+             -- ^ list of patterns to join
+             -> Maybe Text
+             -- ^ joined patterns
 joinPatterns [] = Nothing
 joinPatterns ps = Just $ T.intercalate "|" ps
 
 
 -- | Same as 'match', but works with 'Text' and uses no additional options.
-match' :: Regex        -- ^ a PCRE regular expression value produced by compile
-       -> Text         -- ^ the subject text to match against
-       -> Maybe [Text] -- ^ the result value
+match' :: Regex
+       -- ^ a PCRE regular expression value produced by compile
+       -> Text
+       -- ^ the subject text to match against
+       -> Maybe [Text]
+       -- ^ the result value
 match' regex subject = fmap T.pack <$> match regex (T.unpack subject) []

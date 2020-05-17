@@ -40,9 +40,12 @@ defaultConfig = $(embedStringFile "embedded/default-config.yaml")
 
 -- | License template for given license.
 licenseTemplate :: IsString a
-                => LicenseType -- ^ license for which to return the template
-                -> FileType    -- ^ license for which to return the template
-                -> a           -- ^ template text
+                => LicenseType
+                -- ^ license for which to return the template
+                -> FileType
+                -- ^ license for which to return the template
+                -> a
+                -- ^ template text
 licenseTemplate licenseType fileType = case licenseType of
   Apache2 -> case fileType of
     C       -> $(embedStringFile "embedded/license/apache2/c.mustache")

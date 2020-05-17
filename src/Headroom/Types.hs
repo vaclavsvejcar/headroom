@@ -69,24 +69,34 @@ import qualified RIO.Text                      as T
 
 -- | Action to be performed based on the selected 'RunMode'.
 data RunAction = RunAction
-  { raProcessed    :: !Bool           -- ^ whether the given file was processed
-  , raFunc         :: !(Text -> Text) -- ^ function to process the file
-  , raProcessedMsg :: !Text           -- ^ message to show when file was processed
-  , raSkippedMsg   :: !Text           -- ^ message to show when file was skipped
+  { raProcessed    :: !Bool
+  -- ^ whether the given file was processed
+  , raFunc         :: !(Text -> Text)
+  -- ^ function to process the file
+  , raProcessedMsg :: !Text
+  -- ^ message to show when file was processed
+  , raSkippedMsg   :: !Text
+  -- ^ message to show when file was skipped
   }
 
 -- | Source of license templates
 data TemplateSource
-  = TemplateFiles [FilePath]     -- ^ templates are stored as local files
-  | BuiltInTemplates LicenseType -- ^ use built-in templates for selected license
+  = TemplateFiles [FilePath]
+  -- ^ templates are stored as local files
+  | BuiltInTemplates LicenseType
+  -- ^ use built-in templates for selected license
   deriving (Eq, Show)
 
 -- | Represents what action should the @run@ command perform.
 data RunMode
-  = Add     -- ^ /add mode/ for @run@ command
-  | Check   -- ^ /check mode/ for @run@ command
-  | Drop    -- ^ /drop mode/ for @run@ command
-  | Replace -- ^ /replace mode/ for @run@ command
+  = Add
+  -- ^ /add mode/ for @run@ command
+  | Check
+  -- ^ /check mode/ for @run@ command
+  | Drop
+  -- ^ /drop mode/ for @run@ command
+  | Replace
+  -- ^ /replace mode/ for @run@ command
   deriving (Eq, Show)
 
 instance FromJSON RunMode where
@@ -101,16 +111,22 @@ instance FromJSON RunMode where
 
 -- | Represents what action should the @gen@ command perform.
 data GenMode
-  = GenConfigFile                       -- ^ generate /YAML/ config file stub
-  | GenLicense !(LicenseType, FileType) -- ^ generate license header template
+  = GenConfigFile
+  -- ^ generate /YAML/ config file stub
+  | GenLicense !(LicenseType, FileType)
+  -- ^ generate license header template
   deriving (Eq, Show)
 
 -- | Represents error that can occur during the application execution.
 data ApplicationError
-  = CommandGenError !CommandGenError       -- ^ error specific for the @gen@ command
-  | CommandInitError !CommandInitError     -- ^ error specific for the @init@ command
-  | ConfigurationError !ConfigurationError -- ^ error processing configuration
-  | TemplateError !TemplateError           -- ^ error processing template
+  = CommandGenError !CommandGenError
+  -- ^ error specific for the @gen@ command
+  | CommandInitError !CommandInitError
+  -- ^ error specific for the @init@ command
+  | ConfigurationError !ConfigurationError
+  -- ^ error processing configuration
+  | TemplateError !TemplateError
+  -- ^ error processing template
   deriving (Eq, Show)
 
 instance Exception ApplicationError where
@@ -121,72 +137,104 @@ instance Exception ApplicationError where
     TemplateError      error' -> templateError error'
 
 -- | Error specific for the @gen@ command.
-data CommandGenError = NoGenModeSelected -- ^ no mode of /Gen/ command selected
+data CommandGenError = NoGenModeSelected
+                     -- ^ no mode of /Gen/ command selected
   deriving (Eq, Show)
 
 -- | Error specific for the @init@ command.
 data CommandInitError
-  = AppConfigAlreadyExists !FilePath -- ^ application configuration file already exists
-  | NoProvidedSourcePaths            -- ^ no paths to source code files provided
-  | NoSupportedFileType              -- ^ no supported file types found on source paths
+  = AppConfigAlreadyExists !FilePath
+  -- ^ application configuration file already exists
+  | NoProvidedSourcePaths
+  -- ^ no paths to source code files provided
+  | NoSupportedFileType
+  -- ^ no supported file types found on source paths
   deriving (Eq, Show)
 
 -- | Error during processing configuration.
 data ConfigurationError
-  = InvalidVariable !Text      -- ^ invalid variable input (as @key=value@)
-  | MixedHeaderSyntax          -- ^ illegal configuration for 'HeaderSyntax'
-  | NoFileExtensions !FileType -- ^ no configuration for @file-extensions@
-  | NoHeaderSyntax !FileType   -- ^ no configuration for header syntax
-  | NoMarginAfter !FileType    -- ^ no configuration for @margin-after@
-  | NoMarginBefore !FileType   -- ^ no configuration for @margin-before@
-  | NoPutAfter !FileType       -- ^ no configuration for @put-after@
-  | NoPutBefore !FileType      -- ^ no configuration for @put-before@
-  | NoRunMode                  -- ^ no configuration for @run-mode@
-  | NoSourcePaths              -- ^ no configuration for @source-paths@
-  | NoExcludedPaths            -- ^ no configuration for @excluded-paths@
-  | NoTemplateSource           -- ^ no configuration for template source
-  | NoVariables                -- ^ no configuration for @variables@
+  = InvalidVariable !Text
+  -- ^ invalid variable input (as @key=value@)
+  | MixedHeaderSyntax
+  -- ^ illegal configuration for 'HeaderSyntax'
+  | NoFileExtensions !FileType
+  -- ^ no configuration for @file-extensions@
+  | NoHeaderSyntax !FileType
+  -- ^ no configuration for header syntax
+  | NoMarginAfter !FileType
+  -- ^ no configuration for @margin-after@
+  | NoMarginBefore !FileType
+  -- ^ no configuration for @margin-before@
+  | NoPutAfter !FileType
+  -- ^ no configuration for @put-after@
+  | NoPutBefore !FileType
+  -- ^ no configuration for @put-before@
+  | NoRunMode
+  -- ^ no configuration for @run-mode@
+  | NoSourcePaths
+  -- ^ no configuration for @source-paths@
+  | NoExcludedPaths
+  -- ^ no configuration for @excluded-paths@
+  | NoTemplateSource
+  -- ^ no configuration for template source
+  | NoVariables
+  -- ^ no configuration for @variables@
   deriving (Eq, Show)
 
 -- | Error during processing template.
 data TemplateError
-  = MissingVariables !Text ![Text] -- ^ missing variable values
-  | ParseError !Text               -- ^ error parsing raw template text
+  = MissingVariables !Text ![Text]
+  -- ^ missing variable values
+  | ParseError !Text
+  -- ^ error parsing raw template text
   deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
 -- | Application command.
 data Command
-  = Run [FilePath] [Text] (Maybe TemplateSource) [Text] (Maybe RunMode) Bool Bool -- ^ @run@ command
-  | Gen Bool (Maybe (LicenseType, FileType))                                      -- ^ @gen@ command
-  | Init LicenseType [FilePath]                                                   -- ^ @init@ command
+  = Run [FilePath] [Text] (Maybe TemplateSource) [Text] (Maybe RunMode) Bool Bool
+  -- ^ @run@ command
+  | Gen Bool (Maybe (LicenseType, FileType))
+  -- ^ @gen@ command
+  | Init LicenseType [FilePath]
+  -- ^ @init@ command
   deriving (Show)
 
 --------------------------------------------------------------------------------
 
 -- | Options for the @gen@ command.
 newtype CommandGenOptions = CommandGenOptions
-  { cgoGenMode :: GenMode -- ^ selected mode
+  { cgoGenMode :: GenMode
+  -- ^ selected mode
   }
   deriving (Show)
 
 -- | Options for the @init@ command.
 data CommandInitOptions = CommandInitOptions
-  { cioSourcePaths :: ![FilePath]  -- ^ paths to source code files
-  , cioLicenseType :: !LicenseType -- ^ license type
+  { cioSourcePaths :: ![FilePath]
+  -- ^ paths to source code files
+  , cioLicenseType :: !LicenseType
+  -- ^ license type
   }
   deriving Show
 
 -- | Options for the @run@ command.
 data CommandRunOptions = CommandRunOptions
-  { croRunMode        :: !(Maybe RunMode)         -- ^ used /Run/ command mode
-  , croSourcePaths    :: ![FilePath]              -- ^ source code file paths
-  , croExcludedPaths  :: ![Text]                  -- ^ source paths to exclude
-  , croTemplateSource :: !(Maybe TemplateSource)  -- ^ source of license templates
-  , croVariables      :: ![Text]                  -- ^ raw variables
-  , croDebug          :: !Bool                    -- ^ whether to run in debug mode
-  , croDryRun         :: !Bool                    -- ^ whether to perform dry run
+  { croRunMode        :: !(Maybe RunMode)
+  -- ^ used /Run/ command mode
+  , croSourcePaths    :: ![FilePath]
+  -- ^ source code file paths
+  , croExcludedPaths  :: ![Text]
+  -- ^ source paths to exclude
+  , croTemplateSource :: !(Maybe TemplateSource)
+  -- ^ source of license templates
+  , croVariables      :: ![Text]
+  -- ^ raw variables
+  , croDebug          :: !Bool
+  -- ^ whether to run in debug mode
+  , croDryRun         :: !Bool
+  -- ^ whether to perform dry run
   }
   deriving (Eq, Show)
 
@@ -194,38 +242,58 @@ data CommandRunOptions = CommandRunOptions
 
 -- | Supported type of source code file.
 data FileType
-  = C       -- ^ support for /C/ programming language
-  | CPP     -- ^ support for /C++/ programming language
-  | CSS     -- ^ support for /CSS/
-  | Haskell -- ^ support for /Haskell/ programming language
-  | HTML    -- ^ support for /HTML/
-  | Java    -- ^ support for /Java/ programming language
-  | JS      -- ^ support for /JavaScript/ programming language
-  | Rust    -- ^ support for /Rust/ programming language
-  | Scala   -- ^ support for /Scala/ programming language
-  | Shell   -- ^ support for /Shell/
+  = C
+  -- ^ support for /C/ programming language
+  | CPP
+  -- ^ support for /C++/ programming language
+  | CSS
+  -- ^ support for /CSS/
+  | Haskell
+  -- ^ support for /Haskell/ programming language
+  | HTML
+  -- ^ support for /HTML/
+  | Java
+  -- ^ support for /Java/ programming language
+  | JS
+  -- ^ support for /JavaScript/ programming language
+  | Rust
+  -- ^ support for /Rust/ programming language
+  | Scala
+  -- ^ support for /Scala/ programming language
+  | Shell
+  -- ^ support for /Shell/
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
 
 --------------------------------------------------------------------------------
 
 -- | Supported type of open source license.
 data LicenseType
-  = Apache2 -- ^ support for /Apache-2.0/ license
-  | BSD3    -- ^ support for /BSD-3-Clause/ license
-  | GPL2    -- ^ support for /GNU GPL2/ license
-  | GPL3    -- ^ support for /GNU GPL3/ license
-  | MIT     -- ^ support for /MIT/ license
-  | MPL2    -- ^ support for /MPL2/ license
+  = Apache2
+  -- ^ support for /Apache-2.0/ license
+  | BSD3
+  -- ^ support for /BSD-3-Clause/ license
+  | GPL2
+  -- ^ support for /GNU GPL2/ license
+  | GPL3
+  -- ^ support for /GNU GPL3/ license
+  | MIT
+  -- ^ support for /MIT/ license
+  | MPL2
+  -- ^ support for /MPL2/ license
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
 
 --------------------------------------------------------------------------------
 
 -- | Info extracted about the concrete source code file.
 data FileInfo = FileInfo
-  { fiFileType     :: !FileType            -- ^ type of the file
-  , fiHeaderConfig :: !HeaderConfig        -- ^ configuration for license header
-  , fiHeaderPos    :: !(Maybe (Int, Int))  -- ^ position of existing license header
-  , fiVariables    :: !(HashMap Text Text) -- ^ additional extracted variables
+  { fiFileType     :: !FileType
+  -- ^ type of the file
+  , fiHeaderConfig :: !HeaderConfig
+  -- ^ configuration for license header
+  , fiHeaderPos    :: !(Maybe (Int, Int))
+  -- ^ position of existing license header
+  , fiVariables    :: !(HashMap Text Text)
+  -- ^ additional extracted variables
   }
   deriving (Eq, Show)
 
@@ -233,18 +301,26 @@ data FileInfo = FileInfo
 
 -- | Syntax of the license header comment.
 data HeaderSyntax
-  = BlockComment !Text !Text -- ^ block (multi-line) comment syntax (e.g. @/* */@)
-  | LineComment !Text        -- ^ single line comment syntax (e.g. @//@)
+  = BlockComment !Text !Text
+  -- ^ block (multi-line) comment syntax (e.g. @/* */@)
+  | LineComment !Text
+  -- ^ single line comment syntax (e.g. @//@)
   deriving (Eq, Show)
 
 -- | Application configuration.
 data Configuration = Configuration
-  { cRunMode        :: !RunMode             -- ^ mode of the @run@ command
-  , cSourcePaths    :: ![FilePath]          -- ^ paths to source code files
-  , cExcludedPaths  :: ![Text]              -- ^ excluded source paths
-  , cTemplateSource :: !TemplateSource      -- ^ source of license templates
-  , cVariables      :: !(HashMap Text Text) -- ^ variable values for templates
-  , cLicenseHeaders :: !HeadersConfig       -- ^ configuration of license headers
+  { cRunMode        :: !RunMode
+  -- ^ mode of the @run@ command
+  , cSourcePaths    :: ![FilePath]
+  -- ^ paths to source code files
+  , cExcludedPaths  :: ![Text]
+  -- ^ excluded source paths
+  , cTemplateSource :: !TemplateSource
+  -- ^ source of license templates
+  , cVariables      :: !(HashMap Text Text)
+  -- ^ variable values for templates
+  , cLicenseHeaders :: !HeadersConfig
+  -- ^ configuration of license headers
   }
   deriving (Eq, Show)
 
@@ -261,16 +337,26 @@ data HeaderConfig = HeaderConfig
 
 -- | Group of 'HeaderConfig' configurations for supported file types.
 data HeadersConfig = HeadersConfig
-  { hscC       :: !HeaderConfig -- ^ configuration for /C/ programming language
-  , hscCpp     :: !HeaderConfig -- ^ configuration for /C++/ programming language
-  , hscCss     :: !HeaderConfig -- ^ configuration for /CSS/
-  , hscHaskell :: !HeaderConfig -- ^ configuration for /Haskell/ programming language
-  , hscHtml    :: !HeaderConfig -- ^ configuration for /HTML/
-  , hscJava    :: !HeaderConfig -- ^ configuration for /Java/ programming language
-  , hscJs      :: !HeaderConfig -- ^ configuration for /JavaScript/ programming language
-  , hscRust    :: !HeaderConfig -- ^ configuration for /Rust/ programming language
-  , hscScala   :: !HeaderConfig -- ^ configuration for /Scala/ programming language
-  , hscShell   :: !HeaderConfig -- ^ configuration for /Shell/
+  { hscC       :: !HeaderConfig
+  -- ^ configuration for /C/ programming language
+  , hscCpp     :: !HeaderConfig
+  -- ^ configuration for /C++/ programming language
+  , hscCss     :: !HeaderConfig
+  -- ^ configuration for /CSS/
+  , hscHaskell :: !HeaderConfig
+  -- ^ configuration for /Haskell/ programming language
+  , hscHtml    :: !HeaderConfig
+  -- ^ configuration for /HTML/
+  , hscJava    :: !HeaderConfig
+  -- ^ configuration for /Java/ programming language
+  , hscJs      :: !HeaderConfig
+  -- ^ configuration for /JavaScript/ programming language
+  , hscRust    :: !HeaderConfig
+  -- ^ configuration for /Rust/ programming language
+  , hscScala   :: !HeaderConfig
+  -- ^ configuration for /Scala/ programming language
+  , hscShell   :: !HeaderConfig
+  -- ^ configuration for /Shell/
   }
   deriving (Eq, Show)
 
@@ -278,51 +364,76 @@ data HeadersConfig = HeadersConfig
 
 -- | Internal representation of block comment style of 'HeaderSyntax'.
 data BlockComment' = BlockComment'
-  { bcStartsWith :: !Text -- ^ starting pattern (e.g. @/*@)
-  , bcEndsWith   :: !Text -- ^ ending pattern (e.g. @*/@)
+  { bcStartsWith :: !Text
+  -- ^ starting pattern (e.g. @/*@)
+  , bcEndsWith   :: !Text
+  -- ^ ending pattern (e.g. @*/@)
   }
   deriving (Eq, Generic, Show)
 
 -- | Internal representation of the line style of 'HeaderSyntax'.
 newtype LineComment' = LineComment'
-  { lcPrefixedBy :: Text -- ^ prefix of the comment line (e.g. @//@)
+  { lcPrefixedBy :: Text
+  -- ^ prefix of the comment line (e.g. @//@)
   }
   deriving (Eq, Generic, Show)
 
 -- | Partial (possibly incomplete) version of 'Configuration'.
 data PartialConfiguration = PartialConfiguration
-  { pcRunMode        :: !(Last RunMode)             -- ^ mode of the @run@ command
-  , pcSourcePaths    :: !(Last [FilePath])          -- ^ paths to source code files
-  , pcExcludedPaths  :: !(Last [Text])              -- ^ excluded source paths
-  , pcTemplateSource :: !(Last TemplateSource)      -- ^ paths to template files
-  , pcVariables      :: !(Last (HashMap Text Text)) -- ^ variable values for templates
-  , pcLicenseHeaders :: !PartialHeadersConfig       -- ^ configuration of license headers
+  { pcRunMode        :: !(Last RunMode)
+  -- ^ mode of the @run@ command
+  , pcSourcePaths    :: !(Last [FilePath])
+  -- ^ paths to source code files
+  , pcExcludedPaths  :: !(Last [Text])
+  -- ^ excluded source paths
+  , pcTemplateSource :: !(Last TemplateSource)
+  -- ^ paths to template files
+  , pcVariables      :: !(Last (HashMap Text Text))
+  -- ^ variable values for templates
+  , pcLicenseHeaders :: !PartialHeadersConfig
+  -- ^ configuration of license headers
   }
   deriving (Eq, Generic, Show)
 
 -- | Partial (possibly incomplete) version of 'HeaderConfig'.
 data PartialHeaderConfig = PartialHeaderConfig
-  { phcFileExtensions :: !(Last [Text])       -- ^ list of file extensions (without dot)
-  , phcMarginAfter    :: !(Last Int)          -- ^ number of empty lines to put after header
-  , phcMarginBefore   :: !(Last Int)          -- ^ number of empty lines to put before header
-  , phcPutAfter       :: !(Last [Text])       -- ^ /regexp/ patterns after which to put the header
-  , phcPutBefore      :: !(Last [Text])       -- ^ /regexp/ patterns before which to put the header
-  , phcHeaderSyntax   :: !(Last HeaderSyntax) -- ^ syntax of the license header comment
+  { phcFileExtensions :: !(Last [Text])
+  -- ^ list of file extensions (without dot)
+  , phcMarginAfter    :: !(Last Int)
+  -- ^ number of empty lines to put after header
+  , phcMarginBefore   :: !(Last Int)
+  -- ^ number of empty lines to put before header
+  , phcPutAfter       :: !(Last [Text])
+  -- ^ /regexp/ patterns after which to put the header
+  , phcPutBefore      :: !(Last [Text])
+  -- ^ /regexp/ patterns before which to put the header
+  , phcHeaderSyntax   :: !(Last HeaderSyntax)
+  -- ^ syntax of the license header comment
   }
   deriving (Eq, Generic, Show)
 
 -- | Partial (possibly incomplete) version of 'HeadersConfig'.
 data PartialHeadersConfig = PartialHeadersConfig
-  { phscC       :: !PartialHeaderConfig -- ^ configuration for /C/ programming language
-  , phscCpp     :: !PartialHeaderConfig -- ^ configuration for /C++/ programming language
-  , phscCss     :: !PartialHeaderConfig -- ^ configuration for /CSS/
-  , phscHaskell :: !PartialHeaderConfig -- ^ configuration for /Haskell/ programming language
-  , phscHtml    :: !PartialHeaderConfig -- ^ configuration for /HTML/
-  , phscJava    :: !PartialHeaderConfig -- ^ configuration for /Java/ programming language
-  , phscJs      :: !PartialHeaderConfig -- ^ configuration for /JavaScript/ programming language
-  , phscRust    :: !PartialHeaderConfig -- ^ configuration for /Rust/ programming language
-  , phscScala   :: !PartialHeaderConfig -- ^ configuration for /Scala/ programming language
-  , phscShell   :: !PartialHeaderConfig -- ^ configuration for /Shell/
+  { phscC       :: !PartialHeaderConfig
+  -- ^ configuration for /C/ programming language
+  , phscCpp     :: !PartialHeaderConfig
+  -- ^ configuration for /C++/ programming language
+  , phscCss     :: !PartialHeaderConfig
+  -- ^ configuration for /CSS/
+  , phscHaskell :: !PartialHeaderConfig
+  -- ^ configuration for /Haskell/ programming language
+  , phscHtml    :: !PartialHeaderConfig
+  -- ^ configuration for /HTML/
+  , phscJava    :: !PartialHeaderConfig
+  -- ^ configuration for /Java/ programming language
+  , phscJs      :: !PartialHeaderConfig
+  -- ^ configuration for /JavaScript/ programming language
+  , phscRust    :: !PartialHeaderConfig
+  -- ^ configuration for /Rust/ programming language
+  , phscScala   :: !PartialHeaderConfig
+  -- ^ configuration for /Scala/ programming language
+  , phscShell   :: !PartialHeaderConfig
+  -- ^ configuration for /Shell/
   }
   deriving (Eq, Generic, Show)
 

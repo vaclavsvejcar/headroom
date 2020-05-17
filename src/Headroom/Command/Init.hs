@@ -101,8 +101,10 @@ env' opts logFunc = do
   pure $ Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
 
 -- | Handler for @init@ command.
-commandInit :: CommandInitOptions -- ^ @init@ command options
-            -> IO ()              -- ^ execution result
+commandInit :: CommandInitOptions
+            -- ^ @init@ command options
+            -> IO ()
+            -- ^ execution result
 commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
   False -> do
     fileTypes <- findSupportedFileTypes

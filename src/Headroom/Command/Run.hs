@@ -79,14 +79,18 @@ import qualified RIO.Text                      as T
 
 -- | Initial /RIO/ startup environment for the /Run/ command.
 data StartupEnv = StartupEnv
-  { envLogFunc    :: !LogFunc           -- ^ logging function
-  , envRunOptions :: !CommandRunOptions -- ^ options
+  { envLogFunc    :: !LogFunc
+  -- ^ logging function
+  , envRunOptions :: !CommandRunOptions
+  -- ^ options
   }
 
 -- | Full /RIO/ environment for the /Run/ command.
 data Env = Env
-  { envEnv           :: !StartupEnv     -- ^ startup /RIO/ environment
-  , envConfiguration :: !Configuration  -- ^ application configuration
+  { envEnv           :: !StartupEnv
+  -- ^ startup /RIO/ environment
+  , envConfiguration :: !Configuration
+  -- ^ application configuration
   }
 
 instance Has Configuration Env where
@@ -119,8 +123,10 @@ env' opts logFunc = do
 
 
 -- | Handler for /Run/ command.
-commandRun :: CommandRunOptions -- ^ /Run/ command options
-           -> IO ()             -- ^ execution result
+commandRun :: CommandRunOptions
+           -- ^ /Run/ command options
+           -> IO ()
+           -- ^ execution result
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   CommandRunOptions {..} <- viewL
   Configuration {..}     <- viewL
@@ -254,8 +260,10 @@ chooseAction info header = do
 
 -- | Loads templates from the given paths.
 loadTemplateFiles :: (HasLogFunc env)
-                  => [FilePath]                          -- ^ paths to template files
-                  -> RIO env (Map FileType TemplateType) -- ^ map of file types and templates
+                  => [FilePath]
+                  -- ^ paths to template files
+                  -> RIO env (Map FileType TemplateType)
+                  -- ^ map of file types and templates
 loadTemplateFiles paths' = do
   paths <- mconcat <$> mapM (`findFilesByExts` extensions) paths'
   logDebug $ "Using template paths: " <> displayShow paths
@@ -273,8 +281,10 @@ loadTemplateFiles paths' = do
 -- | Loads built-in templates, stored in "Headroom.Embedded", for the given
 -- 'LicenseType'.
 loadBuiltInTemplates :: (HasLogFunc env)
-                     => LicenseType                         -- ^ license type for which to selected templates
-                     -> RIO env (Map FileType TemplateType) -- ^ map of file types and templates
+                     => LicenseType
+                     -- ^ license type for which to selected templates
+                     -> RIO env (Map FileType TemplateType)
+                     -- ^ map of file types and templates
 loadBuiltInTemplates licenseType = do
   logInfo $ "Using built-in templates for license: " <> displayShow licenseType
   parsed <- mapM (\(t, r) -> (t, ) <$> parseTemplate Nothing r) rawTemplates
@@ -295,8 +305,10 @@ loadTemplates = do
 
 -- | Takes path to the template file and returns detected type of the template.
 typeOfTemplate :: HasLogFunc env
-               => FilePath                 -- ^ path to the template file
-               -> RIO env (Maybe FileType) -- ^ detected template type
+               => FilePath
+               -- ^ path to the template file
+               -> RIO env (Maybe FileType)
+               -- ^ detected template type
 typeOfTemplate path = do
   let fileType = textToEnum . T.pack . takeBaseName $ path
   when (isNothing fileType)

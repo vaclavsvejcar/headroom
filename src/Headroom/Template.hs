@@ -23,18 +23,25 @@ class Template t where
 
 
   -- | Returns list of supported file extensions for this template type.
-  templateExtensions :: NonEmpty Text -- ^ list of supported file extensions
+  templateExtensions :: NonEmpty Text
+                     -- ^ list of supported file extensions
 
 
   -- | Parses template from given raw text.
   parseTemplate :: MonadThrow m
-                => Maybe Text -- ^ name of the template (optional)
-                -> Text       -- ^ raw template text
-                -> m t        -- ^ parsed template
+                => Maybe Text
+                -- ^ name of the template (optional)
+                -> Text
+                -- ^ raw template text
+                -> m t
+                -- ^ parsed template
 
 
   -- | Renders parsed template and replaces all variables with actual values.
   renderTemplate :: MonadThrow m
-                 => HashMap Text Text -- ^ values of variables to replace
-                 -> t                 -- ^ parsed template to render
-                 -> m Text            -- ^ rendered template text
+                 => HashMap Text Text
+                 -- ^ values of variables to replace
+                 -> t
+                 -- ^ parsed template to render
+                 -> m Text
+                 -- ^ rendered template text

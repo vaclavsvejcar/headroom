@@ -51,15 +51,19 @@ import qualified RIO.Text                      as T
 
 -- | Loads and parses application configuration from given /YAML/ file.
 loadConfiguration :: MonadIO m
-                  => FilePath               -- ^ path to /YAML/ configuration file
-                  -> m PartialConfiguration -- ^ parsed configuration
+                  => FilePath
+                  -- ^ path to /YAML/ configuration file
+                  -> m PartialConfiguration
+                  -- ^ parsed configuration
 loadConfiguration path = liftIO $ B.readFile path >>= parseConfiguration
 
 
 -- | Parses application configuration from given raw input in /YAML/ format.
 parseConfiguration :: MonadThrow m
-                   => B.ByteString           -- ^ raw input to parse
-                   -> m PartialConfiguration -- ^ parsed application configuration
+                   => B.ByteString
+                   -- ^ raw input to parse
+                   -> m PartialConfiguration
+                   -- ^ parsed application configuration
 parseConfiguration = Y.decodeThrow
 
 
@@ -68,8 +72,10 @@ parseConfiguration = Y.decodeThrow
 -- >>> parseVariables ["key1=value1"]
 -- fromList [("key1","value1")]
 parseVariables :: MonadThrow m
-               => [Text]                -- ^ list of raw variables
-               -> m (HashMap Text Text) -- ^ parsed variables
+               => [Text]
+               -- ^ list of raw variables
+               -> m (HashMap Text Text)
+               -- ^ parsed variables
 parseVariables variables = fmap HM.fromList (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
@@ -79,8 +85,10 @@ parseVariables variables = fmap HM.fromList (mapM parse variables)
 
 -- | Makes full 'Configuration' from provided 'PartialConfiguration' (if valid).
 makeConfiguration :: MonadThrow m
-                  => PartialConfiguration -- ^ source 'PartialConfiguration'
-                  -> m Configuration      -- ^ full 'Configuration'
+                  => PartialConfiguration
+                  -- ^ source 'PartialConfiguration'
+                  -> m Configuration
+                  -- ^ full 'Configuration'
 makeConfiguration PartialConfiguration {..} = do
   cRunMode        <- lastOrError NoRunMode pcRunMode
   cSourcePaths    <- lastOrError NoSourcePaths pcSourcePaths
@@ -93,8 +101,10 @@ makeConfiguration PartialConfiguration {..} = do
 
 -- | Makes full 'HeadersConfig' from provided 'PartialHeadersConfig' (if valid).
 makeHeadersConfig :: MonadThrow m
-                  => PartialHeadersConfig -- ^ source 'PartialHeadersConfig'
-                  -> m HeadersConfig      -- ^ full 'HeadersConfig'
+                  => PartialHeadersConfig
+                  -- ^ source 'PartialHeadersConfig'
+                  -> m HeadersConfig
+                  -- ^ full 'HeadersConfig'
 makeHeadersConfig PartialHeadersConfig {..} = do
   hscC       <- makeHeaderConfig C phscC
   hscCpp     <- makeHeaderConfig CPP phscCpp
@@ -111,9 +121,12 @@ makeHeadersConfig PartialHeadersConfig {..} = do
 
 -- | Makes full 'HeaderConfig' from provided 'PartialHeaderConfig' (if valid).
 makeHeaderConfig :: MonadThrow m
-                 => FileType             -- ^ determines for which file type this configuration is
-                 -> PartialHeaderConfig  -- ^ source 'PartialHeaderConfig'
-                 -> m HeaderConfig       -- ^ full 'HeaderConfig'
+                 => FileType
+                 -- ^ determines for which file type this configuration is
+                 -> PartialHeaderConfig
+                 -- ^ source 'PartialHeaderConfig'
+                 -> m HeaderConfig
+                 -- ^ full 'HeaderConfig'
 makeHeaderConfig fileType PartialHeaderConfig {..} = do
   hcFileExtensions <- lastOrError (NoFileExtensions fileType) phcFileExtensions
   hcMarginAfter    <- lastOrError (NoMarginAfter fileType) phcMarginAfter
