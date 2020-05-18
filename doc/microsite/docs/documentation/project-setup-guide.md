@@ -1,4 +1,13 @@
-_Headroom_ needs to know where to search for configuration, template and source code files. Because of that, you need to perform few setup steps before running it, as described below.
+_Headroom_ needs to know where to search for configuration, template and source code files. If you plan to use _Headroom_ regularly for your project, you might want to keep template files and configuration together with your project, but there's also option to run _Headroom_ completely without any need to generate any files.
+
+## Running Without Initialization
+If you only plan to use _Headroom_ occasionally or just don't want have any additional files in your project, you can completely skip initialization and specify all required things using command line options, like this:
+
+```
+headroom run --builtin-templates bsd3 -s src -v "author=John Smith" -v "email=john.smith@tardis.co" -v "project=Project Name" -v "year=2020"
+```
+
+See the [Running Headroom][rel:running-headroom] chapter for more details.
 
 ## Automatic Initialization (for OSS projects)
 Easiest and fastest way how to initialize Headroom for your project is to use the `init` command, which generates all the boilerplate for you. The only drawback is that you can use it only in case that you use any supported open source license for which Headroom contains license header templates:
@@ -44,3 +53,6 @@ headroom gen -l bsd3:scala >./scala.mustache
 ```
 
 After these steps, make sure you set correctly the paths to template files and source code files in the _YAML_ configuration file.
+
+
+[rel:running-headroom]: running-headroom.md

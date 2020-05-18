@@ -326,12 +326,18 @@ data Configuration = Configuration
 
 -- | Configuration for specific license header.
 data HeaderConfig = HeaderConfig
-  { hcFileExtensions :: ![Text]       -- ^ list of file extensions (without dot)
-  , hcMarginAfter    :: !Int          -- ^ number of empty lines to put after header
-  , hcMarginBefore   :: !Int          -- ^ number of empty lines to put before header
-  , hcPutAfter       :: ![Text]       -- ^ /regexp/ patterns after which to put the header
-  , hcPutBefore      :: ![Text]       -- ^ /regexp/ patterns before which to put the header
-  , hcHeaderSyntax   :: !HeaderSyntax -- ^ syntax of the license header comment
+  { hcFileExtensions :: ![Text]
+  -- ^ list of file extensions (without dot)
+  , hcMarginAfter    :: !Int
+  -- ^ number of empty lines to put after header
+  , hcMarginBefore   :: !Int
+  -- ^ number of empty lines to put before header
+  , hcPutAfter       :: ![Text]
+  -- ^ /regexp/ patterns after which to put the header
+  , hcPutBefore      :: ![Text]
+  -- ^ /regexp/ patterns before which to put the header
+  , hcHeaderSyntax   :: !HeaderSyntax
+  -- ^ syntax of the license header comment
   }
   deriving (Eq, Show)
 

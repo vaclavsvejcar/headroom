@@ -51,7 +51,7 @@ This command requires you to specify three key parameters, either using command 
 1. __variables__ - if your templates use any variables, you need to specify their values using the `-v|--variable "KEY=VALUE"` option (can be repeated) or using the `variable` option in `.headroom.yaml`.
 1. __run mode__ _(optional)_ - if you don't specify this, the _add mode_ will be used as default, but you can set the run mode using one of the `-a,--add-headers`, `-c,--check-headers`, `-r,--replace-headers` or `-d,--drop-headers` options, or using the `run-mode` option in `.headroom.yaml`.
 
-For regular work, it's more comfortable to define as much options in `.headroom.yaml` and then you can just run _Headroom_ like `headroom run` or just override the _run mode_ like `headroom run -r`, but it's also completely fine to run _Headroom_ without the need to prepare any files (templates, `.headroom.yaml`) and define all the required stuff using command line options.
+For regular work, it's more comfortable to define as much options in `.headroom.yaml` and then you can just run _Headroom_ like `headroom run` or just override the _run mode_ like `headroom run -r`, but it's also completely fine to run _Headroom_ without the need to prepare any files (templates, `.headroom.yaml`) and define all the required stuff using command line options, as shown below:
 
 ### Gen Command
 This command allows to generate stubs for files required by _Headroom_, such as `.headroom.yaml` and template files. You'll likely need this command only once for manual initialization of _Headroom_ for your project. For more info how to use it, see the [Project Setup Guide][rel:project-setup-guide] chapter.
