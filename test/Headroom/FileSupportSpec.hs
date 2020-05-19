@@ -124,9 +124,20 @@ spec = do
   describe "extractFileInfo" $ do
     it "extracts FileInfo from given raw input" $ do
       let config   = bHeaderConfig [] []
-          expected = FileInfo Haskell config (Just (1, 13)) HM.empty
+          expected = FileInfo
+            Haskell
+            config
+            (Just (1, 13))
+            (HM.fromList [("_haskell_module_name", "Test")])
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
       extractFileInfo Haskell config sample `shouldBe` expected
+
+  describe "extractVariables" $ do
+    it "extracts variables specific for Haskell file type" $ do
+      let config   = bHeaderConfig [] []
+          expected = HM.fromList [("_haskell_module_name", "Test")]
+      sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
+      extractVariables Haskell config (Just (1, 13)) sample `shouldBe` expected
 
 
   describe "findHeader" $ do

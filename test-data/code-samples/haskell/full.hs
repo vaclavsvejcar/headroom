@@ -1,6 +1,6 @@
 
 {-|
-Module      : W
+Module      : Test
 Description : Short description
 Copyright   : (c) Some Guy, 2013
                   Someone Else, 2014

@@ -18,6 +18,8 @@ the /license headers/ and the /source code files/.
 module Headroom.FileSupport
   ( -- * File info extraction
     extractFileInfo
+    -- * Variables extraction
+  , extractVariables
     -- * License header manipulation
   , addHeader
   , dropHeader
@@ -32,6 +34,7 @@ module Headroom.FileSupport
   )
 where
 
+import           Headroom.FileSupport.Haskell   ( extractVariablesHaskell )
 import           Headroom.Regex                 ( compile'
                                                 , joinPatterns
                                                 , match'
@@ -48,21 +51,39 @@ import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Light          ( Regex )
 
 
-
 -- | Extracts info about the processed file to be later used by the header
 -- detection/manipulation functions.
 extractFileInfo :: FileType
                 -- ^ type of the detected file
                 -> HeaderConfig
-                -- ^ appropriate header configuration
+                -- ^ license header configuration
                 -> Text
                 -- ^ text used for detection
                 -> FileInfo
                 -- ^ resulting file info
-extractFileInfo fiFileType fiHeaderConfig input =
-  let fiHeaderPos = findHeader fiHeaderConfig input
-      fiVariables = extractVariables fiFileType fiHeaderConfig input
+extractFileInfo fiFileType fiHeaderConfig text =
+  let fiHeaderPos = findHeader fiHeaderConfig text
+      fiVariables = extractVariables fiFileType fiHeaderConfig fiHeaderPos text
   in  FileInfo { .. }
+
+
+-- | Extracts variables specific to the file type (if supported), e.g. module
+-- name for /Haskell/ source code. Currently supported file types are:
+--
+-- * /Haskell/ - implemented in "Headroom.FileSupport.Haskell"
+extractVariables :: FileType
+                 -- ^ type of the file
+                 -> HeaderConfig
+                 -- ^ license header configuration
+                 -> Maybe (Int, Int)
+                 -- ^ license header position @(startLine, endLine)@
+                 -> Text
+                 -- ^ text of the source code file
+                 -> HashMap Text Text
+                 -- ^ extracted variables
+extractVariables fileType config headerPos text = case fileType of
+  Haskell -> extractVariablesHaskell config headerPos text
+  _       -> HM.empty
 
 
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if
@@ -271,11 +292,6 @@ splitInput fstSplit sndSplit input = (before, middle, after)
   inLines           = T.lines input
   len               = L.length inLines
   findSplit f ps i = joinPatterns ps >>= (`f` i) . compile'
-
-
--- TODO: https://github.com/vaclavsvejcar/headroom/issues/25
-extractVariables :: FileType -> HeaderConfig -> Text -> HashMap Text Text
-extractVariables _ _ _ = HM.empty
 
 
 stripLinesEnd :: [Text] -> [Text]
