@@ -31,7 +31,6 @@ import           Text.Regex.PCRE.Light.Char8    ( match
                                                 )
 
 
-
 -- | Same as 'compile', but takes 'Text' on input and enables 'utf8' option
 -- by default.
 compile' :: Text

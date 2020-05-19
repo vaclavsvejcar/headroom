@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 65aac93fbb631714998cb1d0847192ca1ddbb5534401588ec631c930e6c8f89f
+-- hash: 10785832da2872df94967c4378c49f8ed56ef52aea70c7a2fd3c626d9620c08c
 
 name:           headroom
 version:        0.2.3.0
@@ -129,6 +129,7 @@ library
       Headroom.Data.Has
       Headroom.Embedded
       Headroom.FileSupport
+      Headroom.FileSupport.Haskell
       Headroom.FileSystem
       Headroom.FileType
       Headroom.Meta
@@ -151,6 +152,7 @@ library
     , base >=4.7 && <5
     , either
     , file-embed
+    , lens
     , mustache
     , optparse-applicative
     , pcre-light
@@ -197,6 +199,7 @@ test-suite spec
       Headroom.Command.RunSpec
       Headroom.ConfigurationSpec
       Headroom.Data.EnumExtraSpec
+      Headroom.FileSupport.HaskellSpec
       Headroom.FileSupportSpec
       Headroom.FileSystemSpec
       Headroom.FileTypeSpec

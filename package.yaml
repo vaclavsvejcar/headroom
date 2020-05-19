@@ -65,6 +65,7 @@ library:
     - aeson
     - either
     - file-embed
+    - lens
     - mustache
     - pcre-light
     - time
