@@ -68,6 +68,8 @@ library:
     - lens
     - mustache
     - pcre-light
+    - pcre-heavy
+    - template-haskell
     - time
     - yaml
 

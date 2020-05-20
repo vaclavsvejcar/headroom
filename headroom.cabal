@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10785832da2872df94967c4378c49f8ed56ef52aea70c7a2fd3c626d9620c08c
+-- hash: ea67ff8d1d1a85e343dad7bc7d235be2b59765a018dd40f865a2edb8fab4aef8
 
 name:           headroom
 version:        0.2.3.0
@@ -93,6 +93,7 @@ extra-source-files:
     test-data/code-samples/css/sample1.css
     test-data/code-samples/css/sample2.css
     test-data/code-samples/haskell/full.hs
+    test-data/code-samples/haskell/header.hs
     test-data/code-samples/haskell/sample1.hs
     test-data/code-samples/haskell/sample2.hs
     test-data/code-samples/html/sample1.html
@@ -130,6 +131,7 @@ library
       Headroom.Embedded
       Headroom.FileSupport
       Headroom.FileSupport.Haskell
+      Headroom.FileSupport.Haskell.Haddock
       Headroom.FileSystem
       Headroom.FileType
       Headroom.Meta
@@ -155,8 +157,10 @@ library
     , lens
     , mustache
     , optparse-applicative
+    , pcre-heavy
     , pcre-light
     , rio
+    , template-haskell
     , time
     , yaml
   default-language: Haskell2010
@@ -199,6 +203,7 @@ test-suite spec
       Headroom.Command.RunSpec
       Headroom.ConfigurationSpec
       Headroom.Data.EnumExtraSpec
+      Headroom.FileSupport.Haskell.HaddockSpec
       Headroom.FileSupport.HaskellSpec
       Headroom.FileSupportSpec
       Headroom.FileSystemSpec

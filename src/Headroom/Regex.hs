@@ -18,12 +18,17 @@ module Headroom.Regex
   ( compile'
   , joinPatterns
   , match'
+  , re'
+  , regexOptions
   )
 where
 
+import           Language.Haskell.TH.Quote      ( QuasiQuoter )
 import           RIO
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Light          ( Regex
+import           Text.Regex.PCRE.Heavy          ( mkRegexQQ )
+import           Text.Regex.PCRE.Light          ( PCREOption
+                                                , Regex
                                                 , compile
                                                 )
 import           Text.Regex.PCRE.Light.Char8    ( match
@@ -37,7 +42,7 @@ compile' :: Text
          -- ^ regular expression to be compiled
          -> Regex
          -- ^ compiled regular expression
-compile' regex = compile (encodeUtf8 regex) [utf8]
+compile' regex = compile (encodeUtf8 regex) regexOptions
 
 
 -- | Joins list of patterns into single regex string. If the input list is
@@ -61,3 +66,11 @@ match' :: Regex
        -> Maybe [Text]
        -- ^ the result value
 match' regex subject = fmap T.pack <$> match regex (T.unpack subject) []
+
+
+re' :: QuasiQuoter
+re' = mkRegexQQ regexOptions
+
+
+regexOptions :: [PCREOption]
+regexOptions = [utf8]

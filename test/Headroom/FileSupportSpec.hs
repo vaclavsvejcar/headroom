@@ -128,14 +128,23 @@ spec = do
             Haskell
             config
             (Just (1, 13))
-            (HM.fromList [("_haskell_module_name", "Test")])
+            (HM.fromList
+              [ ("_haskell_module_name"     , "Test")
+              , ("_haskell_module_longdesc" , "long\ndescription")
+              , ("_haskell_module_shortdesc", "Short description")
+              ]
+            )
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
       extractFileInfo Haskell config sample `shouldBe` expected
 
   describe "extractVariables" $ do
     it "extracts variables specific for Haskell file type" $ do
       let config   = bHeaderConfig [] []
-          expected = HM.fromList [("_haskell_module_name", "Test")]
+          expected = HM.fromList
+            [ ("_haskell_module_name"     , "Test")
+            , ("_haskell_module_longdesc" , "long\ndescription")
+            , ("_haskell_module_shortdesc", "Short description")
+            ]
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
       extractVariables Haskell config (Just (1, 13)) sample `shouldBe` expected
 

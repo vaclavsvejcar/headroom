@@ -1,4 +1,3 @@
-
 {-|
 Module      : Test
 Description : Short description
@@ -9,12 +8,6 @@ Maintainer  : sample@email.com
 Stability   : experimental
 Portability : POSIX
 
-long
-description
+Here is a longer description of this module, containing some
+commentary with @some markup@.
 -}
-
-{-# LANGUAGE OverloadedStrings #-}
-module Test where
-
-foo :: String
-foo = "Hello, world!"

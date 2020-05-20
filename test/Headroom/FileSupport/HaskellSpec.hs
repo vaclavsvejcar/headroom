@@ -31,7 +31,11 @@ spec = do
   describe "extractVariablesHaskell" $ do
     it "extracts variables from Haskell source code and Haddock header" $ do
       let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
-          headerPos = Nothing
-          expected  = HM.fromList [("_haskell_module_name", "Test")]
+          headerPos = Just (1, 13)
+          expected  = HM.fromList
+            [ ("_haskell_module_name"     , "Test")
+            , ("_haskell_module_longdesc" , "long\ndescription")
+            , ("_haskell_module_shortdesc", "Short description")
+            ]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
       extractVariablesHaskell config headerPos sample `shouldBe` expected
