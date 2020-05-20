@@ -24,7 +24,8 @@ spec = do
           { hmhShortDesc = Just "Short description"
           , hmhLongDesc  =
             Just
-              "Here is a longer description of this module, containing some\ncommentary with @some markup@."
+              "Here is a longer description of this module, containing some\n\
+              \commentary with @some markup@."
           }
       sample <- loadFile $ codeSamples </> "haskell" </> "header.hs"
       extractModuleHeader sample `shouldBe` expected
