@@ -1,6 +1,22 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+
+{-|
+Module      : Headroom.FileSupport.Haskell
+Description : Extraction of /Haskell/-specific template variables
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3-Clause
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module provides support for extracting /Haskell/-specific info from the
+parsed /source code files/ as /template variables/. Such info includes
+/module name/ and selected fields from /Haddock module header/
+(see "Headroom.FileSupport.Haskell.Haddock").
+-}
+
 module Headroom.FileSupport.Haskell
   ( extractModuleName
   , extractVariablesHaskell
@@ -56,13 +72,13 @@ extractVariablesHaskell :: HeaderConfig
                         -- ^ extracted variables
 extractVariablesHaskell _ headerPos text = HM.fromList
   [ ( "_haskell_module_name"
-    , fromMaybe ">> NAME OF HASKELL MODULE <<" $ extractModuleName text
+    , fromMaybe "!!! NAME OF HASKELL MODULE !!!" $ extractModuleName text
     )
   , ( "_haskell_module_longdesc"
-    , fromMaybe ">> MODULE LONG DESCRIPTION <<" hmhLongDesc
+    , fromMaybe "!!! MODULE LONG DESCRIPTION !!!" hmhLongDesc
     )
   , ( "_haskell_module_shortdesc"
-    , fromMaybe ">> MODULE SHORT DESCRIPTION <<" hmhShortDesc
+    , fromMaybe "!!! MODULE SHORT DESCRIPTION !!!" hmhShortDesc
     )
   ]
  where

@@ -10,8 +10,8 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Provides wrappers mainly around functions from "Text.Regex.PCRE.Light" that more
-suits the needs of this application.
+Extends functionalify provided by "Text.Regex.PCRE.Light"
+and "Text.Regex.PCRE.Heavy" that more suits the needs of this application.
 -}
 
 module Headroom.Regex
@@ -68,9 +68,11 @@ match' :: Regex
 match' regex subject = fmap T.pack <$> match regex (T.unpack subject) []
 
 
+-- | /QuasiQuoter/ for "Text.Regex.PCRE.Heavy" compile-time regular expressions.
 re' :: QuasiQuoter
 re' = mkRegexQQ regexOptions
 
 
+-- | /PCRE/ options for regular expressions.
 regexOptions :: [PCREOption]
 regexOptions = [utf8]

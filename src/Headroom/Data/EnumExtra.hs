@@ -4,7 +4,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 {-|
-Module      : Headroom.Types.EnumExtra
+Module      : Headroom.Data.EnumExtra
 Description : Extra functionality for enum types
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause

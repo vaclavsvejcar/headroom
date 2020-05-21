@@ -4,6 +4,20 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
+
+{-|
+Module      : Headroom.FileSupport.Haskell.Haddock
+Description : Extraction of /Haddock module header/ fields
+Copyright   : (c) 2019-2020 Vaclav Svejcar
+License     : BSD-3-Clause
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module provides support for extracting selected fields from the
+/Haddock module header/ part of the /Haskell/ source code file.
+-}
+
 module Headroom.FileSupport.Haskell.Haddock
   ( HaddockModuleHeader(..)
   , extractModuleHeader
@@ -20,9 +34,12 @@ import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Heavy          ( gsub )
 
 
+-- | Extracted fields from the /Haddock module header/.
 data HaddockModuleHeader = HaddockModuleHeader
   { hmhShortDesc :: !(Maybe Text)
+  -- ^ module short description (content of the @Description@ field)
   , hmhLongDesc  :: !(Maybe Text)
+  -- ^ module long description (the text after module header fields)
   }
   deriving (Eq, Show)
 
