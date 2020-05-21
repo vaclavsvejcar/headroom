@@ -26,7 +26,7 @@ spec = do
       parsed `shouldSatisfy` isJust
 
   describe "renderTemplate" $ do
-    it "renders Mustache template with given variables" $ do
+    it "renders template with given variables" $ do
       let template  = "Hello, {{ name }}"
           variables = HM.fromList [("name", "John")]
           parsed    = parseTemplate @Mustache (Just "template") template
@@ -43,3 +43,17 @@ spec = do
           True
         check _ = False
       rendered `shouldSatisfy` matchesException check
+
+    it "renders template with conditionally set variable" $ do
+      let template  = "Foo {{#bar}}{{bar}}{{/bar}}{{^bar}}BAR{{/bar}}"
+          variables = HM.empty
+          parsed    = parseTemplate @Mustache (Just "template") template
+          rendered  = parsed >>= renderTemplate variables
+      rendered `shouldBe` Just "Foo BAR"
+
+    it "fails if non-existing variable is used with inverted sections" $ do
+      let template  = "Foo {{bar}}{{^bar}}BAR{{/bar}}"
+          variables = HM.fromList [("xx", "yy")]
+          parsed    = parseTemplate @Mustache (Just "template") template
+          rendered  = parsed >>= renderTemplate variables
+      rendered `shouldBe` Nothing
