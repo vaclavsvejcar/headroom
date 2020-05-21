@@ -25,9 +25,11 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 - [wire-server](https://github.com/wireapp/wire-server) - Wire back-end services (https://wire.com)
 
 ## Documentation
-For full project documentation, see the [official project microsite][web:headroom].
+* for end-user documentation, [official project microsite][web:headroom]
+* for _Haskell API_ documentation, see [Headroom on Hackage][hackage:headroom]
 
 [i25]: https://github.com/vaclavsvejcar/headroom/issues/25
+[hackage:headroom]: https://hackage.haskell.org/package/headroom
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
 [meta:pulls]: https://github.com/vaclavsvejcar/headroom/pulls
 [web:headroom]: https://doc.norcane.com/headroom/latest/
