@@ -52,13 +52,11 @@ renderTemplate' variables (Mustache t@(MU.Template name _ _)) =
   case MU.checkedSubstitute t variables of
     ([], rendered) -> pure rendered
     (errs, rendered) ->
-      let errs' = missingVariables errs
+      let errs'            = missingVariables errs
+          missingVariables = concatMap $ \case
+            (VariableNotFound ps) -> ps
+            _                     -> []
       in  if length errs == length errs'
             then throwM $ TemplateError (MissingVariables (T.pack name) errs')
             else pure rendered
- where
-  missingVariables = concatMap
-    (\case
-      (VariableNotFound ps) -> ps
-      _                     -> []
-    )
+
