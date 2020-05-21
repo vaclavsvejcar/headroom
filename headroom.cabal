@@ -4,10 +4,10 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ea67ff8d1d1a85e343dad7bc7d235be2b59765a018dd40f865a2edb8fab4aef8
+-- hash: 9273cf46d944fbc3a9ab5f8a0f12204a0e0f1e7e4825a9c27af756b7a6402c47
 
 name:           headroom
-version:        0.2.3.0
+version:        0.3.0.0
 synopsis:       License Header Manager
 description:    Would you like to have nice, up-to-date license/copyright headers in your source code files but hate to manage them by hand? Then Headroom is the right tool for you! Now you can define your license header as Mustache template, put all the variables (such as author's name, year, etc.) into the YAML config file and Headroom will take care to add such license headers to all your source code files.
 category:       Utils

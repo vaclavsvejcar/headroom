@@ -1,7 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.2.3.0 (not released yet, TBD)
+## 0.3.0.0 (not released yet, TBD)
+- [#25] Extract dynamic variables from Haskell source code files
 - [#30] Allow workflow without configuration and template files
 - [#49] Microsite for documentation ([https://doc.norcane.com/headroom/latest/](https://doc.norcane.com/headroom/latest/))
 - Bump _LTS Haskell_ to `15.13`
