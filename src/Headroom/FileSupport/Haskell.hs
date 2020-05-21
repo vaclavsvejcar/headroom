@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 
 {-|
@@ -30,15 +31,14 @@ import           Headroom.FileSupport.Haskell.Haddock
                                                 ( HaddockModuleHeader(..)
                                                 , extractModuleHeader
                                                 )
-import           Headroom.Regex                 ( compile'
-                                                , match'
+import           Headroom.Regex                 ( match'
+                                                , re'
                                                 )
 import           Headroom.Types                 ( HeaderConfig(..) )
 import           RIO
 import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Light          ( Regex )
 
 
 -- | Extracts name of /Haskell/ module from given source code file content.
@@ -52,7 +52,7 @@ extractModuleName :: Text
 extractModuleName = go . T.lines
  where
   go []       = Nothing
-  go (x : xs) = maybe (go xs) (^? element 1) (match' moduleNameRegex x)
+  go (x : xs) = maybe (go xs) (^? element 1) (match' [re'|^module\s+(\S+)|] x)
 
 
 -- | Extracts variables from /Haskell/ source code.
@@ -85,9 +85,3 @@ extractVariablesHaskell _ headerPos text = HM.fromList
   HaddockModuleHeader {..} = extractModuleHeader headerText
   headerText               = maybe "" (\(s, e) -> cut s e text) headerPos
   cut s e = T.unlines . L.take (e - s) . L.drop s . T.lines
-
---------------------------------------------------------------------------------
-
-
-moduleNameRegex :: Regex
-moduleNameRegex = compile' "^module\\s+(\\S+)"
