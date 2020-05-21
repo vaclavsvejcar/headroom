@@ -22,7 +22,7 @@ Headroom, as they are automatically detected from source code files, not from te
 ## Adopters
 Here is the list of projects using _Headroom_. If you're using _Headroom_ and aren't on the list, feel free to [submit new issue][meta:new-issue] or [pull request][meta:pulls].
 
-- [wire-server](https://github.com/wireapp/wire-server) - Wire back-end services (https://wire.com)
+- [wireapp/wire-server](https://github.com/wireapp/wire-server) - Wire back-end services (https://wire.com)
 
 ## Documentation
 * for end-user documentation, [official project microsite][web:headroom]
