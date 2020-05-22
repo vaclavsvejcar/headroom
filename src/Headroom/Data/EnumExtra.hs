@@ -56,7 +56,7 @@ class (Bounded a, Enum a, Eq a, Ord a, Show a) => EnumExtra a where
   -- >>> enumToText Bar
   -- "Bar"
   enumToText :: a -> Text
-  enumToText = T.pack . show
+  enumToText = tshow
 
 
   -- | Returns enum value from its textual representation.

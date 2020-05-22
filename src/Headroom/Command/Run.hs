@@ -21,13 +21,22 @@ responsible for license header management.
 
 module Headroom.Command.Run
   ( commandRun
+  , dynamicVariables
   , loadBuiltInTemplates
   , loadTemplateFiles
   , typeOfTemplate
   )
 where
 
+import           Data.Time.Calendar             ( toGregorian
+                                                , toGregorian
+                                                )
+import           Data.Time.Clock                ( getCurrentTime )
 import           Data.Time.Clock.POSIX          ( getPOSIXTime )
+import           Data.Time.LocalTime            ( getCurrentTimeZone
+                                                , localDay
+                                                , utcToLocalTime
+                                                )
 import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( loadConfiguration
                                                 , makeConfiguration
@@ -72,6 +81,7 @@ import           Headroom.UI                    ( Progress(..)
                                                 )
 import           RIO
 import           RIO.FilePath                   ( takeBaseName )
+import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
@@ -186,34 +196,36 @@ processSourceFiles :: ( Has Configuration env
                    -> RIO env (Int, Int)
 processSourceFiles templates paths = do
   Configuration {..} <- viewL
+  vars               <- dynamicVariables
   let withFileType = mapMaybe (findFileType cLicenseHeaders) paths
       withTemplate = mapMaybe (uncurry findTemplate) withFileType
-  processed <- mapM process (zipWithProgress withTemplate)
+  processed <- mapM (process vars) (zipWithProgress withTemplate)
   pure (L.length withTemplate, L.length . filter (== True) $ processed)
  where
   findFileType conf path =
     fmap (, path) (fileExtension path >>= fileTypeByExt conf)
   findTemplate ft p = (, ft, p) <$> M.lookup ft templates
-  process (pr, (tt, ft, p)) = processSourceFile pr tt ft p
+  process vars (pr, (tt, ft, p)) = processSourceFile vars pr tt ft p
 
 
 processSourceFile :: ( Has Configuration env
                      , HasLogFunc env
                      , Has CommandRunOptions env
                      )
-                  => Progress
+                  => HashMap Text Text
+                  -> Progress
                   -> TemplateType
                   -> FileType
                   -> FilePath
                   -> RIO env Bool
-processSourceFile progress template fileType path = do
+processSourceFile gv progress template fileType path = do
   Configuration {..}     <- viewL
   CommandRunOptions {..} <- viewL
   fileContent            <- readFileUtf8 path
   let fileInfo = extractFileInfo fileType
                                  (configByFileType cLicenseHeaders fileType)
                                  fileContent
-      variables = cVariables <> fiVariables fileInfo
+      variables = cVariables <> fiVariables fileInfo <> gv
   header         <- renderTemplate variables template
   RunAction {..} <- chooseAction fileInfo header
   let result  = raFunc fileContent
@@ -355,7 +367,7 @@ optionsToConfiguration :: (Has CommandRunOptions env)
                        => RIO env PartialConfiguration
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
-  variables  <- parseVariables croVariables
+  variables              <- parseVariables croVariables
   pure PartialConfiguration
     { pcRunMode        = maybe mempty pure croRunMode
     , pcSourcePaths    = ifNot null croSourcePaths
@@ -365,3 +377,15 @@ optionsToConfiguration = do
     , pcLicenseHeaders = mempty
     }
   where ifNot cond value = if cond value then mempty else pure value
+
+
+-- | /Dynamic variables/ that are common for all parsed files.
+--
+-- * @___current_year__@ - current year
+dynamicVariables :: MonadIO m => m (HashMap Text Text)
+dynamicVariables = do
+  now      <- liftIO getCurrentTime
+  timezone <- liftIO getCurrentTimeZone
+  let zoneNow      = utcToLocalTime timezone now
+      (year, _, _) = toGregorian $ localDay zoneNow
+  pure $ HM.fromList [("_current_year", tshow year)]

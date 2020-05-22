@@ -42,7 +42,7 @@ instance Template Mustache where
 
 parseTemplate' :: MonadThrow m => Maybe Text -> Text -> m Mustache
 parseTemplate' name raw = case MU.compileTemplate templateName raw of
-  Left  err -> throwM $ TemplateError (ParseError (T.pack . show $ err))
+  Left  err -> throwM $ TemplateError (ParseError (tshow err))
   Right res -> pure $ Mustache res
   where templateName = T.unpack . fromMaybe "" $ name
 

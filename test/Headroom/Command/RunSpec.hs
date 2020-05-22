@@ -7,6 +7,14 @@ module Headroom.Command.RunSpec
   )
 where
 
+import           Data.Time.Calendar             ( toGregorian
+                                                , toGregorian
+                                                )
+import           Data.Time.Clock                ( getCurrentTime )
+import           Data.Time.LocalTime            ( getCurrentTimeZone
+                                                , localDay
+                                                , utcToLocalTime
+                                                )
 import           Headroom.Command.Run
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Meta                  ( TemplateType )
@@ -16,6 +24,7 @@ import           Headroom.Types                 ( FileType(..)
                                                 )
 import           RIO                     hiding ( assert )
 import           RIO.FilePath                   ( (</>) )
+import qualified RIO.HashMap                   as HM
 import qualified RIO.Map                       as M
 import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
@@ -50,6 +59,17 @@ spec = do
           assert $ isJust result
 
     prop "should detect type of template from template path" prop_typeOfTemplate
+
+
+  describe "dynamicVariables" $ do
+    it "returns map of all expected dynamic variables" $ do
+      actual   <- dynamicVariables
+      now      <- liftIO getCurrentTime
+      timezone <- liftIO getCurrentTimeZone
+      let zoneNow      = utcToLocalTime timezone now
+          (year, _, _) = toGregorian $ localDay zoneNow
+          expected     = HM.fromList [("_current_year", tshow year)]
+      actual `shouldBe` expected
 
 
 env :: TestEnv
