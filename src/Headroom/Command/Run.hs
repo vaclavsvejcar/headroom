@@ -189,7 +189,6 @@ processSourceFiles templates paths = do
   let withFileType = mapMaybe (findFileType cLicenseHeaders) paths
       withTemplate = mapMaybe (uncurry findTemplate) withFileType
   processed <- mapM process (zipWithProgress withTemplate)
-  logDebug "foo"
   pure (L.length withTemplate, L.length . filter (== True) $ processed)
  where
   findFileType conf path =
@@ -355,13 +354,13 @@ finalConfiguration = do
 optionsToConfiguration :: (Has CommandRunOptions env)
                        => RIO env PartialConfiguration
 optionsToConfiguration = do
-  runOptions <- viewL
-  variables  <- parseVariables $ croVariables runOptions
+  CommandRunOptions {..} <- viewL
+  variables  <- parseVariables croVariables
   pure PartialConfiguration
-    { pcRunMode        = maybe mempty pure (croRunMode runOptions)
-    , pcSourcePaths    = ifNot null (croSourcePaths runOptions)
-    , pcExcludedPaths  = ifNot null (croExcludedPaths runOptions)
-    , pcTemplateSource = maybe mempty pure (croTemplateSource runOptions)
+    { pcRunMode        = maybe mempty pure croRunMode
+    , pcSourcePaths    = ifNot null croSourcePaths
+    , pcExcludedPaths  = ifNot null croExcludedPaths
+    , pcTemplateSource = maybe mempty pure croTemplateSource
     , pcVariables      = ifNot null variables
     , pcLicenseHeaders = mempty
     }

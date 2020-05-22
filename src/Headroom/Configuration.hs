@@ -137,5 +137,8 @@ makeHeaderConfig fileType PartialHeaderConfig {..} = do
   pure HeaderConfig { .. }
 
 
+--------------------------------------------------------------------------------
+
+
 lastOrError :: MonadThrow m => ConfigurationError -> Last a -> m a
 lastOrError err (Last x) = maybe (throwM $ ConfigurationError err) pure x
