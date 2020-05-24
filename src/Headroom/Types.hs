@@ -30,6 +30,7 @@ module Headroom.Types
   , PartialHeadersConfig(..)
     -- ** Other Configuration Data Types
   , HeaderSyntax(..)
+  , Variables(..)
     -- * Command Data Types
   , Command(..)
   , CommandGenOptions(..)
@@ -49,6 +50,8 @@ module Headroom.Types
   , LicenseType(..)
   , FileType(..)
   , FileInfo(..)
+    -- * Data Type Constructors
+  , mkVariables
   )
 where
 
@@ -64,6 +67,7 @@ import           Data.Monoid                    ( Last(..) )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Serialization         ( aesonOptions )
 import           RIO
+import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
 
@@ -292,7 +296,7 @@ data FileInfo = FileInfo
   -- ^ configuration for license header
   , fiHeaderPos    :: !(Maybe (Int, Int))
   -- ^ position of existing license header
-  , fiVariables    :: !(HashMap Text Text)
+  , fiVariables    :: !Variables
   -- ^ additional extracted variables
   }
   deriving (Eq, Show)
@@ -307,6 +311,14 @@ data HeaderSyntax
   -- ^ single line comment syntax (e.g. @//@)
   deriving (Eq, Show)
 
+-- | Map of /static/ and /dynamic variables/. Use 'mkVariables' function for
+-- more convenient construction of this data type.
+newtype Variables = Variables
+  { unVariables :: HashMap Text Text
+  -- ^ map of /variables/
+  }
+  deriving (Eq, Show)
+
 -- | Application configuration.
 data Configuration = Configuration
   { cRunMode        :: !RunMode
@@ -317,7 +329,7 @@ data Configuration = Configuration
   -- ^ excluded source paths
   , cTemplateSource :: !TemplateSource
   -- ^ source of license templates
-  , cVariables      :: !(HashMap Text Text)
+  , cVariables      :: !Variables
   -- ^ variable values for templates
   , cLicenseHeaders :: !HeadersConfig
   -- ^ configuration of license headers
@@ -394,7 +406,7 @@ data PartialConfiguration = PartialConfiguration
   -- ^ excluded source paths
   , pcTemplateSource :: !(Last TemplateSource)
   -- ^ paths to template files
-  , pcVariables      :: !(Last (HashMap Text Text))
+  , pcVariables      :: !Variables
   -- ^ variable values for templates
   , pcLicenseHeaders :: !PartialHeadersConfig
   -- ^ configuration of license headers
@@ -455,7 +467,7 @@ instance FromJSON PartialConfiguration where
     pcSourcePaths    <- Last <$> obj .:? "source-paths"
     pcExcludedPaths  <- Last <$> obj .:? "excluded-paths"
     pcTemplateSource <- Last <$> get TemplateFiles (obj .:? "template-paths")
-    pcVariables      <- Last <$> obj .:? "variables"
+    pcVariables      <- fmap Variables (obj .:? "variables" .!= mempty)
     pcLicenseHeaders <- obj .:? "license-headers" .!= mempty
     pure PartialConfiguration { .. }
     where get = fmap . fmap
@@ -492,6 +504,9 @@ instance FromJSON PartialHeadersConfig where
     phscShell   <- obj .:? "shell" .!= mempty
     pure PartialHeadersConfig { .. }
 
+instance Semigroup Variables where
+  (Variables x) <> (Variables y) = Variables (y <> x)
+
 instance Semigroup PartialConfiguration where
   x <> y = PartialConfiguration
     { pcRunMode        = pcRunMode x <> pcRunMode y
@@ -525,6 +540,9 @@ instance Semigroup PartialHeadersConfig where
                                 , phscShell   = phscShell x <> phscShell y
                                 }
 
+instance Monoid Variables where
+  mempty = Variables mempty
+
 instance Monoid PartialConfiguration where
   mempty = PartialConfiguration mempty mempty mempty mempty mempty mempty
 
@@ -543,7 +561,19 @@ instance Monoid PartialHeadersConfig where
                                 mempty
                                 mempty
 
---------------------------------------------------------------------------------
+--------------------------------  Constructors  --------------------------------
+
+
+-- | Constructor function for 'Variables' data type.
+mkVariables :: [(Text, Text)]
+            -- ^ pairs of /key-value/
+            -> Variables
+            -- ^ constructed variables
+mkVariables = Variables . HM.fromList
+
+
+------------------------------  Private Functions  -----------------------------
+
 
 commandGenError :: CommandGenError -> Text
 commandGenError = \case
@@ -632,6 +662,6 @@ templateError = \case
   MissingVariables name variables -> missingVariables name variables
   ParseError msg                  -> parseError msg
  where
-  missingVariables name variables = mconcat
-    ["Missing variables for template '", name, "': ", T.pack $ show variables]
+  missingVariables name variables =
+    mconcat ["Missing variables for '", name, "': ", T.pack $ show variables]
   parseError msg = "Error parsing template: " <> msg

@@ -36,10 +36,10 @@ excluded-paths: []
 ## Variables (key-value) to replace in templates,
 ## same as '-v|--variable="KEY=VALUE"' command line argument (can be used
 ## multiple times for more than one path).
-##
-## NOTE: Not defined in default configuration as this options must be defined by
-## the user.
-# variables: {}
+variables:
+  _haskell_module_name: "!!! INSERT HASKELL MODULE NAME !!!"
+  _haskell_module_longdesc: "!!! INSERT MODULE LONG DESCRIPTION !!!"
+  _haskell_module_shortdesc: "!!! INSERT MODULE SHORT DESCRIPTION !!!"
 
 ## Allows to change behaviour of license header detection and placement. Such
 ## configuration is defined for every supported file type, where individual

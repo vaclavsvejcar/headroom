@@ -22,6 +22,7 @@ where
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , TemplateError(..)
+                                                , Variables(..)
                                                 )
 import           RIO
 import qualified RIO.Text                      as T
@@ -47,8 +48,8 @@ parseTemplate' name raw = case MU.compileTemplate templateName raw of
   where templateName = T.unpack . fromMaybe "" $ name
 
 
-renderTemplate' :: MonadThrow m => HashMap Text Text -> Mustache -> m Text
-renderTemplate' variables (Mustache t@(MU.Template name _ _)) =
+renderTemplate' :: MonadThrow m => Variables -> Mustache -> m Text
+renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _)) =
   case MU.checkedSubstitute t variables of
     ([], rendered) -> pure rendered
     (errs, rendered) ->

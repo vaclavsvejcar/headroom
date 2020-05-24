@@ -18,10 +18,10 @@ import           Headroom.Types                 ( FileInfo(..)
                                                 , HeaderSyntax(..)
                                                 , HeadersConfig(..)
                                                 , PartialConfiguration(..)
+                                                , mkVariables
                                                 )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
-import qualified RIO.HashMap                   as HM
 import           Test.Hspec
 import           Text.Regex.PCRE.Light          ( compile )
 import           Text.Regex.PCRE.Light.Char8    ( utf8 )
@@ -36,7 +36,7 @@ spec = do
         HeaderConfig ["hs"] mb ma pb pa (BlockComment "{-|" "-}")
 
   describe "addHeader" $ do
-    let fileInfo config = FileInfo Haskell config Nothing HM.empty
+    let fileInfo config = FileInfo Haskell config Nothing mempty
 
     it "adds header at the beginning of text" $ do
       let info     = fileInfo $ bHeaderConfig [] []
@@ -76,7 +76,7 @@ spec = do
     it "does nothing if header is already present" $ do
       let config = bHeaderConfig ["^before"] []
           header = "{-| HEADER -}"
-          info   = FileInfo Haskell config (Just (3, 3)) HM.empty
+          info   = FileInfo Haskell config (Just (3, 3)) mempty
           sample = "1\n2\nbefore\n{-| OLDHEADER -}\nafter\n4"
       addHeader info header sample `shouldBe` sample
 
@@ -84,20 +84,20 @@ spec = do
   describe "dropHeader" $ do
     it "does nothing if no header is present" $ do
       let config = bHeaderConfig [] []
-          info   = FileInfo Haskell config Nothing HM.empty
+          info   = FileInfo Haskell config Nothing mempty
           sample = "1\n2\nbefore\nafter\n4\n"
       dropHeader info sample `shouldBe` sample
 
     it "drops existing single line header" $ do
       let config   = bHeaderConfig [] []
-          info     = FileInfo Haskell config (Just (3, 3)) HM.empty
+          info     = FileInfo Haskell config (Just (3, 3)) mempty
           sample   = "1\n2\nbefore\n{-| HEADER -}\nafter\n4\n"
           expected = "1\n2\nbefore\nafter\n4\n"
       dropHeader info sample `shouldBe` expected
 
     it "drops existing multi line header" $ do
       let config   = bHeaderConfig [] []
-          info     = FileInfo Haskell config (Just (3, 4)) HM.empty
+          info     = FileInfo Haskell config (Just (3, 4)) mempty
           sample   = "1\n2\nbefore\n{-| HEADER\nHERE -}\nafter\n4\n"
           expected = "1\n2\nbefore\nafter\n4\n"
       dropHeader info sample `shouldBe` expected
@@ -106,7 +106,7 @@ spec = do
   describe "replaceHeader" $ do
     it "adds header if there's none present" $ do
       let config   = bHeaderConfig ["^before"] []
-          info     = FileInfo Haskell config Nothing HM.empty
+          info     = FileInfo Haskell config Nothing mempty
           header   = "{-| NEWHEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "1\n2\nbefore\n{-| NEWHEADER -}\nafter\n4\n"
@@ -114,7 +114,7 @@ spec = do
 
     it "replaces header if there's existing one" $ do
       let config   = bHeaderConfig ["^before"] []
-          info     = FileInfo Haskell config (Just (3, 4)) HM.empty
+          info     = FileInfo Haskell config (Just (3, 4)) mempty
           header   = "{-| NEWHEADER -}"
           sample   = "1\n2\nbefore\n{-| OLD\nHEADER -}\nafter\n4\n"
           expected = "1\n2\nbefore\n{-| NEWHEADER -}\nafter\n4\n"
@@ -128,7 +128,7 @@ spec = do
             Haskell
             config
             (Just (1, 13))
-            (HM.fromList
+            (mkVariables
               [ ("_haskell_module_name"     , "Test")
               , ("_haskell_module_longdesc" , "long\ndescription")
               , ("_haskell_module_shortdesc", "Short description")
@@ -140,7 +140,7 @@ spec = do
   describe "extractVariables" $ do
     it "extracts variables specific for Haskell file type" $ do
       let config   = bHeaderConfig [] []
-          expected = HM.fromList
+          expected = mkVariables
             [ ("_haskell_module_name"     , "Test")
             , ("_haskell_module_longdesc" , "long\ndescription")
             , ("_haskell_module_shortdesc", "Short description")

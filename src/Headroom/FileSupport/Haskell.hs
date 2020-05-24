@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TupleSections     #-}
 
 {-|
 Module      : Headroom.FileSupport.Haskell
@@ -34,9 +35,11 @@ import           Headroom.FileSupport.Haskell.Haddock
 import           Headroom.Regex                 ( match'
                                                 , re'
                                                 )
-import           Headroom.Types                 ( HeaderConfig(..) )
+import           Headroom.Types                 ( HeaderConfig(..)
+                                                , Variables(..)
+                                                , mkVariables
+                                                )
 import           RIO
-import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 
@@ -68,18 +71,12 @@ extractVariablesHaskell :: HeaderConfig
                         -- ^ license header position @(startLine, endLine)@
                         -> Text
                         -- ^ input text
-                        -> HashMap Text Text
+                        -> Variables
                         -- ^ extracted variables
-extractVariablesHaskell _ headerPos text = HM.fromList
-  [ ( "_haskell_module_name"
-    , fromMaybe "!!! NAME OF HASKELL MODULE !!!" $ extractModuleName text
-    )
-  , ( "_haskell_module_longdesc"
-    , fromMaybe "!!! MODULE LONG DESCRIPTION !!!" hmhLongDesc
-    )
-  , ( "_haskell_module_shortdesc"
-    , fromMaybe "!!! MODULE SHORT DESCRIPTION !!!" hmhShortDesc
-    )
+extractVariablesHaskell _ headerPos text = (mkVariables . catMaybes)
+  [ ("_haskell_module_name", ) <$> extractModuleName text
+  , ("_haskell_module_longdesc", ) <$> hmhLongDesc
+  , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
   ]
  where
   HaddockModuleHeader {..} = extractModuleHeader headerText

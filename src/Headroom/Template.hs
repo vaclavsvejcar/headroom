@@ -16,6 +16,7 @@ the 'Template' /type class/.
 
 module Headroom.Template where
 
+import           Headroom.Types                 ( Variables(..) )
 import           RIO
 
 -- | Type class representing generic license header template support.
@@ -39,7 +40,7 @@ class Template t where
 
   -- | Renders parsed template and replaces all variables with actual values.
   renderTemplate :: MonadThrow m
-                 => HashMap Text Text
+                 => Variables
                  -- ^ values of variables to replace
                  -> t
                  -- ^ parsed template to render

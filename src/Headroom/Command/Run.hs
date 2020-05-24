@@ -21,6 +21,7 @@ responsible for license header management.
 
 module Headroom.Command.Run
   ( commandRun
+  , compileVariables
   , dynamicVariables
   , loadBuiltInTemplates
   , loadTemplateFiles
@@ -75,6 +76,8 @@ import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , RunAction(..)
                                                 , RunMode(..)
                                                 , TemplateSource(..)
+                                                , Variables(..)
+                                                , mkVariables
                                                 )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
@@ -85,6 +88,7 @@ import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
+
 
 
 -- | Initial /RIO/ startup environment for the /Run/ command.
@@ -188,44 +192,47 @@ findSourceFiles fileTypes = do
 
 
 processSourceFiles :: ( Has Configuration env
-                      , HasLogFunc env
                       , Has CommandRunOptions env
+                      , HasLogFunc env
                       )
                    => Map FileType TemplateType
                    -> [FilePath]
                    -> RIO env (Int, Int)
 processSourceFiles templates paths = do
   Configuration {..} <- viewL
-  vars               <- dynamicVariables
+  dVars              <- dynamicVariables
+  cVars              <- compileVariables cVariables
   let withFileType = mapMaybe (findFileType cLicenseHeaders) paths
       withTemplate = mapMaybe (uncurry findTemplate) withFileType
-  processed <- mapM (process vars) (zipWithProgress withTemplate)
+  processed <- mapM (process cVars dVars) (zipWithProgress withTemplate)
   pure (L.length withTemplate, L.length . filter (== True) $ processed)
  where
   findFileType conf path =
     fmap (, path) (fileExtension path >>= fileTypeByExt conf)
   findTemplate ft p = (, ft, p) <$> M.lookup ft templates
-  process vars (pr, (tt, ft, p)) = processSourceFile vars pr tt ft p
+  process cVars dVars (pr, (tt, ft, p)) =
+    processSourceFile cVars dVars pr tt ft p
 
 
 processSourceFile :: ( Has Configuration env
-                     , HasLogFunc env
                      , Has CommandRunOptions env
+                     , HasLogFunc env
                      )
-                  => HashMap Text Text
+                  => Variables
+                  -> Variables
                   -> Progress
                   -> TemplateType
                   -> FileType
                   -> FilePath
                   -> RIO env Bool
-processSourceFile gv progress template fileType path = do
+processSourceFile cVars dVars progress template fileType path = do
   Configuration {..}     <- viewL
   CommandRunOptions {..} <- viewL
   fileContent            <- readFileUtf8 path
   let fileInfo = extractFileInfo fileType
                                  (configByFileType cLicenseHeaders fileType)
                                  fileContent
-      variables = cVariables <> fiVariables fileInfo <> gv
+      variables = dVars <> cVars <> fiVariables fileInfo
   header         <- renderTemplate variables template
   RunAction {..} <- chooseAction fileInfo header
   let result  = raFunc fileContent
@@ -373,19 +380,41 @@ optionsToConfiguration = do
     , pcSourcePaths    = ifNot null croSourcePaths
     , pcExcludedPaths  = ifNot null croExcludedPaths
     , pcTemplateSource = maybe mempty pure croTemplateSource
-    , pcVariables      = ifNot null variables
+    , pcVariables      = variables
     , pcLicenseHeaders = mempty
     }
   where ifNot cond value = if cond value then mempty else pure value
 
 
+-- | Compiles variable values that are itself mini-templates, where their
+-- variables will be substituted by other variable values (if possible).
+-- Note that recursive variable reference and/or cyclic references are not
+-- supported.
+--
+-- >>> compileVariables $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
+-- Variables {unVariables = fromList [("msg","Hello, John"),("name","John")]}
+compileVariables :: (MonadThrow m)
+                 => Variables
+                 -- ^ input variables to compile
+                 -> m Variables
+                 -- ^ compiled variables
+compileVariables variables@(Variables kvs) = do
+  compiled <- mapM compileVariable (HM.toList kvs)
+  pure $ mkVariables compiled
+ where
+  compileVariable (key, value) = do
+    parsed   <- parseTemplate @TemplateType (Just $ "variable " <> key) value
+    rendered <- renderTemplate variables parsed
+    pure (key, rendered)
+
+
 -- | /Dynamic variables/ that are common for all parsed files.
 --
 -- * @___current_year__@ - current year
-dynamicVariables :: MonadIO m => m (HashMap Text Text)
+dynamicVariables :: MonadIO m => m Variables
 dynamicVariables = do
   now      <- liftIO getCurrentTime
   timezone <- liftIO getCurrentTimeZone
   let zoneNow      = utcToLocalTime timezone now
       (year, _, _) = toGregorian $ localDay zoneNow
-  pure $ HM.fromList [("_current_year", tshow year)]
+  pure . mkVariables $ [("_current_year", tshow year)]

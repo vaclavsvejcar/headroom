@@ -9,10 +9,10 @@ import           Headroom.FileSupport.Haskell
 import           Headroom.FileSystem            ( loadFile )
 import           Headroom.Types                 ( HeaderConfig(..)
                                                 , HeaderSyntax(..)
+                                                , mkVariables
                                                 )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
-import qualified RIO.HashMap                   as HM
 import           Test.Hspec
 
 
@@ -32,7 +32,7 @@ spec = do
     it "extracts variables from Haskell source code with Haddock header" $ do
       let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
           headerPos = Just (1, 13)
-          expected  = HM.fromList
+          expected  = mkVariables
             [ ("_haskell_module_name"     , "Test")
             , ("_haskell_module_longdesc" , "long\ndescription")
             , ("_haskell_module_shortdesc", "Short description")
@@ -43,10 +43,6 @@ spec = do
     it "extracts variables from Haskell source code without Haddock header" $ do
       let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
           headerPos = Nothing
-          expected  = HM.fromList
-            [ ("_haskell_module_name"     , "Test")
-            , ("_haskell_module_longdesc" , "!!! MODULE LONG DESCRIPTION !!!")
-            , ("_haskell_module_shortdesc", "!!! MODULE SHORT DESCRIPTION !!!")
-            ]
+          expected  = mkVariables [("_haskell_module_name", "Test")]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
       extractVariablesHaskell config headerPos sample `shouldBe` expected

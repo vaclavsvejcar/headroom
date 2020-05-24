@@ -43,9 +43,9 @@ import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
+                                                , Variables(..)
                                                 )
 import           RIO
-import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 import           Text.Regex.PCRE.Light          ( Regex )
@@ -79,11 +79,11 @@ extractVariables :: FileType
                  -- ^ license header position @(startLine, endLine)@
                  -> Text
                  -- ^ text of the source code file
-                 -> HashMap Text Text
+                 -> Variables
                  -- ^ extracted variables
 extractVariables fileType config headerPos text = case fileType of
   Haskell -> extractVariablesHaskell config headerPos text
-  _       -> HM.empty
+  _       -> mempty
 
 
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if

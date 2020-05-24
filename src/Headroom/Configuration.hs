@@ -41,10 +41,11 @@ import           Headroom.Types                 ( ApplicationError(..)
                                                 , PartialConfiguration(..)
                                                 , PartialHeaderConfig(..)
                                                 , PartialHeadersConfig(..)
+                                                , Variables(..)
+                                                , mkVariables
                                                 )
 import           RIO
 import qualified RIO.ByteString                as B
-import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
 
@@ -70,13 +71,13 @@ parseConfiguration = Y.decodeThrow
 -- | Parses variables from raw input in @key=value@ format.
 --
 -- >>> parseVariables ["key1=value1"]
--- fromList [("key1","value1")]
+-- Variables {unVariables = fromList [("key1","value1")]}
 parseVariables :: MonadThrow m
                => [Text]
                -- ^ list of raw variables
-               -> m (HashMap Text Text)
+               -> m Variables
                -- ^ parsed variables
-parseVariables variables = fmap HM.fromList (mapM parse variables)
+parseVariables variables = fmap mkVariables (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
     [key, value] -> pure (key, value)
@@ -94,8 +95,8 @@ makeConfiguration PartialConfiguration {..} = do
   cSourcePaths    <- lastOrError NoSourcePaths pcSourcePaths
   cExcludedPaths  <- lastOrError NoExcludedPaths pcExcludedPaths
   cTemplateSource <- lastOrError NoTemplateSource pcTemplateSource
-  cVariables      <- lastOrError NoVariables pcVariables
   cLicenseHeaders <- makeHeadersConfig pcLicenseHeaders
+  let cVariables = pcVariables
   pure Configuration { .. }
 
 
@@ -137,7 +138,7 @@ makeHeaderConfig fileType PartialHeaderConfig {..} = do
   pure HeaderConfig { .. }
 
 
---------------------------------------------------------------------------------
+------------------------------  Private Functions  -----------------------------
 
 
 lastOrError :: MonadThrow m => ConfigurationError -> Last a -> m a
