@@ -37,6 +37,7 @@ excluded-paths: []
 ## same as '-v|--variable="KEY=VALUE"' command line argument (can be used
 ## multiple times for more than one path).
 variables:
+  _haskell_module_copyright: "!!! INSERT HASKELL MODULE COPYRIGHT !!!"
   _haskell_module_name: "!!! INSERT HASKELL MODULE NAME !!!"
   _haskell_module_longdesc: "!!! INSERT MODULE LONG DESCRIPTION !!!"
   _haskell_module_shortdesc: "!!! INSERT MODULE SHORT DESCRIPTION !!!"

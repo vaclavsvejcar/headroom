@@ -129,7 +129,10 @@ spec = do
             config
             (Just (1, 13))
             (mkVariables
-              [ ("_haskell_module_name"     , "Test")
+              [ ( "_haskell_module_copyright"
+                , "(c) Some Guy, 2013\n                  Someone Else, 2014"
+                )
+              , ("_haskell_module_name"     , "Test")
               , ("_haskell_module_longdesc" , "long\ndescription")
               , ("_haskell_module_shortdesc", "Short description")
               ]
@@ -141,7 +144,10 @@ spec = do
     it "extracts variables specific for Haskell file type" $ do
       let config   = bHeaderConfig [] []
           expected = mkVariables
-            [ ("_haskell_module_name"     , "Test")
+            [ ( "_haskell_module_copyright"
+              , "(c) Some Guy, 2013\n                  Someone Else, 2014"
+              )
+            , ("_haskell_module_name"     , "Test")
             , ("_haskell_module_longdesc" , "long\ndescription")
             , ("_haskell_module_shortdesc", "Short description")
             ]

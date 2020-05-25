@@ -33,7 +33,10 @@ spec = do
       let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
           headerPos = Just (1, 13)
           expected  = mkVariables
-            [ ("_haskell_module_name"     , "Test")
+            [ ( "_haskell_module_copyright"
+              , "(c) Some Guy, 2013\n                  Someone Else, 2014"
+              )
+            , ("_haskell_module_name"     , "Test")
             , ("_haskell_module_longdesc" , "long\ndescription")
             , ("_haskell_module_shortdesc", "Short description")
             ]

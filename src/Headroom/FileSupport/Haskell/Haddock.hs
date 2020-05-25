@@ -36,7 +36,9 @@ import           Text.Regex.PCRE.Heavy          ( gsub )
 
 -- | Extracted fields from the /Haddock module header/.
 data HaddockModuleHeader = HaddockModuleHeader
-  { hmhShortDesc :: !(Maybe Text)
+  { hmhCopyright :: !(Maybe Text)
+  -- ^ module copyright (content of the @Copyright@ field)
+  , hmhShortDesc :: !(Maybe Text)
   -- ^ module short description (content of the @Description@ field)
   , hmhLongDesc  :: !(Maybe Text)
   -- ^ module long description (the text after module header fields)
@@ -49,7 +51,8 @@ extractModuleHeader :: Text
                     -> HaddockModuleHeader
                     -- ^ extracted metadata
 extractModuleHeader text =
-  let hmhShortDesc = extractField "Description"
+  let hmhCopyright = extractField "Copyright"
+      hmhShortDesc = extractField "Description"
       hmhLongDesc  = if null rest' then Nothing else process rest'
   in  HaddockModuleHeader { .. }
  where

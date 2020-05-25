@@ -21,7 +21,9 @@ spec = do
     it "extracts fields from Haddock module header" $ do
       let
         expected = HaddockModuleHeader
-          { hmhShortDesc = Just "Short description"
+          { hmhCopyright = Just
+            "(c) Some Guy, 2013\n                  Someone Else, 2014"
+          , hmhShortDesc = Just "Short description"
           , hmhLongDesc  =
             Just
               "Here is a longer description of this module, containing some\n\
