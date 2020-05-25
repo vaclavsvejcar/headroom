@@ -21,23 +21,13 @@ responsible for license header management.
 
 module Headroom.Command.Run
   ( commandRun
-  , compileVariables
-  , dynamicVariables
   , loadBuiltInTemplates
   , loadTemplateFiles
   , typeOfTemplate
   )
 where
 
-import           Data.Time.Calendar             ( toGregorian
-                                                , toGregorian
-                                                )
-import           Data.Time.Clock                ( getCurrentTime )
 import           Data.Time.Clock.POSIX          ( getPOSIXTime )
-import           Data.Time.LocalTime            ( getCurrentTimeZone
-                                                , localDay
-                                                , utcToLocalTime
-                                                )
 import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( loadConfiguration
                                                 , makeConfiguration
@@ -80,12 +70,12 @@ import           Headroom.Types                 ( CommandRunOptions(..)
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
                                                 )
-import           Headroom.Variables             ( mkVariables
+import           Headroom.Variables             ( compileVariables
+                                                , dynamicVariables
                                                 , parseVariables
                                                 )
 import           RIO
 import           RIO.FilePath                   ( takeBaseName )
-import qualified RIO.HashMap                   as HM
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
@@ -385,37 +375,3 @@ optionsToConfiguration = do
     , pcLicenseHeaders = mempty
     }
   where ifNot cond value = if cond value then mempty else pure value
-
-
--- | Compiles variable values that are itself mini-templates, where their
--- variables will be substituted by other variable values (if possible).
--- Note that recursive variable reference and/or cyclic references are not
--- supported.
---
--- >>> compileVariables $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
--- Variables {unVariables = fromList [("msg","Hello, John"),("name","John")]}
-compileVariables :: (MonadThrow m)
-                 => Variables
-                 -- ^ input variables to compile
-                 -> m Variables
-                 -- ^ compiled variables
-compileVariables variables@(Variables kvs) = do
-  compiled <- mapM compileVariable (HM.toList kvs)
-  pure $ mkVariables compiled
- where
-  compileVariable (key, value) = do
-    parsed   <- parseTemplate @TemplateType (Just $ "variable " <> key) value
-    rendered <- renderTemplate variables parsed
-    pure (key, rendered)
-
-
--- | /Dynamic variables/ that are common for all parsed files.
---
--- * @___current_year__@ - current year
-dynamicVariables :: MonadIO m => m Variables
-dynamicVariables = do
-  now      <- liftIO getCurrentTime
-  timezone <- liftIO getCurrentTimeZone
-  let zoneNow      = utcToLocalTime timezone now
-      (year, _, _) = toGregorian $ localDay zoneNow
-  pure . mkVariables $ [("_current_year", tshow year)]

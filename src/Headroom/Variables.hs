@@ -1,4 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 
 {-|
 Module      : Headroom.Variables
@@ -13,15 +15,26 @@ Module containing costructor and useful functions for the 'Variables' data type.
 -}
 
 module Headroom.Variables
-  ( -- * Constructor Functions
+  ( -- * Constructing Variables
     mkVariables
+  , dynamicVariables
     -- * Parsing Variables
   , parseVariables
+    -- * Processing Variables
+  , compileVariables
   )
 where
 
 import           RIO
 
+import           Data.Time.Calendar             ( toGregorian )
+import           Data.Time.Clock                ( getCurrentTime )
+import           Data.Time.LocalTime            ( getCurrentTimeZone
+                                                , localDay
+                                                , utcToLocalTime
+                                                )
+import           Headroom.Meta                  ( TemplateType )
+import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , ConfigurationError(..)
                                                 , Variables(..)
@@ -41,6 +54,18 @@ mkVariables :: [(Text, Text)]
 mkVariables = Variables . HM.fromList
 
 
+-- | /Dynamic variables/ that are common for all parsed files.
+--
+-- * @___current_year__@ - current year
+dynamicVariables :: MonadIO m => m Variables
+dynamicVariables = do
+  now      <- liftIO getCurrentTime
+  timezone <- liftIO getCurrentTimeZone
+  let zoneNow      = utcToLocalTime timezone now
+      (year, _, _) = toGregorian $ localDay zoneNow
+  pure . mkVariables $ [("_current_year", tshow year)]
+
+
 -- | Parses variables from raw input in @key=value@ format.
 --
 -- >>> parseVariables ["key1=value1"]
@@ -55,3 +80,25 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
   parse input = case T.split (== '=') input of
     [key, value] -> pure (key, value)
     _            -> throwM $ ConfigurationError (InvalidVariable input)
+
+
+-- | Compiles variable values that are itself mini-templates, where their
+-- variables will be substituted by other variable values (if possible).
+-- Note that recursive variable reference and/or cyclic references are not
+-- supported.
+--
+-- >>> compileVariables $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
+-- Variables {unVariables = fromList [("msg","Hello, John"),("name","John")]}
+compileVariables :: (MonadThrow m)
+                 => Variables
+                 -- ^ input variables to compile
+                 -> m Variables
+                 -- ^ compiled variables
+compileVariables variables@(Variables kvs) = do
+  compiled <- mapM compileVariable (HM.toList kvs)
+  pure $ mkVariables compiled
+ where
+  compileVariable (key, value) = do
+    parsed   <- parseTemplate @TemplateType (Just $ "variable " <> key) value
+    rendered <- renderTemplate variables parsed
+    pure (key, rendered)
