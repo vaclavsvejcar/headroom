@@ -9,8 +9,8 @@ import           Headroom.FileSupport.Haskell
 import           Headroom.FileSystem            ( loadFile )
 import           Headroom.Types                 ( HeaderConfig(..)
                                                 , HeaderSyntax(..)
-                                                , mkVariables
                                                 )
+import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
 import           Test.Hspec

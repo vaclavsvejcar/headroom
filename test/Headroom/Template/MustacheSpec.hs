@@ -11,11 +11,12 @@ import           Headroom.Template
 import           Headroom.Template.Mustache
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , TemplateError(..)
-                                                , mkVariables
                                                 )
+import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           Test.Hspec
 import           Test.Utils                     ( matchesException )
+
 
 spec :: Spec
 spec = do

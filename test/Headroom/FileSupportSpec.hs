@@ -18,8 +18,8 @@ import           Headroom.Types                 ( FileInfo(..)
                                                 , HeaderSyntax(..)
                                                 , HeadersConfig(..)
                                                 , PartialConfiguration(..)
-                                                , mkVariables
                                                 )
+import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
 import           Test.Hspec

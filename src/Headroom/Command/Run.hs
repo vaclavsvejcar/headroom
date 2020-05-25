@@ -42,7 +42,6 @@ import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( loadConfiguration
                                                 , makeConfiguration
                                                 , parseConfiguration
-                                                , parseVariables
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
@@ -77,10 +76,12 @@ import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , RunMode(..)
                                                 , TemplateSource(..)
                                                 , Variables(..)
-                                                , mkVariables
                                                 )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
+                                                )
+import           Headroom.Variables             ( mkVariables
+                                                , parseVariables
                                                 )
 import           RIO
 import           RIO.FilePath                   ( takeBaseName )

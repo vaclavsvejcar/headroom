@@ -50,8 +50,6 @@ module Headroom.Types
   , LicenseType(..)
   , FileType(..)
   , FileInfo(..)
-    -- * Data Type Constructors
-  , mkVariables
   )
 where
 
@@ -67,7 +65,6 @@ import           Data.Monoid                    ( Last(..) )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Serialization         ( aesonOptions )
 import           RIO
-import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
 
@@ -311,7 +308,7 @@ data HeaderSyntax
   -- ^ single line comment syntax (e.g. @//@)
   deriving (Eq, Show)
 
--- | Map of /static/ and /dynamic variables/. Use 'mkVariables' function for
+-- | Map of /static/ and /dynamic variables/. Use 'Headroom.Variables.mkVariables' function for
 -- more convenient construction of this data type.
 newtype Variables = Variables
   { unVariables :: HashMap Text Text
@@ -560,17 +557,6 @@ instance Monoid PartialHeadersConfig where
                                 mempty
                                 mempty
                                 mempty
-
---------------------------------  Constructors  --------------------------------
-
-
--- | Constructor function for 'Variables' data type.
-mkVariables :: [(Text, Text)]
-            -- ^ pairs of /key-value/
-            -> Variables
-            -- ^ constructed variables
-mkVariables = Variables . HM.fromList
-
 
 ------------------------------  Private Functions  -----------------------------
 

@@ -22,7 +22,6 @@ module Headroom.Configuration
   ( -- * Loading & Parsing Configuration
     loadConfiguration
   , parseConfiguration
-  , parseVariables
     -- * Processing Partial Configuration
   , makeConfiguration
   , makeHeadersConfig
@@ -41,13 +40,9 @@ import           Headroom.Types                 ( ApplicationError(..)
                                                 , PartialConfiguration(..)
                                                 , PartialHeaderConfig(..)
                                                 , PartialHeadersConfig(..)
-                                                , Variables(..)
-                                                , mkVariables
                                                 )
 import           RIO
 import qualified RIO.ByteString                as B
-import qualified RIO.Text                      as T
-
 
 
 -- | Loads and parses application configuration from given /YAML/ file.
@@ -66,22 +61,6 @@ parseConfiguration :: MonadThrow m
                    -> m PartialConfiguration
                    -- ^ parsed application configuration
 parseConfiguration = Y.decodeThrow
-
-
--- | Parses variables from raw input in @key=value@ format.
---
--- >>> parseVariables ["key1=value1"]
--- Variables {unVariables = fromList [("key1","value1")]}
-parseVariables :: MonadThrow m
-               => [Text]
-               -- ^ list of raw variables
-               -> m Variables
-               -- ^ parsed variables
-parseVariables variables = fmap mkVariables (mapM parse variables)
- where
-  parse input = case T.split (== '=') input of
-    [key, value] -> pure (key, value)
-    _            -> throwM $ ConfigurationError (InvalidVariable input)
 
 
 -- | Makes full 'Configuration' from provided 'PartialConfiguration' (if valid).

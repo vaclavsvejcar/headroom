@@ -21,8 +21,8 @@ import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( FileType(..)
                                                 , LicenseType(..)
-                                                , mkVariables
                                                 )
+import           Headroom.Variables             ( mkVariables )
 import           RIO                     hiding ( assert )
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.Map                       as M
@@ -32,6 +32,7 @@ import           Test.Hspec
 import           Test.Hspec.QuickCheck          ( prop )
 import           Test.QuickCheck
 import           Test.QuickCheck.Monadic
+
 
 
 spec :: Spec

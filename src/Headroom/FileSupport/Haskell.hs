@@ -37,8 +37,8 @@ import           Headroom.Regex                 ( match'
                                                 )
 import           Headroom.Types                 ( HeaderConfig(..)
                                                 , Variables(..)
-                                                , mkVariables
                                                 )
+import           Headroom.Variables             ( mkVariables )
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
