@@ -12,7 +12,8 @@ import           Headroom.Configuration         ( makeHeadersConfig
 import           Headroom.Embedded              ( defaultConfig )
 import           Headroom.FileSupport
 import           Headroom.FileSystem            ( loadFile )
-import           Headroom.Types                 ( FileInfo(..)
+import           Headroom.Types                 ( CurrentYear(..)
+                                                , FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
@@ -29,7 +30,8 @@ import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 
 spec :: Spec
 spec = do
-  let samplesDir = "test-data" </> "code-samples"
+  let currYear   = CurrentYear 2020
+      samplesDir = "test-data" </> "code-samples"
       lHeaderConfig pb pa = HeaderConfig ["hs"] 0 0 pb pa (LineComment "--")
       bHeaderConfig = bHeaderConfigM 0 0
       bHeaderConfigM mb ma pb pa =
@@ -123,36 +125,45 @@ spec = do
 
   describe "extractFileInfo" $ do
     it "extracts FileInfo from given raw input" $ do
-      let config   = bHeaderConfig [] []
-          expected = FileInfo
-            Haskell
-            config
-            (Just (1, 13))
-            (mkVariables
-              [ ( "_haskell_module_copyright"
-                , "(c) Some Guy, 2013\n                  Someone Else, 2014"
-                )
-              , ("_haskell_module_name"     , "Test")
-              , ("_haskell_module_longdesc" , "long\ndescription")
-              , ("_haskell_module_shortdesc", "Short description")
-              ]
-            )
-      sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      extractFileInfo Haskell config sample `shouldBe` expected
-
-  describe "extractVariables" $ do
-    it "extracts variables specific for Haskell file type" $ do
-      let config   = bHeaderConfig [] []
-          expected = mkVariables
+      let
+        config   = bHeaderConfig [] []
+        expected = FileInfo
+          Haskell
+          config
+          (Just (1, 13))
+          (mkVariables
             [ ( "_haskell_module_copyright"
               , "(c) Some Guy, 2013\n                  Someone Else, 2014"
+              )
+            , ( "_haskell_module_copyright_updated"
+              , "(c) Some Guy, 2013-2020\n                  Someone Else, 2014-2020"
               )
             , ("_haskell_module_name"     , "Test")
             , ("_haskell_module_longdesc" , "long\ndescription")
             , ("_haskell_module_shortdesc", "Short description")
             ]
+          )
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      extractVariables Haskell config (Just (1, 13)) sample `shouldBe` expected
+      extractFileInfo Haskell config currYear sample `shouldBe` expected
+
+  describe "extractVariables" $ do
+    it "extracts variables specific for Haskell file type" $ do
+      let
+        config   = bHeaderConfig [] []
+        expected = mkVariables
+          [ ( "_haskell_module_copyright"
+            , "(c) Some Guy, 2013\n                  Someone Else, 2014"
+            )
+          , ( "_haskell_module_copyright_updated"
+            , "(c) Some Guy, 2013-2020\n                  Someone Else, 2014-2020"
+            )
+          , ("_haskell_module_name"     , "Test")
+          , ("_haskell_module_longdesc" , "long\ndescription")
+          , ("_haskell_module_shortdesc", "Short description")
+          ]
+      sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
+      extractVariables Haskell config (Just (1, 13)) currYear sample
+        `shouldBe` expected
 
 
   describe "findHeader" $ do

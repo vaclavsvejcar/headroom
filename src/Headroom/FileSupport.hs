@@ -39,7 +39,8 @@ import           Headroom.Regex                 ( compile'
                                                 , joinPatterns
                                                 , match'
                                                 )
-import           Headroom.Types                 ( FileInfo(..)
+import           Headroom.Types                 ( CurrentYear
+                                                , FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
@@ -57,13 +58,16 @@ extractFileInfo :: FileType
                 -- ^ type of the detected file
                 -> HeaderConfig
                 -- ^ license header configuration
+                -> CurrentYear
+                -- ^ current year
                 -> Text
                 -- ^ text used for detection
                 -> FileInfo
                 -- ^ resulting file info
-extractFileInfo fiFileType fiHeaderConfig text =
+extractFileInfo fiFileType fiHeaderConfig year text =
   let fiHeaderPos = findHeader fiHeaderConfig text
-      fiVariables = extractVariables fiFileType fiHeaderConfig fiHeaderPos text
+      fiVariables =
+        extractVariables fiFileType fiHeaderConfig fiHeaderPos year text
   in  FileInfo { .. }
 
 
@@ -77,12 +81,14 @@ extractVariables :: FileType
                  -- ^ license header configuration
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
+                 -> CurrentYear
+                 -- ^ current year
                  -> Text
                  -- ^ text of the source code file
                  -> Variables
                  -- ^ extracted variables
-extractVariables fileType config headerPos text = case fileType of
-  Haskell -> extractVariablesHaskell config headerPos text
+extractVariables fileType config headerPos year text = case fileType of
+  Haskell -> extractVariablesHaskell config headerPos year text
   _       -> mempty
 
 

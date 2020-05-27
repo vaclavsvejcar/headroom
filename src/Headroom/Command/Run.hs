@@ -27,7 +27,13 @@ module Headroom.Command.Run
   )
 where
 
+import           Data.Time.Calendar             ( toGregorian )
+import           Data.Time.Clock                ( getCurrentTime )
 import           Data.Time.Clock.POSIX          ( getPOSIXTime )
+import           Data.Time.LocalTime            ( getCurrentTimeZone
+                                                , localDay
+                                                , utcToLocalTime
+                                                )
 import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( loadConfiguration
                                                 , makeConfiguration
@@ -58,6 +64,7 @@ import           Headroom.Meta                  ( TemplateType
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , Configuration(..)
+                                                , CurrentYear(..)
                                                 , FileInfo(..)
                                                 , FileType(..)
                                                 , LicenseType(..)
@@ -96,6 +103,8 @@ data Env = Env
   -- ^ startup /RIO/ environment
   , envConfiguration :: !Configuration
   -- ^ application configuration
+  , envCurrentYear   :: !CurrentYear
+  -- ^ current year
   }
 
 instance Has Configuration Env where
@@ -119,12 +128,16 @@ instance Has CommandRunOptions StartupEnv where
 instance Has CommandRunOptions Env where
   hasLens = hasLens @StartupEnv . hasLens
 
+instance Has CurrentYear Env where
+  hasLens = lens envCurrentYear (\x y -> x { envCurrentYear = y })
+
 
 env' :: CommandRunOptions -> LogFunc -> IO Env
 env' opts logFunc = do
-  let startupEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
-  merged <- runRIO startupEnv finalConfiguration
-  pure $ Env { envEnv = startupEnv, envConfiguration = merged }
+  let envEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
+  envConfiguration <- runRIO envEnv finalConfiguration
+  envCurrentYear   <- currentYear
+  pure Env { .. }
 
 
 -- | Handler for /Run/ command.
@@ -184,6 +197,7 @@ findSourceFiles fileTypes = do
 
 processSourceFiles :: ( Has Configuration env
                       , Has CommandRunOptions env
+                      , Has CurrentYear env
                       , HasLogFunc env
                       )
                    => Map FileType TemplateType
@@ -207,6 +221,7 @@ processSourceFiles templates paths = do
 
 processSourceFile :: ( Has Configuration env
                      , Has CommandRunOptions env
+                     , Has CurrentYear env
                      , HasLogFunc env
                      )
                   => Variables
@@ -219,9 +234,11 @@ processSourceFile :: ( Has Configuration env
 processSourceFile cVars dVars progress template fileType path = do
   Configuration {..}     <- viewL
   CommandRunOptions {..} <- viewL
+  year                   <- viewL
   fileContent            <- readFileUtf8 path
   let fileInfo = extractFileInfo fileType
                                  (configByFileType cLicenseHeaders fileType)
+                                 year
                                  fileContent
       variables = dVars <> cVars <> fiVariables fileInfo
   header         <- renderTemplate variables template
@@ -375,3 +392,12 @@ optionsToConfiguration = do
     , pcLicenseHeaders = mempty
     }
   where ifNot cond value = if cond value then mempty else pure value
+
+
+currentYear :: (MonadIO m) => m CurrentYear
+currentYear = do
+  now      <- liftIO getCurrentTime
+  timezone <- liftIO getCurrentTimeZone
+  let zoneNow      = utcToLocalTime timezone now
+      (year, _, _) = toGregorian $ localDay zoneNow
+  pure $ CurrentYear year

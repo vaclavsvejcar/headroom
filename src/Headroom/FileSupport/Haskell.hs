@@ -5,7 +5,6 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TupleSections     #-}
 
-
 {-|
 Module      : Headroom.FileSupport.Haskell
 Description : Extraction of /Haskell/-specific template variables
@@ -37,11 +36,11 @@ import           Headroom.FileSupport.Haskell.Haddock
                                                 ( HaddockModuleHeader(..)
                                                 , extractModuleHeader
                                                 )
-import           Headroom.Regex                 ( gsub
-                                                , match'
+import           Headroom.Regex                 ( match'
                                                 , re'
                                                 )
-import           Headroom.Types                 ( HeaderConfig(..)
+import           Headroom.Types                 ( CurrentYear(..)
+                                                , HeaderConfig(..)
                                                 , Variables(..)
                                                 )
 import           Headroom.Variables             ( mkVariables )
@@ -49,7 +48,7 @@ import           RIO
 import qualified RIO.List                      as L
 import           RIO.Partial                    ( read )
 import qualified RIO.Text                      as T
-
+import           Text.Regex.PCRE.Heavy          ( gsub )
 
 
 -- | Extracts name of /Haskell/ module from given source code file content.
@@ -71,6 +70,7 @@ extractModuleName = go . T.lines
 -- __List of Extracted Variables:__
 --
 -- * @___haskell_module_copyright__@ - @Copyright@ field of /Haddock/ module header
+-- * @___haskell_module_copyright_updated__@ - @Copyright@ field of /Haddock/ module header with updated years (see 'updateYears')
 -- * @___haskell_module_name__@ - name of the /Haskell/ module
 -- * @___haskell_module_longdesc__@ - long description of /Haddock/ module
 -- * @___haskell_module_shortdesc__@ - @Description@ field of /Haddock/ module header
@@ -78,12 +78,15 @@ extractVariablesHaskell :: HeaderConfig
                         -- ^ license header configuration
                         -> Maybe (Int, Int)
                         -- ^ license header position @(startLine, endLine)@
+                        -> CurrentYear
+                        -- ^ current year
                         -> Text
                         -- ^ input text
                         -> Variables
                         -- ^ extracted variables
-extractVariablesHaskell _ headerPos text = (mkVariables . catMaybes)
+extractVariablesHaskell _ headerPos year text = (mkVariables . catMaybes)
   [ ("_haskell_module_copyright", ) <$> hmhCopyright
+  , ("_haskell_module_copyright_updated", ) . updateYears year <$> hmhCopyright
   , ("_haskell_module_name", ) <$> extractModuleName text
   , ("_haskell_module_longdesc", ) <$> hmhLongDesc
   , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
@@ -96,24 +99,24 @@ extractVariablesHaskell _ headerPos text = (mkVariables . catMaybes)
 
 -- | Updates years and years ranges in given text.
 --
--- >>> updateYears 2020 "Copyright (c) 2020"
+-- >>> updateYears (CurrentYear 2020) "Copyright (c) 2020"
 -- "Copyright (c) 2020"
 --
--- >>> updateYears 2020 "Copyright (c) 2019"
+-- >>> updateYears (CurrentYear 2020) "Copyright (c) 2019"
 -- "Copyright (c) 2019-2020"
 --
--- >>> updateYears 2020 "Copyright (c) 2018-2020"
+-- >>> updateYears (CurrentYear 2020) "Copyright (c) 2018-2020"
 -- "Copyright (c) 2018-2020"
 --
--- >>> updateYears 2020 "Copyright (c) 2018-2019"
+-- >>> updateYears (CurrentYear 2020) "Copyright (c) 2018-2019"
 -- "Copyright (c) 2018-2020"
-updateYears :: Integer
+updateYears :: CurrentYear
             -- ^ current year
             -> Text
             -- ^ text to update
             -> Text
             -- ^ text with updated years
-updateYears year = processYear . processRange
+updateYears (CurrentYear year) = processYear . processRange
  where
   processYear  = gsub [re'|(?!\d{4}-)(?<!-)(\d{4})|] processYear'
   processRange = gsub [re'|(\d{4})-(\d{4})|] processRange'

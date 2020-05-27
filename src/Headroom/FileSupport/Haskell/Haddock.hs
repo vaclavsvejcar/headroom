@@ -27,12 +27,11 @@ where
 
 import           Control.Applicative            ( Alternative(..) )
 import           Control.Monad                  ( ap )
-import           Headroom.Regex                 ( gsub
-                                                , re'
-                                                )
+import           Headroom.Regex                 ( re' )
 import           RIO
 import qualified RIO.Char                      as C
 import qualified RIO.Text                      as T
+import           Text.Regex.PCRE.Heavy          ( gsub )
 
 
 -- | Extracted fields from the /Haddock module header/.

@@ -50,6 +50,8 @@ module Headroom.Types
   , LicenseType(..)
   , FileType(..)
   , FileInfo(..)
+    -- * Newtype wrappers
+  , CurrentYear(..)
   )
 where
 
@@ -67,6 +69,13 @@ import           Headroom.Serialization         ( aesonOptions )
 import           RIO
 import qualified RIO.Text                      as T
 
+
+-- | Wraps the value of current year.
+newtype CurrentYear = CurrentYear
+  { unCurrentYear :: Integer
+  -- ^ value of current year
+  }
+  deriving (Eq, Show)
 
 -- | Action to be performed based on the selected 'RunMode'.
 data RunAction = RunAction
