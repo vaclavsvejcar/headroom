@@ -25,20 +25,14 @@ module Headroom.Variables
   )
 where
 
-import           RIO
-
-import           Data.Time.Calendar             ( toGregorian )
-import           Data.Time.Clock                ( getCurrentTime )
-import           Data.Time.LocalTime            ( getCurrentTimeZone
-                                                , localDay
-                                                , utcToLocalTime
-                                                )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , ConfigurationError(..)
+                                                , CurrentYear(..)
                                                 , Variables(..)
                                                 )
+import           RIO
 import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
 
@@ -57,13 +51,12 @@ mkVariables = Variables . HM.fromList
 -- | /Dynamic variables/ that are common for all parsed files.
 --
 -- * @___current_year__@ - current year
-dynamicVariables :: MonadIO m => m Variables
-dynamicVariables = do
-  now      <- liftIO getCurrentTime
-  timezone <- liftIO getCurrentTimeZone
-  let zoneNow      = utcToLocalTime timezone now
-      (year, _, _) = toGregorian $ localDay zoneNow
-  pure . mkVariables $ [("_current_year", tshow year)]
+dynamicVariables :: CurrentYear
+                 -- ^ current year
+                 -> Variables
+                 -- ^ map of /dynamic variables/
+dynamicVariables (CurrentYear year) =
+  mkVariables [("_current_year", tshow year)]
 
 
 -- | Parses variables from raw input in @key=value@ format.

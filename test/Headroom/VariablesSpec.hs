@@ -5,13 +5,9 @@ module Headroom.VariablesSpec
   )
 where
 
-import           Data.Time.Calendar             ( toGregorian )
-import           Data.Time.Clock                ( getCurrentTime )
-import           Data.Time.LocalTime            ( getCurrentTimeZone
-                                                , localDay
-                                                , utcToLocalTime
+import           Headroom.Types                 ( CurrentYear(..)
+                                                , Variables(..)
                                                 )
-import           Headroom.Types                 ( Variables(..) )
 import           Headroom.Variables
 import           RIO
 import qualified RIO.HashMap                   as HM
@@ -52,10 +48,6 @@ spec = do
 
   describe "dynamicVariables" $ do
     it "returns map of all expected dynamic variables" $ do
-      actual   <- dynamicVariables
-      now      <- liftIO getCurrentTime
-      timezone <- liftIO getCurrentTimeZone
-      let zoneNow      = utcToLocalTime timezone now
-          (year, _, _) = toGregorian $ localDay zoneNow
-          expected     = mkVariables [("_current_year", tshow year)]
-      actual `shouldBe` expected
+      let year     = CurrentYear 2020
+          expected = mkVariables [("_current_year", "2020")]
+      dynamicVariables year `shouldBe` expected
