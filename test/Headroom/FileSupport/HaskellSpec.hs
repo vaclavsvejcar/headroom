@@ -13,6 +13,7 @@ import           Headroom.Types                 ( HeaderConfig(..)
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
+import qualified RIO.Text                      as T
 import           Test.Hspec
 
 
@@ -49,3 +50,40 @@ spec = do
           expected  = mkVariables [("_haskell_module_name", "Test")]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
       extractVariablesHaskell config headerPos sample `shouldBe` expected
+
+
+  describe "updateYears" $ do
+    let currYear = 2020 :: Integer
+
+    it "does nothing on up-to-date year" $ do
+      let sample = "Copyright (c) 2020"
+      updateYears currYear sample `shouldBe` sample
+
+    it "does nothing on up-to-date year range" $ do
+      let sample = "Copyright (c) 2018-2020"
+      updateYears currYear sample `shouldBe` sample
+
+    it "updates outdated year" $ do
+      let sample   = "Copyright (c) 2019"
+          expected = "Copyright (c) 2019-2020"
+      updateYears currYear sample `shouldBe` expected
+
+    it "updates outdated year range" $ do
+      let sample   = "Copyright (c) 2017-2019"
+          expected = "Copyright (c) 2017-2020"
+      updateYears currYear sample `shouldBe` expected
+
+    it "updates complex multi-line text" $ do
+      let sample = T.unlines
+            [ "Copyright (c) 2019"
+            , "Copyright (c) 2020"
+            , "Copyright (c) 2019-2020"
+            , "Copyright (c) 2017-2019"
+            ]
+          expected = T.unlines
+            [ "Copyright (c) 2019-2020"
+            , "Copyright (c) 2020"
+            , "Copyright (c) 2019-2020"
+            , "Copyright (c) 2017-2020"
+            ]
+      updateYears currYear sample `shouldBe` expected

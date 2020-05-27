@@ -17,16 +17,23 @@ and "Text.Regex.PCRE.Heavy" that more suits the needs of this application.
 module Headroom.Regex
   ( compile'
   , joinPatterns
+  , gsub
   , match'
   , re'
   , regexOptions
+  , scan
+  , sub
   )
 where
 
 import           Language.Haskell.TH.Quote      ( QuasiQuoter )
 import           RIO
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Heavy          ( mkRegexQQ )
+import           Text.Regex.PCRE.Heavy          ( gsub
+                                                , mkRegexQQ
+                                                , scan
+                                                , sub
+                                                )
 import           Text.Regex.PCRE.Light          ( PCREOption
                                                 , Regex
                                                 , compile
