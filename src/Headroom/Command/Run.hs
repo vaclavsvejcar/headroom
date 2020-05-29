@@ -206,10 +206,10 @@ processSourceFiles :: ( Has Configuration env
 processSourceFiles templates paths = do
   Configuration {..} <- viewL
   year               <- viewL
-  cVars              <- compileVariables cVariables
   let dVars        = dynamicVariables year
       withFileType = mapMaybe (findFileType cLicenseHeaders) paths
       withTemplate = mapMaybe (uncurry findTemplate) withFileType
+  cVars     <- compileVariables (dVars <> cVariables)
   processed <- mapM (process cVars dVars) (zipWithProgress withTemplate)
   pure (L.length withTemplate, L.length . filter (== True) $ processed)
  where
