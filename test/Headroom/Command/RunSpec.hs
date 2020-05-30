@@ -12,6 +12,7 @@ import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( FileType(..)
+                                                , HeaderSyntax(..)
                                                 , LicenseType(..)
                                                 )
 import           RIO                     hiding ( assert )
@@ -21,7 +22,7 @@ import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
 import           Test.Hspec
 import           Test.Hspec.QuickCheck          ( prop )
-import           Test.QuickCheck
+import           Test.QuickCheck         hiding ( sample )
 import           Test.QuickCheck.Monadic
 
 
@@ -50,6 +51,19 @@ spec = do
           assert $ isJust result
 
     prop "should detect type of template from template path" prop_typeOfTemplate
+
+
+  describe "sanitizeHeader" $ do
+    it "does nothing when block comment syntax used" $ do
+      let sample = T.unlines ["{-", "foo", "bar", "-}"]
+          syntax = BlockComment "{-" "-}"
+      sanitizeHeader syntax sample `shouldBe` sample
+
+    it "adds missing single-line comment syntax" $ do
+      let sample   = T.unlines ["-- first", "second", "-- third"]
+          syntax   = LineComment "--"
+          expected = T.unlines ["-- first", "-- second", "-- third"]
+      sanitizeHeader syntax sample `shouldBe` expected
 
 
 env :: TestEnv

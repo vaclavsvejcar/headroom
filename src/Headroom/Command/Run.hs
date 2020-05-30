@@ -24,6 +24,7 @@ module Headroom.Command.Run
   , loadBuiltInTemplates
   , loadTemplateFiles
   , typeOfTemplate
+  , sanitizeHeader
   )
 where
 
@@ -41,6 +42,7 @@ import           Headroom.Configuration         ( loadConfiguration
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
+import           Headroom.Data.TextExtra        ( mapLines )
 import           Headroom.Embedded              ( defaultConfig
                                                 , licenseTemplate
                                                 )
@@ -67,6 +69,8 @@ import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , CurrentYear(..)
                                                 , FileInfo(..)
                                                 , FileType(..)
+                                                , HeaderConfig(..)
+                                                , HeaderSyntax(..)
                                                 , LicenseType(..)
                                                 , PartialConfiguration(..)
                                                 , RunAction(..)
@@ -237,12 +241,14 @@ processSourceFile cVars dVars progress template fileType path = do
   CommandRunOptions {..} <- viewL
   year                   <- viewL
   fileContent            <- readFileUtf8 path
-  let fileInfo = extractFileInfo fileType
-                                 (configByFileType cLicenseHeaders fileType)
-                                 year
-                                 fileContent
-      variables = dVars <> cVars <> fiVariables fileInfo
-  header         <- renderTemplate variables template
+  let fileInfo@FileInfo {..} = extractFileInfo
+        fileType
+        (configByFileType cLicenseHeaders fileType)
+        year
+        fileContent
+      variables = dVars <> cVars <> fiVariables
+      syntax    = hcHeaderSyntax fiHeaderConfig
+  header         <- sanitizeHeader syntax <$> renderTemplate variables template
   RunAction {..} <- chooseAction fileInfo header
   let result  = raFunc fileContent
       changed = raProcessed && (fileContent /= result)
@@ -402,3 +408,21 @@ currentYear = do
   let zoneNow      = utcToLocalTime timezone now
       (year, _, _) = toGregorian $ localDay zoneNow
   pure $ CurrentYear year
+
+
+-- | Ensures that all lines in license header starts with /line-comment/ syntax
+-- if such syntax is used for license header.
+--
+-- >>> sanitizeHeader (LineComment "--") "-- foo\nbar\n-- baz"
+-- "-- foo\n-- bar\n-- baz\n"
+sanitizeHeader :: HeaderSyntax
+               -- ^ syntax of the license header comments
+               -> Text
+               -- ^ input text to sanitize
+               -> Text
+               -- ^ sanitized text
+sanitizeHeader (BlockComment _ _      ) text = text
+sanitizeHeader (LineComment prefixedBy) text = mapLines process text
+ where
+  process line | T.isPrefixOf prefixedBy line = line
+               | otherwise                    = prefixedBy <> " " <> line
