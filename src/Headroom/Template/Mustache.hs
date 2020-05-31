@@ -31,7 +31,8 @@ import           Text.Mustache.Render           ( SubstitutionError(..) )
 
 
 -- | The /Mustache/ template.
-newtype Mustache = Mustache MU.Template deriving (Show)
+data Mustache = Mustache MU.Template Text
+  deriving Show
 
 
 -- | Support for /Mustache/ templates.
@@ -39,17 +40,18 @@ instance Template Mustache where
   templateExtensions = "mustache" :| []
   parseTemplate      = parseTemplate'
   renderTemplate     = renderTemplate'
+  rawTemplate        = rawTemplate'
 
 
 parseTemplate' :: MonadThrow m => Maybe Text -> Text -> m Mustache
 parseTemplate' name raw = case MU.compileTemplate templateName raw of
   Left  err -> throwM $ TemplateError (ParseError (tshow err))
-  Right res -> pure $ Mustache res
+  Right res -> pure $ Mustache res raw
   where templateName = T.unpack . fromMaybe "" $ name
 
 
 renderTemplate' :: MonadThrow m => Variables -> Mustache -> m Text
-renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _)) =
+renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _) _) =
   case MU.checkedSubstitute t variables of
     ([], rendered) -> pure rendered
     (errs, rendered) ->
@@ -60,4 +62,8 @@ renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _)) =
       in  if length errs == length errs'
             then throwM $ TemplateError (MissingVariables (T.pack name) errs')
             else pure rendered
+
+
+rawTemplate' :: Mustache -> Text
+rawTemplate' (Mustache _ raw) = raw
 

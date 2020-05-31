@@ -26,6 +26,7 @@ spec = do
           parsed   = parseTemplate @Mustache (Just "template") template
       parsed `shouldSatisfy` isJust
 
+
   describe "renderTemplate" $ do
     it "renders template with given variables" $ do
       let template  = "Hello, {{ name }}"
@@ -58,3 +59,10 @@ spec = do
           parsed    = parseTemplate @Mustache (Just "template") template
           rendered  = parsed >>= renderTemplate variables
       rendered `shouldBe` Nothing
+
+
+  describe "rawTemplate" $ do
+    it "returns raw template text for already parsed template" $ do
+      let template = "Hello, {{ name }}"
+          parsed   = parseTemplate @Mustache (Just "template") template
+      fmap rawTemplate parsed `shouldBe` Just template

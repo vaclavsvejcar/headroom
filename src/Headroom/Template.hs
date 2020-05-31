@@ -46,3 +46,11 @@ class Template t where
                  -- ^ parsed template to render
                  -> m Text
                  -- ^ rendered template text
+
+
+  -- | Returns the raw text of the template, same that has been parsed by
+  -- 'parseTemplate' method.
+  rawTemplate :: t
+              -- ^ template for which to return raw template text
+              -> Text
+              -- ^ raw template text
