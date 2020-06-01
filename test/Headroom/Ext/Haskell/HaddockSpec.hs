@@ -1,12 +1,20 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 module Headroom.Ext.Haskell.HaddockSpec
   ( spec
   )
 where
 
+import           Headroom.Embedded              ( licenseTemplate )
 import           Headroom.Ext.Haskell.Haddock
 import           Headroom.FileSystem            ( loadFile )
+import           Headroom.Template              ( Template(..) )
+import           Headroom.Template.Mustache     ( Mustache(..) )
+import           Headroom.Types                 ( FileType(..)
+                                                , HaddockFieldOffsets(..)
+                                                , LicenseType(..)
+                                                )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.Text                      as T
@@ -16,6 +24,12 @@ import           Test.Hspec
 spec :: Spec
 spec = do
   let codeSamples = "test-data" </> "code-samples"
+
+  describe "extractFieldOffsets" $ do
+    it "extract offsets for selected fields of module header" $ do
+      template <- parseTemplate @Mustache Nothing $ licenseTemplate BSD3 Haskell
+      let expected = HaddockFieldOffsets { hfoCopyright = Just 14 }
+      extractFieldOffsets template `shouldBe` expected
 
   describe "extractModuleHeader" $ do
     it "extracts fields from Haddock module header" $ do

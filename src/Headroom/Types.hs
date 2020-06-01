@@ -50,6 +50,9 @@ module Headroom.Types
   , LicenseType(..)
   , FileType(..)
   , FileInfo(..)
+    -- * Template Metadata
+  , TemplateMeta(..)
+  , HaddockFieldOffsets(..)
     -- * Newtype wrappers
   , CurrentYear(..)
   )
@@ -306,6 +309,20 @@ data FileInfo = FileInfo
   -- ^ additional extracted variables
   }
   deriving (Eq, Show)
+
+--------------------------------------------------------------------------------
+
+-- | Offsets for selected fields extracted from /Haddock module header/.
+data HaddockFieldOffsets = HaddockFieldOffsets
+  { hfoCopyright :: !(Maybe Int)
+  -- ^ offset for /Copyright/ field
+  }
+  deriving (Eq, Show)
+
+-- | Metadata parsed from raw /template/, specific for selected /file type/.
+data TemplateMeta = HaskellTemplateMeta !HaddockFieldOffsets
+  deriving (Eq, Show)
+
 
 --------------------------------------------------------------------------------
 

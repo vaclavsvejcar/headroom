@@ -19,13 +19,16 @@ available to template via /template variables/
 
 module Headroom.Ext
   ( extractVariables
+  , extractTemplateMeta
   )
 where
 
 import qualified Headroom.Ext.Haskell          as Haskell
+import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( CurrentYear
                                                 , FileType(..)
                                                 , HeaderConfig
+                                                , TemplateMeta(..)
                                                 , Variables
                                                 )
 import           RIO
@@ -50,3 +53,16 @@ extractVariables :: FileType
 extractVariables fileType config headerPos year text = case fileType of
   Haskell -> Haskell.extractVariables config headerPos year text
   _       -> mempty
+
+
+-- | Extracts medatata from given /template/ for selected /file type/, which
+-- might be later required by the 'extractVariables' function.
+extractTemplateMeta :: (Template t)
+                    => FileType
+                    -- ^ /file type/ for which this template will be used
+                    -> t
+                    -- ^ parsed /template/
+                    -> Maybe TemplateMeta
+                    -- ^ extracted template metadata
+extractTemplateMeta Haskell tmpl = Just $ Haskell.extractTemplateMeta tmpl
+extractTemplateMeta _       _    = Nothing

@@ -14,12 +14,13 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-This module provides support for extracting selected fields from the
-/Haddock module header/ part of the /Haskell/ source code file.
+Support for extracting data from /Haddock module headers/ present in
+/Haskell source code files/ or /templates/.
 -}
 
 module Headroom.Ext.Haskell.Haddock
   ( HaddockModuleHeader(..)
+  , extractFieldOffsets
   , extractModuleHeader
   , stripCommentSyntax
   )
@@ -28,10 +29,14 @@ where
 import           Control.Applicative            ( Alternative(..) )
 import           Control.Monad                  ( ap )
 import           Headroom.Regex                 ( re' )
+import           Headroom.Template              ( Template(..) )
+import           Headroom.Types                 ( HaddockFieldOffsets(..) )
 import           RIO
 import qualified RIO.Char                      as C
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Heavy          ( gsub )
+import           Text.Regex.PCRE.Heavy          ( gsub
+                                                , scan
+                                                )
 
 
 -- | Extracted fields from the /Haddock module header/.
@@ -44,6 +49,27 @@ data HaddockModuleHeader = HaddockModuleHeader
   -- ^ module long description (the text after module header fields)
   }
   deriving (Eq, Show)
+
+
+-- | Extracts /offsets/ for selected haddock fields (i.e. number of chars
+-- between start of line and field value). This is needed to properly format
+-- multi-line field values rendered in new /license headers/.
+extractFieldOffsets :: (Template t)
+                    => t
+                    -- ^ parsed /template/
+                    -> HaddockFieldOffsets
+                    -- ^ extracted field offsets
+extractFieldOffsets template = HaddockFieldOffsets { .. }
+ where
+  hfoCopyright = extractCopyrightOffset text
+  text         = stripCommentSyntax . rawTemplate $ template
+
+
+extractCopyrightOffset :: Text -> Maybe Int
+extractCopyrightOffset text = case scan [re'|\h*Copyright\h*:\h*|] text of
+  [(full, _)] -> Just . T.length $ full
+  _           -> Nothing
+
 
 -- | Extracts metadata from given /Haddock/ module header.
 extractModuleHeader :: Text

@@ -24,6 +24,8 @@ module Headroom.Ext.Haskell
   ( -- * Variables Extraction
     extractModuleName
   , extractVariables
+    -- * Template Metadata Extraction
+  , extractTemplateMeta
     -- * Helper Functions
   , updateYears
   )
@@ -33,13 +35,16 @@ import           Control.Lens                   ( element
                                                 , (^?)
                                                 )
 import           Headroom.Ext.Haskell.Haddock   ( HaddockModuleHeader(..)
+                                                , extractFieldOffsets
                                                 , extractModuleHeader
                                                 )
 import           Headroom.Regex                 ( match'
                                                 , re'
                                                 )
+import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( CurrentYear(..)
                                                 , HeaderConfig(..)
+                                                , TemplateMeta(..)
                                                 , Variables(..)
                                                 )
 import           Headroom.Variables             ( mkVariables )
@@ -94,6 +99,16 @@ extractVariables _ headerPos year text = (mkVariables . catMaybes)
   HaddockModuleHeader {..} = extractModuleHeader headerText
   headerText               = maybe "" (\(s, e) -> cut s e text) headerPos
   cut s e = T.unlines . L.take (e - s) . L.drop s . T.lines
+
+
+-- | Extracts template metadata specific for /Haskell/.
+extractTemplateMeta :: (Template t)
+                    => t
+                    -- ^ parsed /template/
+                    -> TemplateMeta
+                    -- ^ extracted template metadata
+extractTemplateMeta template = HaskellTemplateMeta offsets
+  where offsets = extractFieldOffsets template
 
 
 -- | Updates years and years ranges in given text.
