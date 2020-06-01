@@ -44,7 +44,7 @@ spec = do
               \commentary with @some markup@."
           }
       sample <- loadFile $ codeSamples </> "haskell" </> "header.hs"
-      extractModuleHeader sample `shouldBe` expected
+      extractModuleHeader sample Nothing `shouldBe` expected
 
 
   describe "stripCommentSyntax" $ do
@@ -55,4 +55,24 @@ spec = do
       stripCommentSyntax sample1 `shouldBe` T.unlines ["", "Hello1", "foo", ""]
       stripCommentSyntax sample2 `shouldBe` T.unlines ["", "Hello2", "foo", ""]
       stripCommentSyntax sample3 `shouldBe` T.unlines [" Hello3", " foo"]
+
+
+  describe "indentField" $ do
+    it "does nothing with single line text" $ do
+      let sample = T.unlines ["hello"]
+          offset = Just 2
+      indentField offset sample `shouldBe` sample
+
+    it "indents all but first line using given offset" $ do
+      let sample   = T.unlines ["first", "second", "third"]
+          expected = T.unlines ["first", "  second", "  third"]
+          offset   = Just 2
+      indentField offset sample `shouldBe` expected
+
+    it "intents correctly previously indented text" $ do
+      let sample   = T.unlines ["first", "second", "        third"]
+          expected = T.unlines ["first", "  second", "  third"]
+          offset   = Just 2
+      indentField offset sample `shouldBe` expected
+
 

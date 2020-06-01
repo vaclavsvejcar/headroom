@@ -42,6 +42,8 @@ extractVariables :: FileType
                  -- ^ type of the file
                  -> HeaderConfig
                  -- ^ license header configuration
+                 -> Maybe TemplateMeta
+                 -- ^ extracted metadata from corresponding /template/
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
                  -> CurrentYear
@@ -50,8 +52,8 @@ extractVariables :: FileType
                  -- ^ text of the source code file
                  -> Variables
                  -- ^ extracted variables
-extractVariables fileType config headerPos year text = case fileType of
-  Haskell -> Haskell.extractVariables config headerPos year text
+extractVariables fileType config meta headerPos year text = case fileType of
+  Haskell -> Haskell.extractVariables config meta headerPos year text
   _       -> mempty
 
 

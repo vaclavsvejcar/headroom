@@ -63,6 +63,7 @@ library:
   generated-other-modules: Paths_headroom
   dependencies:
     - aeson
+    - data-default-class
     - either
     - file-embed
     - lens

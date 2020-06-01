@@ -42,6 +42,7 @@ import           Headroom.Types                 ( CurrentYear
                                                 , FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
+                                                , TemplateMeta(..)
                                                 )
 import           RIO
 import qualified RIO.List                      as L
@@ -55,16 +56,18 @@ extractFileInfo :: FileType
                 -- ^ type of the detected file
                 -> HeaderConfig
                 -- ^ license header configuration
+                -> Maybe TemplateMeta
+                -- ^ metadata extracted from /template/
                 -> CurrentYear
                 -- ^ current year
                 -> Text
                 -- ^ text used for detection
                 -> FileInfo
                 -- ^ resulting file info
-extractFileInfo fiFileType fiHeaderConfig year text =
+extractFileInfo fiFileType fiHeaderConfig meta year text =
   let fiHeaderPos = findHeader fiHeaderConfig text
       fiVariables =
-        extractVariables fiFileType fiHeaderConfig fiHeaderPos year text
+        extractVariables fiFileType fiHeaderConfig meta fiHeaderPos year text
   in  FileInfo { .. }
 
 

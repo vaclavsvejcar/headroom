@@ -35,6 +35,7 @@ spec = do
     it "extracts variables from Haskell source code with Haddock header" $ do
       let
         config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
+        meta      = Nothing
         headerPos = Just (1, 13)
         expected  = mkVariables
           [ ( "_haskell_module_copyright"
@@ -48,14 +49,15 @@ spec = do
           , ("_haskell_module_shortdesc", "Short description")
           ]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariables config headerPos currYear sample `shouldBe` expected
+      extractVariables config meta headerPos currYear sample `shouldBe` expected
 
     it "extracts variables from Haskell source code without Haddock header" $ do
       let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
+          meta      = Nothing
           headerPos = Nothing
           expected  = mkVariables [("_haskell_module_name", "Test")]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariables config headerPos currYear sample `shouldBe` expected
+      extractVariables config meta headerPos currYear sample `shouldBe` expected
 
 
   describe "updateYears" $ do

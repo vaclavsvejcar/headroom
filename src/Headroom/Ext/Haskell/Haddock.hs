@@ -22,15 +22,19 @@ module Headroom.Ext.Haskell.Haddock
   ( HaddockModuleHeader(..)
   , extractFieldOffsets
   , extractModuleHeader
+  , indentField
   , stripCommentSyntax
   )
 where
 
 import           Control.Applicative            ( Alternative(..) )
 import           Control.Monad                  ( ap )
+import           Data.Default.Class             ( Default(..) )
 import           Headroom.Regex                 ( re' )
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( HaddockFieldOffsets(..) )
+import           Headroom.Types                 ( HaddockFieldOffsets(..)
+                                                , TemplateMeta(..)
+                                                )
 import           RIO
 import qualified RIO.Char                      as C
 import qualified RIO.Text                      as T
@@ -74,10 +78,12 @@ extractCopyrightOffset text = case scan [re'|\h*Copyright\h*:\h*|] text of
 -- | Extracts metadata from given /Haddock/ module header.
 extractModuleHeader :: Text
                     -- ^ text containing /Haddock/ module header
+                    -> Maybe TemplateMeta
+                    -- ^ extracted metadata from corresponding /template/
                     -> HaddockModuleHeader
                     -- ^ extracted metadata
-extractModuleHeader text =
-  let hmhCopyright = extractField "Copyright"
+extractModuleHeader text meta =
+  let hmhCopyright = indent hfoCopyright <$> extractField "Copyright"
       hmhShortDesc = extractField "Description"
       hmhLongDesc  = if null rest' then Nothing else process rest'
   in  HaddockModuleHeader { .. }
@@ -86,6 +92,39 @@ extractModuleHeader text =
   input            = T.unpack . stripCommentSyntax $ text
   extractField name = fmap (T.strip . T.pack) (lookup name fields')
   process = Just . T.strip . T.pack
+  indent c t = T.strip $ indentField c t
+  HaddockFieldOffsets {..} = case meta of
+    Just (HaskellTemplateMeta offsets') -> offsets'
+    _ -> def
+
+
+-- | Adds correct indentation to multi-line /Haddock/ field values. It's usually
+-- desired to have such values indented like this:
+--
+-- @
+-- Copyright        : (c) 2020, 1st Author
+--                    (c) 2020, 2nd Author
+-- @
+--
+-- This functions achieves that using the /offset/ value, which specifies number
+-- of empty characters that should be placed before second (and any subsequent)
+-- line.
+--
+-- >>> indentField (Just 2) "foo\nbar\nbaz\n"
+-- "foo\n  bar\n  baz\n"
+indentField :: Maybe Int
+            -- ^ offset (in number of black chars) for 2nd and subsequent lines
+            -> Text
+            -- ^ input text to indent
+            -> Text
+            -- ^ processed text
+indentField Nothing       text = text
+indentField (Just offset) text = T.unlines . go . T.lines $ text
+ where
+  go []       = []
+  go [x     ] = [x]
+  go (x : xs) = x : fmap ((prefix <>) . T.stripStart) xs
+  prefix = T.replicate offset " "
 
 
 -- | Strips /Haskell/ comment syntax tokens (e.g. @{-@, @-}@) from input text.

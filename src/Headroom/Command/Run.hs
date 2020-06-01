@@ -46,6 +46,7 @@ import           Headroom.Data.TextExtra        ( mapLines )
 import           Headroom.Embedded              ( defaultConfig
                                                 , licenseTemplate
                                                 )
+import           Headroom.Ext                   ( extractTemplateMeta )
 import           Headroom.FileSupport           ( addHeader
                                                 , dropHeader
                                                 , extractFileInfo
@@ -75,6 +76,7 @@ import           Headroom.Types                 ( CommandRunOptions(..)
                                                 , PartialConfiguration(..)
                                                 , RunAction(..)
                                                 , RunMode(..)
+                                                , TemplateMeta(..)
                                                 , TemplateSource(..)
                                                 , Variables(..)
                                                 )
@@ -91,6 +93,8 @@ import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
 
+
+type TemplatesMap = Map FileType (Maybe TemplateMeta, TemplateType)
 
 
 -- | Initial /RIO/ startup environment for the /Run/ command.
@@ -155,7 +159,7 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   let isCheck = cRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
-  templates          <- loadTemplates
+  templates          <- withTemplateMeta <$> loadTemplates
   sourceFiles        <- findSourceFiles (M.keys templates)
   (total, processed) <- processSourceFiles templates sourceFiles
   endTS              <- liftIO getPOSIXTime
@@ -204,7 +208,7 @@ processSourceFiles :: ( Has Configuration env
                       , Has CurrentYear env
                       , HasLogFunc env
                       )
-                   => Map FileType TemplateType
+                   => TemplatesMap
                    -> [FilePath]
                    -> RIO env (Int, Int)
 processSourceFiles templates paths = do
@@ -220,8 +224,8 @@ processSourceFiles templates paths = do
   findFileType conf path =
     fmap (, path) (fileExtension path >>= fileTypeByExt conf)
   findTemplate ft p = (, ft, p) <$> M.lookup ft templates
-  process cVars dVars (pr, (tt, ft, p)) =
-    processSourceFile cVars dVars pr tt ft p
+  process cVars dVars (pr, ((tm, tt), ft, p)) =
+    processSourceFile cVars dVars pr tm tt ft p
 
 
 processSourceFile :: ( Has Configuration env
@@ -232,11 +236,12 @@ processSourceFile :: ( Has Configuration env
                   => Variables
                   -> Variables
                   -> Progress
+                  -> Maybe TemplateMeta
                   -> TemplateType
                   -> FileType
                   -> FilePath
                   -> RIO env Bool
-processSourceFile cVars dVars progress template fileType path = do
+processSourceFile cVars dVars progress meta template fileType path = do
   Configuration {..}     <- viewL
   CommandRunOptions {..} <- viewL
   year                   <- viewL
@@ -244,6 +249,7 @@ processSourceFile cVars dVars progress template fileType path = do
   let fileInfo@FileInfo {..} = extractFileInfo
         fileType
         (configByFileType cLicenseHeaders fileType)
+        meta
         year
         fileContent
       variables = dVars <> cVars <> fiVariables
@@ -334,6 +340,11 @@ loadTemplates = do
   case cTemplateSource of
     TemplateFiles    paths       -> loadTemplateFiles paths
     BuiltInTemplates licenseType -> loadBuiltInTemplates licenseType
+
+
+withTemplateMeta :: Map FileType TemplateType -> TemplatesMap
+withTemplateMeta = M.fromList . go . M.toList
+  where go = fmap (\(k, v) -> (k, (extractTemplateMeta k v, v)))
 
 
 -- | Takes path to the template file and returns detected type of the template.

@@ -66,6 +66,7 @@ import           Data.Aeson                     ( FromJSON(..)
                                                 , (.!=)
                                                 , (.:?)
                                                 )
+import           Data.Default.Class             ( Default(..) )
 import           Data.Monoid                    ( Last(..) )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Serialization         ( aesonOptions )
@@ -318,6 +319,9 @@ data HaddockFieldOffsets = HaddockFieldOffsets
   -- ^ offset for /Copyright/ field
   }
   deriving (Eq, Show)
+
+instance Default HaddockFieldOffsets where
+  def = HaddockFieldOffsets { hfoCopyright = Nothing }
 
 -- | Metadata parsed from raw /template/, specific for selected /file type/.
 data TemplateMeta = HaskellTemplateMeta !HaddockFieldOffsets

@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 879b607f27e5472f5c5509a2110f0f4d1fc549f45925478c3a9304ecd47628ed
+-- hash: 218ed386de8113c942c8d370ab43c31617d2d92a2ed3f3685e96a311d70b266e
 
 name:           headroom
 version:        0.3.0.0
@@ -155,6 +155,7 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , data-default-class
     , either
     , file-embed
     , lens

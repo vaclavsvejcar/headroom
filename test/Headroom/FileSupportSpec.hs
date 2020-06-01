@@ -127,6 +127,7 @@ spec = do
     it "extracts FileInfo from given raw input" $ do
       let
         config   = bHeaderConfig [] []
+        meta     = Nothing
         expected = FileInfo
           Haskell
           config
@@ -144,7 +145,7 @@ spec = do
             ]
           )
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      extractFileInfo Haskell config currYear sample `shouldBe` expected
+      extractFileInfo Haskell config meta currYear sample `shouldBe` expected
 
 
   describe "findHeader" $ do

@@ -25,6 +25,7 @@ spec = do
         currYear   = CurrentYear 2020
         samplesDir = "test-data" </> "code-samples"
         config     = HeaderConfig ["hs"] 0 0 [] [] (LineComment "--")
+        meta       = Nothing
         expected   = mkVariables
           [ ( "_haskell_module_copyright"
             , "(c) Some Guy, 2013\n                  Someone Else, 2014"
@@ -37,5 +38,5 @@ spec = do
           , ("_haskell_module_shortdesc", "Short description")
           ]
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      extractVariables Haskell config (Just (1, 13)) currYear sample
+      extractVariables Haskell config meta (Just (1, 13)) currYear sample
         `shouldBe` expected
