@@ -109,7 +109,7 @@ dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
   before     = take start inputLines
   after      = drop (end + 1) inputLines
   inputLines = T.lines text
-  result     = T.unlines (stripLinesEnd before ++ stripLinesStart after)
+  result     = T.unlines (stripLinesEnd before <> stripLinesStart after)
 
 
 -- | Replaces existing header at position specified by the 'FileInfo' in the

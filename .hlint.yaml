@@ -34,13 +34,13 @@
 # Turn on hints that are off by default
 #
 # Ban "module X(module X) where", to require a real export list
-# - warn: {name: Use explicit module export list}
+- warn: { name: Use explicit module export list }
 #
 # Replace a $ b $ c with a . b $ c
-# - group: {name: dollar, enabled: true}
+- group: {name: dollar, enabled: true}
 #
 # Generalise map to fmap, ++ to <>
-# - group: {name: generalise, enabled: true}
+- group: { name: generalise, enabled: true }
 
 # Ignore some builtin hints
 # - ignore: {name: Use let}

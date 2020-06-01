@@ -161,7 +161,7 @@ runP :: P a -> String -> Maybe a
 runP p input = fmap snd (unP p input')
  where
   input' =
-    concat [ zipWith C [0 ..] l ++ [C (length l) '\n'] | l <- lines input ]
+    concat [ zipWith C [0 ..] l <> [C (length l) '\n'] | l <- lines input ]
 
 -------------------------------------------------------------------------------
 --

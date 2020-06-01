@@ -128,7 +128,7 @@ findSupportedFileTypes = do
                      (cioSourcePaths opts)
     let allFileTypes = fmap (fileExtension >=> fileTypeByExt headersConfig)
                             (concat allFiles)
-    pure $ L.nub . catMaybes $ allFileTypes
+    pure . L.nub . catMaybes $ allFileTypes
   case fileTypes of
     [] -> throwM $ CommandInitError NoProvidedSourcePaths
     _  -> do
