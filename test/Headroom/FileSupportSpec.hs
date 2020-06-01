@@ -146,25 +146,6 @@ spec = do
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
       extractFileInfo Haskell config currYear sample `shouldBe` expected
 
-  describe "extractVariables" $ do
-    it "extracts variables specific for Haskell file type" $ do
-      let
-        config   = bHeaderConfig [] []
-        expected = mkVariables
-          [ ( "_haskell_module_copyright"
-            , "(c) Some Guy, 2013\n                  Someone Else, 2014"
-            )
-          , ( "_haskell_module_copyright_updated"
-            , "(c) Some Guy, 2013-2020\n                  Someone Else, 2014-2020"
-            )
-          , ("_haskell_module_name"     , "Test")
-          , ("_haskell_module_longdesc" , "long\ndescription")
-          , ("_haskell_module_shortdesc", "Short description")
-          ]
-      sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      extractVariables Haskell config (Just (1, 13)) currYear sample
-        `shouldBe` expected
-
 
   describe "findHeader" $ do
     it "finds block header (one line long)" $ do

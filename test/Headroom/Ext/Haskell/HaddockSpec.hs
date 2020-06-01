@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.FileSupport.Haskell.HaddockSpec
+module Headroom.Ext.Haskell.HaddockSpec
   ( spec
   )
 where
 
-import           Headroom.FileSupport.Haskell.Haddock
+import           Headroom.Ext.Haskell.Haddock
 import           Headroom.FileSystem            ( loadFile )
 import           RIO
 import           RIO.FilePath                   ( (</>) )

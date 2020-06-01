@@ -6,7 +6,7 @@
 {-# LANGUAGE TupleSections     #-}
 
 {-|
-Module      : Headroom.FileSupport.Haskell
+Module      : Headroom.Ext.Haskell
 Description : Extraction of /Haskell/-specific template variables
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -20,10 +20,10 @@ parsed /source code files/ as /template variables/. Such info includes
 (see "Headroom.FileSupport.Haskell.Haddock").
 -}
 
-module Headroom.FileSupport.Haskell
+module Headroom.Ext.Haskell
   ( -- * Variables Extraction
     extractModuleName
-  , extractVariablesHaskell
+  , extractVariables
     -- * Helper Functions
   , updateYears
   )
@@ -32,8 +32,7 @@ where
 import           Control.Lens                   ( element
                                                 , (^?)
                                                 )
-import           Headroom.FileSupport.Haskell.Haddock
-                                                ( HaddockModuleHeader(..)
+import           Headroom.Ext.Haskell.Haddock   ( HaddockModuleHeader(..)
                                                 , extractModuleHeader
                                                 )
 import           Headroom.Regex                 ( match'
@@ -74,17 +73,17 @@ extractModuleName = go . T.lines
 -- * @___haskell_module_name__@ - name of the /Haskell/ module
 -- * @___haskell_module_longdesc__@ - long description of /Haddock/ module
 -- * @___haskell_module_shortdesc__@ - @Description@ field of /Haddock/ module header
-extractVariablesHaskell :: HeaderConfig
+extractVariables :: HeaderConfig
                         -- ^ license header configuration
-                        -> Maybe (Int, Int)
+                 -> Maybe (Int, Int)
                         -- ^ license header position @(startLine, endLine)@
-                        -> CurrentYear
+                 -> CurrentYear
                         -- ^ current year
-                        -> Text
+                 -> Text
                         -- ^ input text
-                        -> Variables
+                 -> Variables
                         -- ^ extracted variables
-extractVariablesHaskell _ headerPos year text = (mkVariables . catMaybes)
+extractVariables _ headerPos year text = (mkVariables . catMaybes)
   [ ("_haskell_module_copyright", ) <$> hmhCopyright
   , ("_haskell_module_copyright_updated", ) . updateYears year <$> hmhCopyright
   , ("_haskell_module_name", ) <$> extractModuleName text

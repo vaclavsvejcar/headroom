@@ -6,7 +6,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 
 {-|
-Module      : Headroom.FileSupport.Haskell.Haddock
+Module      : Headroom.Ext.Haskell.Haddock
 Description : Extraction of /Haddock module header/ fields
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -18,7 +18,7 @@ This module provides support for extracting selected fields from the
 /Haddock module header/ part of the /Haskell/ source code file.
 -}
 
-module Headroom.FileSupport.Haskell.Haddock
+module Headroom.Ext.Haskell.Haddock
   ( HaddockModuleHeader(..)
   , extractModuleHeader
   , stripCommentSyntax

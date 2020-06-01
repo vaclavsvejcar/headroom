@@ -18,8 +18,6 @@ the /license headers/ and the /source code files/.
 module Headroom.FileSupport
   ( -- * File info extraction
     extractFileInfo
-    -- * Variables extraction
-  , extractVariables
     -- * License header manipulation
   , addHeader
   , dropHeader
@@ -34,7 +32,7 @@ module Headroom.FileSupport
   )
 where
 
-import           Headroom.FileSupport.Haskell   ( extractVariablesHaskell )
+import           Headroom.Ext                   ( extractVariables )
 import           Headroom.Regex                 ( compile'
                                                 , joinPatterns
                                                 , match'
@@ -44,7 +42,6 @@ import           Headroom.Types                 ( CurrentYear
                                                 , FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
-                                                , Variables(..)
                                                 )
 import           RIO
 import qualified RIO.List                      as L
@@ -70,26 +67,6 @@ extractFileInfo fiFileType fiHeaderConfig year text =
         extractVariables fiFileType fiHeaderConfig fiHeaderPos year text
   in  FileInfo { .. }
 
-
--- | Extracts variables specific to the file type (if supported), e.g. module
--- name for /Haskell/ source code. Currently supported file types are:
---
--- * /Haskell/ - implemented in "Headroom.FileSupport.Haskell"
-extractVariables :: FileType
-                 -- ^ type of the file
-                 -> HeaderConfig
-                 -- ^ license header configuration
-                 -> Maybe (Int, Int)
-                 -- ^ license header position @(startLine, endLine)@
-                 -> CurrentYear
-                 -- ^ current year
-                 -> Text
-                 -- ^ text of the source code file
-                 -> Variables
-                 -- ^ extracted variables
-extractVariables fileType config headerPos year text = case fileType of
-  Haskell -> extractVariablesHaskell config headerPos year text
-  _       -> mempty
 
 
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if

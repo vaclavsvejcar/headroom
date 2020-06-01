@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.FileSupport.HaskellSpec
+module Headroom.Ext.HaskellSpec
   ( spec
   )
 where
 
-import           Headroom.FileSupport.Haskell
+import           Headroom.Ext.Haskell
 import           Headroom.FileSystem            ( loadFile )
 import           Headroom.Types                 ( CurrentYear(..)
                                                 , HeaderConfig(..)
@@ -31,7 +31,7 @@ spec = do
       extractModuleName sample2 `shouldBe` Nothing
 
 
-  describe "extractVariablesHaskell" $ do
+  describe "extractVariables" $ do
     it "extracts variables from Haskell source code with Haddock header" $ do
       let
         config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
@@ -48,16 +48,14 @@ spec = do
           , ("_haskell_module_shortdesc", "Short description")
           ]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariablesHaskell config headerPos currYear sample
-        `shouldBe` expected
+      extractVariables config headerPos currYear sample `shouldBe` expected
 
     it "extracts variables from Haskell source code without Haddock header" $ do
       let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
           headerPos = Nothing
           expected  = mkVariables [("_haskell_module_name", "Test")]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariablesHaskell config headerPos currYear sample
-        `shouldBe` expected
+      extractVariables config headerPos currYear sample `shouldBe` expected
 
 
   describe "updateYears" $ do
