@@ -28,6 +28,18 @@ import           RIO
 -- environment. When combined with the "Headroom.Data.Has" monad, it provides
 -- powerful way how to combine different /license header function/ and
 -- environments.
+--
+-- = Structure of License Header Function Type
+-- 
+-- @
+-- __Text -> ReaderT env Identity Text__
+--   │               │            │
+--   └─ rendered text of license header
+--                   │            │
+--                   └─ environment holding possible configuration
+--                                │
+--                                └─ modified license header text
+-- @
 newtype HeaderFn env = HeaderFn (Text -> ReaderT env Identity Text)
 
 instance Semigroup (HeaderFn env) where
