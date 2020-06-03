@@ -40,7 +40,7 @@ import qualified RIO.Text                      as T
 -- | Constructor function for 'Variables' data type.
 --
 -- >>> mkVariables [("key1", "value1")]
--- Variables {unVariables = fromList [("key1","value1")]}
+-- Variables (fromList [("key1","value1")])
 mkVariables :: [(Text, Text)]
             -- ^ pairs of /key-value/
             -> Variables
@@ -62,7 +62,7 @@ dynamicVariables (CurrentYear year) =
 -- | Parses variables from raw input in @key=value@ format.
 --
 -- >>> parseVariables ["key1=value1"]
--- Variables {unVariables = fromList [("key1","value1")]}
+-- Variables (fromList [("key1","value1")])
 parseVariables :: MonadThrow m
                => [Text]
                -- ^ list of raw variables
@@ -81,7 +81,7 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
 -- supported.
 --
 -- >>> compileVariables $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
--- Variables {unVariables = fromList [("msg","Hello, John"),("name","John")]}
+-- Variables (fromList [("msg","Hello, John"),("name","John")])
 compileVariables :: (MonadThrow m)
                  => Variables
                  -- ^ input variables to compile

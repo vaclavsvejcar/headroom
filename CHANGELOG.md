@@ -7,7 +7,8 @@ All notable changes to this project will be documented in this file.
 - [#30] Allow workflow without configuration and template files
 - [#49] Microsite for documentation ([https://doc.norcane.com/headroom/latest/](https://doc.norcane.com/headroom/latest/))
 - [#51] Allow template variable values to be templates itself
-- Bump _LTS Haskell_ to `15.14`
+- [#52] Postprocessing functions for _license headers_
+- Bump _LTS Haskell_ to `15.15`
 
 ## 0.2.2.1 (released 2020-05-08)
 - Minor improves in generated `.headroom.yaml` in `init` mode

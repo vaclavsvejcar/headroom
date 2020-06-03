@@ -340,11 +340,7 @@ data HeaderSyntax
 
 -- | Map of /static/ and /dynamic variables/. Use 'Headroom.Variables.mkVariables' function for
 -- more convenient construction of this data type.
-newtype Variables = Variables
-  { unVariables :: HashMap Text Text
-  -- ^ map of /variables/
-  }
-  deriving (Eq, Show)
+newtype Variables = Variables (HashMap Text Text) deriving (Eq, Show)
 
 -- | Application configuration.
 data Configuration = Configuration
