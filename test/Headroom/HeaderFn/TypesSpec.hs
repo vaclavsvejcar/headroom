@@ -28,6 +28,14 @@ spec = do
           actual      = runHeaderFn combinedFn combinedEnv input
       actual `shouldBe` expected
 
+  describe "Monoid HeaderFn" $ do
+    it "does nothing with the input" $ do
+      let input   = "input"
+          testEnv = undefined
+          testFn  = mempty
+          actual  = runHeaderFn testFn testEnv input
+      actual `shouldBe` input
+
 
 -------------------------------  Test Data Types  ------------------------------
 

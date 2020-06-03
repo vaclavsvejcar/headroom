@@ -32,3 +32,6 @@ newtype HeaderFn env = HeaderFn (Text -> ReaderT env Identity Text)
 
 instance Semigroup (HeaderFn env) where
   HeaderFn fnX <> HeaderFn fnY = HeaderFn $ fnX >=> fnY
+
+instance Monoid (HeaderFn env) where
+  mempty = HeaderFn $ \input -> pure input
