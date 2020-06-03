@@ -37,8 +37,7 @@ import           Headroom.Regex                 ( compile'
                                                 , joinPatterns
                                                 , match'
                                                 )
-import           Headroom.Types                 ( CurrentYear
-                                                , FileInfo(..)
+import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
@@ -58,16 +57,14 @@ extractFileInfo :: FileType
                 -- ^ license header configuration
                 -> Maybe TemplateMeta
                 -- ^ metadata extracted from /template/
-                -> CurrentYear
-                -- ^ current year
                 -> Text
                 -- ^ text used for detection
                 -> FileInfo
                 -- ^ resulting file info
-extractFileInfo fiFileType fiHeaderConfig meta year text =
+extractFileInfo fiFileType fiHeaderConfig meta text =
   let fiHeaderPos = findHeader fiHeaderConfig text
       fiVariables =
-        extractVariables fiFileType fiHeaderConfig meta fiHeaderPos year text
+        extractVariables fiFileType fiHeaderConfig meta fiHeaderPos text
   in  FileInfo { .. }
 
 

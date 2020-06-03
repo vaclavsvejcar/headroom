@@ -230,7 +230,6 @@ processSourceFiles templates paths = do
 
 processSourceFile :: ( Has Configuration env
                      , Has CommandRunOptions env
-                     , Has CurrentYear env
                      , HasLogFunc env
                      )
                   => Variables
@@ -244,13 +243,11 @@ processSourceFile :: ( Has Configuration env
 processSourceFile cVars dVars progress meta template fileType path = do
   Configuration {..}     <- viewL
   CommandRunOptions {..} <- viewL
-  year                   <- viewL
   fileContent            <- readFileUtf8 path
   let fileInfo@FileInfo {..} = extractFileInfo
         fileType
         (configByFileType cLicenseHeaders fileType)
         meta
-        year
         fileContent
       variables = dVars <> cVars <> fiVariables
       syntax    = hcHeaderSyntax fiHeaderConfig

@@ -74,7 +74,6 @@ extractModuleName = go . T.lines
 -- __List of Extracted Variables:__
 --
 -- * @___haskell_module_copyright__@ - @Copyright@ field of /Haddock/ module header
--- * @___haskell_module_copyright_updated__@ - @Copyright@ field of /Haddock/ module header with updated years (see 'updateYears')
 -- * @___haskell_module_name__@ - name of the /Haskell/ module
 -- * @___haskell_module_longdesc__@ - long description of /Haddock/ module
 -- * @___haskell_module_shortdesc__@ - @Description@ field of /Haddock/ module header
@@ -84,15 +83,12 @@ extractVariables :: HeaderConfig
                  -- ^ extracted metadata from corresponding /template/
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
-                 -> CurrentYear
-                 -- ^ current year
                  -> Text
                  -- ^ input text
                  -> Variables
                  -- ^ extracted variables
-extractVariables _ meta headerPos year text = (mkVariables . catMaybes)
+extractVariables _ meta headerPos text = (mkVariables . catMaybes)
   [ ("_haskell_module_copyright", ) <$> hmhCopyright
-  , ("_haskell_module_copyright_updated", ) . updateYears year <$> hmhCopyright
   , ("_haskell_module_name", ) <$> extractModuleName text
   , ("_haskell_module_longdesc", ) <$> hmhLongDesc
   , ("_haskell_module_shortdesc", ) <$> hmhShortDesc

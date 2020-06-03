@@ -25,8 +25,7 @@ where
 
 import qualified Headroom.Ext.Haskell          as Haskell
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( CurrentYear
-                                                , FileType(..)
+import           Headroom.Types                 ( FileType(..)
                                                 , HeaderConfig
                                                 , TemplateMeta(..)
                                                 , Variables
@@ -46,14 +45,12 @@ extractVariables :: FileType
                  -- ^ extracted metadata from corresponding /template/
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
-                 -> CurrentYear
-                 -- ^ current year
                  -> Text
                  -- ^ text of the source code file
                  -> Variables
                  -- ^ extracted variables
-extractVariables fileType config meta headerPos year text = case fileType of
-  Haskell -> Haskell.extractVariables config meta headerPos year text
+extractVariables fileType config meta headerPos text = case fileType of
+  Haskell -> Haskell.extractVariables config meta headerPos text
   _       -> mempty
 
 

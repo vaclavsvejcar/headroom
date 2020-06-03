@@ -33,23 +33,19 @@ spec = do
 
   describe "extractVariables" $ do
     it "extracts variables from Haskell source code with Haddock header" $ do
-      let
-        config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
-        meta      = Nothing
-        headerPos = Just (1, 13)
-        expected  = mkVariables
-          [ ( "_haskell_module_copyright"
-            , "(c) Some Guy, 2013\n                  Someone Else, 2014"
-            )
-          , ( "_haskell_module_copyright_updated"
-            , "(c) Some Guy, 2013-2020\n                  Someone Else, 2014-2020"
-            )
-          , ("_haskell_module_name"     , "Test")
-          , ("_haskell_module_longdesc" , "long\ndescription")
-          , ("_haskell_module_shortdesc", "Short description")
-          ]
+      let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
+          meta      = Nothing
+          headerPos = Just (1, 13)
+          expected  = mkVariables
+            [ ( "_haskell_module_copyright"
+              , "(c) Some Guy, 2013\n                  Someone Else, 2014"
+              )
+            , ("_haskell_module_name"     , "Test")
+            , ("_haskell_module_longdesc" , "long\ndescription")
+            , ("_haskell_module_shortdesc", "Short description")
+            ]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariables config meta headerPos currYear sample `shouldBe` expected
+      extractVariables config meta headerPos sample `shouldBe` expected
 
     it "extracts variables from Haskell source code without Haddock header" $ do
       let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
@@ -57,7 +53,7 @@ spec = do
           headerPos = Nothing
           expected  = mkVariables [("_haskell_module_name", "Test")]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariables config meta headerPos currYear sample `shouldBe` expected
+      extractVariables config meta headerPos sample `shouldBe` expected
 
 
   describe "updateYears" $ do

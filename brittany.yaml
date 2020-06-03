@@ -1,2 +1,3 @@
 conf_layout:
   lconfig_hangingTypeSignature: true
+  # lconfig_allowSingleLineExportList: true
