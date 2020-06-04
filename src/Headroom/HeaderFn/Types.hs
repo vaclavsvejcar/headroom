@@ -30,17 +30,17 @@ import           RIO
 -- environments.
 --
 -- = Structure of License Header Function Type
--- 
+--
 -- @
--- __Text -> ReaderT env Identity Text__
---   │               │            │
+-- __Text -> Reader env Text__
+--   │              │   │
 --   └─ rendered text of license header
---                   │            │
---                   └─ environment holding possible configuration
---                                │
---                                └─ modified license header text
+--                  │   │
+--                  └─ environment holding possible configuration
+--                      │
+--                      └─ modified license header text
 -- @
-newtype HeaderFn env = HeaderFn (Text -> ReaderT env Identity Text)
+newtype HeaderFn env = HeaderFn (Text -> Reader env Text)
 
 instance Semigroup (HeaderFn env) where
   HeaderFn fnX <> HeaderFn fnY = HeaderFn $ fnX >=> fnY

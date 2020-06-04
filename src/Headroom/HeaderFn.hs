@@ -33,4 +33,4 @@ runHeaderFn :: HeaderFn env
             -- ^ text of rendered /license header/
             -> Text
             -- ^ processed text of /license header/
-runHeaderFn (HeaderFn fn) env input = runIdentity $ runReaderT (fn input) env
+runHeaderFn (HeaderFn fn) env input = runReader (fn input) env
