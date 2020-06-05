@@ -26,8 +26,6 @@ module Headroom.Ext.Haskell
   , extractVariables
     -- * Template Metadata Extraction
   , extractTemplateMeta
-    -- * Helper Functions
-  , updateYears
   )
 where
 
@@ -42,17 +40,14 @@ import           Headroom.Regex                 ( match'
                                                 , re'
                                                 )
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( CurrentYear(..)
-                                                , HeaderConfig(..)
+import           Headroom.Types                 ( HeaderConfig(..)
                                                 , TemplateMeta(..)
                                                 , Variables(..)
                                                 )
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import qualified RIO.List                      as L
-import           RIO.Partial                    ( read )
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Heavy          ( gsub )
 
 
 -- | Extracts name of /Haskell/ module from given source code file content.
@@ -107,36 +102,3 @@ extractTemplateMeta :: (Template t)
                     -- ^ extracted template metadata
 extractTemplateMeta template = HaskellTemplateMeta offsets
   where offsets = extractFieldOffsets template
-
-
--- | Updates years and years ranges in given text.
---
--- >>> updateYears (CurrentYear 2020) "Copyright (c) 2020"
--- "Copyright (c) 2020"
---
--- >>> updateYears (CurrentYear 2020) "Copyright (c) 2019"
--- "Copyright (c) 2019-2020"
---
--- >>> updateYears (CurrentYear 2020) "Copyright (c) 2018-2020"
--- "Copyright (c) 2018-2020"
---
--- >>> updateYears (CurrentYear 2020) "Copyright (c) 2018-2019"
--- "Copyright (c) 2018-2020"
-updateYears :: CurrentYear
-            -- ^ current year
-            -> Text
-            -- ^ text to update
-            -> Text
-            -- ^ text with updated years
-updateYears (CurrentYear year) = processYear . processRange
- where
-  processYear  = gsub [re'|(?!\d{4}-)(?<!-)(\d{4})|] processYear'
-  processRange = gsub [re'|(\d{4})-(\d{4})|] processRange'
-  replaceYear curr | read curr == year = show year
-                   | otherwise         = mconcat [curr, "-", show year]
-  replaceRange full fromY toY | read toY == year = full
-                              | otherwise = mconcat [fromY, "-", show year]
-  processYear' _    (curr : _) = replaceYear curr
-  processYear' full _          = full
-  processRange' full (fromY : toY : _) = replaceRange full fromY toY
-  processRange' full _                 = full
