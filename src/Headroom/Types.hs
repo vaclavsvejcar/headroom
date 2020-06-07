@@ -69,6 +69,7 @@ import           Data.Aeson                     ( FromJSON(..)
 import           Data.Default.Class             ( Default(..) )
 import           Data.Monoid                    ( Last(..) )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.Regex                 ( Regex(..) )
 import           Headroom.Serialization         ( aesonOptions )
 import           RIO
 import qualified RIO.Text                      as T
@@ -207,7 +208,7 @@ data TemplateError
 
 -- | Application command.
 data Command
-  = Run [FilePath] [Text] (Maybe TemplateSource) [Text] (Maybe RunMode) Bool Bool
+  = Run [FilePath] [Regex] (Maybe TemplateSource) [Text] (Maybe RunMode) Bool Bool
   -- ^ @run@ command
   | Gen Bool (Maybe (LicenseType, FileType))
   -- ^ @gen@ command
@@ -239,7 +240,7 @@ data CommandRunOptions = CommandRunOptions
   -- ^ used /Run/ command mode
   , croSourcePaths    :: ![FilePath]
   -- ^ source code file paths
-  , croExcludedPaths  :: ![Text]
+  , croExcludedPaths  :: ![Regex]
   -- ^ source paths to exclude
   , croTemplateSource :: !(Maybe TemplateSource)
   -- ^ source of license templates
@@ -348,7 +349,7 @@ data Configuration = Configuration
   -- ^ mode of the @run@ command
   , cSourcePaths    :: ![FilePath]
   -- ^ paths to source code files
-  , cExcludedPaths  :: ![Text]
+  , cExcludedPaths  :: ![Regex]
   -- ^ excluded source paths
   , cTemplateSource :: !TemplateSource
   -- ^ source of license templates
@@ -367,9 +368,9 @@ data HeaderConfig = HeaderConfig
   -- ^ number of empty lines to put after header
   , hcMarginBefore   :: !Int
   -- ^ number of empty lines to put before header
-  , hcPutAfter       :: ![Text]
+  , hcPutAfter       :: ![Regex]
   -- ^ /regexp/ patterns after which to put the header
-  , hcPutBefore      :: ![Text]
+  , hcPutBefore      :: ![Regex]
   -- ^ /regexp/ patterns before which to put the header
   , hcHeaderSyntax   :: !HeaderSyntax
   -- ^ syntax of the license header comment
@@ -425,7 +426,7 @@ data PartialConfiguration = PartialConfiguration
   -- ^ mode of the @run@ command
   , pcSourcePaths    :: !(Last [FilePath])
   -- ^ paths to source code files
-  , pcExcludedPaths  :: !(Last [Text])
+  , pcExcludedPaths  :: !(Last [Regex])
   -- ^ excluded source paths
   , pcTemplateSource :: !(Last TemplateSource)
   -- ^ paths to template files
@@ -444,9 +445,9 @@ data PartialHeaderConfig = PartialHeaderConfig
   -- ^ number of empty lines to put after header
   , phcMarginBefore   :: !(Last Int)
   -- ^ number of empty lines to put before header
-  , phcPutAfter       :: !(Last [Text])
+  , phcPutAfter       :: !(Last [Regex])
   -- ^ /regexp/ patterns after which to put the header
-  , phcPutBefore      :: !(Last [Text])
+  , phcPutBefore      :: !(Last [Regex])
   -- ^ /regexp/ patterns before which to put the header
   , phcHeaderSyntax   :: !(Last HeaderSyntax)
   -- ^ syntax of the license header comment

@@ -1,7 +1,9 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TypeApplications  #-}
+
 
 module Headroom.HeaderFn.UpdateCopyright
   ( -- * Helper Functions
@@ -9,11 +11,12 @@ module Headroom.HeaderFn.UpdateCopyright
   )
 where
 
-import           Headroom.Regex                 ( re' )
+import qualified Headroom.Data.TextExtra       as TE
+import           Headroom.Regex                 ( re
+                                                , replace
+                                                )
 import           Headroom.Types                 ( CurrentYear(..) )
 import           RIO
-import           RIO.Partial                    ( read )
-import           Text.Regex.PCRE.Heavy          ( gsub )
 
 
 -- | Updates years and years ranges in given text.
@@ -37,12 +40,12 @@ updateYears :: CurrentYear
             -- ^ text with updated years
 updateYears (CurrentYear year) = processYear . processRange
  where
-  processYear  = gsub [re'|(?!\d{4}-)(?<!-)(\d{4})|] processYear'
-  processRange = gsub [re'|(\d{4})-(\d{4})|] processRange'
-  replaceYear curr | read curr == year = show year
-                   | otherwise         = mconcat [curr, "-", show year]
-  replaceRange full fromY toY | read toY == year = full
-                              | otherwise = mconcat [fromY, "-", show year]
+  processYear  = replace [re|(?!\d{4}-)(?<!-)(\d{4})|] processYear'
+  processRange = replace [re|(\d{4})-(\d{4})|] processRange'
+  replaceYear curr | TE.read curr == year = tshow year
+                   | otherwise            = mconcat [curr, "-", tshow year]
+  replaceRange full fromY toY | TE.read toY == year = full
+                              | otherwise = mconcat [fromY, "-", tshow year]
   processYear' _    (curr : _) = replaceYear curr
   processYear' full _          = full
   processRange' full (fromY : toY : _) = replaceRange full fromY toY

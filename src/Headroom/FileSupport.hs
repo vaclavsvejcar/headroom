@@ -33,9 +33,8 @@ module Headroom.FileSupport
 where
 
 import           Headroom.Ext                   ( extractVariables )
-import           Headroom.Regex                 ( compile'
-                                                , joinPatterns
-                                                , match'
+import           Headroom.Regex                 ( Regex
+                                                , match
                                                 )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
@@ -46,7 +45,6 @@ import           Headroom.Types                 ( FileInfo(..)
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Light          ( Regex )
 
 
 -- | Extracts info about the processed file to be later used by the header
@@ -204,17 +202,19 @@ findLineHeader prefix = go Nothing
 
 -- | Finds very first line that matches the given /regex/ (numbered from zero).
 --
--- >>> firstMatching (compile' "^foo") ["some text", "foo bar", "foo baz", "last"]
+-- >>> import Headroom.Regex (re)
+-- >>> :set -XQuasiQuotes
+-- >>> firstMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
 -- Just 1
-firstMatching :: Regex
+firstMatching :: [Regex]
               -- ^ /regex/ used for matching
               -> [Text]
               -- ^ input lines
               -> Maybe Int
               -- ^ matching line number
-firstMatching regex input = go input 0
+firstMatching patterns input = go input 0
  where
-  cond x = isJust $ match' regex x
+  cond x = any (\r -> isJust $ match r x) patterns
   go (x : _) i | cond x = Just i
   go (_ : xs) i         = go xs (i + 1)
   go []       _         = Nothing
@@ -222,17 +222,19 @@ firstMatching regex input = go input 0
 
 -- | Finds very last line that matches the given /regex/ (numbered from zero).
 --
--- >>> lastMatching (compile' "^foo") ["some text", "foo bar", "foo baz", "last"]
+-- >>> import Headroom.Regex (re)
+-- >>> :set -XQuasiQuotes
+-- >>> lastMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
 -- Just 2
-lastMatching :: Regex
+lastMatching :: [Regex]
              -- ^ /regex/ used for matching
              -> [Text]
              -- ^ input lines
              -> Maybe Int
              -- ^ matching line number
-lastMatching regex input = go input 0 Nothing
+lastMatching patterns input = go input 0 Nothing
  where
-  cond x = isJust $ match' regex x
+  cond x = any (\r -> isJust $ match r x) patterns
   go (x : xs) i _ | cond x = go xs (i + 1) (Just i)
   go (_ : xs) i pos        = go xs (i + 1) pos
   go []       _ pos        = pos
@@ -249,18 +251,21 @@ lastMatching regex input = go input 0 Nothing
 -- If both first and second patterns are empty, then all lines are returned in
 -- the middle list.
 --
--- >>> splitInput ["->"] ["<-"] "text\n->\nRESULT\n<-\nfoo"
+-- >>> import Headroom.Regex (re)
+-- >>> :set -XQuasiQuotes
+--
+-- >>> splitInput [[re|->|]] [[re|<-|]] "text\n->\nRESULT\n<-\nfoo"
 -- (["text","->"],["RESULT"],["<-","foo"])
 --
--- >>> splitInput [] ["<-"] "text\n->\nRESULT\n<-\nfoo"
+-- >>> splitInput [] [[re|<-|]] "text\n->\nRESULT\n<-\nfoo"
 -- ([],["text","->","RESULT"],["<-","foo"])
 --
 -- >>> splitInput [] [] "one\ntwo"
 -- ([],["one","two"],[])
-splitInput :: [Text]
-           -- ^ pattern for first split
-           -> [Text]
-           -- ^ pattern for second split
+splitInput :: [Regex]
+           -- ^ patterns for first split
+           -> [Regex]
+           -- ^ patterns for second split
            -> Text
            -- ^ text to split
            -> ([Text], [Text], [Text])
@@ -270,11 +275,10 @@ splitInput fstSplit sndSplit input = (before, middle, after)
  where
   (middle', after ) = L.splitAt sndSplitAt inLines
   (before , middle) = L.splitAt fstSplitAt middle'
-  fstSplitAt        = maybe 0 (+ 1) (findSplit lastMatching fstSplit middle')
-  sndSplitAt        = fromMaybe len (findSplit firstMatching sndSplit inLines)
+  fstSplitAt        = maybe 0 (+ 1) (lastMatching fstSplit middle')
+  sndSplitAt        = fromMaybe len (firstMatching sndSplit inLines)
   inLines           = T.lines input
   len               = L.length inLines
-  findSplit f ps i = joinPatterns ps >>= (`f` i) . compile'
 
 
 stripLinesEnd :: [Text] -> [Text]

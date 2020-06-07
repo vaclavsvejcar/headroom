@@ -18,12 +18,16 @@ library to parse data types such as 'LicenseType' or 'FileType'.
 module Headroom.Command.Readers
   ( licenseReader
   , licenseTypeReader
+  , regexReader
   , parseLicenseAndFileType
   )
 where
 
 import           Data.Either.Combinators        ( maybeToRight )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.Regex                 ( Regex(..)
+                                                , compile
+                                                )
 import           Headroom.Types                 ( FileType
                                                 , LicenseType
                                                 )
@@ -31,7 +35,6 @@ import           Options.Applicative
 import           RIO
 import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
-
 
 
 -- | Reader for tuple of 'LicenseType' and 'FileType'.
@@ -58,6 +61,12 @@ licenseTypeReader = eitherReader parseLicenseType
     [ "invalid license type, available options: "
     , T.toLower (allValuesToText @LicenseType)
     ]
+
+
+-- | Reader for 'Regex'.
+regexReader :: ReadM Regex
+regexReader = eitherReader parse
+  where parse input = mapLeft displayException (compile . T.pack $ input)
 
 
 -- | Parses 'LicenseType' and 'FileType' from the input string,

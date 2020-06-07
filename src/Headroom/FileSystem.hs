@@ -32,9 +32,8 @@ module Headroom.FileSystem
 where
 
 import           Headroom.FileType              ( listExtensions )
-import           Headroom.Regex                 ( compile'
-                                                , joinPatterns
-                                                , match'
+import           Headroom.Regex                 ( Regex
+                                                , match
                                                 )
 import           Headroom.Types                 ( FileType
                                                 , HeadersConfig(..)
@@ -135,9 +134,11 @@ loadFile = readFileUtf8
 -- | Takes list of patterns and file paths and returns list of file paths where
 -- those matching the given patterns are excluded.
 --
--- >>> excludePaths ["\\.hidden", "zzz"] ["foo/.hidden", "test/bar", "x/zzz/e"]
+-- >>> import Headroom.Regex (re)
+-- >>> :set -XQuasiQuotes
+-- >>> excludePaths [[re|\.hidden|], [re|zzz|]] ["foo/.hidden", "test/bar", "x/zzz/e"]
 -- ["test/bar"]
-excludePaths :: [Text]
+excludePaths :: [Regex]
              -- ^ patterns describing paths to exclude
              -> [FilePath]
              -- ^ list of file paths
@@ -145,7 +146,5 @@ excludePaths :: [Text]
              -- ^ resulting list of file paths
 excludePaths _        []    = []
 excludePaths []       paths = paths
-excludePaths patterns paths = go $ compile' <$> joinPatterns patterns
- where
-  go Nothing      = paths
-  go (Just regex) = L.filter (isNothing . match' regex . T.pack) paths
+excludePaths patterns paths = L.filter excluded paths
+  where excluded item = all (\p -> isNothing $ match p (T.pack item)) patterns

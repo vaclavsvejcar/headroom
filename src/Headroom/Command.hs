@@ -22,6 +22,7 @@ where
 
 import           Headroom.Command.Readers       ( licenseReader
                                                 , licenseTypeReader
+                                                , regexReader
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Meta                  ( productDesc
@@ -70,7 +71,8 @@ runOptions =
             )
           )
     <*> many
-          (strOption
+          (option
+            regexReader
             (long "excluded-path" <> short 'e' <> metavar "REGEX" <> help
               "path to exclude from source code file paths"
             )

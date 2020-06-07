@@ -14,11 +14,14 @@ Module containing bunch of useful functions for working with text.
 
 module Headroom.Data.TextExtra
   ( mapLines
+  , read
   )
 where
 
 import           RIO
+import qualified RIO.Partial                   as RP
 import qualified RIO.Text                      as T
+
 
 
 -- | Maps given function over individual lines of the given text.
@@ -35,3 +38,7 @@ mapLines fn = T.unlines . go . T.lines
  where
   go []       = []
   go (x : xs) = fn x : go xs
+
+
+read :: Read a => Text -> a
+read = RP.read . T.unpack

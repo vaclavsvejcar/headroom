@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 module Headroom.FileSupportSpec
   ( spec
@@ -12,6 +13,7 @@ import           Headroom.Configuration         ( makeHeadersConfig
 import           Headroom.Embedded              ( defaultConfig )
 import           Headroom.FileSupport
 import           Headroom.FileSystem            ( loadFile )
+import           Headroom.Regex                 ( re )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
@@ -23,8 +25,6 @@ import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
 import           Test.Hspec
-import           Text.Regex.PCRE.Light          ( compile )
-import           Text.Regex.PCRE.Light.Char8    ( utf8 )
 
 
 spec :: Spec
@@ -53,28 +53,28 @@ spec = do
       addHeader info header sample `shouldBe` expected
 
     it "adds header at correct position" $ do
-      let info     = fileInfo $ bHeaderConfig ["^before"] ["^after"]
+      let info     = fileInfo $ bHeaderConfig [[re|^before|]] [[re|^after|]]
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "1\n2\nbefore\n{-| HEADER -}\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
     it "adds header at correct position (with correct margins)" $ do
-      let info     = fileInfo $ bHeaderConfigM 2 2 ["^before"] ["^after"]
+      let info = fileInfo $ bHeaderConfigM 2 2 [[re|^before|]] [[re|^after|]]
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "1\n2\nbefore\n\n\n{-| HEADER -}\n\n\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
     it "adds header at the end of text (with correct margins)" $ do
-      let info     = fileInfo $ bHeaderConfigM 2 2 ["^before"] []
+      let info     = fileInfo $ bHeaderConfigM 2 2 [[re|^before|]] []
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore"
           expected = "1\n2\nbefore\n\n\n{-| HEADER -}\n"
       addHeader info header sample `shouldBe` expected
 
     it "does nothing if header is already present" $ do
-      let config = bHeaderConfig ["^before"] []
+      let config = bHeaderConfig [[re|^before|]] []
           header = "{-| HEADER -}"
           info   = FileInfo Haskell config (Just (3, 3)) mempty
           sample = "1\n2\nbefore\n{-| OLDHEADER -}\nafter\n4"
@@ -105,7 +105,7 @@ spec = do
 
   describe "replaceHeader" $ do
     it "adds header if there's none present" $ do
-      let config   = bHeaderConfig ["^before"] []
+      let config   = bHeaderConfig [[re|^before|]] []
           info     = FileInfo Haskell config Nothing mempty
           header   = "{-| NEWHEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
@@ -113,7 +113,7 @@ spec = do
       replaceHeader info header sample `shouldBe` expected
 
     it "replaces header if there's existing one" $ do
-      let config   = bHeaderConfig ["^before"] []
+      let config   = bHeaderConfig [[re|^before|]] []
           info     = FileInfo Haskell config (Just (3, 4)) mempty
           header   = "{-| NEWHEADER -}"
           sample   = "1\n2\nbefore\n{-| OLD\nHEADER -}\nafter\n4\n"
@@ -155,22 +155,22 @@ spec = do
 
     it "finds block comment header put after 'putAfter' constraint" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
-          config = bHeaderConfig ["^foo"] []
+          config = bHeaderConfig [[re|^foo|]] []
       findHeader config sample `shouldBe` Just (2, 3)
 
     it "finds line comment header put after 'putAfter' constraint" $ do
       let sample = "-- 1\nfoo\n-- 2\n-- 2\nbar\n-- 3\n-- 3"
-          config = lHeaderConfig ["^foo"] []
+          config = lHeaderConfig [[re|^foo|]] []
       findHeader config sample `shouldBe` Just (2, 3)
 
     it "finds block comment header put after composed constraint" $ do
       let sample = "{-| 1 -}\nfoo\n{-| 2\n2 -}\nbar\n{-| 3\n3 -}"
-          config = bHeaderConfig ["^bar", "^foo"] []
+          config = bHeaderConfig [[re|^bar|^foo|]] []
       findHeader config sample `shouldBe` Just (5, 6)
 
     it "finds line comment header put after composed constraint" $ do
       let sample = "-- 1\nfoo\n-- 2\n-- 2\nbar\n-- 3\n-- 3"
-          config = lHeaderConfig ["^bar", "^foo"] []
+          config = lHeaderConfig [[re|^bar|^foo|]] []
       findHeader config sample `shouldBe` Just (5, 6)
 
     it "finds nothing if no header present" $ do
@@ -180,7 +180,7 @@ spec = do
 
     it "finds nothing if header is present before 'putAfter' constraint" $ do
       let sample = "foo\n{-| 1 -}\nbar\nsome text"
-          config = bHeaderConfig ["^bar"] []
+          config = bHeaderConfig [[re|^bar|]] []
       findHeader config sample `shouldBe` Nothing
 
     it "correctly detects headers using default YAML configuration" $ do
@@ -268,35 +268,35 @@ spec = do
 
 
   describe "lastMatching" $ do
-    let regex = compile "^foo" [utf8]
+    let patterns = [[re|^foo|]]
 
-    it "finds very last line that matches given regex" $ do
+    it "finds very last line that matches given patterns" $ do
       let sample = ["some text", "hello", "foo bar", "foo baz", "last one"]
-      lastMatching regex sample `shouldBe` Just 3
+      lastMatching patterns sample `shouldBe` Just 3
 
     it "returns Nothing if no matching input found" $ do
       let sample = ["some text", "hello", "last one"]
-      lastMatching regex sample `shouldBe` Nothing
+      lastMatching patterns sample `shouldBe` Nothing
 
     it "returns Nothing the input is empty" $ do
-      lastMatching regex [] `shouldBe` Nothing
+      lastMatching patterns [] `shouldBe` Nothing
 
 
   describe "firstMatching" $ do
-    let regex = compile "^foo" [utf8]
+    let patterns = [[re|^foo|]]
 
-    it "finds very first line that matches given regex" $ do
+    it "finds very first line that matches given patterns" $ do
       let sample = ["some text", "hello", "foo bar", "foo baz", "last one"]
-      firstMatching regex sample `shouldBe` Just 2
+      firstMatching patterns sample `shouldBe` Just 2
 
     it "returns Nothing if the input is empty" $ do
-      firstMatching regex [] `shouldBe` Nothing
+      firstMatching patterns [] `shouldBe` Nothing
 
 
   describe "splitInput" $ do
     let sample   = "text\n->\nRESULT\n<-\nfoo"
-        fstSplit = ["->"]
-        sndSplit = ["<-"]
+        fstSplit = [[re|->|]]
+        sndSplit = [[re|<-|]]
 
     it "handles empty input and conditions" $ do
       splitInput [] [] "" `shouldBe` ([], [], [])

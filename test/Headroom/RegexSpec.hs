@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 module Headroom.RegexSpec
   ( spec
   )
@@ -12,21 +13,10 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "joinPatterns" $ do
-    it "returns Nothing for empty input" $ do
-      joinPatterns [] `shouldBe` Nothing
-
-    it "handles single item list input" $ do
-      joinPatterns ["foo"] `shouldBe` Just "foo"
-
-    it "handles multiple item list input" $ do
-      joinPatterns ["^foo", "^bar"] `shouldBe` Just "^foo|^bar"
-
-
-  describe "match'" $ do
+  describe "match" $ do
     it "matches regular expression against given sample" $ do
-      let regex = compile' <$> joinPatterns ["foo", "bar"]
-      (regex >>= (`match'` "xxx")) `shouldSatisfy` isNothing
-      (regex >>= (`match'` "foz")) `shouldSatisfy` isNothing
-      (regex >>= (`match'` "foosdas")) `shouldSatisfy` isJust
-      (regex >>= (`match'` "barfoo")) `shouldSatisfy` isJust
+      let regex = [re|foo|bar|]
+      match regex "xxx" `shouldSatisfy` isNothing
+      match regex "foz" `shouldSatisfy` isNothing
+      match regex "foosdas" `shouldSatisfy` isJust
+      match regex "barfoo" `shouldSatisfy` isJust

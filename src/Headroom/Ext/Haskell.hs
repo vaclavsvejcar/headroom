@@ -36,8 +36,8 @@ import           Headroom.Ext.Haskell.Haddock   ( HaddockModuleHeader(..)
                                                 , extractFieldOffsets
                                                 , extractModuleHeader
                                                 )
-import           Headroom.Regex                 ( match'
-                                                , re'
+import           Headroom.Regex                 ( match
+                                                , re
                                                 )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( HeaderConfig(..)
@@ -61,7 +61,7 @@ extractModuleName :: Text
 extractModuleName = go . T.lines
  where
   go []       = Nothing
-  go (x : xs) = maybe (go xs) (^? element 1) (match' [re'|^module\s+(\S+)|] x)
+  go (x : xs) = maybe (go xs) (^? element 1) (match [re|^module\s+(\S+)|] x)
 
 
 -- | Extracts variables from /Haskell/ source code.

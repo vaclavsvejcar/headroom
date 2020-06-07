@@ -1,11 +1,13 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 module Headroom.FileSystemSpec
   ( spec
   )
 where
 
 import           Headroom.FileSystem
+import           Headroom.Regex                 ( re )
 import           RIO
 import           RIO.List                       ( sort )
 import qualified RIO.List                      as L
@@ -50,7 +52,7 @@ spec = do
 
   describe "excludePaths" $ do
     it "excludes paths matching selected pattern from input list" $ do
-      let patterns = ["\\.stack-work", "remove\\.txt"]
+      let patterns = [[re|\.stack-work|], [re|remove\.txt|]]
           sample =
             [ "/foo/bar/.stack-work/xx"
             , "/hello/world"

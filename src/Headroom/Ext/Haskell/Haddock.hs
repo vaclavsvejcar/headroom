@@ -30,7 +30,10 @@ where
 import           Control.Applicative            ( Alternative(..) )
 import           Control.Monad                  ( ap )
 import           Data.Default.Class             ( Default(..) )
-import           Headroom.Regex                 ( re' )
+import           Headroom.Regex                 ( re
+                                                , replace
+                                                , scan
+                                                )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( HaddockFieldOffsets(..)
                                                 , TemplateMeta(..)
@@ -38,9 +41,6 @@ import           Headroom.Types                 ( HaddockFieldOffsets(..)
 import           RIO
 import qualified RIO.Char                      as C
 import qualified RIO.Text                      as T
-import           Text.Regex.PCRE.Heavy          ( gsub
-                                                , scan
-                                                )
 
 
 -- | Extracted fields from the /Haddock module header/.
@@ -70,7 +70,7 @@ extractFieldOffsets template = HaddockFieldOffsets { .. }
 
 
 extractCopyrightOffset :: Text -> Maybe Int
-extractCopyrightOffset text = case scan [re'|\h*Copyright\h*:\h*|] text of
+extractCopyrightOffset text = case scan [re|\h*Copyright\h*:\h*|] text of
   [(full, _)] -> Just . T.length $ full
   _           -> Nothing
 
@@ -137,8 +137,8 @@ stripCommentSyntax :: Text
                    -- ^ resulting text without comment syntax tokens
 stripCommentSyntax text = T.unlines $ go (T.lines text) []
  where
-  regex = [re'|^(-- \||-{2,})|^\h*({-\h?\|?)|(-})\h*$|]
-  strip = gsub regex ("" :: Text)
+  regex = [re|^(-- \||-{2,})|^\h*({-\h?\|?)|(-})\h*$|]
+  strip = replace regex (const . const $ "")
   go []       acc = reverse acc
   go (x : xs) acc = go xs (strip x : acc)
 
