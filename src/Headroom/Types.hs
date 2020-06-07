@@ -69,7 +69,7 @@ import           Data.Aeson                     ( FromJSON(..)
 import           Data.Default.Class             ( Default(..) )
 import           Data.Monoid                    ( Last(..) )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Regex                 ( Regex(..) )
+import           Headroom.Data.Regex            ( Regex(..) )
 import           Headroom.Serialization         ( aesonOptions )
 import           RIO
 import qualified RIO.Text                      as T

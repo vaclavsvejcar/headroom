@@ -1,12 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
-module Headroom.RegexSpec
+module Headroom.Data.RegexSpec
   ( spec
   )
 where
 
-import           Headroom.Regex
+import           Headroom.Data.Regex
 import           RIO
 import           Test.Hspec
 

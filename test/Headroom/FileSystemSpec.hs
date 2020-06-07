@@ -6,8 +6,8 @@ module Headroom.FileSystemSpec
   )
 where
 
+import           Headroom.Data.Regex            ( re )
 import           Headroom.FileSystem
-import           Headroom.Regex                 ( re )
 import           RIO
 import           RIO.List                       ( sort )
 import qualified RIO.List                      as L

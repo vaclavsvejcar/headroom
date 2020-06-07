@@ -30,7 +30,7 @@ where
 import           Control.Applicative            ( Alternative(..) )
 import           Control.Monad                  ( ap )
 import           Data.Default.Class             ( Default(..) )
-import           Headroom.Regex                 ( re
+import           Headroom.Data.Regex            ( re
                                                 , replace
                                                 , scan
                                                 )

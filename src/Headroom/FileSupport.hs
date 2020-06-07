@@ -32,10 +32,10 @@ module Headroom.FileSupport
   )
 where
 
-import           Headroom.Ext                   ( extractVariables )
-import           Headroom.Regex                 ( Regex
+import           Headroom.Data.Regex            ( Regex
                                                 , match
                                                 )
+import           Headroom.Ext                   ( extractVariables )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)
@@ -202,7 +202,7 @@ findLineHeader prefix = go Nothing
 
 -- | Finds very first line that matches the given /regex/ (numbered from zero).
 --
--- >>> import Headroom.Regex (re)
+-- >>> import Headroom.Data.Regex (re)
 -- >>> :set -XQuasiQuotes
 -- >>> firstMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
 -- Just 1
@@ -222,7 +222,7 @@ firstMatching patterns input = go input 0
 
 -- | Finds very last line that matches the given /regex/ (numbered from zero).
 --
--- >>> import Headroom.Regex (re)
+-- >>> import Headroom.Data.Regex (re)
 -- >>> :set -XQuasiQuotes
 -- >>> lastMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
 -- Just 2
@@ -251,7 +251,7 @@ lastMatching patterns input = go input 0 Nothing
 -- If both first and second patterns are empty, then all lines are returned in
 -- the middle list.
 --
--- >>> import Headroom.Regex (re)
+-- >>> import Headroom.Data.Regex (re)
 -- >>> :set -XQuasiQuotes
 --
 -- >>> splitInput [[re|->|]] [[re|<-|]] "text\n->\nRESULT\n<-\nfoo"

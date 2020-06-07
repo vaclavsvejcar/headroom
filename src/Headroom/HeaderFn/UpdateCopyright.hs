@@ -11,10 +11,10 @@ module Headroom.HeaderFn.UpdateCopyright
   )
 where
 
-import qualified Headroom.Data.TextExtra       as TE
-import           Headroom.Regex                 ( re
+import           Headroom.Data.Regex            ( re
                                                 , replace
                                                 )
+import qualified Headroom.Data.TextExtra       as TE
 import           Headroom.Types                 ( CurrentYear(..) )
 import           RIO
 

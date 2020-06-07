@@ -25,7 +25,7 @@ where
 
 import           Data.Either.Combinators        ( maybeToRight )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Regex                 ( Regex(..)
+import           Headroom.Data.Regex            ( Regex(..)
                                                 , compile
                                                 )
 import           Headroom.Types                 ( FileType

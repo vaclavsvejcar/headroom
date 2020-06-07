@@ -5,7 +5,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 {-|
-Module      : Headroom.Regex
+Module      : Headroom.Data.Regex
 Description : Helper functions for regular expressions
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -17,14 +17,16 @@ Extends functionalify provided by "Text.Regex.PCRE.Light"
 and "Text.Regex.PCRE.Heavy" that more suits the needs of this application.
 -}
 
-module Headroom.Regex
-  ( compile
+module Headroom.Data.Regex
+  ( -- * Data Types
+    Regex(..)
+  , CompileException(..)
+    -- * Regex Functions
+  , compile
   , match
   , re
-  , scan
   , replace
-  , Regex(..)
-  , CompileException(..)
+  , scan
   )
 where
 
@@ -40,10 +42,16 @@ import qualified Text.Regex.PCRE.Light         as PL
 import qualified Text.Regex.PCRE.Light.Char8   as PLC
 
 
--- | Exception type specifying that given input cannot be compiled as /regex/.
-data CompileException = CompileException !Text !Text deriving (Show, Typeable)
+---------------------------------  DATA TYPES  ---------------------------------
 
-instance Exception CompileException
+
+-- | Exception type specifying that given input cannot be compiled as /regex/.
+data CompileException = CompileException !Text !Text
+  deriving (Show, Typeable)
+
+instance Exception CompileException where
+  displayException (CompileException raw reason) = (T.unpack . mconcat)
+    ["Cannot compile regex from input '", raw, "', reason: ", reason]
 
 
 -- | Represents compiled /regex/, encapsulates the actual implementation.
@@ -52,6 +60,9 @@ newtype Regex = Regex PL.Regex deriving (Eq, Show)
 instance FromJSON Regex where
   parseJSON (String s) = pure . compileUnsafe $ s
   parseJSON val = error $ "Invalid value: expected regex, found: " <> show val
+
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 
 -- | Compiles given /regex/ in /runtime/. If possible, prefer the 're'

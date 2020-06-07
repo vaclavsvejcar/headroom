@@ -31,10 +31,10 @@ module Headroom.FileSystem
   )
 where
 
-import           Headroom.FileType              ( listExtensions )
-import           Headroom.Regex                 ( Regex
+import           Headroom.Data.Regex            ( Regex
                                                 , match
                                                 )
+import           Headroom.FileType              ( listExtensions )
 import           Headroom.Types                 ( FileType
                                                 , HeadersConfig(..)
                                                 )
@@ -134,7 +134,7 @@ loadFile = readFileUtf8
 -- | Takes list of patterns and file paths and returns list of file paths where
 -- those matching the given patterns are excluded.
 --
--- >>> import Headroom.Regex (re)
+-- >>> import Headroom.Data.Regex (re)
 -- >>> :set -XQuasiQuotes
 -- >>> excludePaths [[re|\.hidden|], [re|zzz|]] ["foo/.hidden", "test/bar", "x/zzz/e"]
 -- ["test/bar"]

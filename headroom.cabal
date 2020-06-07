@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5826072c27836874928c80e92017a8bd71e0e5f77dec692678e8a9d125ba85e7
+-- hash: bb7a36786f865ef297f3b2eef915f0f59a683df36cdfcadf8ab8f8afc96e2962
 
 name:           headroom
 version:        0.3.0.0
@@ -128,6 +128,7 @@ library
       Headroom.Configuration
       Headroom.Data.EnumExtra
       Headroom.Data.Has
+      Headroom.Data.Regex
       Headroom.Data.TextExtra
       Headroom.Embedded
       Headroom.Ext
@@ -140,7 +141,6 @@ library
       Headroom.HeaderFn.Types
       Headroom.HeaderFn.UpdateCopyright
       Headroom.Meta
-      Headroom.Regex
       Headroom.Serialization
       Headroom.Template
       Headroom.Template.Mustache
@@ -210,6 +210,7 @@ test-suite spec
       Headroom.Command.RunSpec
       Headroom.ConfigurationSpec
       Headroom.Data.EnumExtraSpec
+      Headroom.Data.RegexSpec
       Headroom.Data.TextExtraSpec
       Headroom.Ext.Haskell.HaddockSpec
       Headroom.Ext.HaskellSpec
@@ -220,7 +221,6 @@ test-suite spec
       Headroom.HeaderFn.TypesSpec
       Headroom.HeaderFn.UpdateCopyrightSpec
       Headroom.HeaderFnSpec
-      Headroom.RegexSpec
       Headroom.SerializationSpec
       Headroom.Template.MustacheSpec
       Headroom.TypesSpec

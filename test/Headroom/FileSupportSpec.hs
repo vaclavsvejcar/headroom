@@ -10,10 +10,10 @@ where
 import           Headroom.Configuration         ( makeHeadersConfig
                                                 , parseConfiguration
                                                 )
+import           Headroom.Data.Regex            ( re )
 import           Headroom.Embedded              ( defaultConfig )
 import           Headroom.FileSupport
 import           Headroom.FileSystem            ( loadFile )
-import           Headroom.Regex                 ( re )
 import           Headroom.Types                 ( FileInfo(..)
                                                 , FileType(..)
                                                 , HeaderConfig(..)

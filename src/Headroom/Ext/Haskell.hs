@@ -32,12 +32,12 @@ where
 import           Control.Lens                   ( element
                                                 , (^?)
                                                 )
+import           Headroom.Data.Regex            ( match
+                                                , re
+                                                )
 import           Headroom.Ext.Haskell.Haddock   ( HaddockModuleHeader(..)
                                                 , extractFieldOffsets
                                                 , extractModuleHeader
-                                                )
-import           Headroom.Regex                 ( match
-                                                , re
                                                 )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( HeaderConfig(..)
