@@ -42,10 +42,10 @@ updateYears (CurrentYear year) = processYear . processRange
  where
   processYear  = replace [re|(?!\d{4}-)(?<!-)(\d{4})|] processYear'
   processRange = replace [re|(\d{4})-(\d{4})|] processRange'
-  replaceYear curr | TE.read curr == year = tshow year
-                   | otherwise            = mconcat [curr, "-", tshow year]
-  replaceRange full fromY toY | TE.read toY == year = full
-                              | otherwise = mconcat [fromY, "-", tshow year]
+  replaceYear curr | TE.read curr == Just year = tshow year
+                   | otherwise                 = mconcat [curr, "-", tshow year]
+  replaceRange full fY tY | TE.read tY == Just year = full
+                          | otherwise = mconcat [fY, "-", tshow year]
   processYear' _    (curr : _) = replaceYear curr
   processYear' full _          = full
   processRange' full (fromY : toY : _) = replaceRange full fromY toY

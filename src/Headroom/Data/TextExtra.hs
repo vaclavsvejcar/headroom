@@ -19,7 +19,6 @@ module Headroom.Data.TextExtra
 where
 
 import           RIO
-import qualified RIO.Partial                   as RP
 import qualified RIO.Text                      as T
 
 
@@ -40,5 +39,13 @@ mapLines fn = T.unlines . go . T.lines
   go (x : xs) = fn x : go xs
 
 
-read :: Read a => Text -> a
-read = RP.read . T.unpack
+-- | Same as 'readMaybe', but takes 'Text' as input instead of 'String'.
+--
+-- >>> read "123" :: Maybe Int
+-- Just 123
+read :: Read a
+     => Text
+     -- ^ input text to parse
+     -> Maybe a
+     -- ^ parsed value
+read = readMaybe . T.unpack
