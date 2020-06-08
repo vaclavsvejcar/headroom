@@ -30,7 +30,7 @@ import           Headroom.Types                 ( ApplicationError
                                                 , CommandInitOptions(..)
                                                 , CommandRunOptions(..)
                                                 )
-import           Options.Applicative (execParser)
+import           Options.Applicative            ( execParser )
 import           RIO
 import           System.IO                      ( hPutStrLn )
 

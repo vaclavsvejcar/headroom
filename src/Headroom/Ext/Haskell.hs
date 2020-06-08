@@ -29,9 +29,6 @@ module Headroom.Ext.Haskell
   )
 where
 
-import           Control.Lens                   ( element
-                                                , (^?)
-                                                )
 import           Headroom.Data.Regex            ( match
                                                 , re
                                                 )
@@ -46,6 +43,7 @@ import           Headroom.Types                 ( HeaderConfig(..)
                                                 )
 import           Headroom.Variables             ( mkVariables )
 import           RIO
+import           RIO.Lens                       ( ix )
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 
@@ -61,7 +59,7 @@ extractModuleName :: Text
 extractModuleName = go . T.lines
  where
   go []       = Nothing
-  go (x : xs) = maybe (go xs) (^? element 1) (match [re|^module\s+(\S+)|] x)
+  go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^module\s+(\S+)|] x)
 
 
 -- | Extracts variables from /Haskell/ source code.
