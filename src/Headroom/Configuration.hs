@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -31,6 +32,22 @@ where
 
 import           Data.Monoid                    ( Last(..) )
 import qualified Data.Yaml                     as Y
+import           Headroom.Configuration.Types   ( HeaderFnConfig
+                                                , HeaderFnConfig'(..)
+                                                , HeaderFnConfigs
+                                                , HeaderFnConfigs'(..)
+                                                , Phase(..)
+                                                , PtHeaderFnConfig
+                                                , PtHeaderFnConfigs
+                                                , PtUpdateCopyrightConfig
+                                                , UpdateCopyrightConfig
+                                                , UpdateCopyrightConfig'(..)
+                                                , hfcConfigL
+                                                , hfcEnabledL
+                                                , hfcsUpdateCopyrightL
+                                                , hfcsUpdateCopyrightL
+                                                , uccSelectedAuthorsL
+                                                )
 import           Headroom.Types                 ( ApplicationError(..)
                                                 , Configuration(..)
                                                 , ConfigurationError(..)
@@ -70,11 +87,12 @@ makeConfiguration :: MonadThrow m
                   -> m Configuration
                   -- ^ full 'Configuration'
 makeConfiguration PartialConfiguration {..} = do
-  cRunMode        <- lastOrError NoRunMode pcRunMode
-  cSourcePaths    <- lastOrError NoSourcePaths pcSourcePaths
-  cExcludedPaths  <- lastOrError NoExcludedPaths pcExcludedPaths
-  cTemplateSource <- lastOrError NoTemplateSource pcTemplateSource
-  cLicenseHeaders <- makeHeadersConfig pcLicenseHeaders
+  cRunMode         <- lastOrError NoRunMode pcRunMode
+  cSourcePaths     <- lastOrError NoSourcePaths pcSourcePaths
+  cExcludedPaths   <- lastOrError NoExcludedPaths pcExcludedPaths
+  cTemplateSource  <- lastOrError NoTemplateSource pcTemplateSource
+  cLicenseHeaders  <- makeHeadersConfig pcLicenseHeaders
+  cHeaderFnConfigs <- makeHeaderFnConfigs pcHeaderFnConfigs
   let cVariables = pcVariables
   pure Configuration { .. }
 
@@ -117,8 +135,37 @@ makeHeaderConfig fileType PartialHeaderConfig {..} = do
   pure HeaderConfig { .. }
 
 
+makeHeaderFnConfigs :: MonadThrow m => PtHeaderFnConfigs -> m HeaderFnConfigs
+makeHeaderFnConfigs pt = do
+  hfcsUpdateCopyright <- makeHeaderFnConfig (pt ^. hfcsUpdateCopyrightL)
+                                            makeUpdateCopyrightConfig
+  pure HeaderFnConfigs { .. }
+
+
+makeHeaderFnConfig :: MonadThrow m
+                   => PtHeaderFnConfig c
+                   -> (c 'Partial -> m (c 'Complete))
+                   -> m (HeaderFnConfig c)
+makeHeaderFnConfig pt fn = do
+  hfcEnabled <- lastOrError NoEnabled (pt ^. hfcEnabledL)
+  hfcConfig  <- fn $ pt ^. hfcConfigL
+  pure HeaderFnConfig { .. }
+
+
+makeUpdateCopyrightConfig :: MonadThrow m
+                          => PtUpdateCopyrightConfig
+                          -> m UpdateCopyrightConfig
+makeUpdateCopyrightConfig pt = do
+  let uccSelectedAuthors = lastOrNothing $ pt ^. uccSelectedAuthorsL
+  pure UpdateCopyrightConfig { .. }
+
+
 ------------------------------  Private Functions  -----------------------------
 
 
 lastOrError :: MonadThrow m => ConfigurationError -> Last a -> m a
-lastOrError err (Last x) = maybe (throwM $ ConfigurationError err) pure x
+lastOrError err (Last a) = maybe (throwM $ ConfigurationError err) pure a
+
+
+lastOrNothing :: Last (Maybe a) -> Maybe a
+lastOrNothing (Last a) = fromMaybe Nothing a

@@ -399,12 +399,13 @@ optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
   pure PartialConfiguration
-    { pcRunMode        = maybe mempty pure croRunMode
-    , pcSourcePaths    = ifNot null croSourcePaths
-    , pcExcludedPaths  = ifNot null croExcludedPaths
-    , pcTemplateSource = maybe mempty pure croTemplateSource
-    , pcVariables      = variables
-    , pcLicenseHeaders = mempty
+    { pcRunMode         = maybe mempty pure croRunMode
+    , pcSourcePaths     = ifNot null croSourcePaths
+    , pcExcludedPaths   = ifNot null croExcludedPaths
+    , pcTemplateSource  = maybe mempty pure croTemplateSource
+    , pcVariables       = variables
+    , pcLicenseHeaders  = mempty
+    , pcHeaderFnConfigs = mempty
     }
   where ifNot cond value = if cond value then mempty else pure value
 

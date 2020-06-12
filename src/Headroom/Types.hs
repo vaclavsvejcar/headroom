@@ -68,6 +68,7 @@ import           Data.Aeson                     ( FromJSON(..)
                                                 )
 import           Data.Default.Class             ( Default(..) )
 import           Data.Monoid                    ( Last(..) )
+import           Headroom.Configuration.Types
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Regex            ( Regex(..) )
 import           Headroom.Serialization         ( aesonOptions )
@@ -194,6 +195,8 @@ data ConfigurationError
   -- ^ no configuration for template source
   | NoVariables
   -- ^ no configuration for @variables@
+  | NoEnabled
+  -- ^ no configuration for @enabled@
   deriving (Eq, Show)
 
 -- | Error during processing template.
@@ -345,18 +348,20 @@ newtype Variables = Variables (HashMap Text Text) deriving (Eq, Show)
 
 -- | Application configuration.
 data Configuration = Configuration
-  { cRunMode        :: !RunMode
+  { cRunMode         :: !RunMode
   -- ^ mode of the @run@ command
-  , cSourcePaths    :: ![FilePath]
+  , cSourcePaths     :: ![FilePath]
   -- ^ paths to source code files
-  , cExcludedPaths  :: ![Regex]
+  , cExcludedPaths   :: ![Regex]
   -- ^ excluded source paths
-  , cTemplateSource :: !TemplateSource
+  , cTemplateSource  :: !TemplateSource
   -- ^ source of license templates
-  , cVariables      :: !Variables
+  , cVariables       :: !Variables
   -- ^ variable values for templates
-  , cLicenseHeaders :: !HeadersConfig
+  , cLicenseHeaders  :: !HeadersConfig
   -- ^ configuration of license headers
+  , cHeaderFnConfigs :: !HeaderFnConfigs
+  -- ^ configuration of license header functions
   }
   deriving (Eq, Show)
 
@@ -422,18 +427,20 @@ newtype LineComment' = LineComment'
 
 -- | Partial (possibly incomplete) version of 'Configuration'.
 data PartialConfiguration = PartialConfiguration
-  { pcRunMode        :: !(Last RunMode)
+  { pcRunMode         :: !(Last RunMode)
   -- ^ mode of the @run@ command
-  , pcSourcePaths    :: !(Last [FilePath])
+  , pcSourcePaths     :: !(Last [FilePath])
   -- ^ paths to source code files
-  , pcExcludedPaths  :: !(Last [Regex])
+  , pcExcludedPaths   :: !(Last [Regex])
   -- ^ excluded source paths
-  , pcTemplateSource :: !(Last TemplateSource)
+  , pcTemplateSource  :: !(Last TemplateSource)
   -- ^ paths to template files
-  , pcVariables      :: !Variables
+  , pcVariables       :: !Variables
   -- ^ variable values for templates
-  , pcLicenseHeaders :: !PartialHeadersConfig
+  , pcLicenseHeaders  :: !PartialHeadersConfig
   -- ^ configuration of license headers
+  , pcHeaderFnConfigs :: !PtHeaderFnConfigs
+  -- ^ configuration of license header functions
   }
   deriving (Eq, Generic, Show)
 
@@ -487,12 +494,13 @@ instance FromJSON LineComment' where
 
 instance FromJSON PartialConfiguration where
   parseJSON = withObject "PartialConfiguration" $ \obj -> do
-    pcRunMode        <- Last <$> obj .:? "run-mode"
-    pcSourcePaths    <- Last <$> obj .:? "source-paths"
-    pcExcludedPaths  <- Last <$> obj .:? "excluded-paths"
-    pcTemplateSource <- Last <$> get TemplateFiles (obj .:? "template-paths")
-    pcVariables      <- fmap Variables (obj .:? "variables" .!= mempty)
-    pcLicenseHeaders <- obj .:? "license-headers" .!= mempty
+    pcRunMode         <- Last <$> obj .:? "run-mode"
+    pcSourcePaths     <- Last <$> obj .:? "source-paths"
+    pcExcludedPaths   <- Last <$> obj .:? "excluded-paths"
+    pcTemplateSource  <- Last <$> get TemplateFiles (obj .:? "template-paths")
+    pcVariables       <- fmap Variables (obj .:? "variables" .!= mempty)
+    pcLicenseHeaders  <- obj .:? "license-headers" .!= mempty
+    pcHeaderFnConfigs <- obj .:? "header-functions" .!= mempty
     pure PartialConfiguration { .. }
     where get = fmap . fmap
 
@@ -533,12 +541,13 @@ instance Semigroup Variables where
 
 instance Semigroup PartialConfiguration where
   x <> y = PartialConfiguration
-    { pcRunMode        = pcRunMode x <> pcRunMode y
-    , pcSourcePaths    = pcSourcePaths x <> pcSourcePaths y
-    , pcExcludedPaths  = pcExcludedPaths x <> pcExcludedPaths y
-    , pcTemplateSource = pcTemplateSource x <> pcTemplateSource y
-    , pcVariables      = pcVariables x <> pcVariables y
-    , pcLicenseHeaders = pcLicenseHeaders x <> pcLicenseHeaders y
+    { pcRunMode         = pcRunMode x <> pcRunMode y
+    , pcSourcePaths     = pcSourcePaths x <> pcSourcePaths y
+    , pcExcludedPaths   = pcExcludedPaths x <> pcExcludedPaths y
+    , pcTemplateSource  = pcTemplateSource x <> pcTemplateSource y
+    , pcVariables       = pcVariables x <> pcVariables y
+    , pcLicenseHeaders  = pcLicenseHeaders x <> pcLicenseHeaders y
+    , pcHeaderFnConfigs = pcHeaderFnConfigs x <> pcHeaderFnConfigs y
     }
 
 instance Semigroup PartialHeaderConfig where
@@ -568,7 +577,8 @@ instance Monoid Variables where
   mempty = Variables mempty
 
 instance Monoid PartialConfiguration where
-  mempty = PartialConfiguration mempty mempty mempty mempty mempty mempty
+  mempty =
+    PartialConfiguration mempty mempty mempty mempty mempty mempty mempty
 
 instance Monoid PartialHeaderConfig where
   mempty = PartialHeaderConfig mempty mempty mempty mempty mempty mempty
@@ -647,6 +657,7 @@ configurationError = \case
     (Just "(-t|--template-path)|--builtin-templates")
   NoVariables ->
     missingConfig "template variables" (Just "variables") (Just "-v|--variable")
+  NoEnabled -> missingConfig "enabled" (Just "enabled") Nothing
  where
   withFT msg fileType = msg <> " (" <> T.pack (show fileType) <> ")"
   invalidVariable   = ("Cannot parse variable key=value from: " <>)
