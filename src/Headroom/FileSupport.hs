@@ -32,16 +32,17 @@ module Headroom.FileSupport
   )
 where
 
+import           Headroom.Configuration.Types   ( CtHeaderConfig
+                                                , HeaderConfig(..)
+                                                , HeaderSyntax(..)
+                                                )
 import           Headroom.Data.Regex            ( Regex
                                                 , match
                                                 )
 import           Headroom.Ext                   ( extractVariables )
-import           Headroom.Types                 ( FileInfo(..)
-                                                , FileType(..)
-                                                , HeaderConfig(..)
-                                                , HeaderSyntax(..)
-                                                , TemplateMeta(..)
-                                                )
+import           Headroom.FileSupport.Types     ( FileInfo(..) )
+import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Types                 ( TemplateMeta(..) )
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
@@ -51,7 +52,7 @@ import qualified RIO.Text                      as T
 -- detection/manipulation functions.
 extractFileInfo :: FileType
                 -- ^ type of the detected file
-                -> HeaderConfig
+                -> CtHeaderConfig
                 -- ^ license header configuration
                 -> Maybe TemplateMeta
                 -- ^ metadata extracted from /template/
@@ -64,7 +65,6 @@ extractFileInfo fiFileType fiHeaderConfig meta text =
       fiVariables =
         extractVariables fiFileType fiHeaderConfig meta fiHeaderPos text
   in  FileInfo { .. }
-
 
 
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if
@@ -133,10 +133,12 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- Based on the 'HeaderSyntax' specified in given 'HeaderConfig', this function
 -- delegates its work to either 'findBlockHeader' or 'findLineHeader'.
 --
+-- >>> :set -XFlexibleContexts
+-- >>> :set -XTypeFamilies
 -- >>> let hc = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-" "-}")
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
 -- Just (2,2)
-findHeader :: HeaderConfig
+findHeader :: CtHeaderConfig
            -- ^ appropriate header configuration
            -> Text
            -- ^ text in which to detect the header

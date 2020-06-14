@@ -23,13 +23,12 @@ module Headroom.Ext
   )
 where
 
+import           Headroom.Configuration.Types   ( CtHeaderConfig )
 import qualified Headroom.Ext.Haskell          as Haskell
+import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( FileType(..)
-                                                , HeaderConfig
-                                                , TemplateMeta(..)
-                                                , Variables
-                                                )
+import           Headroom.Types                 ( TemplateMeta(..) )
+import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 
 
@@ -39,7 +38,7 @@ import           RIO
 -- * /Haskell/ - implemented in "Headroom.FileSupport.Haskell"
 extractVariables :: FileType
                  -- ^ type of the file
-                 -> HeaderConfig
+                 -> CtHeaderConfig
                  -- ^ license header configuration
                  -> Maybe TemplateMeta
                  -- ^ extracted metadata from corresponding /template/

@@ -9,9 +9,6 @@ where
 
 import           Headroom.Template
 import           Headroom.Template.Mustache
-import           Headroom.Types                 ( ApplicationError(..)
-                                                , TemplateError(..)
-                                                )
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           Test.Hspec
@@ -36,14 +33,12 @@ spec = do
       rendered `shouldBe` Just "Hello, John"
 
     it "fails if not enough variables is provided" $ do
-      let
-        template  = "Hello, {{ name }} {{ surname }}"
-        variables = mkVariables [("name", "John")]
-        parsed    = parseTemplate @Mustache (Just "test") template
-        rendered  = parsed >>= renderTemplate variables
-        check (Just (TemplateError (MissingVariables "test" ["surname"]))) =
-          True
-        check _ = False
+      let template  = "Hello, {{ name }} {{ surname }}"
+          variables = mkVariables [("name", "John")]
+          parsed    = parseTemplate @Mustache (Just "test") template
+          rendered  = parsed >>= renderTemplate variables
+          check (Just (MissingVariables "test" ["surname"])) = True
+          check _ = False
       rendered `shouldSatisfy` matchesException check
 
     it "renders template with conditionally set variable" $ do

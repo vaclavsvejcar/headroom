@@ -19,11 +19,10 @@ module Headroom.Template.Mustache
   )
 where
 
-import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( ApplicationError(..)
+import           Headroom.Template              ( Template(..)
                                                 , TemplateError(..)
-                                                , Variables(..)
                                                 )
+import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 import qualified RIO.Text                      as T
 import qualified Text.Mustache                 as MU
@@ -45,7 +44,7 @@ instance Template Mustache where
 
 parseTemplate' :: MonadThrow m => Maybe Text -> Text -> m Mustache
 parseTemplate' name raw = case MU.compileTemplate templateName raw of
-  Left  err -> throwM $ TemplateError (ParseError (tshow err))
+  Left  err -> throwM . ParseError $ tshow err
   Right res -> pure $ Mustache res raw
   where templateName = T.unpack . fromMaybe "" $ name
 
@@ -60,7 +59,7 @@ renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _) _) =
             (VariableNotFound ps) -> ps
             _                     -> []
       in  if length errs == length errs'
-            then throwM $ TemplateError (MissingVariables (T.pack name) errs')
+            then throwM $ MissingVariables (T.pack name) errs'
             else pure rendered
 
 

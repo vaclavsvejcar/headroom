@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9c7af7aae717f39b7b2daac0ee3347c1586b2a29d59255f1bb6ef01c5365f2dd
+-- hash: cb2a0896559fe1b260cc9d04c646362e16c0bb2113fd2925981ebbaff3bc1d4e
 
 name:           headroom
 version:        0.3.0.0
@@ -124,6 +124,7 @@ library
       Headroom.Command.Init
       Headroom.Command.Readers
       Headroom.Command.Run
+      Headroom.Command.Types
       Headroom.Command.Utils
       Headroom.Configuration
       Headroom.Configuration.Types
@@ -137,8 +138,10 @@ library
       Headroom.Ext.Haskell
       Headroom.Ext.Haskell.Haddock
       Headroom.FileSupport
+      Headroom.FileSupport.Types
       Headroom.FileSystem
       Headroom.FileType
+      Headroom.FileType.Types
       Headroom.HeaderFn
       Headroom.HeaderFn.Types
       Headroom.HeaderFn.UpdateCopyright
@@ -150,6 +153,7 @@ library
       Headroom.UI
       Headroom.UI.Progress
       Headroom.Variables
+      Headroom.Variables.Types
   other-modules:
       Paths_headroom
   autogen-modules:

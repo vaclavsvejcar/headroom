@@ -22,11 +22,13 @@ module Headroom.FileType
   )
 where
 
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Types                 ( FileType(..)
+import           Headroom.Configuration.Types   ( CtHeaderConfig
+                                                , CtHeadersConfig
                                                 , HeaderConfig(..)
                                                 , HeadersConfig(..)
                                                 )
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 import qualified RIO.List                      as L
 
@@ -34,7 +36,7 @@ import qualified RIO.List                      as L
 
 -- | Returns 'FileType' for given file extension (without dot), using configured
 -- values from the 'HeadersConfig'.
-fileTypeByExt :: HeadersConfig
+fileTypeByExt :: CtHeadersConfig
               -- ^ license headers configuration
               -> Text
               -- ^ file extension (without dot)
@@ -46,7 +48,7 @@ fileTypeByExt config ext =
 
 -- | Lists all recognized file extensions for given 'FileType', using configured
 -- values from the 'HeadersConfig'.
-listExtensions :: HeadersConfig
+listExtensions :: CtHeadersConfig
                -- ^ license headers configuration
                -> FileType
                -- ^ 'FileType' for which to list extensions
@@ -58,11 +60,11 @@ listExtensions config fileType =
 
 -- | Returns the proper 'HeaderConfig' for the given 'FileType', selected
 -- from the 'HeadersConfig'.
-configByFileType :: HeadersConfig
+configByFileType :: CtHeadersConfig
                  -- ^ license headers configuration
                  -> FileType
                  -- ^ selected 'FileType'
-                 -> HeaderConfig
+                 -> CtHeaderConfig
                  -- ^ appropriate 'HeaderConfig'
 configByFileType HeadersConfig {..} fileType = case fileType of
   C       -> hscC

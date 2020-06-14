@@ -30,9 +30,13 @@ module Headroom.Command.Init
   )
 where
 
+import           Headroom.Command.Types         ( CommandInitOptions(..) )
 import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( makeHeadersConfig
                                                 , parseConfiguration
+                                                )
+import           Headroom.Configuration.Types   ( Configuration(..)
+                                                , LicenseType(..)
                                                 )
 import           Headroom.Data.Has              ( Has(..) )
 import           Headroom.Embedded              ( configFileStub
@@ -45,15 +49,12 @@ import           Headroom.FileSystem            ( createDirectory
                                                 , findFiles
                                                 )
 import           Headroom.FileType              ( fileTypeByExt )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Serialization         ( prettyPrintYAML )
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( ApplicationError(..)
-                                                , CommandInitError(..)
-                                                , CommandInitOptions(..)
-                                                , FileType(..)
-                                                , LicenseType(..)
-                                                , PartialConfiguration(..)
+import           Headroom.Types                 ( fromHeadroomError
+                                                , toHeadroomError
                                                 )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
@@ -66,7 +67,6 @@ import qualified RIO.Map                       as M
 import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
 import qualified RIO.Text.Partial              as TP
-
 
 
 -- | /RIO/ Environment for the @init@ command.
@@ -113,7 +113,7 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
     createConfigFile
   True -> do
     paths <- viewL
-    throwM $ CommandInitError (AppConfigAlreadyExists $ pConfigFile paths)
+    throwM . AppConfigAlreadyExists $ pConfigFile paths
 
 -- | Recursively scans provided source paths for known file types for which
 -- templates can be generated.
@@ -121,7 +121,7 @@ findSupportedFileTypes :: (Has CommandInitOptions env, HasLogFunc env)
                        => RIO env [FileType]
 findSupportedFileTypes = do
   opts           <- viewL
-  pHeadersConfig <- pcLicenseHeaders <$> parseConfiguration defaultConfig
+  pHeadersConfig <- cLicenseHeaders <$> parseConfiguration defaultConfig
   headersConfig  <- makeHeadersConfig pHeadersConfig
   fileTypes      <- do
     allFiles <- mapM (\path -> findFiles path (const True))
@@ -130,7 +130,7 @@ findSupportedFileTypes = do
                             (concat allFiles)
     pure . L.nub . catMaybes $ allFileTypes
   case fileTypes of
-    [] -> throwM $ CommandInitError NoProvidedSourcePaths
+    [] -> throwM NoProvidedSourcePaths
     _  -> do
       logInfo $ "Found supported file types: " <> displayShow fileTypes
       pure fileTypes
@@ -190,3 +190,32 @@ makeTemplatesDir = do
   Paths {..} <- viewL
   logInfo $ "Creating directory for templates in " <> fromString pTemplatesDir
   createDirectory pTemplatesDir
+
+
+---------------------------------  Error Types  --------------------------------
+
+-- | Exception specific to the "Headroom.Command.Init" module
+data CommandInitError
+  = AppConfigAlreadyExists !FilePath
+  -- ^ application configuration file already exists
+  | NoProvidedSourcePaths
+  -- ^ no paths to source code files provided
+  | NoSupportedFileType
+  -- ^ no supported file types found on source paths
+  deriving (Eq, Show)
+
+instance Exception CommandInitError where
+  displayException = displayException'
+  toException      = toHeadroomError
+  fromException    = fromHeadroomError
+
+displayException' :: CommandInitError -> String
+displayException' = T.unpack . \case
+  AppConfigAlreadyExists path -> appConfigAlreadyExists path
+  NoProvidedSourcePaths       -> noProvidedSourcePaths
+  NoSupportedFileType         -> noSupportedFileType
+ where
+  appConfigAlreadyExists path =
+    mconcat ["Configuration file '", T.pack path, "' already exists"]
+  noProvidedSourcePaths = "No source code paths (files or directories) defined"
+  noSupportedFileType   = "No supported file type found in scanned source paths"

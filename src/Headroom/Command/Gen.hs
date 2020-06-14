@@ -1,6 +1,7 @@
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 {-|
 Module      : Headroom.Command.Gen
@@ -23,18 +24,20 @@ module Headroom.Command.Gen
 where
 
 
+import           Headroom.Command.Types         ( Command(..)
+                                                , CommandGenOptions(..)
+                                                )
 import           Headroom.Command.Utils         ( bootstrap )
+import           Headroom.Configuration.Types   ( GenMode(..) )
 import           Headroom.Embedded              ( configFileStub
                                                 , licenseTemplate
                                                 )
-import           Headroom.Types                 ( ApplicationError(..)
-                                                , Command(..)
-                                                , CommandGenError(..)
-                                                , CommandGenOptions(..)
-                                                , GenMode(..)
+import           Headroom.Types                 ( fromHeadroomError
+                                                , toHeadroomError
                                                 )
 import           Prelude                        ( putStrLn )
 import           RIO
+import qualified RIO.Text                      as T
 
 
 data Env = Env
@@ -59,7 +62,7 @@ parseGenMode :: MonadThrow m
 parseGenMode = \case
   Gen True  Nothing        -> pure GenConfigFile
   Gen False (Just license) -> pure $ GenLicense license
-  _                        -> throwM $ CommandGenError NoGenModeSelected
+  _                        -> throwM NoGenModeSelected
 
 -- | Handler for /Generator/ command.
 commandGen :: CommandGenOptions
@@ -72,3 +75,23 @@ commandGen opts = bootstrap (env' opts) False $ case cgoGenMode opts of
 
 printConfigFile :: IO ()
 printConfigFile = putStrLn configFileStub
+
+
+---------------------------------  Error Types  --------------------------------
+
+-- | Exception specific to the @gen@ command.
+data CommandGenError = NoGenModeSelected
+                     -- ^ no mode of /Gen/ command selected
+  deriving (Eq, Show)
+
+instance Exception CommandGenError where
+  displayException = displayException'
+  toException      = toHeadroomError
+  fromException    = fromHeadroomError
+
+displayException' :: CommandGenError -> String
+displayException' = T.unpack . \case
+  NoGenModeSelected -> mconcat
+    [ "Please select at least one option what to generate "
+    , "(see --help for details)"
+    ]

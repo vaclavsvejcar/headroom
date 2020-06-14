@@ -24,12 +24,12 @@ import           Headroom.Command.Gen           ( commandGen
                                                 )
 import           Headroom.Command.Init          ( commandInit )
 import           Headroom.Command.Run           ( commandRun )
-import           Headroom.Types                 ( ApplicationError
-                                                , Command(..)
+import           Headroom.Command.Types         ( Command(..)
                                                 , CommandGenOptions(..)
                                                 , CommandInitOptions(..)
                                                 , CommandRunOptions(..)
                                                 )
+import           Headroom.Types                 ( HeadroomError(..) )
 import           Options.Applicative            ( execParser )
 import           RIO
 import           System.IO                      ( hPutStrLn )
@@ -41,7 +41,7 @@ main = do
   catch
     (bootstrap command')
     (\ex -> do
-      hPutStrLn stderr $ "ERROR: " <> displayException (ex :: ApplicationError)
+      hPutStrLn stderr $ "ERROR: " <> displayException (ex :: HeadroomError)
       exitWith $ ExitFailure 1
     )
 

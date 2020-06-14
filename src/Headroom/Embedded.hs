@@ -21,9 +21,8 @@ module Headroom.Embedded
 where
 
 import           Data.FileEmbed                 ( embedStringFile )
-import           Headroom.Types                 ( FileType(..)
-                                                , LicenseType(..)
-                                                )
+import           Headroom.Configuration.Types   ( LicenseType(..) )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 
 

@@ -5,10 +5,9 @@ module Headroom.Command.InitSpec
 where
 
 import           Headroom.Command.Init
-import           Headroom.Types                 ( CommandInitOptions(..)
-                                                , FileType(HTML)
-                                                , LicenseType(..)
-                                                )
+import           Headroom.Command.Types         ( CommandInitOptions(..) )
+import           Headroom.Configuration.Types   ( LicenseType(..) )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.List                      as L

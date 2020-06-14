@@ -1,5 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
 
 {-|
 Module      : Headroom.Template
@@ -14,10 +16,19 @@ Module providing generic representation of supported template type, using
 the 'Template' /type class/.
 -}
 
-module Headroom.Template where
+module Headroom.Template
+  ( Template(..)
+  , TemplateError(..)
+  )
+where
 
-import           Headroom.Types                 ( Variables(..) )
+import           Headroom.Types                 ( fromHeadroomError
+                                                , toHeadroomError
+                                                )
+import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
+import qualified RIO.Text                      as T
+
 
 -- | Type class representing generic license header template support.
 class Template t where
@@ -54,3 +65,28 @@ class Template t where
               -- ^ template for which to return raw template text
               -> Text
               -- ^ raw template text
+
+
+---------------------------------  Error Types  --------------------------------
+
+-- | Error during processing template.
+data TemplateError
+  = MissingVariables !Text ![Text]
+  -- ^ missing variable values
+  | ParseError !Text
+  -- ^ error parsing raw template text
+  deriving (Eq, Show, Typeable)
+
+instance Exception TemplateError where
+  displayException = displayException'
+  toException      = toHeadroomError
+  fromException    = fromHeadroomError
+
+displayException' :: TemplateError -> String
+displayException' = T.unpack . \case
+  MissingVariables name variables -> missingVariables name variables
+  ParseError msg                  -> parseError msg
+ where
+  missingVariables name variables =
+    mconcat ["Missing variables for '", name, "': ", T.pack $ show variables]
+  parseError msg = "Error parsing template: " <> msg

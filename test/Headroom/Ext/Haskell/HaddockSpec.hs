@@ -6,15 +6,14 @@ module Headroom.Ext.Haskell.HaddockSpec
   )
 where
 
+import           Headroom.Configuration.Types   ( LicenseType(..) )
 import           Headroom.Embedded              ( licenseTemplate )
 import           Headroom.Ext.Haskell.Haddock
 import           Headroom.FileSystem            ( loadFile )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Template.Mustache     ( Mustache(..) )
-import           Headroom.Types                 ( FileType(..)
-                                                , HaddockFieldOffsets(..)
-                                                , LicenseType(..)
-                                                )
+import           Headroom.Types                 ( HaddockFieldOffsets(..) )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.Text                      as T

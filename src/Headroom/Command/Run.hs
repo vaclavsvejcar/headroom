@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
@@ -35,10 +36,20 @@ import           Data.Time.LocalTime            ( getCurrentTimeZone
                                                 , localDay
                                                 , utcToLocalTime
                                                 )
+import           Headroom.Command.Types         ( CommandRunOptions(..) )
 import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( loadConfiguration
                                                 , makeConfiguration
                                                 , parseConfiguration
+                                                )
+import           Headroom.Configuration.Types   ( Configuration(..)
+                                                , CtConfiguration
+                                                , HeaderConfig(..)
+                                                , HeaderSyntax(..)
+                                                , LicenseType(..)
+                                                , PtConfiguration
+                                                , RunMode(..)
+                                                , TemplateSource(..)
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
@@ -52,6 +63,7 @@ import           Headroom.FileSupport           ( addHeader
                                                 , extractFileInfo
                                                 , replaceHeader
                                                 )
+import           Headroom.FileSupport.Types     ( FileInfo(..) )
 import           Headroom.FileSystem            ( excludePaths
                                                 , fileExtension
                                                 , findFilesByExts
@@ -61,24 +73,13 @@ import           Headroom.FileSystem            ( excludePaths
 import           Headroom.FileType              ( configByFileType
                                                 , fileTypeByExt
                                                 )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Meta                  ( TemplateType
                                                 , productInfo
                                                 )
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( CommandRunOptions(..)
-                                                , Configuration(..)
-                                                , CurrentYear(..)
-                                                , FileInfo(..)
-                                                , FileType(..)
-                                                , HeaderConfig(..)
-                                                , HeaderSyntax(..)
-                                                , LicenseType(..)
-                                                , PartialConfiguration(..)
-                                                , RunAction(..)
-                                                , RunMode(..)
+import           Headroom.Types                 ( CurrentYear(..)
                                                 , TemplateMeta(..)
-                                                , TemplateSource(..)
-                                                , Variables(..)
                                                 )
 import           Headroom.UI                    ( Progress(..)
                                                 , zipWithProgress
@@ -87,6 +88,7 @@ import           Headroom.Variables             ( compileVariables
                                                 , dynamicVariables
                                                 , parseVariables
                                                 )
+import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 import           RIO.FilePath                   ( takeBaseName )
 import qualified RIO.List                      as L
@@ -95,6 +97,18 @@ import qualified RIO.Text                      as T
 
 
 type TemplatesMap = Map FileType (Maybe TemplateMeta, TemplateType)
+
+-- | Action to be performed based on the selected 'RunMode'.
+data RunAction = RunAction
+  { raProcessed    :: !Bool
+  -- ^ whether the given file was processed
+  , raFunc         :: !(Text -> Text)
+  -- ^ function to process the file
+  , raProcessedMsg :: !Text
+  -- ^ message to show when file was processed
+  , raSkippedMsg   :: !Text
+  -- ^ message to show when file was skipped
+  }
 
 
 -- | Initial /RIO/ startup environment for the /Run/ command.
@@ -109,13 +123,13 @@ data StartupEnv = StartupEnv
 data Env = Env
   { envEnv           :: !StartupEnv
   -- ^ startup /RIO/ environment
-  , envConfiguration :: !Configuration
+  , envConfiguration :: !CtConfiguration
   -- ^ application configuration
   , envCurrentYear   :: !CurrentYear
   -- ^ current year
   }
 
-instance Has Configuration Env where
+instance Has CtConfiguration Env where
   hasLens = lens envConfiguration (\x y -> x { envConfiguration = y })
 
 instance Has StartupEnv StartupEnv where
@@ -155,7 +169,7 @@ commandRun :: CommandRunOptions
            -- ^ execution result
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   CommandRunOptions {..} <- viewL
-  Configuration {..}     <- viewL
+  Configuration {..}     <- viewL @CtConfiguration
   let isCheck = cRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
@@ -184,7 +198,7 @@ warnOnDryRun = do
   when croDryRun $ logWarn "[!] Running with '--dry-run', no files are changed!"
 
 
-findSourceFiles :: (Has Configuration env, HasLogFunc env)
+findSourceFiles :: (Has CtConfiguration env, HasLogFunc env)
                 => [FileType]
                 -> RIO env [FilePath]
 findSourceFiles fileTypes = do
@@ -203,7 +217,7 @@ findSourceFiles fileTypes = do
   where findFiles' licenseHeaders = findFilesByTypes licenseHeaders fileTypes
 
 
-processSourceFiles :: ( Has Configuration env
+processSourceFiles :: ( Has CtConfiguration env
                       , Has CommandRunOptions env
                       , Has CurrentYear env
                       , HasLogFunc env
@@ -228,7 +242,7 @@ processSourceFiles templates paths = do
     processSourceFile cVars dVars pr tm tt ft p
 
 
-processSourceFile :: ( Has Configuration env
+processSourceFile :: ( Has CtConfiguration env
                      , Has CommandRunOptions env
                      , HasLogFunc env
                      )
@@ -241,7 +255,7 @@ processSourceFile :: ( Has Configuration env
                   -> FilePath
                   -> RIO env Bool
 processSourceFile cVars dVars progress meta template fileType path = do
-  Configuration {..}     <- viewL
+  Configuration {..}     <- viewL @CtConfiguration
   CommandRunOptions {..} <- viewL
   fileContent            <- readFileUtf8 path
   let fileInfo@FileInfo {..} = extractFileInfo
@@ -263,9 +277,12 @@ processSourceFile cVars dVars progress meta template fileType path = do
   pure changed
 
 
-chooseAction :: (Has Configuration env) => FileInfo -> Text -> RIO env RunAction
+chooseAction :: (Has CtConfiguration env)
+             => FileInfo
+             -> Text
+             -> RIO env RunAction
 chooseAction info header = do
-  Configuration {..} <- viewL
+  Configuration {..} <- viewL @CtConfiguration
   let hasHeader = isJust $ fiHeaderPos info
   pure $ go cRunMode hasHeader
  where
@@ -330,10 +347,10 @@ loadBuiltInTemplates licenseType = do
   template     = licenseTemplate licenseType
 
 
-loadTemplates :: (Has Configuration env, HasLogFunc env)
+loadTemplates :: (Has CtConfiguration env, HasLogFunc env)
               => RIO env (Map FileType TemplateType)
 loadTemplates = do
-  Configuration {..} <- viewL
+  Configuration {..} <- viewL @CtConfiguration
   case cTemplateSource of
     TemplateFiles    paths       -> loadTemplateFiles paths
     BuiltInTemplates licenseType -> loadBuiltInTemplates licenseType
@@ -359,7 +376,7 @@ typeOfTemplate path = do
 
 loadConfigurationSafe :: (HasLogFunc env)
                       => FilePath
-                      -> RIO env (Maybe PartialConfiguration)
+                      -> RIO env (Maybe PtConfiguration)
 loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
  where
   onError err = do
@@ -376,7 +393,7 @@ loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
 
 
 finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
-                   => RIO env Configuration
+                   => RIO env CtConfiguration
 finalConfiguration = do
   logInfo $ display productInfo
   defaultConfig' <- Just <$> parseConfiguration defaultConfig
@@ -393,20 +410,18 @@ finalConfiguration = do
   pure config
 
 
-optionsToConfiguration :: (Has CommandRunOptions env)
-                       => RIO env PartialConfiguration
+optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtConfiguration
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
-  pure PartialConfiguration
-    { pcRunMode         = maybe mempty pure croRunMode
-    , pcSourcePaths     = ifNot null croSourcePaths
-    , pcExcludedPaths   = ifNot null croExcludedPaths
-    , pcTemplateSource  = maybe mempty pure croTemplateSource
-    , pcVariables       = variables
-    , pcLicenseHeaders  = mempty
-    , pcHeaderFnConfigs = mempty
-    }
+  pure Configuration { cRunMode         = maybe mempty pure croRunMode
+                     , cSourcePaths     = ifNot null croSourcePaths
+                     , cExcludedPaths   = ifNot null croExcludedPaths
+                     , cTemplateSource  = maybe mempty pure croTemplateSource
+                     , cVariables       = variables
+                     , cLicenseHeaders  = mempty
+                     , cHeaderFnConfigs = mempty
+                     }
   where ifNot cond value = if cond value then mempty else pure value
 
 

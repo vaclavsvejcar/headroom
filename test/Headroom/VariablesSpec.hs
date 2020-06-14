@@ -5,10 +5,9 @@ module Headroom.VariablesSpec
   )
 where
 
-import           Headroom.Types                 ( CurrentYear(..)
-                                                , Variables(..)
-                                                )
+import           Headroom.Types                 ( CurrentYear(..) )
 import           Headroom.Variables
+import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 import qualified RIO.HashMap                   as HM
 import           Test.Hspec

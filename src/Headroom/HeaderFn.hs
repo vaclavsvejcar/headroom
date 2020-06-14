@@ -37,9 +37,9 @@ module Headroom.HeaderFn
   )
 where
 
-import           Headroom.Configuration.Types   ( HeaderFnConfig'(..)
-                                                , HeaderFnConfigs
-                                                , HeaderFnConfigs'(..)
+import           Headroom.Configuration.Types   ( CtHeaderFnConfigs
+                                                , HeaderFnConfig(..)
+                                                , HeaderFnConfigs(..)
                                                 , hfcConfigL
                                                 , hfcsUpdateCopyrightL
                                                 , uccSelectedAuthorsL
@@ -73,7 +73,7 @@ runHeaderFn (HeaderFn fn) env input = runReader (fn input) env
 -- based on /YAML/ configuration and which can be enabled/disabled to fit
 -- end user's needs.
 configuredHeaderFn :: (Has CurrentYear env, Has UpdateCopyrightMode env)
-                   => HeaderFnConfigs
+                   => CtHeaderFnConfigs
                    -- ^ configuration of /license header functions/
                    -> HeaderFn env
                    -- ^ composed /license header function/
@@ -101,7 +101,7 @@ postProcessHeader env = runHeaderFn (configuredHeaderFn configs) env
 data ConfiguredEnv = ConfiguredEnv
   { ceCurrentYear         :: !CurrentYear
   -- ^ current year
-  , ceHeaderFnConfigs     :: !HeaderFnConfigs
+  , ceHeaderFnConfigs     :: !CtHeaderFnConfigs
   -- ^ configuration of /license header functions/
   , ceUpdateCopyrightMode :: !UpdateCopyrightMode
   -- ^ mode used by the 'updateCopyright' /license header function/
@@ -114,7 +114,7 @@ suffixLenses ''ConfiguredEnv
 -- | Constructor function for 'ConfiguredEnv' data type.
 mkConfiguredEnv :: CurrentYear
                 -- ^ current year
-                -> HeaderFnConfigs
+                -> CtHeaderFnConfigs
                 -- ^ configuration of /license header functions/
                 -> ConfiguredEnv
                 -- ^ environment data type

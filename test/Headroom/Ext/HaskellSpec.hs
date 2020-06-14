@@ -5,11 +5,11 @@ module Headroom.Ext.HaskellSpec
   )
 where
 
-import           Headroom.Ext.Haskell
-import           Headroom.FileSystem            ( loadFile )
-import           Headroom.Types                 ( HeaderConfig(..)
+import           Headroom.Configuration.Types   ( HeaderConfig(..)
                                                 , HeaderSyntax(..)
                                                 )
+import           Headroom.Ext.Haskell
+import           Headroom.FileSystem            ( loadFile )
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           RIO.FilePath                   ( (</>) )

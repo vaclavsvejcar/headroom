@@ -7,9 +7,9 @@ module Headroom.HeaderFnSpec
   )
 where
 
-import           Headroom.Configuration.Types   ( HeaderFnConfig'(..)
-                                                , HeaderFnConfigs'(..)
-                                                , UpdateCopyrightConfig'(..)
+import           Headroom.Configuration.Types   ( HeaderFnConfig(..)
+                                                , HeaderFnConfigs(..)
+                                                , UpdateCopyrightConfig(..)
                                                 )
 import           Headroom.Data.Has              ( Has(..) )
 import           Headroom.HeaderFn

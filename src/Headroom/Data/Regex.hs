@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns      #-}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
@@ -20,7 +21,7 @@ and "Text.Regex.PCRE.Heavy" that more suits the needs of this application.
 module Headroom.Data.Regex
   ( -- * Data Types
     Regex(..)
-  , CompileException(..)
+  , RegexError(..)
     -- * Regex Functions
   , compile
   , match
@@ -33,6 +34,9 @@ where
 import           Data.Aeson                     ( FromJSON(..)
                                                 , Value(String)
                                                 )
+import           Headroom.Types                 ( fromHeadroomError
+                                                , toHeadroomError
+                                                )
 import           Language.Haskell.TH     hiding ( match )
 import           Language.Haskell.TH.Quote      ( QuasiQuoter(..) )
 import           RIO
@@ -43,16 +47,6 @@ import qualified Text.Regex.PCRE.Light.Char8   as PLC
 
 
 ---------------------------------  DATA TYPES  ---------------------------------
-
-
--- | Exception type specifying that given input cannot be compiled as /regex/.
-data CompileException = CompileException !Text !Text
-  deriving (Show, Typeable)
-
-instance Exception CompileException where
-  displayException (CompileException raw reason) = (T.unpack . mconcat)
-    ["Cannot compile regex from input '", raw, "', reason: ", reason]
-
 
 -- | Represents compiled /regex/, encapsulates the actual implementation.
 newtype Regex = Regex PL.Regex deriving (Eq, Show)
@@ -72,7 +66,7 @@ compile :: MonadThrow m
         -- ^ /regex/ to compile
         -> m Regex
         -- ^ compiled regex
-compile raw = either (throwM . CompileException raw . T.pack) pure compile'
+compile raw = either (throwM . CompilationFailed raw . T.pack) pure compile'
   where compile' = Regex <$> PH.compileM (encodeUtf8 raw) [PLC.utf8]
 
 
@@ -130,3 +124,20 @@ quoteExpRegex :: String -> ExpQ
 quoteExpRegex txt = [| compileUnsafe . T.pack $ txt |]
   where !_ = compileUnsafe . T.pack $ txt -- check at compile time
 
+
+---------------------------------  Error Types  --------------------------------
+
+-- | Exception specific to the "Headroom.Data.Regex" module.
+data RegexError = CompilationFailed !Text !Text
+                -- ^ given input cannot be compiled as /regex/
+  deriving (Show, Typeable)
+
+instance Exception RegexError where
+  displayException = displayException'
+  toException      = toHeadroomError
+  fromException    = fromHeadroomError
+
+displayException' :: RegexError -> String
+displayException' = T.unpack . \case
+  CompilationFailed raw reason ->
+    mconcat ["Cannot compile regex from input '", raw, "', reason: ", reason]

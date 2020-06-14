@@ -29,6 +29,7 @@ module Headroom.Ext.Haskell
   )
 where
 
+import           Headroom.Configuration.Types   ( CtHeaderConfig )
 import           Headroom.Data.Regex            ( match
                                                 , re
                                                 )
@@ -37,11 +38,9 @@ import           Headroom.Ext.Haskell.Haddock   ( HaddockModuleHeader(..)
                                                 , extractModuleHeader
                                                 )
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( HeaderConfig(..)
-                                                , TemplateMeta(..)
-                                                , Variables(..)
-                                                )
+import           Headroom.Types                 ( TemplateMeta(..) )
 import           Headroom.Variables             ( mkVariables )
+import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 import           RIO.Lens                       ( ix )
 import qualified RIO.List                      as L
@@ -70,7 +69,7 @@ extractModuleName = go . T.lines
 -- * @___haskell_module_name__@ - name of the /Haskell/ module
 -- * @___haskell_module_longdesc__@ - long description of /Haddock/ module
 -- * @___haskell_module_shortdesc__@ - @Description@ field of /Haddock/ module header
-extractVariables :: HeaderConfig
+extractVariables :: CtHeaderConfig
                  -- ^ license header configuration
                  -> Maybe TemplateMeta
                  -- ^ extracted metadata from corresponding /template/

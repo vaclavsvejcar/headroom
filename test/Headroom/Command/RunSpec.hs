@@ -8,13 +8,13 @@ module Headroom.Command.RunSpec
 where
 
 import           Headroom.Command.Run
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Meta                  ( TemplateType )
-import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( FileType(..)
-                                                , HeaderSyntax(..)
+import           Headroom.Configuration.Types   ( HeaderSyntax(..)
                                                 , LicenseType(..)
                                                 )
+import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Meta                  ( TemplateType )
+import           Headroom.Template              ( Template(..) )
 import           RIO                     hiding ( assert )
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.Map                       as M

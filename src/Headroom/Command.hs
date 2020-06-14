@@ -24,14 +24,14 @@ import           Headroom.Command.Readers       ( licenseReader
                                                 , licenseTypeReader
                                                 , regexReader
                                                 )
+import           Headroom.Command.Types         ( Command(..) )
+import           Headroom.Configuration.Types   ( LicenseType
+                                                , RunMode(..)
+                                                , TemplateSource(..)
+                                                )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Meta                  ( productDesc
                                                 , productInfo
-                                                )
-import           Headroom.Types                 ( Command(..)
-                                                , LicenseType
-                                                , RunMode(..)
-                                                , TemplateSource(..)
                                                 )
 import           Options.Applicative
 import           RIO

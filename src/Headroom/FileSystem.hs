@@ -31,13 +31,12 @@ module Headroom.FileSystem
   )
 where
 
+import           Headroom.Configuration.Types   ( CtHeadersConfig )
 import           Headroom.Data.Regex            ( Regex
                                                 , match
                                                 )
 import           Headroom.FileType              ( listExtensions )
-import           Headroom.Types                 ( FileType
-                                                , HeadersConfig(..)
-                                                )
+import           Headroom.FileType.Types        ( FileType )
 import           RIO
 import           RIO.Directory                  ( createDirectory
                                                 , doesDirectoryExist
@@ -79,7 +78,7 @@ findFilesByExts path exts = findFiles path predicate
 
 -- | Recursively find files on given path by their file types.
 findFilesByTypes :: MonadIO m
-                 => HeadersConfig
+                 => CtHeadersConfig
                  -- ^ configuration of license headers
                  -> [FileType]
                  -- ^ list of file types

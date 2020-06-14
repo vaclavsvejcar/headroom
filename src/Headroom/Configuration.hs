@@ -15,8 +15,7 @@ Portability : POSIX
 This module provides logic for working with the cofiguration data types.
 Headroom uses the
 <https://medium.com/@jonathangfischoff/the-partial-options-monoid-pattern-31914a71fc67 partial options monoid>
-pattern for the configuration, where the 'Configuration' is the data type for
-total configuration and 'PartialConfiguration' for the partial one.
+pattern for the configuration.
 -}
 
 module Headroom.Configuration
@@ -32,32 +31,34 @@ where
 
 import           Data.Monoid                    ( Last(..) )
 import qualified Data.Yaml                     as Y
-import           Headroom.Configuration.Types   ( HeaderFnConfig
-                                                , HeaderFnConfig'(..)
-                                                , HeaderFnConfigs
-                                                , HeaderFnConfigs'(..)
+import           Headroom.Configuration.Types   ( Configuration(..)
+                                                , ConfigurationError(..)
+                                                , ConfigurationKey(..)
+                                                , CtConfiguration
+                                                , CtHeaderConfig
+                                                , CtHeaderFnConfig
+                                                , CtHeaderFnConfigs
+                                                , CtHeadersConfig
+                                                , CtUpdateCopyrightConfig
+                                                , HeaderConfig(..)
+                                                , HeaderFnConfig(..)
+                                                , HeaderFnConfigs(..)
+                                                , HeadersConfig(..)
                                                 , Phase(..)
+                                                , PtConfiguration
+                                                , PtHeaderConfig
                                                 , PtHeaderFnConfig
                                                 , PtHeaderFnConfigs
+                                                , PtHeadersConfig
                                                 , PtUpdateCopyrightConfig
-                                                , UpdateCopyrightConfig
-                                                , UpdateCopyrightConfig'(..)
+                                                , UpdateCopyrightConfig(..)
                                                 , hfcConfigL
                                                 , hfcEnabledL
                                                 , hfcsUpdateCopyrightL
                                                 , hfcsUpdateCopyrightL
                                                 , uccSelectedAuthorsL
                                                 )
-import           Headroom.Types                 ( ApplicationError(..)
-                                                , Configuration(..)
-                                                , ConfigurationError(..)
-                                                , FileType(..)
-                                                , HeaderConfig(..)
-                                                , HeadersConfig(..)
-                                                , PartialConfiguration(..)
-                                                , PartialHeaderConfig(..)
-                                                , PartialHeadersConfig(..)
-                                                )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 import qualified RIO.ByteString                as B
 
@@ -66,7 +67,7 @@ import qualified RIO.ByteString                as B
 loadConfiguration :: MonadIO m
                   => FilePath
                   -- ^ path to /YAML/ configuration file
-                  -> m PartialConfiguration
+                  -> m PtConfiguration
                   -- ^ parsed configuration
 loadConfiguration path = liftIO $ B.readFile path >>= parseConfiguration
 
@@ -75,67 +76,68 @@ loadConfiguration path = liftIO $ B.readFile path >>= parseConfiguration
 parseConfiguration :: MonadThrow m
                    => B.ByteString
                    -- ^ raw input to parse
-                   -> m PartialConfiguration
+                   -> m PtConfiguration
                    -- ^ parsed application configuration
 parseConfiguration = Y.decodeThrow
 
 
--- | Makes full 'Configuration' from provided 'PartialConfiguration' (if valid).
+-- | Makes full 'CtConfiguration' from provided 'PtConfiguration' (if valid).
 makeConfiguration :: MonadThrow m
-                  => PartialConfiguration
-                  -- ^ source 'PartialConfiguration'
-                  -> m Configuration
-                  -- ^ full 'Configuration'
-makeConfiguration PartialConfiguration {..} = do
-  cRunMode         <- lastOrError NoRunMode pcRunMode
-  cSourcePaths     <- lastOrError NoSourcePaths pcSourcePaths
-  cExcludedPaths   <- lastOrError NoExcludedPaths pcExcludedPaths
-  cTemplateSource  <- lastOrError NoTemplateSource pcTemplateSource
-  cLicenseHeaders  <- makeHeadersConfig pcLicenseHeaders
-  cHeaderFnConfigs <- makeHeaderFnConfigs pcHeaderFnConfigs
-  let cVariables = pcVariables
+                  => PtConfiguration
+                  -- ^ source 'PtConfiguration'
+                  -> m CtConfiguration
+                  -- ^ full 'CtConfiguration'
+makeConfiguration pt = do
+  cRunMode         <- lastOrError CkRunMode (cRunMode pt)
+  cSourcePaths     <- lastOrError CkSourcePaths (cSourcePaths pt)
+  cExcludedPaths   <- lastOrError CkExcludedPaths (cExcludedPaths pt)
+  cTemplateSource  <- lastOrError CkTemplateSource (cTemplateSource pt)
+  cLicenseHeaders  <- makeHeadersConfig (cLicenseHeaders pt)
+  cHeaderFnConfigs <- makeHeaderFnConfigs (cHeaderFnConfigs pt)
+  cVariables       <- pure $ cVariables pt
   pure Configuration { .. }
 
 
--- | Makes full 'HeadersConfig' from provided 'PartialHeadersConfig' (if valid).
+-- | Makes full 'CtHeadersConfig' from provided 'PtHeadersConfig' (if valid).
 makeHeadersConfig :: MonadThrow m
-                  => PartialHeadersConfig
-                  -- ^ source 'PartialHeadersConfig'
-                  -> m HeadersConfig
-                  -- ^ full 'HeadersConfig'
-makeHeadersConfig PartialHeadersConfig {..} = do
-  hscC       <- makeHeaderConfig C phscC
-  hscCpp     <- makeHeaderConfig CPP phscCpp
-  hscCss     <- makeHeaderConfig CSS phscCss
-  hscHaskell <- makeHeaderConfig Haskell phscHaskell
-  hscHtml    <- makeHeaderConfig HTML phscHtml
-  hscJava    <- makeHeaderConfig Java phscJava
-  hscJs      <- makeHeaderConfig JS phscJs
-  hscRust    <- makeHeaderConfig Rust phscRust
-  hscScala   <- makeHeaderConfig Scala phscScala
-  hscShell   <- makeHeaderConfig Shell phscShell
+                  => PtHeadersConfig
+                  -- ^ source 'PtHeadersConfig'
+                  -> m CtHeadersConfig
+                  -- ^ full 'CtHeadersConfig'
+makeHeadersConfig pt = do
+  hscC       <- makeHeaderConfig C (hscC pt)
+  hscCpp     <- makeHeaderConfig CPP (hscCpp pt)
+  hscCss     <- makeHeaderConfig CSS (hscCss pt)
+  hscHaskell <- makeHeaderConfig Haskell (hscHaskell pt)
+  hscHtml    <- makeHeaderConfig HTML (hscHtml pt)
+  hscJava    <- makeHeaderConfig Java (hscJava pt)
+  hscJs      <- makeHeaderConfig JS (hscJs pt)
+  hscRust    <- makeHeaderConfig Rust (hscRust pt)
+  hscScala   <- makeHeaderConfig Scala (hscScala pt)
+  hscShell   <- makeHeaderConfig Shell (hscShell pt)
   pure HeadersConfig { .. }
 
 
--- | Makes full 'HeaderConfig' from provided 'PartialHeaderConfig' (if valid).
+-- | Makes full 'CtHeaderConfig' from provided 'PtHeaderConfig' (if valid).
 makeHeaderConfig :: MonadThrow m
                  => FileType
                  -- ^ determines for which file type this configuration is
-                 -> PartialHeaderConfig
-                 -- ^ source 'PartialHeaderConfig'
-                 -> m HeaderConfig
-                 -- ^ full 'HeaderConfig'
-makeHeaderConfig fileType PartialHeaderConfig {..} = do
-  hcFileExtensions <- lastOrError (NoFileExtensions fileType) phcFileExtensions
-  hcMarginAfter    <- lastOrError (NoMarginAfter fileType) phcMarginAfter
-  hcMarginBefore   <- lastOrError (NoMarginBefore fileType) phcMarginBefore
-  hcPutAfter       <- lastOrError (NoPutAfter fileType) phcPutAfter
-  hcPutBefore      <- lastOrError (NoPutBefore fileType) phcPutBefore
-  hcHeaderSyntax   <- lastOrError (NoHeaderSyntax fileType) phcHeaderSyntax
+                 -> PtHeaderConfig
+                 -- ^ source 'PtHeaderConfig'
+                 -> m CtHeaderConfig
+                 -- ^ full 'CtHeaderConfig'
+makeHeaderConfig fileType pt = do
+  hcFileExtensions <- lastOrError (CkFileExtensions fileType)
+                                  (hcFileExtensions pt)
+  hcMarginAfter  <- lastOrError (CkMarginAfter fileType) (hcMarginAfter pt)
+  hcMarginBefore <- lastOrError (CkMarginBefore fileType) (hcMarginBefore pt)
+  hcPutAfter     <- lastOrError (CkPutAfter fileType) (hcPutAfter pt)
+  hcPutBefore    <- lastOrError (CkPutBefore fileType) (hcPutBefore pt)
+  hcHeaderSyntax <- lastOrError (CkHeaderSyntax fileType) (hcHeaderSyntax pt)
   pure HeaderConfig { .. }
 
 
-makeHeaderFnConfigs :: MonadThrow m => PtHeaderFnConfigs -> m HeaderFnConfigs
+makeHeaderFnConfigs :: MonadThrow m => PtHeaderFnConfigs -> m CtHeaderFnConfigs
 makeHeaderFnConfigs pt = do
   hfcsUpdateCopyright <- makeHeaderFnConfig (pt ^. hfcsUpdateCopyrightL)
                                             makeUpdateCopyrightConfig
@@ -145,16 +147,16 @@ makeHeaderFnConfigs pt = do
 makeHeaderFnConfig :: MonadThrow m
                    => PtHeaderFnConfig c
                    -> (c 'Partial -> m (c 'Complete))
-                   -> m (HeaderFnConfig c)
+                   -> m (CtHeaderFnConfig c)
 makeHeaderFnConfig pt fn = do
-  hfcEnabled <- lastOrError NoEnabled (pt ^. hfcEnabledL)
+  hfcEnabled <- lastOrError CkEnabled (pt ^. hfcEnabledL)
   hfcConfig  <- fn $ pt ^. hfcConfigL
   pure HeaderFnConfig { .. }
 
 
 makeUpdateCopyrightConfig :: MonadThrow m
                           => PtUpdateCopyrightConfig
-                          -> m UpdateCopyrightConfig
+                          -> m CtUpdateCopyrightConfig
 makeUpdateCopyrightConfig pt = do
   let uccSelectedAuthors = lastOrNothing $ pt ^. uccSelectedAuthorsL
   pure UpdateCopyrightConfig { .. }
@@ -163,8 +165,8 @@ makeUpdateCopyrightConfig pt = do
 ------------------------------  Private Functions  -----------------------------
 
 
-lastOrError :: MonadThrow m => ConfigurationError -> Last a -> m a
-lastOrError err (Last a) = maybe (throwM $ ConfigurationError err) pure a
+lastOrError :: MonadThrow m => ConfigurationKey -> Last a -> m a
+lastOrError key (Last a) = maybe (throwM $ MissingConfiguration key) pure a
 
 
 lastOrNothing :: Last (Maybe a) -> Maybe a

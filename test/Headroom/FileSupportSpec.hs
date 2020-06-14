@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeFamilies      #-}
 module Headroom.FileSupportSpec
   ( spec
   )
@@ -10,17 +12,17 @@ where
 import           Headroom.Configuration         ( makeHeadersConfig
                                                 , parseConfiguration
                                                 )
-import           Headroom.Data.Regex            ( re )
-import           Headroom.Embedded              ( defaultConfig )
-import           Headroom.FileSupport
-import           Headroom.FileSystem            ( loadFile )
-import           Headroom.Types                 ( FileInfo(..)
-                                                , FileType(..)
+import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
                                                 , HeadersConfig(..)
-                                                , PartialConfiguration(..)
                                                 )
+import           Headroom.Data.Regex            ( re )
+import           Headroom.Embedded              ( defaultConfig )
+import           Headroom.FileSupport
+import           Headroom.FileSupport.Types     ( FileInfo(..) )
+import           Headroom.FileSystem            ( loadFile )
+import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
@@ -186,7 +188,7 @@ spec = do
     it "correctly detects headers using default YAML configuration" $ do
       let path = "test-data" </> "code-samples"
       defaultConfig'     <- parseConfiguration defaultConfig
-      HeadersConfig {..} <- makeHeadersConfig (pcLicenseHeaders defaultConfig')
+      HeadersConfig {..} <- makeHeadersConfig (cLicenseHeaders defaultConfig')
       sampleC1           <- loadFile $ path </> "c" </> "sample1.c"
       sampleC2           <- loadFile $ path </> "c" </> "sample2.c"
       sampleCpp1         <- loadFile $ path </> "cpp" </> "sample1.cpp"

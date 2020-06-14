@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
@@ -27,11 +28,11 @@ where
 
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
-import           Headroom.Types                 ( ApplicationError(..)
-                                                , ConfigurationError(..)
-                                                , CurrentYear(..)
-                                                , Variables(..)
+import           Headroom.Types                 ( CurrentYear(..)
+                                                , fromHeadroomError
+                                                , toHeadroomError
                                                 )
+import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 import qualified RIO.HashMap                   as HM
 import qualified RIO.Text                      as T
@@ -72,7 +73,7 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
     [key, value] -> pure (key, value)
-    _            -> throwM $ ConfigurationError (InvalidVariable input)
+    _            -> throwM $ InvalidVariable input
 
 
 -- | Compiles variable values that are itself mini-templates, where their
@@ -95,3 +96,22 @@ compileVariables variables@(Variables kvs) = do
     parsed   <- parseTemplate @TemplateType (Just $ "variable " <> key) value
     rendered <- renderTemplate variables parsed
     pure (key, rendered)
+
+
+---------------------------------  Error Types  --------------------------------
+
+-- | Exception specific to the "Headroom.Variables" module.
+data VariablesError = InvalidVariable !Text
+                    -- ^ invalid variable input (as @key=value@)
+  deriving (Eq, Show)
+
+
+instance Exception VariablesError where
+  displayException = displayException'
+  toException      = toHeadroomError
+  fromException    = fromHeadroomError
+
+
+displayException' :: VariablesError -> String
+displayException' = T.unpack . \case
+  InvalidVariable raw -> ("Cannot parse variable key=value from: " <> raw)
