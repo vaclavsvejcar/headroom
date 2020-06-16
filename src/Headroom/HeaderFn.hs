@@ -83,10 +83,10 @@ configuredHeaderFn :: (Has CurrentYear env, Has UpdateCopyrightMode env)
                    -> HeaderFn env
                    -- ^ composed /license header function/
 configuredHeaderFn HeaderFnConfigs {..} = mconcat
-  [condFn hfcsUpdateCopyright updateCopyright]
+  [ifEnabled hfcsUpdateCopyright updateCopyright]
  where
-  condFn HeaderFnConfig {..} fn | hfcEnabled = fn
-                                | otherwise  = mempty
+  ifEnabled HeaderFnConfig {..} fn | hfcEnabled = fn
+                                   | otherwise  = mempty
 
 
 -- | Takes already rendered /license header/ and postprocess it based on the
