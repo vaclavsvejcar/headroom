@@ -54,6 +54,7 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , PtConfiguration
                                                 , RunMode(..)
                                                 , TemplateSource(..)
+                                                , cHeaderFnConfigsL
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
@@ -144,6 +145,9 @@ suffixLenses ''Env
 instance Has CtConfiguration Env where
   hasLens = envConfigurationL
 
+instance Has CtHeaderFnConfigs Env where
+  hasLens = envConfigurationL . cHeaderFnConfigsL
+
 instance Has StartupEnv StartupEnv where
   hasLens = id
 
@@ -230,6 +234,7 @@ findSourceFiles fileTypes = do
 
 
 processSourceFiles :: ( Has CtConfiguration env
+                      , Has CtHeaderFnConfigs env
                       , Has CommandRunOptions env
                       , Has CurrentYear env
                       , HasLogFunc env
@@ -254,8 +259,10 @@ processSourceFiles templates paths = do
     processSourceFile cVars dVars pr tm tt ft p
 
 
-processSourceFile :: ( Has CtConfiguration env
-                     , Has CommandRunOptions env
+processSourceFile :: ( Has CommandRunOptions env
+                     , Has CtConfiguration env
+                     , Has CtHeaderFnConfigs env
+                     , Has CurrentYear env
                      , HasLogFunc env
                      )
                   => Variables
@@ -277,7 +284,8 @@ processSourceFile cVars dVars progress meta template fileType path = do
         fileContent
       variables = dVars <> cVars <> fiVariables
       syntax    = hcHeaderSyntax fiHeaderConfig
-  header         <- sanitizeHeader syntax <$> renderTemplate variables template
+  header'        <- renderTemplate variables template
+  header         <- postProcessHeader' syntax variables header'
   RunAction {..} <- chooseAction fileInfo header
   let result  = raFunc fileContent
       changed = raProcessed && (fileContent /= result)

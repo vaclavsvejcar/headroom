@@ -67,6 +67,13 @@ module Headroom.Configuration.Types
   , RunMode(..)
   , TemplateSource(..)
     -- * Lenses
+  , cRunModeL
+  , cSourcePathsL
+  , cExcludedPathsL
+  , cTemplateSourceL
+  , cVariablesL
+  , cLicenseHeadersL
+  , cHeaderFnConfigsL
   , uccSelectedAuthorsL
   , hfcEnabledL
   , hfcConfigL
@@ -222,8 +229,6 @@ data UpdateCopyrightConfig (p :: Phase) = UpdateCopyrightConfig
   -- given authors
   }
 
-suffixLenses ''UpdateCopyrightConfig
-
 -- | Alias for complete variant of 'UpdateCopyrightConfig'.
 type CtUpdateCopyrightConfig = UpdateCopyrightConfig 'Complete
 
@@ -258,8 +263,6 @@ data HeaderFnConfig (p :: Phase) c = HeaderFnConfig
   , hfcConfig  :: !(c p)
   -- ^ custom configuration of the /license header function/
   }
-
-suffixLenses ''HeaderFnConfig
 
 -- | Alias for complete variant of 'HeaderFnConfig'.
 type CtHeaderFnConfig c = HeaderFnConfig 'Complete c
@@ -296,8 +299,6 @@ data HeaderFnConfigs (p :: Phase) = HeaderFnConfigs
   -- ^ configuration for the "Headroom.HeaderFn.UpdateCopyright"
   -- /license header function/
   }
-
-suffixLenses ''HeaderFnConfigs
 
 -- | Alias for complete variant of 'HeaderFnConfigs'.
 type CtHeaderFnConfigs = HeaderFnConfigs 'Complete
@@ -630,3 +631,11 @@ missingConfig desc yaml cli = mconcat
   cliText  = fmap (\c -> "command line option '" <> c <> "'") cli
   yamlText = fmap (\y -> "YAML option '" <> y <> "'") yaml
   options  = T.intercalate " or " . catMaybes $ [cliText, yamlText]
+
+
+-----------------------------------  LENSES  -----------------------------------
+
+suffixLenses ''Configuration
+suffixLenses ''UpdateCopyrightConfig
+suffixLenses ''HeaderFnConfig
+suffixLenses ''HeaderFnConfigs
