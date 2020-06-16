@@ -1,20 +1,33 @@
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeFamilies          #-}
 module Headroom.Command.RunSpec
   ( spec
   )
 where
 
 import           Headroom.Command.Run
-import           Headroom.Configuration.Types   ( HeaderSyntax(..)
+import           Headroom.Configuration.Types   ( CtHeaderFnConfigs
+                                                , HeaderFnConfig(..)
+                                                , HeaderFnConfigs(..)
+                                                , HeaderSyntax(..)
                                                 , LicenseType(..)
+                                                , UpdateCopyrightConfig(..)
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.Data.Has              ( Has(..) )
+import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
+import           Headroom.Types                 ( CurrentYear(..) )
+import           Headroom.Variables             ( mkVariables )
 import           RIO                     hiding ( assert )
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.Map                       as M
@@ -53,6 +66,21 @@ spec = do
     prop "should detect type of template from template path" prop_typeOfTemplate
 
 
+  describe "postProcessHeader'" $ do
+    it "should perform expected postprocessing on license header" $ do
+      let sample = T.unlines
+            [ "-- Copyright (c) 2018-2019 1st Author"
+            , "Copyright (c) 2017 2nd Author"
+            ]
+          expected = T.unlines
+            [ "-- Copyright (c) 2018-2019 1st Author"
+            , "-- Copyright (c) 2017-2020 2nd Author"
+            ]
+          vars   = mkVariables [("sndAuthor", "2nd Author")]
+          syntax = LineComment "--"
+      actual <- runRIO env $ postProcessHeader' syntax vars sample
+      actual `shouldBe` expected
+
   describe "sanitizeHeader" $ do
     it "does nothing when block comment syntax used" $ do
       let sample = T.unlines ["{-", "foo", "bar", "-}"]
@@ -67,12 +95,32 @@ spec = do
 
 
 env :: TestEnv
-env = TestEnv { envLogFunc = logFunc }
-  where logFunc = mkLogFunc (\_ _ _ _ -> pure ())
+env = TestEnv { .. }
+ where
+  envLogFunc         = mkLogFunc (\_ _ _ _ -> pure ())
+  envCurrentYear     = CurrentYear 2020
+  envHeaderFnConfigs = HeaderFnConfigs
+    { hfcsUpdateCopyright = HeaderFnConfig
+                              { hfcEnabled = True
+                              , hfcConfig  = UpdateCopyrightConfig
+                                               { uccSelectedAuthors =
+                                                 Just $ "{{ sndAuthor }}" :| []
+                                               }
+                              }
+    }
 
-newtype TestEnv = TestEnv
-  { envLogFunc :: LogFunc
+data TestEnv = TestEnv
+  { envLogFunc         :: !LogFunc
+  , envHeaderFnConfigs :: !CtHeaderFnConfigs
+  , envCurrentYear     :: !CurrentYear
   }
+suffixLenses ''TestEnv
 
 instance HasLogFunc TestEnv where
-  logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
+  logFuncL = envLogFuncL
+
+instance Has CtHeaderFnConfigs TestEnv where
+  hasLens = envHeaderFnConfigsL
+
+instance Has CurrentYear TestEnv where
+  hasLens = envCurrentYearL

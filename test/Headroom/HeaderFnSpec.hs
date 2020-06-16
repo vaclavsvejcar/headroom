@@ -2,6 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TypeFamilies          #-}
 module Headroom.HeaderFnSpec
   ( spec
   )
@@ -16,6 +17,7 @@ import           Headroom.HeaderFn
 import           Headroom.HeaderFn.Types
 import           Headroom.HeaderFn.UpdateCopyright
 import           Headroom.Types                 ( CurrentYear(..) )
+import           Headroom.Variables             ( mkVariables )
 import           RIO
 import qualified RIO.Text                      as T
 import           Test.Hspec
@@ -25,19 +27,21 @@ spec :: Spec
 spec = do
   let currentYear = CurrentYear 2020
       mode        = UpdateSelectedAuthors . SelectedAuthors $ "2nd Author" :| []
-      configs     = HeaderFnConfigs
+      vars        = mkVariables [("sndAuthor", "2nd Author")]
+      configs a = HeaderFnConfigs
         { hfcsUpdateCopyright = HeaderFnConfig
                                   { hfcEnabled = True
                                   , hfcConfig  = UpdateCopyrightConfig
-                                                   { uccSelectedAuthors =
-                                                     Just $ "2nd Author" :| []
+                                                   { uccSelectedAuthors = Just
+                                                                          $  a
+                                                                          :| []
                                                    }
                                   }
         }
-      configuredEnv = ConfiguredEnv { ceCurrentYear         = currentYear
-                                    , ceHeaderFnConfigs     = configs
-                                    , ceUpdateCopyrightMode = mode
-                                    }
+      configuredEnv a = ConfiguredEnv { ceCurrentYear         = currentYear
+                                      , ceHeaderFnConfigs     = configs a
+                                      , ceUpdateCopyrightMode = mode
+                                      }
 
 
   describe "runHeaderFn" $ do
@@ -61,12 +65,15 @@ spec = do
             , "Copyright (c) 2019 1st Author"
             , "Copyright (c) 2018-2020 2nd Author"
             ]
-      postProcessHeader configuredEnv header `shouldBe` expected
+          env = configuredEnv "2nd Author"
+      postProcessHeader env header `shouldBe` expected
 
 
   describe "mkConfiguredEnv" $ do
     it "makes ConfiguredEnv from input parameters" $ do
-      mkConfiguredEnv currentYear configs `shouldBe` configuredEnv
+      let configsIn = configs "{{ sndAuthor }}"
+          envOut    = configuredEnv "2nd Author"
+      mkConfiguredEnv currentYear vars configsIn `shouldBe` Just envOut
 
 -------------------------------  Test Data Types  ------------------------------
 

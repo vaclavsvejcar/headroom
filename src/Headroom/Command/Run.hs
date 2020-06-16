@@ -4,6 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE TypeApplications      #-}
 
@@ -25,6 +26,8 @@ module Headroom.Command.Run
   , loadBuiltInTemplates
   , loadTemplateFiles
   , typeOfTemplate
+    -- * License Header Postprocessing
+  , postProcessHeader'
   , sanitizeHeader
   )
 where
@@ -44,6 +47,7 @@ import           Headroom.Configuration         ( loadConfiguration
                                                 )
 import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , CtConfiguration
+                                                , CtHeaderFnConfigs
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
                                                 , LicenseType(..)
@@ -53,6 +57,7 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
+import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.Data.TextExtra        ( mapLines )
 import           Headroom.Embedded              ( defaultConfig
                                                 , licenseTemplate
@@ -74,6 +79,9 @@ import           Headroom.FileType              ( configByFileType
                                                 , fileTypeByExt
                                                 )
 import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.HeaderFn              ( mkConfiguredEnv
+                                                , postProcessHeader
+                                                )
 import           Headroom.Meta                  ( TemplateType
                                                 , productInfo
                                                 )
@@ -119,6 +127,8 @@ data StartupEnv = StartupEnv
   -- ^ options
   }
 
+suffixLenses ''StartupEnv
+
 -- | Full /RIO/ environment for the /Run/ command.
 data Env = Env
   { envEnv           :: !StartupEnv
@@ -129,29 +139,31 @@ data Env = Env
   -- ^ current year
   }
 
+suffixLenses ''Env
+
 instance Has CtConfiguration Env where
-  hasLens = lens envConfiguration (\x y -> x { envConfiguration = y })
+  hasLens = envConfigurationL
 
 instance Has StartupEnv StartupEnv where
   hasLens = id
 
 instance Has StartupEnv Env where
-  hasLens = lens envEnv (\x y -> x { envEnv = y })
+  hasLens = envEnvL
 
 instance HasLogFunc StartupEnv where
-  logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
+  logFuncL = envLogFuncL
 
 instance HasLogFunc Env where
   logFuncL = hasLens @StartupEnv . logFuncL
 
 instance Has CommandRunOptions StartupEnv where
-  hasLens = lens envRunOptions (\x y -> x { envRunOptions = y })
+  hasLens = envRunOptionsL
 
 instance Has CommandRunOptions Env where
   hasLens = hasLens @StartupEnv . hasLens
 
 instance Has CurrentYear Env where
-  hasLens = lens envCurrentYear (\x y -> x { envCurrentYear = y })
+  hasLens = envCurrentYearL
 
 
 env' :: CommandRunOptions -> LogFunc -> IO Env
@@ -433,6 +445,27 @@ currentYear = do
       (year, _, _) = toGregorian $ localDay zoneNow
   pure $ CurrentYear year
 
+
+-- | Performs postprocessing on rendered /license header/, based on given
+-- configuration. Currently the main points are to:
+--
+--  1. sanitize possibly corrupted comment syntax ('sanitizeHeader')
+--  2. apply /license header functions/ ('postProcessHeader')
+postProcessHeader' :: (Has CtHeaderFnConfigs env, Has CurrentYear env)
+                   => HeaderSyntax
+                   -- ^ syntax of the license header comments
+                   -> Variables
+                   -- ^ template variables
+                   -> Text
+                   -- ^ rendered /license header/ to postprocess
+                   -> RIO env Text
+                   -- ^ postprocessed /license header/
+postProcessHeader' syntax vars rawHeader = do
+  configs <- viewL @CtHeaderFnConfigs
+  year    <- viewL
+  cEnv    <- mkConfiguredEnv year vars configs
+  let processed = sanitizeHeader syntax . postProcessHeader cEnv $ rawHeader
+  pure processed
 
 -- | Ensures that all lines in license header starts with /line-comment/ syntax
 -- if such syntax is used for license header.

@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
@@ -52,7 +53,11 @@ import           Headroom.HeaderFn.UpdateCopyright
                                                 , UpdateCopyrightMode(..)
                                                 , updateCopyright
                                                 )
+import           Headroom.Meta                  ( TemplateType )
+import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( CurrentYear(..) )
+import           Headroom.Variables.Types       ( Variables(..) )
+import           Lens.Micro                     ( traverseOf )
 import           RIO
 
 
@@ -110,27 +115,50 @@ data ConfiguredEnv = ConfiguredEnv
 
 suffixLenses ''ConfiguredEnv
 
-
--- | Constructor function for 'ConfiguredEnv' data type.
-mkConfiguredEnv :: CurrentYear
-                -- ^ current year
-                -> CtHeaderFnConfigs
-                -- ^ configuration of /license header functions/
-                -> ConfiguredEnv
-                -- ^ environment data type
-mkConfiguredEnv ceCurrentYear ceHeaderFnConfigs = ConfiguredEnv { .. }
- where
-  authorsL = hfcsUpdateCopyrightL . hfcConfigL . uccSelectedAuthorsL
-  ceUpdateCopyrightMode = maybe UpdateAllAuthors
-                                (UpdateSelectedAuthors . SelectedAuthors)
-                                (ceHeaderFnConfigs ^. authorsL)
-
-
 instance Has CurrentYear ConfiguredEnv where
   hasLens = ceCurrentYearL
 
 instance Has UpdateCopyrightMode ConfiguredEnv where
   hasLens = ceUpdateCopyrightModeL
+
+
+-- | Constructor function for 'ConfiguredEnv' data type. This function takes
+-- 'Variables' as argument, because it performs template compilation on
+-- selected fields of 'CtHeaderFnConfigs'.
+mkConfiguredEnv :: (MonadThrow m)
+                => CurrentYear
+                -- ^ current year
+                -> Variables
+                -- ^ template variables
+                -> CtHeaderFnConfigs
+                -- ^ configuration of /license header functions/
+                -> m ConfiguredEnv
+                -- ^ environment data type
+mkConfiguredEnv ceCurrentYear vars configs = do
+  ceHeaderFnConfigs <- compileTemplates vars configs
+  let ceUpdateCopyrightMode = mode ceHeaderFnConfigs
+  pure ConfiguredEnv { .. }
+ where
+  authorsL = hfcsUpdateCopyrightL . hfcConfigL . uccSelectedAuthorsL
+  mode configs' = maybe UpdateAllAuthors
+                        (UpdateSelectedAuthors . SelectedAuthors)
+                        (configs' ^. authorsL)
+
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+compileTemplates :: (MonadThrow m)
+                 => Variables
+                 -> CtHeaderFnConfigs
+                 -> m CtHeaderFnConfigs
+compileTemplates vars configs = configs & traverseOf authorsL compileAuthors'
+ where
+  authorsL        = hfcsUpdateCopyrightL . hfcConfigL . uccSelectedAuthorsL
+  compileAuthors' = mapM . mapM $ compileAuthor
+  compileAuthor author = do
+    parsed <- parseTemplate @TemplateType (Just $ "author " <> author) author
+    renderTemplate vars parsed
+
 
 
 

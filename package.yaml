@@ -66,6 +66,7 @@ library:
     - data-default-class
     - either
     - file-embed
+    - microlens
     - microlens-th
     - mustache
     - pcre-light
