@@ -2,6 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 
 {-|
 Module      : Headroom.Command.Gen
@@ -29,6 +30,7 @@ import           Headroom.Command.Types         ( Command(..)
                                                 )
 import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration.Types   ( GenMode(..) )
+import           Headroom.Data.Lens             ( suffixLensesFor )
 import           Headroom.Embedded              ( configFileStub
                                                 , licenseTemplate
                                                 )
@@ -47,8 +49,10 @@ data Env = Env
   -- ^ options
   }
 
+suffixLensesFor ["envLogFunc"] ''Env
+
 instance HasLogFunc Env where
-  logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
+  logFuncL = envLogFuncL
 
 env' :: CommandGenOptions -> LogFunc -> IO Env
 env' opts logFunc = pure $ Env { envLogFunc = logFunc, envGenOptions = opts }

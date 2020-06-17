@@ -4,6 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE TypeApplications      #-}
 
@@ -39,6 +40,7 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , LicenseType(..)
                                                 )
 import           Headroom.Data.Has              ( Has(..) )
+import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.Embedded              ( configFileStub
                                                 , defaultConfig
                                                 , licenseTemplate
@@ -82,14 +84,16 @@ data Paths = Paths
   , pTemplatesDir :: !FilePath
   }
 
+suffixLenses ''Env
+
 instance HasLogFunc Env where
-  logFuncL = lens envLogFunc (\x y -> x { envLogFunc = y })
+  logFuncL = envLogFuncL
 
 instance Has CommandInitOptions Env where
-  hasLens = lens envInitOptions (\x y -> x { envInitOptions = y })
+  hasLens = envInitOptionsL
 
 instance Has Paths Env where
-  hasLens = lens envPaths (\x y -> x { envPaths = y })
+  hasLens = envPathsL
 
 --------------------------------------------------------------------------------
 
