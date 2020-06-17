@@ -364,7 +364,7 @@ instance FromJSON PtConfiguration where
     cTemplateSource  <- Last <$> get TemplateFiles (obj .:? "template-paths")
     cVariables       <- fmap Variables (obj .:? "variables" .!= mempty)
     cLicenseHeaders  <- obj .:? "license-headers" .!= mempty
-    cHeaderFnConfigs <- obj .:? "header-functions" .!= mempty
+    cHeaderFnConfigs <- obj .:? "post-process" .!= mempty
     pure Configuration { .. }
     where get = fmap . fmap
 

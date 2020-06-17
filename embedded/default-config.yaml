@@ -180,8 +180,8 @@ license-headers:
       prefixed-by: "#"
 
 
-## Configuration of license header functions.
-header-functions:
+## Configuration of postprocessing license header functions.
+post-process:
   ## License header function used to update years in copyright statements.
   update-copyright:
     enabled: false
