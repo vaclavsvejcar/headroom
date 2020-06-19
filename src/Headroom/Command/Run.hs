@@ -475,11 +475,12 @@ postProcessHeader' syntax vars rawHeader = do
   let processed = sanitizeHeader syntax . postProcessHeader cEnv $ rawHeader
   pure processed
 
+
 -- | Ensures that all lines in license header starts with /line-comment/ syntax
 -- if such syntax is used for license header.
 --
 -- >>> sanitizeHeader (LineComment "--") "-- foo\nbar\n-- baz"
--- "-- foo\n-- bar\n-- baz\n"
+-- "-- foo\n-- bar\n-- baz"
 sanitizeHeader :: HeaderSyntax
                -- ^ syntax of the license header comments
                -> Text

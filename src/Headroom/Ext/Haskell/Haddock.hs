@@ -34,6 +34,9 @@ import           Headroom.Data.Regex            ( re
                                                 , replace
                                                 , scan
                                                 )
+import           Headroom.Data.TextExtra        ( fromLines
+                                                , toLines
+                                                )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( HaddockFieldOffsets(..)
                                                 , TemplateMeta(..)
@@ -110,8 +113,8 @@ extractModuleHeader text meta =
 -- of empty characters that should be placed before second (and any subsequent)
 -- line.
 --
--- >>> indentField (Just 2) "foo\nbar\nbaz\n"
--- "foo\n  bar\n  baz\n"
+-- >>> indentField (Just 2) "foo\nbar\nbaz"
+-- "foo\n  bar\n  baz"
 indentField :: Maybe Int
             -- ^ offset (in number of black chars) for 2nd and subsequent lines
             -> Text
@@ -119,7 +122,7 @@ indentField :: Maybe Int
             -> Text
             -- ^ processed text
 indentField Nothing       text = text
-indentField (Just offset) text = T.unlines . go . T.lines $ text
+indentField (Just offset) text = fromLines . go . toLines $ text
  where
   go []       = []
   go [x     ] = [x]
@@ -135,7 +138,7 @@ stripCommentSyntax :: Text
                    -- ^ input text to strip
                    -> Text
                    -- ^ resulting text without comment syntax tokens
-stripCommentSyntax text = T.unlines $ go (T.lines text) []
+stripCommentSyntax text = fromLines $ go (toLines text) []
  where
   regex = [re|^(-- \||-{2,})|^\h*({-\h?\|?)|(-})\h*$|]
   strip = replace regex (const . const $ "")

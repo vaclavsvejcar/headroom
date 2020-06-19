@@ -8,11 +8,11 @@ module Headroom.HeaderFn.UpdateCopyrightSpec
 where
 
 import           Headroom.Data.Has              ( Has(..) )
+import           Headroom.Data.TextExtra        ( fromLines )
 import           Headroom.HeaderFn              ( runHeaderFn )
 import           Headroom.HeaderFn.UpdateCopyright
 import           Headroom.Types                 ( CurrentYear(..) )
 import           RIO
-import qualified RIO.Text                      as T
 import           Test.Hspec
 
 
@@ -24,11 +24,11 @@ spec = do
   describe "updateCopyright" $ do
     it "updates all authors when such mode selected" $ do
       let
-        sample = T.unlines
+        sample = fromLines
           [ "Copyright (c) 2019 1st Author"
           , "Copyright (c) 2017-2019 2nd Author"
           ]
-        expected = T.unlines
+        expected = fromLines
           [ "Copyright (c) 2019-2020 1st Author"
           , "Copyright (c) 2017-2020 2nd Author"
           ]
@@ -36,11 +36,11 @@ spec = do
       runHeaderFn updateCopyright testEnv sample `shouldBe` expected
 
     it "updates only selected authors in such mode" $ do
-      let sample = T.unlines
+      let sample = fromLines
             [ "Copyright (c) 2019 1st Author"
             , "Copyright (c) 2017-2019 2nd Author"
             ]
-          expected = T.unlines
+          expected = fromLines
             [ "Copyright (c) 2019 1st Author"
             , "Copyright (c) 2017-2020 2nd Author"
             ]
@@ -69,13 +69,13 @@ spec = do
       updateYears currYear sample `shouldBe` expected
 
     it "updates complex multi-line text" $ do
-      let sample = T.unlines
+      let sample = fromLines
             [ "Copyright (c) 2019"
             , "Copyright (c) 2020"
             , "Copyright (c) 2019-2020"
             , "Copyright (c) 2017-2019"
             ]
-          expected = T.unlines
+          expected = fromLines
             [ "Copyright (c) 2019-2020"
             , "Copyright (c) 2020"
             , "Copyright (c) 2019-2020"

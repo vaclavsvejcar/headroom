@@ -7,6 +7,7 @@ module Headroom.Ext.Haskell.HaddockSpec
 where
 
 import           Headroom.Configuration.Types   ( LicenseType(..) )
+import           Headroom.Data.TextExtra        ( fromLines )
 import           Headroom.Embedded              ( licenseTemplate )
 import           Headroom.Ext.Haskell.Haddock
 import           Headroom.FileSystem            ( loadFile )
@@ -16,7 +17,6 @@ import           Headroom.Template.Mustache     ( Mustache(..) )
 import           Headroom.Types                 ( HaddockFieldOffsets(..) )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
-import qualified RIO.Text                      as T
 import           Test.Hspec
 
 
@@ -48,29 +48,29 @@ spec = do
 
   describe "stripCommentSyntax" $ do
     it "strips single-line or block comment syntax from input" $ do
-      let sample1 = T.unlines ["{-|", "Hello1", "foo", "-}"]
-          sample2 = T.unlines ["{- |", "Hello2", "foo", "-}"]
-          sample3 = T.unlines ["-- | Hello3", "-- foo"]
-      stripCommentSyntax sample1 `shouldBe` T.unlines ["", "Hello1", "foo", ""]
-      stripCommentSyntax sample2 `shouldBe` T.unlines ["", "Hello2", "foo", ""]
-      stripCommentSyntax sample3 `shouldBe` T.unlines [" Hello3", " foo"]
+      let sample1 = fromLines ["{-|", "Hello1", "foo", "-}"]
+          sample2 = fromLines ["{- |", "Hello2", "foo", "-}"]
+          sample3 = fromLines ["-- | Hello3", "-- foo"]
+      stripCommentSyntax sample1 `shouldBe` fromLines ["", "Hello1", "foo", ""]
+      stripCommentSyntax sample2 `shouldBe` fromLines ["", "Hello2", "foo", ""]
+      stripCommentSyntax sample3 `shouldBe` fromLines [" Hello3", " foo"]
 
 
   describe "indentField" $ do
     it "does nothing with single line text" $ do
-      let sample = T.unlines ["hello"]
+      let sample = fromLines ["hello"]
           offset = Just 2
       indentField offset sample `shouldBe` sample
 
     it "indents all but first line using given offset" $ do
-      let sample   = T.unlines ["first", "second", "third"]
-          expected = T.unlines ["first", "  second", "  third"]
+      let sample   = fromLines ["first", "second", "third"]
+          expected = fromLines ["first", "  second", "  third"]
           offset   = Just 2
       indentField offset sample `shouldBe` expected
 
     it "intents correctly previously indented text" $ do
-      let sample   = T.unlines ["first", "second", "        third"]
-          expected = T.unlines ["first", "  second", "  third"]
+      let sample   = fromLines ["first", "second", "        third"]
+          expected = fromLines ["first", "  second", "  third"]
           offset   = Just 2
       indentField offset sample `shouldBe` expected
 

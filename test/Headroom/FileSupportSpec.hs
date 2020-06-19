@@ -72,7 +72,7 @@ spec = do
       let info     = fileInfo $ bHeaderConfigM 2 2 [[re|^before|]] []
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore"
-          expected = "1\n2\nbefore\n\n\n{-| HEADER -}\n"
+          expected = "1\n2\nbefore\n\n\n{-| HEADER -}"
       addHeader info header sample `shouldBe` expected
 
     it "does nothing if header is already present" $ do

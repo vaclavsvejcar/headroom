@@ -13,13 +13,13 @@ import           Headroom.Configuration.Types   ( HeaderFnConfig(..)
                                                 , UpdateCopyrightConfig(..)
                                                 )
 import           Headroom.Data.Has              ( Has(..) )
+import           Headroom.Data.TextExtra        ( fromLines )
 import           Headroom.HeaderFn
 import           Headroom.HeaderFn.Types
 import           Headroom.HeaderFn.UpdateCopyright
 import           Headroom.Types                 ( CurrentYear(..) )
 import           Headroom.Variables             ( mkVariables )
 import           RIO
-import qualified RIO.Text                      as T
 import           Test.Hspec
 
 
@@ -55,12 +55,12 @@ spec = do
 
   describe "postProcessHeader" $ do
     it "postprocesses given license header using given configuration" $ do
-      let header = T.unlines
+      let header = fromLines
             [ "License header"
             , "Copyright (c) 2019 1st Author"
             , "Copyright (c) 2018-2019 2nd Author"
             ]
-          expected = T.unlines
+          expected = fromLines
             [ "License header"
             , "Copyright (c) 2019 1st Author"
             , "Copyright (c) 2018-2020 2nd Author"

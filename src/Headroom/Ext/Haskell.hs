@@ -33,6 +33,9 @@ import           Headroom.Configuration.Types   ( CtHeaderConfig )
 import           Headroom.Data.Regex            ( match
                                                 , re
                                                 )
+import           Headroom.Data.TextExtra        ( fromLines
+                                                , toLines
+                                                )
 import           Headroom.Ext.Haskell.Haddock   ( HaddockModuleHeader(..)
                                                 , extractFieldOffsets
                                                 , extractModuleHeader
@@ -44,7 +47,6 @@ import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 import           RIO.Lens                       ( ix )
 import qualified RIO.List                      as L
-import qualified RIO.Text                      as T
 
 
 -- | Extracts name of /Haskell/ module from given source code file content.
@@ -55,7 +57,7 @@ extractModuleName :: Text
                   -- ^ input text
                   -> Maybe Text
                   -- ^ extracted module name
-extractModuleName = go . T.lines
+extractModuleName = go . toLines
  where
   go []       = Nothing
   go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^module\s+(\S+)|] x)
@@ -88,7 +90,7 @@ extractVariables _ meta headerPos text = (mkVariables . catMaybes)
  where
   HaddockModuleHeader {..} = extractModuleHeader headerText meta
   headerText               = maybe "" (\(s, e) -> cut s e text) headerPos
-  cut s e = T.unlines . L.take (e - s) . L.drop s . T.lines
+  cut s e = fromLines . L.take (e - s) . L.drop s . toLines
 
 
 -- | Extracts template metadata specific for /Haskell/.

@@ -39,6 +39,9 @@ import           Headroom.Configuration.Types   ( CtHeaderConfig
 import           Headroom.Data.Regex            ( Regex
                                                 , match
                                                 )
+import           Headroom.Data.TextExtra        ( fromLines
+                                                , toLines
+                                                )
 import           Headroom.Ext                   ( extractVariables )
 import           Headroom.FileSupport.Types     ( FileInfo(..) )
 import           Headroom.FileType.Types        ( FileType(..) )
@@ -89,7 +92,7 @@ addHeader FileInfo {..} header text                 = result
   margin _  size = replicate size ""
   marginBefore = margin before' hcMarginBefore
   marginAfter  = margin (middle' <> after) hcMarginAfter
-  result       = T.unlines $ concat joined
+  result       = fromLines $ concat joined
   joined       = [before', marginBefore, [header], marginAfter, middle', after]
 
 
@@ -106,8 +109,8 @@ dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
  where
   before     = take start inputLines
   after      = drop (end + 1) inputLines
-  inputLines = T.lines text
-  result     = T.unlines (stripLinesEnd before <> stripLinesStart after)
+  inputLines = toLines text
+  result     = fromLines (stripLinesEnd before <> stripLinesStart after)
 
 
 -- | Replaces existing header at position specified by the 'FileInfo' in the
@@ -272,14 +275,14 @@ splitInput :: [Regex]
            -- ^ text to split
            -> ([Text], [Text], [Text])
            -- ^ result lines as @([before1stSplit], [middle], [after2ndSplit])@
-splitInput []       []       input = ([], T.lines input, [])
+splitInput []       []       input = ([], toLines input, [])
 splitInput fstSplit sndSplit input = (before, middle, after)
  where
   (middle', after ) = L.splitAt sndSplitAt inLines
   (before , middle) = L.splitAt fstSplitAt middle'
   fstSplitAt        = maybe 0 (+ 1) (lastMatching fstSplit middle')
   sndSplitAt        = fromMaybe len (firstMatching sndSplit inLines)
-  inLines           = T.lines input
+  inLines           = toLines input
   len               = L.length inLines
 
 

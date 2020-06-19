@@ -23,6 +23,7 @@ import           Headroom.Configuration.Types   ( CtHeaderFnConfigs
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
 import           Headroom.Data.Lens             ( suffixLenses )
+import           Headroom.Data.TextExtra        ( fromLines )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
@@ -68,11 +69,11 @@ spec = do
 
   describe "postProcessHeader'" $ do
     it "should perform expected postprocessing on license header" $ do
-      let sample = T.unlines
+      let sample = fromLines
             [ "-- Copyright (c) 2018-2019 1st Author"
             , "Copyright (c) 2017 2nd Author"
             ]
-          expected = T.unlines
+          expected = fromLines
             [ "-- Copyright (c) 2018-2019 1st Author"
             , "-- Copyright (c) 2017-2020 2nd Author"
             ]
@@ -83,14 +84,14 @@ spec = do
 
   describe "sanitizeHeader" $ do
     it "does nothing when block comment syntax used" $ do
-      let sample = T.unlines ["{-", "foo", "bar", "-}"]
+      let sample = fromLines ["{-", "foo", "bar", "-}"]
           syntax = BlockComment "{-" "-}"
       sanitizeHeader syntax sample `shouldBe` sample
 
     it "adds missing single-line comment syntax" $ do
-      let sample   = T.unlines ["-- first", "second", "-- third"]
+      let sample   = fromLines ["-- first", "second", "-- third"]
           syntax   = LineComment "--"
-          expected = T.unlines ["-- first", "-- second", "-- third"]
+          expected = fromLines ["-- first", "-- second", "-- third"]
       sanitizeHeader syntax sample `shouldBe` expected
 
 
