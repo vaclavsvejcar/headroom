@@ -287,11 +287,12 @@ splitInput fstSplit sndSplit input = (before, middle, after)
 
 
 stripLinesEnd :: [Text] -> [Text]
-stripLinesEnd = takeWhile (not . T.null . T.strip)
+stripLinesEnd = toLines . T.stripEnd . fromLines
 
 
 stripLinesStart :: [Text] -> [Text]
-stripLinesStart = dropWhile (T.null . T.strip)
+stripLinesStart = toLines . T.stripStart . fromLines
+
 
 fiHeaderPosL :: Lens' FileInfo (Maybe (Int, Int))
 fiHeaderPosL = lens fiHeaderPos (\x y -> x { fiHeaderPos = y })
