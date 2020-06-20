@@ -43,7 +43,9 @@ import           Headroom.Data.TextExtra        ( fromLines
                                                 , toLines
                                                 )
 import           Headroom.Ext                   ( extractVariables )
-import           Headroom.FileSupport.Types     ( FileInfo(..) )
+import           Headroom.FileSupport.Types     ( FileInfo(..)
+                                                , fiHeaderPosL
+                                                )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Types                 ( TemplateMeta(..) )
 import           RIO
@@ -292,7 +294,3 @@ stripLinesEnd = toLines . T.stripEnd . fromLines
 
 stripLinesStart :: [Text] -> [Text]
 stripLinesStart = toLines . T.stripStart . fromLines
-
-
-fiHeaderPosL :: Lens' FileInfo (Maybe (Int, Int))
-fiHeaderPosL = lens fiHeaderPos (\x y -> x { fiHeaderPos = y })

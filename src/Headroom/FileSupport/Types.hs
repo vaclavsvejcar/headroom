@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 {-|
 Module      : Headroom.FileSupport.Types
@@ -13,11 +14,18 @@ This module contains data types for "Headroom.FileSupport" module.
 -}
 
 module Headroom.FileSupport.Types
-  ( FileInfo(..)
+  ( -- * Data Types
+    FileInfo(..)
+    -- * Lenses
+  , fiFileTypeL
+  , fiHeaderConfigL
+  , fiHeaderPosL
+  , fiVariablesL
   )
 where
 
 import           Headroom.Configuration.Types   ( CtHeaderConfig )
+import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.FileType.Types        ( FileType )
 import           Headroom.Variables.Types       ( Variables )
 import           RIO
@@ -35,3 +43,5 @@ data FileInfo = FileInfo
   -- ^ additional extracted variables
   }
   deriving (Eq, Show)
+
+suffixLenses ''FileInfo
