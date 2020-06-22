@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#51] Allow template variable values to be templates itself
 - [#52] Postprocessing functions for _license headers_
 - Various bugfixes and performance improvements
-- Bump _LTS Haskell_ to `16.1`
+- Bump _LTS Haskell_ to `16.2`
 
 ## 0.2.2.1 (released 2020-05-08)
 - Minor improves in generated `.headroom.yaml` in `init` mode
