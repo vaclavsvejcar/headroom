@@ -68,7 +68,7 @@ spec = do
 
 
   describe "postProcessHeader'" $ do
-    it "should perform expected postprocessing on license header" $ do
+    it "should perform expected post-processing on license header" $ do
       let sample = fromLines
             [ "-- Copyright (c) 2018-2019 1st Author"
             , "Copyright (c) 2017 2nd Author"

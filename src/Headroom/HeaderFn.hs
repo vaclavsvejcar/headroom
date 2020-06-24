@@ -89,14 +89,14 @@ configuredHeaderFn HeaderFnConfigs {..} = mconcat
                                    | otherwise  = mempty
 
 
--- | Takes already rendered /license header/ and postprocess it based on the
+-- | Takes already rendered /license header/ and post-process it based on the
 -- given configuration.
 postProcessHeader :: ConfiguredEnv
-                  -- ^ configuration used to define postprocessing behaviour
+                  -- ^ configuration used to define post-processing behaviour
                   -> Text
                   -- ^ rendered text of /license header/
                   -> Text
-                  -- ^ postprocessed text of /license header/
+                  -- ^ post-processed text of /license header/
 postProcessHeader env = runHeaderFn (configuredHeaderFn configs) env
   where configs = ceHeaderFnConfigs env
 

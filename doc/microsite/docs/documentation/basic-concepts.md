@@ -16,6 +16,8 @@ Before continuing to next chapters, here's the overview of key parts of _Headroo
 
 - __Variables__ - Changing parts of license headers (such as year, author, e-mail, etc.) can be represented by variables and the actual values are then loaded from either `.headroom.yaml` or command line arguments and filled in during template rendering.
 
+- __Post-processing Functions__ - These are built-in functions, enabled in _YAML_ configuration, that performs some additional post-processing on rendered license headers, for example to update years in copyright statements.
+
 
 [rel:Configuration]: configuration.md
 [web:mustache]: https://mustache.github.io/

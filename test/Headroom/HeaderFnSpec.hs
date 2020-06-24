@@ -54,7 +54,7 @@ spec = do
 
 
   describe "postProcessHeader" $ do
-    it "postprocesses given license header using given configuration" $ do
+    it "post-processes given license header using given configuration" $ do
       let header = fromLines
             [ "License header"
             , "Copyright (c) 2019 1st Author"

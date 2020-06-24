@@ -26,7 +26,7 @@ module Headroom.Command.Run
   , loadBuiltInTemplates
   , loadTemplateFiles
   , typeOfTemplate
-    -- * License Header Postprocessing
+    -- * License Header Post-processing
   , postProcessHeader'
   , sanitizeHeader
   )
@@ -454,7 +454,7 @@ currentYear = do
   pure $ CurrentYear year
 
 
--- | Performs postprocessing on rendered /license header/, based on given
+-- | Performs post-processing on rendered /license header/, based on given
 -- configuration. Currently the main points are to:
 --
 --  1. sanitize possibly corrupted comment syntax ('sanitizeHeader')
@@ -465,9 +465,9 @@ postProcessHeader' :: (Has CtHeaderFnConfigs env, Has CurrentYear env)
                    -> Variables
                    -- ^ template variables
                    -> Text
-                   -- ^ rendered /license header/ to postprocess
+                   -- ^ rendered /license header/ to post-process
                    -> RIO env Text
-                   -- ^ postprocessed /license header/
+                   -- ^ post-processed /license header/
 postProcessHeader' syntax vars rawHeader = do
   configs <- viewL @CtHeaderFnConfigs
   year    <- viewL

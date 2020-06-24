@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#30] Allow workflow without configuration and template files
 - [#49] Microsite for documentation ([https://doc.norcane.com/headroom/latest/](https://doc.norcane.com/headroom/latest/))
 - [#51] Allow template variable values to be templates itself
-- [#52] Postprocessing functions for _license headers_
+- [#52] Post-processing functions for _license headers_
 - Various bugfixes and performance improvements
 - Bump _LTS Haskell_ to `16.2`
 
