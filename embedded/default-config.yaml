@@ -39,6 +39,10 @@ excluded-paths: []
 variables:
   _haskell_module_copyright: "!!! INSERT HASKELL MODULE COPYRIGHT !!!"
   _haskell_module_name: "!!! INSERT HASKELL MODULE NAME !!!"
+  _haskell_module_license: "!!! INSERT MODULE LICENSE !!!"
+  _haskell_module_maintainer: "!!! INSERT MODULE MAINTAINER !!!"
+  _haskell_module_stability: "!!! INSERT MODULE STABILITY !!!"
+  _haskell_module_portability: "!!! INSERT MODULE PORTABILITY !!!"
   _haskell_module_longdesc: "!!! INSERT MODULE LONG DESCRIPTION !!!"
   _haskell_module_shortdesc: "!!! INSERT MODULE SHORT DESCRIPTION !!!"
 

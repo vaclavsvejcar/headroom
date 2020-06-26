@@ -37,9 +37,13 @@ spec = do
             [ ( "_haskell_module_copyright"
               , "(c) Some Guy, 2013\n                  Someone Else, 2014"
               )
-            , ("_haskell_module_name"     , "Test")
-            , ("_haskell_module_longdesc" , "long\ndescription")
-            , ("_haskell_module_shortdesc", "Short description")
+            , ("_haskell_module_license"    , "GPL-3")
+            , ("_haskell_module_maintainer" , "sample@email.com")
+            , ("_haskell_module_name"       , "Test")
+            , ("_haskell_module_stability"  , "experimental")
+            , ("_haskell_module_portability", "POSIX")
+            , ("_haskell_module_longdesc"   , "long\ndescription")
+            , ("_haskell_module_shortdesc"  , "Short description")
             ]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
       extractVariables config meta headerPos sample `shouldBe` expected

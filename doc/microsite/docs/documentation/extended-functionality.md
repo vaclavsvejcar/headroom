@@ -4,9 +4,13 @@ Apart of basic functionality of adding, replacing or dropping _license headers_,
 This support includes extracting additional info from processed _Haskell source code file_ and exposing it using following _dynamic variables_:
 
 - `_haskell_module_name` - Contains module name of the currently processed `Haskell` source code file. If such file contains module definition such as `module Foo where`, then this variable will contain the `Foo` value.
-- `_haskell_module_copyright` - If currently processed `Haskell` source code file contains _Haddock module header_ with `Copyright` field, then this variable will contain value of this field.
-- `_haskell_module_longdesc` - If currently processed `Haskell` source code file contains _Haddock module header_ with long description (the text after all the fields), then this variable will contain this value.
-- `_haskell_module_shortdesc` - If currently processed `Haskell` source code file contains _Haddock module header_ with `Description` field, then this variable will contain value of this field.
+- `_haskell_module_copyright` - Content of the `Copyright` field of the _Haddock module header_.
+- `_haskell_module_license` - Content of the `License` field of the _Haddock module header_.
+- `_haskell_module_maintainer` - Content of the `Maintainer` field of the _Haddock module header_.
+- `_haskell_module_stability` - Content of the `Stability` field of the _Haddock module header_.
+- `_haskell_module_portability` - Content of the `Portability` field of the _Haddock module header_.
+- `_haskell_module_longdesc` - Content of the long description (the one after all other fields) of the _Haddock module header_.
+- `_haskell_module_shortdesc` - Content of the `Description` field of the _Haddock module header_.
 
 ### Example of Use
 The use case for `_haskell_module_name` might be pretty straightforward, but you might be wondering what is the real-world use for the other variables? Well, let's say you want to use _Headroom_ to manage your _license headers_, defined as _Haddock module headers_. Initial design of _template file_ could be as following:

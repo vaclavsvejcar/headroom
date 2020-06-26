@@ -68,6 +68,10 @@ extractModuleName = go . toLines
 -- __List of Extracted Variables:__
 --
 -- * @___haskell_module_copyright__@ - @Copyright@ field of /Haddock/ module header
+-- * @___haskell_module_license__@ - @License@ field of /Haddock/ module header
+-- * @___haskell_module_maintainer__@ - @Maintainer@ field of /Haddock/ module header
+-- * @___haskell_module_portability__@ - @Portability@ field of /Haddock/ module header
+-- * @___haskell_module_stability__@ - @Stability@ field of /Haddock/ module header
 -- * @___haskell_module_name__@ - name of the /Haskell/ module
 -- * @___haskell_module_longdesc__@ - long description of /Haddock/ module
 -- * @___haskell_module_shortdesc__@ - @Description@ field of /Haddock/ module header
@@ -83,7 +87,11 @@ extractVariables :: CtHeaderConfig
                  -- ^ extracted variables
 extractVariables _ meta headerPos text = (mkVariables . catMaybes)
   [ ("_haskell_module_copyright", ) <$> hmhCopyright
+  , ("_haskell_module_license", ) <$> hmhLicense
+  , ("_haskell_module_maintainer", ) <$> hmhMaintainer
   , ("_haskell_module_name", ) <$> extractModuleName text
+  , ("_haskell_module_portability", ) <$> hmhPortability
+  , ("_haskell_module_stability", ) <$> hmhStability
   , ("_haskell_module_longdesc", ) <$> hmhLongDesc
   , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
   ]

@@ -4,6 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE StrictData        #-}
 
 {-|
 Module      : Headroom.Ext.Haskell.Haddock
@@ -48,11 +49,19 @@ import qualified RIO.Text                      as T
 
 -- | Extracted fields from the /Haddock module header/.
 data HaddockModuleHeader = HaddockModuleHeader
-  { hmhCopyright :: !(Maybe Text)
+  { hmhCopyright   :: Maybe Text
   -- ^ module copyright (content of the @Copyright@ field)
-  , hmhShortDesc :: !(Maybe Text)
+  , hmhLicense     :: Maybe Text
+  -- ^ module license (content of the @License@ field)
+  , hmhMaintainer  :: Maybe Text
+  -- ^ module license (content of the @Maintainer@ field)
+  , hmhPortability :: Maybe Text
+  -- ^ module license (content of the @Portability@ field)
+  , hmhStability   :: Maybe Text
+  -- ^ module license (content of the @Stability@ field)
+  , hmhShortDesc   :: Maybe Text
   -- ^ module short description (content of the @Description@ field)
-  , hmhLongDesc  :: !(Maybe Text)
+  , hmhLongDesc    :: Maybe Text
   -- ^ module long description (the text after module header fields)
   }
   deriving (Eq, Show)
@@ -86,9 +95,13 @@ extractModuleHeader :: Text
                     -> HaddockModuleHeader
                     -- ^ extracted metadata
 extractModuleHeader text meta =
-  let hmhCopyright = indent hfoCopyright <$> extractField "Copyright"
-      hmhShortDesc = extractField "Description"
-      hmhLongDesc  = if null rest' then Nothing else process rest'
+  let hmhCopyright   = indent hfoCopyright <$> extractField "Copyright"
+      hmhLicense     = extractField "License"
+      hmhMaintainer  = extractField "Maintainer"
+      hmhPortability = extractField "Portability"
+      hmhStability   = extractField "Stability"
+      hmhShortDesc   = extractField "Description"
+      hmhLongDesc    = if null rest' then Nothing else process rest'
   in  HaddockModuleHeader { .. }
  where
   (fields', rest') = fromMaybe ([], input) $ runP fields input
