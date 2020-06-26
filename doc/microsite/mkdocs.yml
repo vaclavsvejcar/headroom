@@ -11,6 +11,8 @@ nav:
       - Project Setup Guide: documentation/project-setup-guide.md
       - Running Headroom: documentation/running-headroom.md
       - Configuration: documentation/configuration.md
+      - Extended Functionality: documentation/extended-functionality.md
+      - Post-processing Functions: documentation/post-processing.md
   - License:
       - BSD-3-Clause License: license.md
 
