@@ -28,3 +28,4 @@ stack.yaml.lock
 
 ## Exclude built mkdocs website
 doc/microsite/site
+doc/microsite/site.tgz
