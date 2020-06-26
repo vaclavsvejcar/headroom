@@ -34,7 +34,7 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 [meta:pulls]: https://github.com/vaclavsvejcar/headroom/pulls
 [web:headroom]: https://doc.norcane.com/headroom/latest/
 [doc:configuration]: https://doc.norcane.com/headroom/latest/documentation/configuration/
-[rel:extended-functionality]: https://doc.norcane.com/headroom/latest/documentation/extended-functionality/
+[doc:extended-functionality]: https://doc.norcane.com/headroom/latest/documentation/extended-functionality/
 [doc:post-processing]: https://doc.norcane.com/headroom/latest/documentation/post-processing/
 [doc:running-headroom]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/
 [doc:running-headroom#gen-command]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/#gen-command
