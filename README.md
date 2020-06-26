@@ -15,6 +15,7 @@ __Headroom__ also offers much more than just adding, replacing or dropping licen
 - __Powerful Customization__ - Default [configuration][doc:configuration] should cover most use-cases, but if you need to put empty lines before/after generated header, use different comment style of headers, you can customize the configuration to match exactly your needs.
 - __Built-in OSS License Headers__ - If you want to use license header for one of the popular OSS licenses, then __Headroom__ can [generate them for you][doc:running-headroom#gen-command]: documentation/running-headroom.md - no need to search for them on web.
 - __Automatic Initialization for OSS Projects__ - Setting up external tools like __Headroom__ for your project can be boring. Fortunately, __Headroom__ can [initialize itself][doc:running-headroom#init-command] for your project, by generating configuration file and template files.
+- __Extended Functionality__ - __Headroom__ supports [extended functionality][doc:extended-functionality] for selected types of source code files, such as extracting extra data from processed source code files.
 - __Copyright Year Updater__ - __Headroom__ is good not only for basic license header management, but also for further processing of generated headers. Do you need to [update years in your copyrights][doc:post-processing]? No problem!
 
 ## Adopters
@@ -33,6 +34,7 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 [meta:pulls]: https://github.com/vaclavsvejcar/headroom/pulls
 [web:headroom]: https://doc.norcane.com/headroom/latest/
 [doc:configuration]: https://doc.norcane.com/headroom/latest/documentation/configuration/
+[rel:extended-functionality]: https://doc.norcane.com/headroom/latest/documentation/extended-functionality/
 [doc:post-processing]: https://doc.norcane.com/headroom/latest/documentation/post-processing/
 [doc:running-headroom]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/
 [doc:running-headroom#gen-command]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/#gen-command
