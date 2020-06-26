@@ -1,7 +1,7 @@
 ## New & Noteworthy
 
 ### Support for Dynamic Template Variables
-Until now, _Headroom_ allowed to use _static variables_ only. _Static variables_ are defined by used either in _YAML configuration_ or as _command line argument_ and their values are same for all processed _source code files_.
+Until now, _Headroom_ allowed to use _static variables_ only. _Static variables_ are defined by user either in _YAML configuration_ or as _command line argument_ and their values are same for all processed _source code files_.
 
 On the other hand, _dynamic variables_ are produced by _Headroom_ during runtime and can be either the same for all processed _source code files_ or may differ file from file. _Dynamic variables_ also stars with _underscode_ symbol, so you can easy tell which one is dynamic and which static. Following _global dynamic variables_ were added as part of this update:
 
