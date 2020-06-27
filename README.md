@@ -6,7 +6,7 @@
 
 Would you like to have nice, up-to-date license/copyright headers in your source code files but hate to manage them manually? Then __Headroom__ is the right tool for you. Define your license header as [Mustache][web:mustache] template, put any template variables into [YAML][wiki:yaml] configuarion file, and you're ready to go!
 
-__Headroom__ also offers much more than just adding, replacing or dropping license headers. It can also update years in copyrights for you, provides specialized support for some source code file types, and much more!
+__Headroom__ also offers much more than just adding, replacing or dropping license headers. It can also [update years in copyrights][doc:post-processing] for you, provides [extended functionality][doc:extended-functionality] for some source code file types, and much more!
 
 [![asciicast](https://asciinema.org/a/4Pfxdss0V4msFjjt2z6mgCZCp.svg)](https://asciinema.org/a/4Pfxdss0V4msFjjt2z6mgCZCp)
 
