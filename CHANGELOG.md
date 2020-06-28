@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.3.0.0 (not released yet, TBD)
+## 0.3.0.0 (released 2020-06-28)
 - [#25] Extract _dynamic variables_ from Haskell source code files
 - [#29] Add _dynamic variable_ for current year and add support for updating years
 - [#30] Allow workflow without configuration and template files
