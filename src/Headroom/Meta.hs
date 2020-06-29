@@ -31,7 +31,6 @@ import           RIO
 import qualified RIO.Text                      as T
 
 
-
 -- | Type of the template format used for license headers.
 type TemplateType = Mustache
 
