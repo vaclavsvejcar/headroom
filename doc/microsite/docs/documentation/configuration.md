@@ -125,6 +125,7 @@ _Headroom_ can manage license headers only for supported types of source code fi
 | _HTML_       | `html`                | `.html`, `.htm`    |
 | _Java_       | `java`                | `.java`            |
 | _JavaScript_ | `js`                  | `.js`              |
+| _PureScript_ | `purescript`          | `.purs`            |
 | _Rust_       | `rust`                | `.rs`              |
 | _Scala_      | `scala`               | `.scala`           |
 | _Shell_      | `shell`               | `.sh`              |
