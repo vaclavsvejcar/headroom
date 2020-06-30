@@ -25,6 +25,7 @@ where
 
 import           Headroom.Configuration.Types   ( CtHeaderConfig )
 import qualified Headroom.Ext.Haskell          as Haskell
+import qualified Headroom.Ext.PureScript       as PureScript
 import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( TemplateMeta(..) )
@@ -36,6 +37,7 @@ import           RIO
 -- name for /Haskell/ source code. Currently supported file types are:
 --
 -- * /Haskell/ - implemented in "Headroom.FileSupport.Haskell"
+-- * /PureScript/ - implemented in "Headroom.FileSupport.PureScript"
 extractVariables :: FileType
                  -- ^ type of the file
                  -> CtHeaderConfig
@@ -49,8 +51,9 @@ extractVariables :: FileType
                  -> Variables
                  -- ^ extracted variables
 extractVariables fileType config meta headerPos text = case fileType of
-  Haskell -> Haskell.extractVariables config meta headerPos text
-  _       -> mempty
+  Haskell    -> Haskell.extractVariables config meta headerPos text
+  PureScript -> PureScript.extractVariables config meta headerPos text
+  _          -> mempty
 
 
 -- | Extracts medatata from given /template/ for selected /file type/, which

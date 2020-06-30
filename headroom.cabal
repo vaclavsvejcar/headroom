@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9a445c1c3801715ebcfbc4499716d94881103e6188409ac46d499edcc0e06a41
+-- hash: f78fd98d8a877a13d11f5fc2dff8f0c34bb924a64804923d4725f5d9b05bfa3d
 
 name:           headroom
 version:        0.3.1.0
@@ -108,6 +108,7 @@ extra-source-files:
     test-data/code-samples/java/sample2.java
     test-data/code-samples/js/sample1.js
     test-data/code-samples/js/sample2.js
+    test-data/code-samples/purescript/full.purs
     test-data/code-samples/rust/sample1.rs
     test-data/code-samples/scala/sample1.scala
     test-data/code-samples/scala/sample2.scala
@@ -144,6 +145,7 @@ library
       Headroom.Ext
       Headroom.Ext.Haskell
       Headroom.Ext.Haskell.Haddock
+      Headroom.Ext.PureScript
       Headroom.FileSupport
       Headroom.FileSupport.Types
       Headroom.FileSystem
@@ -228,6 +230,7 @@ test-suite spec
       Headroom.Data.TextExtraSpec
       Headroom.Ext.Haskell.HaddockSpec
       Headroom.Ext.HaskellSpec
+      Headroom.Ext.PureScriptSpec
       Headroom.ExtSpec
       Headroom.FileSupportSpec
       Headroom.FileSystemSpec

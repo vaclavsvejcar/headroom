@@ -38,3 +38,13 @@ spec = do
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
       extractVariables Haskell config meta (Just (1, 13)) sample
         `shouldBe` expected
+
+    it "extracts variables specific for PureScript file type" $ do
+      let samplesDir = "test-data" </> "code-samples"
+          config     = HeaderConfig ["purs"] 0 0 [] [] (LineComment "--")
+          meta       = Nothing
+          expected   = mkVariables [("_purescript_module_name", "Test")]
+      sample <- readFileUtf8 $ samplesDir </> "purescript" </> "full.purs"
+      extractVariables PureScript config meta (Just (1, 1)) sample
+        `shouldBe` expected
+

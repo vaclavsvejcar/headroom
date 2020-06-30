@@ -120,3 +120,8 @@ Portability : POSIX
 Some long description
 -}
 ```
+
+## Extended PureScript Support
+This support includes extracting additional info from processed _PureScript source code file_ and exposing it using following _dynamic variables_:
+
+- `_purescript_module_name` - Contains module name of the currently processed `PureScript` source code file. If such file contains module definition such as `module Foo where`, then this variable will contain the `Foo` value.

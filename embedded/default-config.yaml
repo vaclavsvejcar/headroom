@@ -45,6 +45,7 @@ variables:
   _haskell_module_portability: "!!! INSERT MODULE PORTABILITY !!!"
   _haskell_module_longdesc: "!!! INSERT MODULE LONG DESCRIPTION !!!"
   _haskell_module_shortdesc: "!!! INSERT MODULE SHORT DESCRIPTION !!!"
+  _purescript_module_name: "!!! INSERT PURESCRIPT MODULE NAME !!!"
 
 ## Allows to change behaviour of license header detection and placement. Such
 ## configuration is defined for every supported file type, where individual
@@ -193,13 +194,11 @@ license-headers:
     line-comment:
       prefixed-by: "#"
 
-
 ## Configuration for post-processing license header functions. These functions
 ## allows to modify/enhance already rendered license headers, e.g. update years
 ## in copyright statements, etc. Each function can be enabled/disabled using the
 ## 'enabled' key and eventually customized using the 'config' key.
 post-process:
-
   ## License header function that updates years in copyright statements in
   ## rendered license header. If you need to update copyright year only for
   ## selected author(s), define them in 'selected-authors-only' key, otherwise
@@ -208,5 +207,5 @@ post-process:
   update-copyright:
     enabled: false
     config:
-     ## If used, updates copyright statements of selected authors only.
-     # selected-authors-only: ["John Smith"]
+      ## If used, updates copyright statements of selected authors only.
+      # selected-authors-only: ["John Smith"]
