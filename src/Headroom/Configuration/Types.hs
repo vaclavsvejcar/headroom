@@ -8,6 +8,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE StandaloneDeriving   #-}
+{-# LANGUAGE StrictData           #-}
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeOperators        #-}
@@ -125,17 +126,17 @@ type family (p :: Phase) ::: a where
 
 -- | Syntax of the license header comment.
 data HeaderSyntax
-  = BlockComment !Text !Text
+  = BlockComment Text Text
   -- ^ block (multi-line) comment syntax (e.g. @/* */@)
-  | LineComment !Text
+  | LineComment Text
   -- ^ single line comment syntax (e.g. @//@)
   deriving (Eq, Show)
 
 -- | Internal representation of the block style of 'HeaderSyntax'.
 data BlockComment' = BlockComment'
-  { bcStartsWith :: !Text
+  { bcStartsWith :: Text
   -- ^ starting pattern (e.g. @/*@)
-  , bcEndsWith   :: !Text
+  , bcEndsWith   :: Text
   -- ^ ending pattern (e.g. @*/@)
   }
   deriving (Eq, Generic, Show)
@@ -203,7 +204,7 @@ instance FromJSON RunMode where
 data GenMode
   = GenConfigFile
   -- ^ generate /YAML/ config file stub
-  | GenLicense !(LicenseType, FileType)
+  | GenLicense (LicenseType, FileType)
   -- ^ generate license header template
   deriving (Eq, Show)
 
@@ -224,7 +225,7 @@ data TemplateSource
 -- | Main configuration for the "Headroom.HeaderFn.UpdateCopyright"
 -- /license header function/.
 data UpdateCopyrightConfig (p :: Phase) = UpdateCopyrightConfig
-  { uccSelectedAuthors :: !(p ::: Maybe (NonEmpty Text))
+  { uccSelectedAuthors :: p ::: Maybe (NonEmpty Text)
   -- ^ if specified, years will be updated only in copyright statements of
   -- given authors
   }
@@ -258,9 +259,9 @@ instance Monoid PtUpdateCopyrightConfig where
 
 -- | Configuration for selected /license header function/.
 data HeaderFnConfig (p :: Phase) c = HeaderFnConfig
-  { hfcEnabled :: !(p ::: Bool)
+  { hfcEnabled :: p ::: Bool
   -- ^ whether this function is enabled or not
-  , hfcConfig  :: !(c p)
+  , hfcConfig  :: c p
   -- ^ custom configuration of the /license header function/
   }
 
@@ -295,7 +296,7 @@ instance (FromJSON (c 'Partial), Monoid (c 'Partial)) => FromJSON (PtHeaderFnCon
 
 -- | Configuration of all known /license header functions/.
 data HeaderFnConfigs (p :: Phase) = HeaderFnConfigs
-  { hfcsUpdateCopyright :: !(HeaderFnConfig p UpdateCopyrightConfig)
+  { hfcsUpdateCopyright :: HeaderFnConfig p UpdateCopyrightConfig
   -- ^ configuration for the "Headroom.HeaderFn.UpdateCopyright"
   -- /license header function/
   }
@@ -329,19 +330,19 @@ instance FromJSON PtHeaderFnConfigs where
 
 -- | Application configuration.
 data Configuration (p :: Phase) = Configuration
-  { cRunMode         :: !(p ::: RunMode)
+  { cRunMode         :: p ::: RunMode
   -- ^ mode of the @run@ command
-  , cSourcePaths     :: !(p ::: [FilePath])
+  , cSourcePaths     :: p ::: [FilePath]
   -- ^ paths to source code files
-  , cExcludedPaths   :: !(p ::: [Regex])
+  , cExcludedPaths   :: p ::: [Regex]
   -- ^ excluded source paths
-  , cTemplateSource  :: !(p ::: TemplateSource)
+  , cTemplateSource  :: p ::: TemplateSource
   -- ^ source of license templates
-  , cVariables       :: !Variables
+  , cVariables       :: Variables
   -- ^ variable values for templates
-  , cLicenseHeaders  :: !(HeadersConfig p)
+  , cLicenseHeaders  :: HeadersConfig p
   -- ^ configuration of license headers
-  , cHeaderFnConfigs :: !(HeaderFnConfigs p)
+  , cHeaderFnConfigs :: HeaderFnConfigs p
   -- ^ configuration of license header functions
   }
 
@@ -387,17 +388,17 @@ instance Monoid PtConfiguration where
 
 -- | Configuration for specific license header.
 data HeaderConfig (p :: Phase) = HeaderConfig
-  { hcFileExtensions :: !(p ::: [Text])
+  { hcFileExtensions :: p ::: [Text]
   -- ^ list of file extensions (without dot)
-  , hcMarginAfter    :: !(p ::: Int)
+  , hcMarginAfter    :: p ::: Int
   -- ^ number of empty lines to put after header
-  , hcMarginBefore   :: !(p ::: Int)
+  , hcMarginBefore   :: p ::: Int
   -- ^ number of empty lines to put before header
-  , hcPutAfter       :: !(p ::: [Regex])
+  , hcPutAfter       :: p ::: [Regex]
   -- ^ /regexp/ patterns after which to put the header
-  , hcPutBefore      :: !(p ::: [Regex])
+  , hcPutBefore      :: p ::: [Regex]
   -- ^ /regexp/ patterns before which to put the header
-  , hcHeaderSyntax   :: !(p ::: HeaderSyntax)
+  , hcHeaderSyntax   :: p ::: HeaderSyntax
   -- ^ syntax of the license header comment
   }
 
@@ -447,25 +448,27 @@ instance Semigroup PtHeaderConfig where
 
 -- | Group of 'HeaderConfig' configurations for supported file types.
 data HeadersConfig (p :: Phase) = HeadersConfig
-  { hscC       :: !(HeaderConfig p)
+  { hscC          :: HeaderConfig p
   -- ^ configuration for /C/ programming language
-  , hscCpp     :: !(HeaderConfig p)
+  , hscCpp        :: HeaderConfig p
   -- ^ configuration for /C++/ programming language
-  , hscCss     :: !(HeaderConfig p)
+  , hscCss        :: HeaderConfig p
   -- ^ configuration for /CSS/
-  , hscHaskell :: !(HeaderConfig p)
+  , hscHaskell    :: HeaderConfig p
   -- ^ configuration for /Haskell/ programming language
-  , hscHtml    :: !(HeaderConfig p)
+  , hscHtml       :: HeaderConfig p
   -- ^ configuration for /HTML/
-  , hscJava    :: !(HeaderConfig p)
+  , hscJava       :: HeaderConfig p
   -- ^ configuration for /Java/ programming language
-  , hscJs      :: !(HeaderConfig p)
+  , hscJs         :: HeaderConfig p
   -- ^ configuration for /JavaScript/ programming language
-  , hscRust    :: !(HeaderConfig p)
+  , hscPureScript :: HeaderConfig p
+  -- ^ configuration for /PureScript/ programming language
+  , hscRust       :: HeaderConfig p
   -- ^ configuration for /Rust/ programming language
-  , hscScala   :: !(HeaderConfig p)
+  , hscScala      :: HeaderConfig p
   -- ^ configuration for /Scala/ programming language
-  , hscShell   :: !(HeaderConfig p)
+  , hscShell      :: HeaderConfig p
   -- ^ configuration for /Shell/
   }
 
@@ -482,35 +485,38 @@ deriving instance Show PtHeadersConfig
 
 instance FromJSON PtHeadersConfig where
   parseJSON = withObject "PartialHeadersConfig" $ \obj -> do
-    hscC       <- obj .:? "c" .!= mempty
-    hscCpp     <- obj .:? "cpp" .!= mempty
-    hscCss     <- obj .:? "css" .!= mempty
-    hscHaskell <- obj .:? "haskell" .!= mempty
-    hscHtml    <- obj .:? "html" .!= mempty
-    hscJava    <- obj .:? "java" .!= mempty
-    hscJs      <- obj .:? "js" .!= mempty
-    hscRust    <- obj .:? "rust" .!= mempty
-    hscScala   <- obj .:? "scala" .!= mempty
-    hscShell   <- obj .:? "shell" .!= mempty
+    hscC          <- obj .:? "c" .!= mempty
+    hscCpp        <- obj .:? "cpp" .!= mempty
+    hscCss        <- obj .:? "css" .!= mempty
+    hscHaskell    <- obj .:? "haskell" .!= mempty
+    hscHtml       <- obj .:? "html" .!= mempty
+    hscJava       <- obj .:? "java" .!= mempty
+    hscJs         <- obj .:? "js" .!= mempty
+    hscPureScript <- obj .:? "purescript" .!= mempty
+    hscRust       <- obj .:? "rust" .!= mempty
+    hscScala      <- obj .:? "scala" .!= mempty
+    hscShell      <- obj .:? "shell" .!= mempty
     pure HeadersConfig { .. }
 
 
 instance Semigroup PtHeadersConfig where
-  x <> y = HeadersConfig { hscC       = hscC x <> hscC y
-                         , hscCpp     = hscCpp x <> hscCpp y
-                         , hscCss     = hscCss x <> hscCss y
-                         , hscHaskell = hscHaskell x <> hscHaskell y
-                         , hscHtml    = hscHtml x <> hscHtml y
-                         , hscJava    = hscJava x <> hscJava y
-                         , hscJs      = hscJs x <> hscJs y
-                         , hscRust    = hscRust x <> hscRust y
-                         , hscScala   = hscScala x <> hscScala y
-                         , hscShell   = hscShell x <> hscShell y
+  x <> y = HeadersConfig { hscC          = hscC x <> hscC y
+                         , hscCpp        = hscCpp x <> hscCpp y
+                         , hscCss        = hscCss x <> hscCss y
+                         , hscHaskell    = hscHaskell x <> hscHaskell y
+                         , hscHtml       = hscHtml x <> hscHtml y
+                         , hscJava       = hscJava x <> hscJava y
+                         , hscJs         = hscJs x <> hscJs y
+                         , hscPureScript = hscPureScript x <> hscPureScript y
+                         , hscRust       = hscRust x <> hscRust y
+                         , hscScala      = hscScala x <> hscScala y
+                         , hscShell      = hscShell x <> hscShell y
                          }
 
 
 instance Monoid PtHeadersConfig where
   mempty = HeadersConfig mempty
+                         mempty
                          mempty
                          mempty
                          mempty
@@ -526,17 +532,17 @@ instance Monoid PtHeadersConfig where
 
 -- | Represents single key in the configuration.
 data ConfigurationKey
-  = CkFileExtensions !FileType
+  = CkFileExtensions FileType
   -- ^ no configuration for @file-extensions@
-  | CkHeaderSyntax !FileType
+  | CkHeaderSyntax FileType
   -- ^ no configuration for header syntax
-  | CkMarginAfter !FileType
+  | CkMarginAfter FileType
   -- ^ no configuration for @margin-after@
-  | CkMarginBefore !FileType
+  | CkMarginBefore FileType
   -- ^ no configuration for @margin-before@
-  | CkPutAfter !FileType
+  | CkPutAfter FileType
   -- ^ no configuration for @put-after@
-  | CkPutBefore !FileType
+  | CkPutBefore FileType
   -- ^ no configuration for @put-before@
   | CkRunMode
   -- ^ no configuration for @run-mode@
@@ -555,7 +561,7 @@ data ConfigurationKey
 
 -- | Exception specific to the "Headroom.Configuration" module.
 data ConfigurationError
-  = MissingConfiguration !ConfigurationKey
+  = MissingConfiguration ConfigurationKey
   -- ^ some of the required configuration keys has not been specified
   | MixedHeaderSyntax
   -- ^ illegal configuration for 'HeaderSyntax'

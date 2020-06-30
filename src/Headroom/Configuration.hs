@@ -105,16 +105,17 @@ makeHeadersConfig :: MonadThrow m
                   -> m CtHeadersConfig
                   -- ^ full 'CtHeadersConfig'
 makeHeadersConfig pt = do
-  hscC       <- makeHeaderConfig C (hscC pt)
-  hscCpp     <- makeHeaderConfig CPP (hscCpp pt)
-  hscCss     <- makeHeaderConfig CSS (hscCss pt)
-  hscHaskell <- makeHeaderConfig Haskell (hscHaskell pt)
-  hscHtml    <- makeHeaderConfig HTML (hscHtml pt)
-  hscJava    <- makeHeaderConfig Java (hscJava pt)
-  hscJs      <- makeHeaderConfig JS (hscJs pt)
-  hscRust    <- makeHeaderConfig Rust (hscRust pt)
-  hscScala   <- makeHeaderConfig Scala (hscScala pt)
-  hscShell   <- makeHeaderConfig Shell (hscShell pt)
+  hscC          <- makeHeaderConfig C (hscC pt)
+  hscCpp        <- makeHeaderConfig CPP (hscCpp pt)
+  hscCss        <- makeHeaderConfig CSS (hscCss pt)
+  hscHaskell    <- makeHeaderConfig Haskell (hscHaskell pt)
+  hscHtml       <- makeHeaderConfig HTML (hscHtml pt)
+  hscJava       <- makeHeaderConfig Java (hscJava pt)
+  hscJs         <- makeHeaderConfig JS (hscJs pt)
+  hscPureScript <- makeHeaderConfig PureScript (hscPureScript pt)
+  hscRust       <- makeHeaderConfig Rust (hscRust pt)
+  hscScala      <- makeHeaderConfig Scala (hscScala pt)
+  hscShell      <- makeHeaderConfig Shell (hscShell pt)
   pure HeadersConfig { .. }
 
 

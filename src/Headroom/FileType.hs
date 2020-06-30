@@ -67,13 +67,14 @@ configByFileType :: CtHeadersConfig
                  -> CtHeaderConfig
                  -- ^ appropriate 'HeaderConfig'
 configByFileType HeadersConfig {..} fileType = case fileType of
-  C       -> hscC
-  CPP     -> hscCpp
-  CSS     -> hscCss
-  Haskell -> hscHaskell
-  HTML    -> hscHtml
-  Java    -> hscJava
-  JS      -> hscJs
-  Rust    -> hscRust
-  Scala   -> hscScala
-  Shell   -> hscShell
+  C          -> hscC
+  CPP        -> hscCpp
+  CSS        -> hscCss
+  Haskell    -> hscHaskell
+  HTML       -> hscHtml
+  Java       -> hscJava
+  JS         -> hscJs
+  PureScript -> hscPureScript
+  Rust       -> hscRust
+  Scala      -> hscScala
+  Shell      -> hscShell

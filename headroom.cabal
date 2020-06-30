@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a67c3d59fea05225e8b7ff45c0dacfc37f0f75098eceed564024f1577d125e27
+-- hash: 9a445c1c3801715ebcfbc4499716d94881103e6188409ac46d499edcc0e06a41
 
 name:           headroom
 version:        0.3.1.0
@@ -32,6 +32,7 @@ extra-source-files:
     embedded/license/apache2/html.mustache
     embedded/license/apache2/java.mustache
     embedded/license/apache2/js.mustache
+    embedded/license/apache2/purescript.mustache
     embedded/license/apache2/rust.mustache
     embedded/license/apache2/scala.mustache
     embedded/license/apache2/shell.mustache
@@ -42,6 +43,7 @@ extra-source-files:
     embedded/license/bsd3/html.mustache
     embedded/license/bsd3/java.mustache
     embedded/license/bsd3/js.mustache
+    embedded/license/bsd3/purescript.mustache
     embedded/license/bsd3/rust.mustache
     embedded/license/bsd3/scala.mustache
     embedded/license/bsd3/shell.mustache
@@ -52,6 +54,7 @@ extra-source-files:
     embedded/license/gpl2/html.mustache
     embedded/license/gpl2/java.mustache
     embedded/license/gpl2/js.mustache
+    embedded/license/gpl2/purescript.mustache
     embedded/license/gpl2/rust.mustache
     embedded/license/gpl2/scala.mustache
     embedded/license/gpl2/shell.mustache
@@ -62,6 +65,7 @@ extra-source-files:
     embedded/license/gpl3/html.mustache
     embedded/license/gpl3/java.mustache
     embedded/license/gpl3/js.mustache
+    embedded/license/gpl3/purescript.mustache
     embedded/license/gpl3/rust.mustache
     embedded/license/gpl3/scala.mustache
     embedded/license/gpl3/shell.mustache
@@ -72,6 +76,7 @@ extra-source-files:
     embedded/license/mit/html.mustache
     embedded/license/mit/java.mustache
     embedded/license/mit/js.mustache
+    embedded/license/mit/purescript.mustache
     embedded/license/mit/rust.mustache
     embedded/license/mit/scala.mustache
     embedded/license/mit/shell.mustache
@@ -82,6 +87,7 @@ extra-source-files:
     embedded/license/mpl2/html.mustache
     embedded/license/mpl2/java.mustache
     embedded/license/mpl2/js.mustache
+    embedded/license/mpl2/purescript.mustache
     embedded/license/mpl2/rust.mustache
     embedded/license/mpl2/scala.mustache
     embedded/license/mpl2/shell.mustache
@@ -134,6 +140,7 @@ library
       Headroom.Data.Regex
       Headroom.Data.TextExtra
       Headroom.Embedded
+      Headroom.Embedded.TH
       Headroom.Ext
       Headroom.Ext.Haskell
       Headroom.Ext.Haskell.Haddock

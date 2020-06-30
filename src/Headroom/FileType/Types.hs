@@ -34,6 +34,8 @@ data FileType
   -- ^ support for /Java/ programming language
   | JS
   -- ^ support for /JavaScript/ programming language
+  | PureScript
+  -- ^ support for /PureScript/ programming language
   | Rust
   -- ^ support for /Rust/ programming language
   | Scala

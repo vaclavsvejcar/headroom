@@ -45,7 +45,7 @@ spec = do
   describe "loadBuiltInTemplates" $ do
     it "should load correct number of built-in templates" $ do
       templates <- runRIO env $ loadBuiltInTemplates BSD3
-      M.size templates `shouldBe` 10
+      M.size templates `shouldBe` 11
 
 
   describe "loadTemplateFiles" $ do

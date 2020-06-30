@@ -151,6 +151,16 @@ license-headers:
       starts-with: "/*"
       ends-with: "*/"
 
+  ## PureScript configuration
+  purescript:
+    file-extensions: ["purs"]
+    margin-after: 0
+    margin-before: 0
+    put-after: []
+    put-before: ["^module"]
+    line-comment:
+      prefixed-by: "--"
+
   ## Rust configuration
   rust:
     file-extensions: ["rs"]

@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
@@ -20,21 +21,23 @@ module Headroom.Embedded
   )
 where
 
-import           Data.FileEmbed                 ( embedStringFile )
 import           Headroom.Configuration.Types   ( LicenseType(..) )
+import           Headroom.Embedded.TH           ( embedConfigFile
+                                                , embedDefaultConfig
+                                                , embedTemplate
+                                                )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 
 
-
 -- | Content of dummy /YAML/ configuration file for the application.
 configFileStub :: IsString a => a
-configFileStub = $(embedStringFile "embedded/config-file.yaml")
+configFileStub = $(embedConfigFile)
 
 
 -- | Default /YAML/ configuration.
 defaultConfig :: IsString a => a
-defaultConfig = $(embedStringFile "embedded/default-config.yaml")
+defaultConfig = $(embedDefaultConfig)
 
 
 -- | License template for given license.
@@ -47,68 +50,74 @@ licenseTemplate :: IsString a
                 -- ^ template text
 licenseTemplate licenseType fileType = case licenseType of
   Apache2 -> case fileType of
-    C       -> $(embedStringFile "embedded/license/apache2/c.mustache")
-    CPP     -> $(embedStringFile "embedded/license/apache2/cpp.mustache")
-    CSS     -> $(embedStringFile "embedded/license/apache2/css.mustache")
-    Haskell -> $(embedStringFile "embedded/license/apache2/haskell.mustache")
-    HTML    -> $(embedStringFile "embedded/license/apache2/html.mustache")
-    Java    -> $(embedStringFile "embedded/license/apache2/java.mustache")
-    JS      -> $(embedStringFile "embedded/license/apache2/js.mustache")
-    Rust    -> $(embedStringFile "embedded/license/apache2/rust.mustache")
-    Scala   -> $(embedStringFile "embedded/license/apache2/scala.mustache")
-    Shell   -> $(embedStringFile "embedded/license/apache2/shell.mustache")
+    C          -> $(embedTemplate Apache2 C)
+    CPP        -> $(embedTemplate Apache2 CPP)
+    CSS        -> $(embedTemplate Apache2 CSS)
+    Haskell    -> $(embedTemplate Apache2 Haskell)
+    HTML       -> $(embedTemplate Apache2 HTML)
+    Java       -> $(embedTemplate Apache2 Java)
+    JS         -> $(embedTemplate Apache2 JS)
+    PureScript -> $(embedTemplate Apache2 PureScript)
+    Rust       -> $(embedTemplate Apache2 Rust)
+    Scala      -> $(embedTemplate Apache2 Scala)
+    Shell      -> $(embedTemplate Apache2 Shell)
   BSD3 -> case fileType of
-    C       -> $(embedStringFile "embedded/license/bsd3/c.mustache")
-    CPP     -> $(embedStringFile "embedded/license/bsd3/cpp.mustache")
-    CSS     -> $(embedStringFile "embedded/license/bsd3/css.mustache")
-    Haskell -> $(embedStringFile "embedded/license/bsd3/haskell.mustache")
-    HTML    -> $(embedStringFile "embedded/license/bsd3/html.mustache")
-    Java    -> $(embedStringFile "embedded/license/bsd3/java.mustache")
-    JS      -> $(embedStringFile "embedded/license/bsd3/js.mustache")
-    Rust    -> $(embedStringFile "embedded/license/bsd3/rust.mustache")
-    Scala   -> $(embedStringFile "embedded/license/bsd3/scala.mustache")
-    Shell   -> $(embedStringFile "embedded/license/bsd3/shell.mustache")
+    C          -> $(embedTemplate BSD3 C)
+    CPP        -> $(embedTemplate BSD3 CPP)
+    CSS        -> $(embedTemplate BSD3 CSS)
+    Haskell    -> $(embedTemplate BSD3 Haskell)
+    HTML       -> $(embedTemplate BSD3 HTML)
+    Java       -> $(embedTemplate BSD3 Java)
+    JS         -> $(embedTemplate BSD3 JS)
+    PureScript -> $(embedTemplate BSD3 PureScript)
+    Rust       -> $(embedTemplate BSD3 Rust)
+    Scala      -> $(embedTemplate BSD3 Scala)
+    Shell      -> $(embedTemplate BSD3 Shell)
   GPL2 -> case fileType of
-    C       -> $(embedStringFile "embedded/license/gpl2/c.mustache")
-    CPP     -> $(embedStringFile "embedded/license/gpl2/cpp.mustache")
-    CSS     -> $(embedStringFile "embedded/license/gpl2/css.mustache")
-    Haskell -> $(embedStringFile "embedded/license/gpl2/haskell.mustache")
-    HTML    -> $(embedStringFile "embedded/license/gpl2/html.mustache")
-    Java    -> $(embedStringFile "embedded/license/gpl2/java.mustache")
-    JS      -> $(embedStringFile "embedded/license/gpl2/js.mustache")
-    Rust    -> $(embedStringFile "embedded/license/gpl2/rust.mustache")
-    Scala   -> $(embedStringFile "embedded/license/gpl2/scala.mustache")
-    Shell   -> $(embedStringFile "embedded/license/gpl2/shell.mustache")
+    C          -> $(embedTemplate GPL2 C)
+    CPP        -> $(embedTemplate GPL2 CPP)
+    CSS        -> $(embedTemplate GPL2 CSS)
+    Haskell    -> $(embedTemplate GPL2 Haskell)
+    HTML       -> $(embedTemplate GPL2 HTML)
+    Java       -> $(embedTemplate GPL2 Java)
+    JS         -> $(embedTemplate GPL2 JS)
+    PureScript -> $(embedTemplate GPL2 PureScript)
+    Rust       -> $(embedTemplate GPL2 Rust)
+    Scala      -> $(embedTemplate GPL2 Scala)
+    Shell      -> $(embedTemplate GPL2 Shell)
   GPL3 -> case fileType of
-    C       -> $(embedStringFile "embedded/license/gpl3/c.mustache")
-    CPP     -> $(embedStringFile "embedded/license/gpl3/cpp.mustache")
-    CSS     -> $(embedStringFile "embedded/license/gpl3/css.mustache")
-    Haskell -> $(embedStringFile "embedded/license/gpl3/haskell.mustache")
-    HTML    -> $(embedStringFile "embedded/license/gpl3/html.mustache")
-    Java    -> $(embedStringFile "embedded/license/gpl3/java.mustache")
-    JS      -> $(embedStringFile "embedded/license/gpl3/js.mustache")
-    Rust    -> $(embedStringFile "embedded/license/gpl3/rust.mustache")
-    Scala   -> $(embedStringFile "embedded/license/gpl3/scala.mustache")
-    Shell   -> $(embedStringFile "embedded/license/gpl3/shell.mustache")
+    C          -> $(embedTemplate GPL3 C)
+    CPP        -> $(embedTemplate GPL3 CPP)
+    CSS        -> $(embedTemplate GPL3 CSS)
+    Haskell    -> $(embedTemplate GPL3 Haskell)
+    HTML       -> $(embedTemplate GPL3 HTML)
+    Java       -> $(embedTemplate GPL3 Java)
+    JS         -> $(embedTemplate GPL3 JS)
+    PureScript -> $(embedTemplate GPL3 PureScript)
+    Rust       -> $(embedTemplate GPL3 Rust)
+    Scala      -> $(embedTemplate GPL3 Scala)
+    Shell      -> $(embedTemplate GPL3 Shell)
   MIT -> case fileType of
-    C       -> $(embedStringFile "embedded/license/mit/c.mustache")
-    CPP     -> $(embedStringFile "embedded/license/mit/cpp.mustache")
-    CSS     -> $(embedStringFile "embedded/license/mit/css.mustache")
-    Haskell -> $(embedStringFile "embedded/license/mit/haskell.mustache")
-    HTML    -> $(embedStringFile "embedded/license/mit/html.mustache")
-    Java    -> $(embedStringFile "embedded/license/mit/java.mustache")
-    JS      -> $(embedStringFile "embedded/license/mit/js.mustache")
-    Rust    -> $(embedStringFile "embedded/license/mit/rust.mustache")
-    Scala   -> $(embedStringFile "embedded/license/mit/scala.mustache")
-    Shell   -> $(embedStringFile "embedded/license/mit/shell.mustache")
+    C          -> $(embedTemplate MIT C)
+    CPP        -> $(embedTemplate MIT CPP)
+    CSS        -> $(embedTemplate MIT CSS)
+    Haskell    -> $(embedTemplate MIT Haskell)
+    HTML       -> $(embedTemplate MIT HTML)
+    Java       -> $(embedTemplate MIT Java)
+    JS         -> $(embedTemplate MIT JS)
+    PureScript -> $(embedTemplate MIT PureScript)
+    Rust       -> $(embedTemplate MIT Rust)
+    Scala      -> $(embedTemplate MIT Scala)
+    Shell      -> $(embedTemplate MIT Shell)
   MPL2 -> case fileType of
-    C       -> $(embedStringFile "embedded/license/mpl2/c.mustache")
-    CPP     -> $(embedStringFile "embedded/license/mpl2/cpp.mustache")
-    CSS     -> $(embedStringFile "embedded/license/mpl2/css.mustache")
-    Haskell -> $(embedStringFile "embedded/license/mpl2/haskell.mustache")
-    HTML    -> $(embedStringFile "embedded/license/mpl2/html.mustache")
-    Java    -> $(embedStringFile "embedded/license/mpl2/java.mustache")
-    JS      -> $(embedStringFile "embedded/license/mpl2/js.mustache")
-    Rust    -> $(embedStringFile "embedded/license/mpl2/rust.mustache")
-    Scala   -> $(embedStringFile "embedded/license/mpl2/scala.mustache")
-    Shell   -> $(embedStringFile "embedded/license/mpl2/shell.mustache")
+    C          -> $(embedTemplate MPL2 C)
+    CPP        -> $(embedTemplate MPL2 CPP)
+    CSS        -> $(embedTemplate MPL2 CSS)
+    Haskell    -> $(embedTemplate MPL2 Haskell)
+    HTML       -> $(embedTemplate MPL2 HTML)
+    Java       -> $(embedTemplate MPL2 Java)
+    JS         -> $(embedTemplate MPL2 JS)
+    PureScript -> $(embedTemplate MPL2 PureScript)
+    Rust       -> $(embedTemplate MPL2 Rust)
+    Scala      -> $(embedTemplate MPL2 Scala)
+    Shell      -> $(embedTemplate MPL2 Shell)
