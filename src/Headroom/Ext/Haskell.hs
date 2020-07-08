@@ -7,7 +7,7 @@
 
 {-|
 Module      : Headroom.Ext.Haskell
-Description : Extraction of /Haskell/-specific template variables
+Description : Extended support for /Haskell/ source code files
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com

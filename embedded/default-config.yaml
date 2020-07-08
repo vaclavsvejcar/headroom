@@ -45,6 +45,7 @@ variables:
   _haskell_module_portability: "!!! INSERT MODULE PORTABILITY !!!"
   _haskell_module_longdesc: "!!! INSERT MODULE LONG DESCRIPTION !!!"
   _haskell_module_shortdesc: "!!! INSERT MODULE SHORT DESCRIPTION !!!"
+  _java_package_name: "!!! UNKNOWN JAVA PACKAGE NAME !!!"
   _purescript_module_name: "!!! INSERT PURESCRIPT MODULE NAME !!!"
 
 ## Allows to change behaviour of license header detection and placement. Such

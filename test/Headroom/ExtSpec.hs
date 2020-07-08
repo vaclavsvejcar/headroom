@@ -39,6 +39,14 @@ spec = do
       extractVariables Haskell config meta (Just (1, 13)) sample
         `shouldBe` expected
 
+    it "extracts variables specific for Java file type" $ do
+      let samplesDir = "test-data" </> "code-samples"
+          config     = HeaderConfig ["java"] 0 0 [] [] (BlockComment "/*" "*/")
+          meta       = Nothing
+          expected   = mkVariables [("_java_package_name", "foo")]
+      sample <- readFileUtf8 $ samplesDir </> "java" </> "sample1.java"
+      extractVariables Java config meta (Just (0, 2)) sample `shouldBe` expected
+
     it "extracts variables specific for PureScript file type" $ do
       let samplesDir = "test-data" </> "code-samples"
           config     = HeaderConfig ["purs"] 0 0 [] [] (LineComment "--")

@@ -25,6 +25,7 @@ where
 
 import           Headroom.Configuration.Types   ( CtHeaderConfig )
 import qualified Headroom.Ext.Haskell          as Haskell
+import qualified Headroom.Ext.Java             as Java
 import qualified Headroom.Ext.PureScript       as PureScript
 import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Template              ( Template(..) )
@@ -36,8 +37,9 @@ import           RIO
 -- | Extracts variables specific to the file type (if supported), e.g. module
 -- name for /Haskell/ source code. Currently supported file types are:
 --
--- * /Haskell/ - implemented in "Headroom.FileSupport.Haskell"
--- * /PureScript/ - implemented in "Headroom.FileSupport.PureScript"
+-- * /Haskell/ - implemented in "Headroom.Ext.Haskell"
+-- * /Java/ - implemented in "Headroom.Ext.Java"
+-- * /PureScript/ - implemented in "Headroom.Ext.PureScript"
 extractVariables :: FileType
                  -- ^ type of the file
                  -> CtHeaderConfig
@@ -50,9 +52,10 @@ extractVariables :: FileType
                  -- ^ text of the source code file
                  -> Variables
                  -- ^ extracted variables
-extractVariables fileType config meta headerPos text = case fileType of
-  Haskell    -> Haskell.extractVariables config meta headerPos text
-  PureScript -> PureScript.extractVariables config meta headerPos text
+extractVariables fileType = case fileType of
+  Haskell    -> Haskell.extractVariables
+  Java       -> Java.extractVariables
+  PureScript -> PureScript.extractVariables
   _          -> mempty
 
 
