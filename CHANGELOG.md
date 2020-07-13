@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.3.1.0 (not released yet)
 - [#53] Add support for _PureScript_ source code files
-- Bump _LTS Haskell_ to `16.4`
+- Bump _LTS Haskell_ to `16.5`
 
 ## 0.3.0.0 (released 2020-06-28)
 - [#25] Extract _dynamic variables_ from Haskell source code files
