@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 {-|
 Module      : Headroom.FileSystem
@@ -14,8 +15,17 @@ directories.
 -}
 
 module Headroom.FileSystem
-  ( -- * Traversing the File System
-    findFiles
+  ( -- * Type Aliases
+    FindFilesFn
+  , FindFilesByExtsFn
+  , FindFilesByTypesFn
+  , ListFilesFn
+  , LoadFileFn
+    -- * Polymorphic Record
+  , FileSystem(..)
+  , mkFileSystem
+    -- * Traversing the File System
+  , findFiles
   , findFilesByExts
   , findFilesByTypes
   , listFiles
@@ -52,51 +62,114 @@ import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
 
 
+--------------------------------  TYPE ALIASES  --------------------------------
+
+-- | Type of a function that recursively finds files on given path whose
+-- filename matches the predicate.
+type FindFilesFn m
+  =  FilePath
+  -- ^ path to search
+  -> (FilePath -> Bool)
+  -- ^ predicate to match filename
+  -> m [FilePath]
+  -- ^ found files
+
+
+-- | Type of a function that recursively finds files on given path by file
+-- extensions.
+type FindFilesByExtsFn m
+  =  FilePath
+  -- ^ path to search
+  -> [Text]
+  -- ^ list of file extensions (without dot)
+  -> m [FilePath]
+  -- ^ list of found files
+
+
+-- | Type of a function that recursively find files on given path by their
+-- file types.
+type FindFilesByTypesFn m
+  =  CtHeadersConfig
+  -- ^ configuration of license headers
+  -> [FileType]
+  -- ^ list of file types
+  -> FilePath
+  -- ^ path to search
+  -> m [FilePath]
+  -- ^ list of found files
+
+
+-- | Type of a function that recursively find all files on given path. If file
+-- reference is passed instead of directory, such file path is returned.
+type ListFilesFn m
+  =  FilePath
+  -- ^ path to search
+  -> m [FilePath]
+  -- ^ list of found files
+
+-- | Type of a function that loads file content in UTF8 encoding.
+type LoadFileFn m
+  =  FilePath
+  -- ^ file path
+  -> m Text
+  -- ^ file content
+
+-----------------------------  POLYMORPHIC RECORD  -----------------------------
+
+-- | /Polymorphic record/ composed of file system /IO/ function types, allowing
+-- to abstract over concrete implementation. Whenever you need to use effectful
+-- functions from this module, consider using this record instead of using them
+-- directly, as it allows you to use different records for production code and
+-- for testing, which is not as easy if you wire some of the provided functions
+-- directly.
+data FileSystem m = FileSystem
+  { fsFindFiles        :: FindFilesFn m
+  -- ^ Function that recursively finds files on given path whose filename
+  -- matches the predicate.
+  , fsFindFilesByExts  :: FindFilesByExtsFn m
+  -- ^ Function that recursively finds files on given path by file extensions.
+  , fsFindFilesByTypes :: FindFilesByTypesFn m
+  -- ^ Function that recursively find files on given path by their file types.
+  , fsListFiles        :: ListFilesFn m
+  -- ^ Function that recursively find all files on given path. If file reference
+  -- is passed instead of directory, such file path is returned.
+  , fsLoadFile         :: LoadFileFn m
+  -- ^ Function that loads file content in UTF8 encoding.
+  }
+
+
+-- | Creates new 'FileSystem' that performs actual disk /IO/ operations.
+mkFileSystem :: MonadIO m => FileSystem m
+mkFileSystem = FileSystem { fsFindFiles        = findFiles
+                          , fsFindFilesByExts  = findFilesByExts
+                          , fsFindFilesByTypes = findFilesByTypes
+                          , fsListFiles        = listFiles
+                          , fsLoadFile         = loadFile
+                          }
+
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Recursively finds files on given path whose filename matches the predicate.
-findFiles :: MonadIO m
-          => FilePath
-          -- ^ path to search
-          -> (FilePath -> Bool)
-          -- ^ predicate to match filename
-          -> m [FilePath]
-          -- ^ found files
+findFiles :: MonadIO m => FindFilesFn m
 findFiles path predicate = fmap (filter predicate) (listFiles path)
 
 
 -- | Recursively finds files on given path by file extensions.
-findFilesByExts :: MonadIO m
-                => FilePath
-                -- ^ path to search
-                -> [Text]
-                -- ^ list of file extensions (without dot)
-                -> m [FilePath]
-                -- ^ list of found files
+findFilesByExts :: MonadIO m => FindFilesByExtsFn m
 findFilesByExts path exts = findFiles path predicate
   where predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 
 
 -- | Recursively find files on given path by their file types.
-findFilesByTypes :: MonadIO m
-                 => CtHeadersConfig
-                 -- ^ configuration of license headers
-                 -> [FileType]
-                 -- ^ list of file types
-                 -> FilePath
-                 -- ^ path to search
-                 -> m [FilePath]
-                 -- ^ list of found files
+findFilesByTypes :: MonadIO m => FindFilesByTypesFn m
 findFilesByTypes headersConfig types path =
   findFilesByExts path (types >>= listExtensions headersConfig)
 
 
 -- | Recursively find all files on given path. If file reference is passed
 -- instead of directory, such file path is returned.
-listFiles :: MonadIO m
-          => FilePath
-          -- ^ path to search
-          -> m [FilePath]
-          -- ^ list of found files
+listFiles :: MonadIO m => ListFilesFn m
 listFiles fileOrDir = do
   isDir <- doesDirectoryExist fileOrDir
   if isDir then listDirectory fileOrDir else pure [fileOrDir]
@@ -115,18 +188,16 @@ listFiles fileOrDir = do
 --
 -- >>> fileExtension "path/to/some/file.txt"
 -- Just "txt"
-fileExtension :: FilePath -> Maybe Text
-fileExtension path = case takeExtension path of
-  '.' : xs -> Just $ T.pack xs
-  _        -> Nothing
+fileExtension :: FilePath
+              -- ^ path from which to extract file extension
+              -> Maybe Text
+              -- ^ extracted file extension
+fileExtension (takeExtension -> '.' : xs) = Just $ T.pack xs
+fileExtension _                           = Nothing
 
 
 -- | Loads file content in UTF8 encoding.
-loadFile :: MonadIO m
-         => FilePath
-         -- ^ file path
-         -> m Text
-         -- ^ file content
+loadFile :: MonadIO m => LoadFileFn m
 loadFile = readFileUtf8
 
 
