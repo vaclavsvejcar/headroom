@@ -1,4 +1,10 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE StrictData            #-}
+{-# LANGUAGE TemplateHaskell       #-}
+
 module Headroom.Command.InitSpec
   ( spec
   )
@@ -7,6 +13,11 @@ where
 import           Headroom.Command.Init
 import           Headroom.Command.Types         ( CommandInitOptions(..) )
 import           Headroom.Configuration.Types   ( LicenseType(..) )
+import           Headroom.Data.Has              ( Has(..) )
+import           Headroom.Data.Lens             ( suffixLenses
+                                                , suffixLensesFor
+                                                )
+import           Headroom.FileSystem            ( FileSystem(..) )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
@@ -14,27 +25,62 @@ import qualified RIO.List                      as L
 import           Test.Hspec
 
 
+data TestEnv = TestEnv
+  { envLogFunc     :: LogFunc
+  , envFileSystem  :: FileSystem (RIO TestEnv)
+  , envInitOptions :: CommandInitOptions
+  , envPaths       :: Paths
+  }
+
+suffixLenses ''TestEnv
+suffixLensesFor ["fsDoesFileExist"] ''FileSystem
+suffixLensesFor ["pConfigFile"] ''Paths
+
+instance HasLogFunc TestEnv where
+  logFuncL = envLogFuncL
+
+instance Has CommandInitOptions TestEnv where
+  hasLens = envInitOptionsL
+
+instance Has (FileSystem (RIO TestEnv)) TestEnv where
+  hasLens = envFileSystemL
+
+instance Has Paths TestEnv where
+  hasLens = envPathsL
+
+
 spec :: Spec
 spec = do
   describe "doesAppConfigExist" $ do
-    it "checks that '.headroom.yaml' exists in selected directory" $ do
-      result <- runRIO env doesAppConfigExist
+    it "checks that configuration file exists in selected directory" $ do
+      let env' = env & envFileSystemL . fsDoesFileExistL .~ check
+          check path = pure $ env' ^. envPathsL . pConfigFileL == path
+      result <- runRIO env' doesAppConfigExist
       result `shouldBe` True
 
   describe "findSupportedFileTypes" $ do
     it "recursively finds all known file types present in given path" $ do
       result <- runRIO env findSupportedFileTypes
-      let expected = [HTML]
-      L.sort result `shouldBe` L.sort expected
+      L.sort result `shouldBe` L.sort [HTML]
 
-env :: Env
-env = Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
+env :: TestEnv
+env = TestEnv { .. }
  where
-  logFunc = mkLogFunc (\_ _ _ _ -> pure ())
-  opts    = CommandInitOptions
+  envLogFunc     = mkLogFunc (\_ _ _ _ -> pure ())
+  envInitOptions = CommandInitOptions
     { cioSourcePaths = ["test-data" </> "test-traverse"]
     , cioLicenseType = BSD3
     }
-  paths = Paths { pConfigFile   = "test-data" </> "configs" </> "full.yaml"
-                , pTemplatesDir = "headroom-templates"
-                }
+  envPaths = Paths { pConfigFile   = "test-data" </> "configs" </> "full.yaml"
+                   , pTemplatesDir = "headroom-templates"
+                   }
+  envFileSystem = FileSystem { fsCreateDirectory     = undefined
+                             , fsDoesFileExist       = undefined
+                             , fsFindFiles           = undefined
+                             , fsFindFilesByExts     = undefined
+                             , fsFindFilesByTypes    = undefined
+                             , fsGetCurrentDirectory = undefined
+                             , fsListFiles           = undefined
+                             , fsLoadFile            = undefined
+                             }
+

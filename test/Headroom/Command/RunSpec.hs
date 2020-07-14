@@ -4,6 +4,7 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
@@ -22,15 +23,17 @@ import           Headroom.Configuration.Types   ( CtHeaderFnConfigs
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses )
+import           Headroom.Data.Lens             ( suffixLenses
+                                                , suffixLensesFor
+                                                )
 import           Headroom.Data.TextExtra        ( fromLines )
+import           Headroom.FileSystem            ( FileSystem(..) )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Meta                  ( TemplateType )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( CurrentYear(..) )
 import           Headroom.Variables             ( mkVariables )
 import           RIO                     hiding ( assert )
-import           RIO.FilePath                   ( (</>) )
 import qualified RIO.Map                       as M
 import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
@@ -38,6 +41,29 @@ import           Test.Hspec
 import           Test.Hspec.QuickCheck          ( prop )
 import           Test.QuickCheck         hiding ( sample )
 import           Test.QuickCheck.Monadic
+
+
+data TestEnv = TestEnv
+  { envLogFunc         :: LogFunc
+  , envCurrentYear     :: CurrentYear
+  , envFileSystem      :: FileSystem (RIO TestEnv)
+  , envHeaderFnConfigs :: CtHeaderFnConfigs
+  }
+
+suffixLenses ''TestEnv
+suffixLensesFor ["fsFindFilesByExts", "fsLoadFile"] ''FileSystem
+
+instance HasLogFunc TestEnv where
+  logFuncL = envLogFuncL
+
+instance Has CtHeaderFnConfigs TestEnv where
+  hasLens = envHeaderFnConfigsL
+
+instance Has CurrentYear TestEnv where
+  hasLens = envCurrentYearL
+
+instance Has (FileSystem (RIO TestEnv)) TestEnv where
+  hasLens = envFileSystemL
 
 
 spec :: Spec
@@ -50,7 +76,15 @@ spec = do
 
   describe "loadTemplateFiles" $ do
     it "should load templates from given paths" $ do
-      templates <- runRIO env $ loadTemplateFiles ["test-data" </> "templates"]
+      let env' =
+            env
+              & (envFileSystemL . fsFindFilesByExtsL .~ fsFindFilesByExts')
+              & (envFileSystemL . fsLoadFileL .~ fsLoadFile')
+          fsFindFilesByExts' "test-dir" _ = pure ["haskell.mustache"]
+          fsFindFilesByExts' _          _ = throwString "INVALID CONDITION"
+          fsLoadFile' "haskell.mustache" = pure "template content"
+          fsLoadFile' _                  = throwString "INVALID CONDITION"
+      templates <- runRIO env' $ loadTemplateFiles ["test-dir"]
       M.size templates `shouldBe` 1
       M.member Haskell templates `shouldBe` True
 
@@ -98,8 +132,17 @@ spec = do
 env :: TestEnv
 env = TestEnv { .. }
  where
-  envLogFunc         = mkLogFunc (\_ _ _ _ -> pure ())
-  envCurrentYear     = CurrentYear 2020
+  envLogFunc     = mkLogFunc (\_ _ _ _ -> pure ())
+  envCurrentYear = CurrentYear 2020
+  envFileSystem  = FileSystem { fsCreateDirectory     = undefined
+                              , fsDoesFileExist       = undefined
+                              , fsFindFiles           = undefined
+                              , fsFindFilesByExts     = undefined
+                              , fsFindFilesByTypes    = undefined
+                              , fsGetCurrentDirectory = undefined
+                              , fsListFiles           = undefined
+                              , fsLoadFile            = undefined
+                              }
   envHeaderFnConfigs = HeaderFnConfigs
     { hfcsUpdateCopyright = HeaderFnConfig
                               { hfcEnabled = True
@@ -109,19 +152,3 @@ env = TestEnv { .. }
                                                }
                               }
     }
-
-data TestEnv = TestEnv
-  { envLogFunc         :: !LogFunc
-  , envHeaderFnConfigs :: !CtHeaderFnConfigs
-  , envCurrentYear     :: !CurrentYear
-  }
-suffixLenses ''TestEnv
-
-instance HasLogFunc TestEnv where
-  logFuncL = envLogFuncL
-
-instance Has CtHeaderFnConfigs TestEnv where
-  hasLens = envHeaderFnConfigsL
-
-instance Has CurrentYear TestEnv where
-  hasLens = envCurrentYearL

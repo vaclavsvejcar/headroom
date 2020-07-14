@@ -1,9 +1,11 @@
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE TypeApplications      #-}
@@ -45,10 +47,10 @@ import           Headroom.Embedded              ( configFileStub
                                                 , defaultConfig
                                                 , licenseTemplate
                                                 )
-import           Headroom.FileSystem            ( createDirectory
-                                                , doesFileExist
+import           Headroom.FileSystem            ( FileSystem(..)
                                                 , fileExtension
                                                 , findFiles
+                                                , mkFileSystem
                                                 )
 import           Headroom.FileType              ( fileTypeByExt )
 import           Headroom.FileType.Types        ( FileType(..) )
@@ -73,15 +75,16 @@ import qualified RIO.Text.Partial              as TP
 
 -- | /RIO/ Environment for the @init@ command.
 data Env = Env
-  { envLogFunc     :: !LogFunc
-  , envInitOptions :: !CommandInitOptions
-  , envPaths       :: !Paths
+  { envLogFunc     :: LogFunc
+  , envFileSystem  :: FileSystem (RIO Env)
+  , envInitOptions :: CommandInitOptions
+  , envPaths       :: Paths
   }
 
 -- | Paths to various locations of file system.
 data Paths = Paths
-  { pConfigFile   :: !FilePath
-  , pTemplatesDir :: !FilePath
+  { pConfigFile   :: FilePath
+  , pTemplatesDir :: FilePath
   }
 
 suffixLenses ''Env
@@ -91,6 +94,9 @@ instance HasLogFunc Env where
 
 instance Has CommandInitOptions Env where
   hasLens = envInitOptionsL
+
+instance Has (FileSystem (RIO Env)) Env where
+  hasLens = envFileSystemL
 
 instance Has Paths Env where
   hasLens = envPathsL
@@ -102,7 +108,11 @@ env' opts logFunc = do
   let paths = Paths { pConfigFile   = ".headroom.yaml"
                     , pTemplatesDir = "headroom-templates"
                     }
-  pure $ Env { envLogFunc = logFunc, envInitOptions = opts, envPaths = paths }
+  pure $ Env { envLogFunc     = logFunc
+             , envFileSystem  = mkFileSystem
+             , envInitOptions = opts
+             , envPaths       = paths
+             }
 
 -- | Handler for @init@ command.
 commandInit :: CommandInitOptions
@@ -182,18 +192,28 @@ createConfigFile = do
     T.stripEnd . prettyPrintYAML $ M.fromList [(field :: Text, list)]
 
 -- | Checks whether application config file already exists.
-doesAppConfigExist :: (HasLogFunc env, Has Paths env) => RIO env Bool
+doesAppConfigExist :: ( HasLogFunc env
+                      , Has (FileSystem (RIO env)) env
+                      , Has Paths env
+                      )
+                   => RIO env Bool
 doesAppConfigExist = do
-  Paths {..} <- viewL
+  FileSystem {..} <- viewL
+  Paths {..}      <- viewL
   logInfo "Verifying that there's no existing Headroom configuration..."
-  doesFileExist pConfigFile
+  fsDoesFileExist pConfigFile
 
 -- | Creates directory for template files.
-makeTemplatesDir :: (HasLogFunc env, Has Paths env) => RIO env ()
+makeTemplatesDir :: ( HasLogFunc env
+                    , Has (FileSystem (RIO env)) env
+                    , Has Paths env
+                    )
+                 => RIO env ()
 makeTemplatesDir = do
-  Paths {..} <- viewL
+  FileSystem {..} <- viewL
+  Paths {..}      <- viewL
   logInfo $ "Creating directory for templates in " <> fromString pTemplatesDir
-  createDirectory pTemplatesDir
+  fsCreateDirectory pTemplatesDir
 
 
 ---------------------------------  Error Types  --------------------------------

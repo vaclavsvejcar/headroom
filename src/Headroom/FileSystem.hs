@@ -16,9 +16,12 @@ directories.
 
 module Headroom.FileSystem
   ( -- * Type Aliases
-    FindFilesFn
+    CreateDirectoryFn
+  , DoesFileExistFn
+  , FindFilesFn
   , FindFilesByExtsFn
   , FindFilesByTypesFn
+  , GetCurrentDirectoryFn
   , ListFilesFn
   , LoadFileFn
     -- * Polymorphic Record
@@ -30,10 +33,6 @@ module Headroom.FileSystem
   , findFilesByTypes
   , listFiles
   , loadFile
-    -- * Working with Files/Directories
-  , doesFileExist
-  , getCurrentDirectory
-  , createDirectory
     -- * Working with Files Metadata
   , fileExtension
     -- * Other
@@ -63,6 +62,23 @@ import qualified RIO.Text                      as T
 
 
 --------------------------------  TYPE ALIASES  --------------------------------
+
+-- | Type of a function that creates new empty directory on the given path.
+type CreateDirectoryFn m
+  =  FilePath
+  -- ^ path of new directory
+  -> m ()
+  -- ^ /IO/ action result
+
+
+-- | Type of a function that returns 'True' if the argument file exists and is
+-- not a directory, and 'False' otherwise.
+type DoesFileExistFn m
+  =  FilePath
+  -- ^ path to check
+  -> m Bool
+  -- ^ whether the given path is existing file
+
 
 -- | Type of a function that recursively finds files on given path whose
 -- filename matches the predicate.
@@ -99,6 +115,11 @@ type FindFilesByTypesFn m
   -- ^ list of found files
 
 
+-- | Type of a function that obtains the current working directory as an
+-- absolute path.
+type GetCurrentDirectoryFn m = m FilePath
+
+
 -- | Type of a function that recursively find all files on given path. If file
 -- reference is passed instead of directory, such file path is returned.
 type ListFilesFn m
@@ -123,28 +144,38 @@ type LoadFileFn m
 -- for testing, which is not as easy if you wire some of the provided functions
 -- directly.
 data FileSystem m = FileSystem
-  { fsFindFiles        :: FindFilesFn m
+  { fsCreateDirectory     :: CreateDirectoryFn m
+  -- ^ Function that creates new empty directory on the given path.
+  , fsDoesFileExist       :: DoesFileExistFn m
+  -- ^ Function that returns 'True' if the argument file exists and is not
+  -- a directory, and 'False' otherwise.
+  , fsFindFiles           :: FindFilesFn m
   -- ^ Function that recursively finds files on given path whose filename
   -- matches the predicate.
-  , fsFindFilesByExts  :: FindFilesByExtsFn m
+  , fsFindFilesByExts     :: FindFilesByExtsFn m
   -- ^ Function that recursively finds files on given path by file extensions.
-  , fsFindFilesByTypes :: FindFilesByTypesFn m
+  , fsFindFilesByTypes    :: FindFilesByTypesFn m
   -- ^ Function that recursively find files on given path by their file types.
-  , fsListFiles        :: ListFilesFn m
+  , fsGetCurrentDirectory :: GetCurrentDirectoryFn m
+  -- ^ Function that obtains the current working directory as an absolute path.
+  , fsListFiles           :: ListFilesFn m
   -- ^ Function that recursively find all files on given path. If file reference
   -- is passed instead of directory, such file path is returned.
-  , fsLoadFile         :: LoadFileFn m
+  , fsLoadFile            :: LoadFileFn m
   -- ^ Function that loads file content in UTF8 encoding.
   }
 
 
 -- | Creates new 'FileSystem' that performs actual disk /IO/ operations.
 mkFileSystem :: MonadIO m => FileSystem m
-mkFileSystem = FileSystem { fsFindFiles        = findFiles
-                          , fsFindFilesByExts  = findFilesByExts
-                          , fsFindFilesByTypes = findFilesByTypes
-                          , fsListFiles        = listFiles
-                          , fsLoadFile         = loadFile
+mkFileSystem = FileSystem { fsCreateDirectory     = createDirectory
+                          , fsDoesFileExist       = doesFileExist
+                          , fsFindFiles           = findFiles
+                          , fsFindFilesByExts     = findFilesByExts
+                          , fsFindFilesByTypes    = findFilesByTypes
+                          , fsGetCurrentDirectory = getCurrentDirectory
+                          , fsListFiles           = listFiles
+                          , fsLoadFile            = loadFile
                           }
 
 

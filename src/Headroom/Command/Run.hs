@@ -4,6 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE TypeApplications      #-}
@@ -70,11 +71,10 @@ import           Headroom.FileSupport           ( addHeader
                                                 , replaceHeader
                                                 )
 import           Headroom.FileSupport.Types     ( FileInfo(..) )
-import           Headroom.FileSystem            ( excludePaths
+import           Headroom.FileSystem            ( FileSystem(..)
+                                                , excludePaths
                                                 , fileExtension
-                                                , findFilesByExts
-                                                , findFilesByTypes
-                                                , loadFile
+                                                , mkFileSystem
                                                 )
 import           Headroom.FileType              ( configByFileType
                                                 , fileTypeByExt
@@ -109,22 +109,22 @@ type TemplatesMap = Map FileType (Maybe TemplateMeta, TemplateType)
 
 -- | Action to be performed based on the selected 'RunMode'.
 data RunAction = RunAction
-  { raProcessed    :: !Bool
+  { raProcessed    :: Bool
   -- ^ whether the given file was processed
-  , raFunc         :: !(Text -> Text)
+  , raFunc         :: Text -> Text
   -- ^ function to process the file
-  , raProcessedMsg :: !Text
+  , raProcessedMsg :: Text
   -- ^ message to show when file was processed
-  , raSkippedMsg   :: !Text
+  , raSkippedMsg   :: Text
   -- ^ message to show when file was skipped
   }
 
 
 -- | Initial /RIO/ startup environment for the /Run/ command.
 data StartupEnv = StartupEnv
-  { envLogFunc    :: !LogFunc
+  { envLogFunc    :: LogFunc
   -- ^ logging function
-  , envRunOptions :: !CommandRunOptions
+  , envRunOptions :: CommandRunOptions
   -- ^ options
   }
 
@@ -132,12 +132,14 @@ suffixLenses ''StartupEnv
 
 -- | Full /RIO/ environment for the /Run/ command.
 data Env = Env
-  { envEnv           :: !StartupEnv
+  { envEnv           :: StartupEnv
   -- ^ startup /RIO/ environment
-  , envConfiguration :: !CtConfiguration
+  , envConfiguration :: CtConfiguration
   -- ^ application configuration
-  , envCurrentYear   :: !CurrentYear
+  , envCurrentYear   :: CurrentYear
   -- ^ current year
+  , envFileSystem    :: FileSystem (RIO Env)
+  -- ^ file system operations
   }
 
 suffixLenses ''Env
@@ -169,10 +171,14 @@ instance Has CommandRunOptions Env where
 instance Has CurrentYear Env where
   hasLens = envCurrentYearL
 
+instance Has (FileSystem (RIO Env)) Env where
+  hasLens = envFileSystemL
+
 
 env' :: CommandRunOptions -> LogFunc -> IO Env
 env' opts logFunc = do
-  let envEnv = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
+  let envEnv        = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
+      envFileSystem = mkFileSystem
   envConfiguration <- runRIO envEnv finalConfiguration
   envCurrentYear   <- currentYear
   pure Env { .. }
@@ -214,13 +220,18 @@ warnOnDryRun = do
   when croDryRun $ logWarn "[!] Running with '--dry-run', no files are changed!"
 
 
-findSourceFiles :: (Has CtConfiguration env, HasLogFunc env)
+findSourceFiles :: ( Has CtConfiguration env
+                   , Has (FileSystem (RIO env)) env
+                   , HasLogFunc env
+                   )
                 => [FileType]
                 -> RIO env [FilePath]
 findSourceFiles fileTypes = do
   Configuration {..} <- viewL
+  FileSystem {..}    <- viewL
   logDebug $ "Using source paths: " <> displayShow cSourcePaths
-  files <- mconcat <$> mapM (findFiles' cLicenseHeaders) cSourcePaths
+  files <-
+    mconcat <$> mapM (fsFindFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
   let files' = excludePaths cExcludedPaths files
   logInfo $ mconcat
     [ "Found "
@@ -230,7 +241,6 @@ findSourceFiles fileTypes = do
     , " file(s))"
     ]
   pure files'
-  where findFiles' licenseHeaders = findFilesByTypes licenseHeaders fileTypes
 
 
 processSourceFiles :: ( Has CtConfiguration env
@@ -332,23 +342,25 @@ chooseAction info header = do
 
 
 -- | Loads templates from the given paths.
-loadTemplateFiles :: (HasLogFunc env)
+loadTemplateFiles :: (Has (FileSystem (RIO env)) env, HasLogFunc env)
                   => [FilePath]
                   -- ^ paths to template files
                   -> RIO env (Map FileType TemplateType)
                   -- ^ map of file types and templates
 loadTemplateFiles paths' = do
-  paths <- mconcat <$> mapM (`findFilesByExts` extensions) paths'
+  FileSystem {..} <- viewL
+  paths           <- mconcat <$> mapM (`fsFindFilesByExts` extensions) paths'
   logDebug $ "Using template paths: " <> displayShow paths
   withTypes <- catMaybes <$> mapM (\p -> fmap (, p) <$> typeOfTemplate p) paths
-  parsed    <- mapM (\(t, p) -> (t, ) <$> load p) withTypes
+  parsed    <- mapM
+    (\(t, p) ->
+      (t, ) <$> ((T.strip <$> fsLoadFile p) >>= parseTemplate (Just $ T.pack p))
+    )
+    withTypes
   logInfo
     $ mconcat ["Found ", display $ L.length parsed, " license template(s)"]
   pure $ M.fromList parsed
- where
-  extensions = toList $ templateExtensions @TemplateType
-  load path =
-    liftIO $ (T.strip <$> loadFile path) >>= parseTemplate (Just $ T.pack path)
+  where extensions = toList $ templateExtensions @TemplateType
 
 
 -- | Loads built-in templates, stored in "Headroom.Embedded", for the given
@@ -367,7 +379,10 @@ loadBuiltInTemplates licenseType = do
   template     = licenseTemplate licenseType
 
 
-loadTemplates :: (Has CtConfiguration env, HasLogFunc env)
+loadTemplates :: ( Has CtConfiguration env
+                 , Has (FileSystem (RIO env)) env
+                 , HasLogFunc env
+                 )
               => RIO env (Map FileType TemplateType)
 loadTemplates = do
   Configuration {..} <- viewL @CtConfiguration
