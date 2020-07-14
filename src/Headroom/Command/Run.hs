@@ -55,11 +55,12 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , PtConfiguration
                                                 , RunMode(..)
                                                 , TemplateSource(..)
-                                                , cHeaderFnConfigsL
                                                 )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
 import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses )
+import           Headroom.Data.Lens             ( suffixLenses
+                                                , suffixLensesFor
+                                                )
 import           Headroom.Data.TextExtra        ( mapLines )
 import           Headroom.Embedded              ( defaultConfig
                                                 , licenseTemplate
@@ -103,6 +104,9 @@ import           RIO.FilePath                   ( takeBaseName )
 import qualified RIO.List                      as L
 import qualified RIO.Map                       as M
 import qualified RIO.Text                      as T
+
+
+suffixLensesFor ["cHeaderFnConfigs"] ''Configuration
 
 
 type TemplatesMap = Map FileType (Maybe TemplateMeta, TemplateType)

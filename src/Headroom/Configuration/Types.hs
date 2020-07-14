@@ -9,7 +9,6 @@
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE StrictData           #-}
-{-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -67,18 +66,6 @@ module Headroom.Configuration.Types
   , LicenseType(..)
   , RunMode(..)
   , TemplateSource(..)
-    -- * Lenses
-  , cRunModeL
-  , cSourcePathsL
-  , cExcludedPathsL
-  , cTemplateSourceL
-  , cVariablesL
-  , cLicenseHeadersL
-  , cHeaderFnConfigsL
-  , uccSelectedAuthorsL
-  , hfcEnabledL
-  , hfcConfigL
-  , hfcsUpdateCopyrightL
   )
 where
 
@@ -92,7 +79,6 @@ import           Data.Aeson                     ( FromJSON(..)
                                                 )
 import           Data.Monoid                    ( Last(..) )
 import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.Data.Regex            ( Regex(..) )
 import           Headroom.FileType.Types        ( FileType )
 import           Headroom.Serialization         ( aesonOptions )
@@ -637,11 +623,3 @@ missingConfig desc yaml cli = mconcat
   cliText  = fmap (\c -> "command line option '" <> c <> "'") cli
   yamlText = fmap (\y -> "YAML option '" <> y <> "'") yaml
   options  = T.intercalate " or " . catMaybes $ [cliText, yamlText]
-
-
------------------------------------  LENSES  -----------------------------------
-
-suffixLenses ''Configuration
-suffixLenses ''UpdateCopyrightConfig
-suffixLenses ''HeaderFnConfig
-suffixLenses ''HeaderFnConfigs

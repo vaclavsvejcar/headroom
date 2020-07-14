@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 {-|
 Module      : Headroom.FileSupport
@@ -43,14 +44,16 @@ import           Headroom.Data.TextExtra        ( fromLines
                                                 , toLines
                                                 )
 import           Headroom.Ext                   ( extractVariables )
-import           Headroom.FileSupport.Types     ( FileInfo(..)
-                                                , fiHeaderPosL
-                                                )
+import           Headroom.FileSupport.Types     ( FileInfo(..) )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           Headroom.Types                 ( TemplateMeta(..) )
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
+import           Headroom.Data.Lens             ( suffixLensesFor )
+
+
+suffixLensesFor ["fiHeaderPos"] ''FileInfo
 
 
 -- | Extracts info about the processed file to be later used by the header

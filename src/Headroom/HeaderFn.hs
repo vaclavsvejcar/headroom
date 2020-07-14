@@ -31,22 +31,18 @@ module Headroom.HeaderFn
     -- * Environment Data Types
   , ConfiguredEnv(..)
   , mkConfiguredEnv
-    -- * Lenses
-  , ceCurrentYearL
-  , ceHeaderFnConfigsL
-  , ceUpdateCopyrightModeL
   )
 where
 
 import           Headroom.Configuration.Types   ( CtHeaderFnConfigs
                                                 , HeaderFnConfig(..)
                                                 , HeaderFnConfigs(..)
-                                                , hfcConfigL
-                                                , hfcsUpdateCopyrightL
-                                                , uccSelectedAuthorsL
+                                                , UpdateCopyrightConfig(..)
                                                 )
 import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses )
+import           Headroom.Data.Lens             ( suffixLenses
+                                                , suffixLensesFor
+                                                )
 import           Headroom.HeaderFn.Types        ( HeaderFn(..) )
 import           Headroom.HeaderFn.UpdateCopyright
                                                 ( SelectedAuthors(..)
@@ -59,6 +55,11 @@ import           Headroom.Types                 ( CurrentYear(..) )
 import           Headroom.Variables.Types       ( Variables(..) )
 import           Lens.Micro                     ( traverseOf )
 import           RIO
+
+
+suffixLenses ''HeaderFnConfigs
+suffixLenses ''UpdateCopyrightConfig
+suffixLensesFor ["hfcConfig"] ''HeaderFnConfig
 
 
 -- | Runs the /license header function/ using the given /environment/ and text
@@ -113,7 +114,7 @@ data ConfiguredEnv = ConfiguredEnv
   }
   deriving (Eq, Show)
 
-suffixLenses ''ConfiguredEnv
+suffixLensesFor ["ceCurrentYear", "ceUpdateCopyrightMode"] ''ConfiguredEnv
 
 instance Has CurrentYear ConfiguredEnv where
   hasLens = ceCurrentYearL

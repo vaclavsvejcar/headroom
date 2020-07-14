@@ -2,6 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 {-|
 Module      : Headroom.Configuration
@@ -52,15 +53,16 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , PtHeadersConfig
                                                 , PtUpdateCopyrightConfig
                                                 , UpdateCopyrightConfig(..)
-                                                , hfcConfigL
-                                                , hfcEnabledL
-                                                , hfcsUpdateCopyrightL
-                                                , hfcsUpdateCopyrightL
-                                                , uccSelectedAuthorsL
                                                 )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 import qualified RIO.ByteString                as B
+import           Headroom.Data.Lens             ( suffixLenses )
+
+
+suffixLenses ''HeaderFnConfig
+suffixLenses ''HeaderFnConfigs
+suffixLenses ''UpdateCopyrightConfig
 
 
 -- | Loads and parses application configuration from given /YAML/ file.
