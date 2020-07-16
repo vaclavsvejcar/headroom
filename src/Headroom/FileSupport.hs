@@ -37,6 +37,7 @@ import           Headroom.Configuration.Types   ( CtHeaderConfig
                                                 , HeaderConfig(..)
                                                 , HeaderSyntax(..)
                                                 )
+import           Headroom.Data.Lens             ( suffixLensesFor )
 import           Headroom.Data.Regex            ( Regex
                                                 , match
                                                 )
@@ -50,7 +51,6 @@ import           Headroom.Types                 ( TemplateMeta(..) )
 import           RIO
 import qualified RIO.List                      as L
 import qualified RIO.Text                      as T
-import           Headroom.Data.Lens             ( suffixLensesFor )
 
 
 suffixLensesFor ["fiHeaderPos"] ''FileInfo

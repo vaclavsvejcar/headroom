@@ -54,10 +54,10 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , PtUpdateCopyrightConfig
                                                 , UpdateCopyrightConfig(..)
                                                 )
+import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.FileType.Types        ( FileType(..) )
 import           RIO
 import qualified RIO.ByteString                as B
-import           Headroom.Data.Lens             ( suffixLenses )
 
 
 suffixLenses ''HeaderFnConfig
