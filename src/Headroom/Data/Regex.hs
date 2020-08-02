@@ -28,6 +28,8 @@ module Headroom.Data.Regex
   , re
   , replace
   , scan
+    -- * Unsafe Functions
+  , compileUnsafe
   )
 where
 
@@ -111,14 +113,19 @@ scan :: Regex
 scan (Regex regex) = PH.scan regex
 
 
-------------------------------  PRIVATE FUNCTIONS  -----------------------------
-
-
-compileUnsafe :: Text -> Regex
+-- | Compiles the given text into /regex/ in runtime. Note that if the /regex/
+-- cannot be compiled, it will throw runtime error. Do not use this function
+-- unless you know what you're doing.
+compileUnsafe :: Text
+              -- ^ /regex/ to compile
+              -> Regex
+              -- ^ compiled /regex/ or runtime exception
 compileUnsafe raw = case compile raw of
   Left  err -> error . displayException $ err
   Right res -> res
 
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
 quoteExpRegex :: String -> ExpQ
 quoteExpRegex txt = [| compileUnsafe . T.pack $ txt |]
