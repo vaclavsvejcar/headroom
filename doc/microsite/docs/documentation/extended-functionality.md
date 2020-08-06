@@ -121,6 +121,11 @@ Some long description
 -}
 ```
 
+## Extended Java Support
+This support includes extracting additional info from processed _Java source code file_ and exposing it using following _dynamic variables_:
+
+- `_java_package_name` - Contains package name of the currently processed `Java` source code file.
+
 ## Extended PureScript Support
 This support includes extracting additional info from processed _PureScript source code file_ and exposing it using following _dynamic variables_:
 

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 - [#48] Decouple IO actions for easier testing
 - [#53] Add support for _PureScript_ source code files
 - [#54] Extract _dynamic variables_ from _Java_ source code files
-- Bump _LTS Haskell_ to `16.6`
+- Bump _LTS Haskell_ to `16.8`
 
 ## 0.3.0.0 (released 2020-06-28)
 - [#25] Extract _dynamic variables_ from Haskell source code files
