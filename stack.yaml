@@ -1,4 +1,3 @@
-resolver: lts-16.9
-pvp-bounds: lower
+resolver: lts-16.10
 packages:
   - .

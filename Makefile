@@ -3,6 +3,10 @@ clean:
 	rm -rf ./.stack-work/
 	rm -rf ./dist-newstyle
 
+.PHONY: dist
+dist: fresh
+	stack sdist
+
 .PHONY: format
 format: 
 	find ./app -name '*.hs' | xargs stylish-haskell -i -v
