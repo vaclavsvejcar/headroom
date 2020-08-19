@@ -3,6 +3,7 @@
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE StrictData            #-}
 module Headroom.HeaderFn.TypesSpec
   ( spec
   )
@@ -41,16 +42,16 @@ spec = do
 
 
 data FooEnv = FooEnv
-  { feValue :: !Text
+  { feValue :: Text
   }
 
 data BarEnv = BarEnv
-  { beValue :: !Text
+  { beValue :: Text
   }
 
 data CombinedEnv = CombinedEnv
-  { ceFooEnv :: !FooEnv
-  , ceBarEnv :: !BarEnv
+  { ceFooEnv :: FooEnv
+  , ceBarEnv :: BarEnv
   }
 
 

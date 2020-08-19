@@ -1,6 +1,7 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StrictData        #-}
 {-# LANGUAGE TypeApplications  #-}
 
 {-|
@@ -101,7 +102,7 @@ compileVariables variables@(Variables kvs) = do
 ---------------------------------  Error Types  --------------------------------
 
 -- | Exception specific to the "Headroom.Variables" module.
-data VariablesError = InvalidVariable !Text
+data VariablesError = InvalidVariable Text
                     -- ^ invalid variable input (as @key=value@)
   deriving (Eq, Show)
 

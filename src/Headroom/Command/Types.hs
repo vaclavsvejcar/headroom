@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE StrictData        #-}
 
 {-|
 Module      : Headroom.Command.Types
@@ -50,28 +51,28 @@ newtype CommandGenOptions = CommandGenOptions
 
 -- | Options for the @init@ command.
 data CommandInitOptions = CommandInitOptions
-  { cioSourcePaths :: ![FilePath]
+  { cioSourcePaths :: [FilePath]
   -- ^ paths to source code files
-  , cioLicenseType :: !LicenseType
+  , cioLicenseType :: LicenseType
   -- ^ license type
   }
   deriving Show
 
 -- | Options for the @run@ command.
 data CommandRunOptions = CommandRunOptions
-  { croRunMode        :: !(Maybe RunMode)
+  { croRunMode        :: Maybe RunMode
   -- ^ used /Run/ command mode
-  , croSourcePaths    :: ![FilePath]
+  , croSourcePaths    :: [FilePath]
   -- ^ source code file paths
-  , croExcludedPaths  :: ![Regex]
+  , croExcludedPaths  :: [Regex]
   -- ^ source paths to exclude
-  , croTemplateSource :: !(Maybe TemplateSource)
+  , croTemplateSource :: Maybe TemplateSource
   -- ^ source of license templates
-  , croVariables      :: ![Text]
+  , croVariables      :: [Text]
   -- ^ raw variables
-  , croDebug          :: !Bool
+  , croDebug          :: Bool
   -- ^ whether to run in debug mode
-  , croDryRun         :: !Bool
+  , croDryRun         :: Bool
   -- ^ whether to perform dry run
   }
   deriving (Eq, Show)

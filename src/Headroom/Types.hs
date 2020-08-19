@@ -1,6 +1,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE NoImplicitPrelude         #-}
 {-# LANGUAGE OverloadedStrings         #-}
+{-# LANGUAGE StrictData                #-}
 
 {-|
 Module      : Headroom.Types
@@ -72,7 +73,7 @@ newtype CurrentYear = CurrentYear
 
 -- | Offsets for selected fields extracted from /Haddock module header/.
 data HaddockFieldOffsets = HaddockFieldOffsets
-  { hfoCopyright :: !(Maybe Int)
+  { hfoCopyright :: Maybe Int
   -- ^ offset for /Copyright/ field
   }
   deriving (Eq, Show)
@@ -81,6 +82,6 @@ instance Default HaddockFieldOffsets where
   def = HaddockFieldOffsets { hfoCopyright = Nothing }
 
 -- | Metadata parsed from raw /template/, specific for selected /file type/.
-data TemplateMeta = HaskellTemplateMeta !HaddockFieldOffsets
+data TemplateMeta = HaskellTemplateMeta HaddockFieldOffsets
   deriving (Eq, Show)
 

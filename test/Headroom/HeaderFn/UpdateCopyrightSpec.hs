@@ -2,6 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE StrictData            #-}
 module Headroom.HeaderFn.UpdateCopyrightSpec
   ( spec
   )
@@ -88,8 +89,8 @@ spec = do
 
 
 data TestEnv = TestEnv
-  { teCurrentYear :: !CurrentYear
-  , teMode        :: !UpdateCopyrightMode
+  { teCurrentYear :: CurrentYear
+  , teMode        :: UpdateCopyrightMode
   }
   deriving (Eq, Show)
 

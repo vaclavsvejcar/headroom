@@ -2,6 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE StrictData        #-}
 {-# LANGUAGE TypeApplications  #-}
 
 {-|
@@ -53,7 +54,7 @@ newtype SelectedAuthors = SelectedAuthors (NonEmpty Text) deriving (Eq, Show)
 data UpdateCopyrightMode
   = UpdateAllAuthors
   -- ^ updates years in copyrights for all authors
-  | UpdateSelectedAuthors !SelectedAuthors
+  | UpdateSelectedAuthors SelectedAuthors
   -- ^ updates years in copyrights only for selected authors
   deriving (Eq, Show)
 

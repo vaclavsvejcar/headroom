@@ -3,6 +3,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE StrictData        #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
 {-|
@@ -135,7 +136,7 @@ quoteExpRegex txt = [| compileUnsafe . T.pack $ txt |]
 ---------------------------------  Error Types  --------------------------------
 
 -- | Exception specific to the "Headroom.Data.Regex" module.
-data RegexError = CompilationFailed !Text !Text
+data RegexError = CompilationFailed Text Text
                 -- ^ given input cannot be compiled as /regex/
   deriving (Show, Typeable)
 

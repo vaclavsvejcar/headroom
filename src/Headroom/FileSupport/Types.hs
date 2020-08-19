@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE StrictData        #-}
 
 {-|
 Module      : Headroom.FileSupport.Types
@@ -26,13 +27,13 @@ import           RIO
 
 -- | Info extracted about the concrete source code file.
 data FileInfo = FileInfo
-  { fiFileType     :: !FileType
+  { fiFileType     :: FileType
   -- ^ type of the file
-  , fiHeaderConfig :: !CtHeaderConfig
+  , fiHeaderConfig :: CtHeaderConfig
   -- ^ configuration for license header
-  , fiHeaderPos    :: !(Maybe (Int, Int))
+  , fiHeaderPos    :: Maybe (Int, Int)
   -- ^ position of existing license header
-  , fiVariables    :: !Variables
+  , fiVariables    :: Variables
   -- ^ additional extracted variables
   }
   deriving (Eq, Show)

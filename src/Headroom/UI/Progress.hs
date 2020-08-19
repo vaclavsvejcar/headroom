@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE StrictData        #-}
 
 {-|
 Module      : Headroom.UI.Progress
@@ -26,7 +27,7 @@ import           Text.Printf                    ( printf )
 
 -- | Progress indication. First argument is current progress, second the maximum
 -- value.
-data Progress = Progress !Int !Int
+data Progress = Progress Int Int
   deriving (Eq, Show)
 
 

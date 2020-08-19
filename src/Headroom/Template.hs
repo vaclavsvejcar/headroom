@@ -2,6 +2,7 @@
 {-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE NoImplicitPrelude   #-}
 {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE StrictData          #-}
 
 {-|
 Module      : Headroom.Template
@@ -71,9 +72,9 @@ class Template t where
 
 -- | Error during processing template.
 data TemplateError
-  = MissingVariables !Text ![Text]
+  = MissingVariables Text [Text]
   -- ^ missing variable values
-  | ParseError !Text
+  | ParseError Text
   -- ^ error parsing raw template text
   deriving (Eq, Show, Typeable)
 

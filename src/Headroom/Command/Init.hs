@@ -220,7 +220,7 @@ makeTemplatesDir = do
 
 -- | Exception specific to the "Headroom.Command.Init" module
 data CommandInitError
-  = AppConfigAlreadyExists !FilePath
+  = AppConfigAlreadyExists FilePath
   -- ^ application configuration file already exists
   | NoProvidedSourcePaths
   -- ^ no paths to source code files provided
