@@ -71,7 +71,7 @@ extractFileInfo :: FileType
 extractFileInfo fiFileType fiHeaderConfig meta text =
   let fiHeaderPos = findHeader fiHeaderConfig text
       fiVariables =
-        extractVariables fiFileType fiHeaderConfig meta fiHeaderPos text
+          extractVariables fiFileType fiHeaderConfig meta fiHeaderPos text
   in  FileInfo { .. }
 
 
