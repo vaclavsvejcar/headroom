@@ -48,9 +48,8 @@ spec = do
     it "executes the function for given environment" $ do
       let testEnv  = TestEnv "ENV"
           input    = "input"
-          actual   = runHeaderFn testFn testEnv input
           expected = "input_ENV"
-      actual `shouldBe` expected
+      runHeaderFn testFn testEnv input `shouldBe` expected
 
 
   describe "postProcessHeader" $ do

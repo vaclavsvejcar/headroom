@@ -70,8 +70,7 @@ spec :: Spec
 spec = do
   describe "loadBuiltInTemplates" $ do
     it "should load correct number of built-in templates" $ do
-      templates <- runRIO env $ loadBuiltInTemplates BSD3
-      M.size templates `shouldBe` 11
+      M.size <$> runRIO env (loadBuiltInTemplates BSD3) `shouldReturn` 11
 
 
   describe "loadTemplateFiles" $ do
@@ -113,8 +112,8 @@ spec = do
             ]
           vars   = mkVariables [("sndAuthor", "2nd Author")]
           syntax = LineComment "--"
-      actual <- runRIO env $ postProcessHeader' syntax vars sample
-      actual `shouldBe` expected
+      runRIO env (postProcessHeader' syntax vars sample) `shouldReturn` expected
+
 
   describe "sanitizeHeader" $ do
     it "does nothing when block comment syntax used" $ do

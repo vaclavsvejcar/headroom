@@ -7,8 +7,8 @@ clean:
 dist: fresh
 	stack sdist
 
-.PHONY: format
-format: 
+.PHONY: pretty
+pretty: 
 	find ./app -name '*.hs' | xargs stylish-haskell -i -v
 	find ./src -name '*.hs' | xargs stylish-haskell -i -v
 	find ./test -name '*.hs' | xargs stylish-haskell -i -v
@@ -20,7 +20,7 @@ format:
 fresh: clean build
 
 .PHONY: build
-build: format
+build: pretty
 	stack build
 	stack test
 	stack haddock

@@ -14,9 +14,8 @@ spec = do
   describe "zipWithProgress" $ do
     it "zips progress for given collection" $ do
       let col      = ["a", "b"] :: [Text]
-          actual   = zipWithProgress col
           expected = [(Progress 1 2, "a"), (Progress 2 2, "b")]
-      actual `shouldBe` expected
+      zipWithProgress col `shouldBe` expected
 
   describe "show" $ do
     it "displays correct output for Progress data type" $ do

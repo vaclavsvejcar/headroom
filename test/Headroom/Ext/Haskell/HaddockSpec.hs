@@ -30,6 +30,7 @@ spec = do
       let expected = HaddockFieldOffsets { hfoCopyright = Just 14 }
       extractFieldOffsets template `shouldBe` expected
 
+
   describe "extractModuleHeader" $ do
     it "extracts fields from Haddock module header" $ do
       let

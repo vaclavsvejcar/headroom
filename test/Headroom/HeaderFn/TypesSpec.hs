@@ -18,6 +18,7 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
+
   describe "Semigroup HeaderFn" $ do
     it "combines two values together" $ do
       let fooEnv      = FooEnv "_FOO_ENV"
@@ -26,16 +27,15 @@ spec = do
           input       = "input"
           combinedFn  = fooFn <> barFn
           expected    = "input_FOO_ENV_BAR_ENV"
-          actual      = runHeaderFn combinedFn combinedEnv input
-      actual `shouldBe` expected
+      runHeaderFn combinedFn combinedEnv input `shouldBe` expected
+
 
   describe "Monoid HeaderFn" $ do
     it "does nothing with the input" $ do
       let input   = "input"
           testEnv = undefined
           testFn  = mempty
-          actual  = runHeaderFn testFn testEnv input
-      actual `shouldBe` input
+      runHeaderFn testFn testEnv input `shouldBe` input
 
 
 -------------------------------  Test Data Types  ------------------------------

@@ -51,17 +51,18 @@ instance Has Paths TestEnv where
 
 spec :: Spec
 spec = do
+
   describe "doesAppConfigExist" $ do
     it "checks that configuration file exists in selected directory" $ do
       let env' = env & envFileSystemL . fsDoesFileExistL .~ check
           check path = pure $ env' ^. envPathsL . pConfigFileL == path
-      result <- runRIO env' doesAppConfigExist
-      result `shouldBe` True
+      runRIO env' doesAppConfigExist `shouldReturn` True
+
 
   describe "findSupportedFileTypes" $ do
     it "recursively finds all known file types present in given path" $ do
-      result <- runRIO env findSupportedFileTypes
-      L.sort result `shouldBe` L.sort [HTML]
+      L.sort <$> runRIO env findSupportedFileTypes `shouldReturn` [HTML]
+
 
 env :: TestEnv
 env = TestEnv { .. }
