@@ -12,7 +12,6 @@ import           Headroom.Template.Mustache
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           Test.Hspec
-import           Test.Utils                     ( matchesException )
 
 
 spec :: Spec
@@ -36,10 +35,9 @@ spec = do
       let template  = "Hello, {{ name }} {{ surname }}"
           variables = mkVariables [("name", "John")]
           parsed    = parseTemplate @Mustache (Just "test") template
-          rendered  = parsed >>= renderTemplate variables
-          check (Just (MissingVariables "test" ["surname"])) = True
-          check _ = False
-      rendered `shouldSatisfy` matchesException check
+      let err (MissingVariables "test" ["surname"]) = True
+          err _ = False
+      (parsed >>= renderTemplate variables) `shouldThrow` err
 
     it "renders template with conditionally set variable" $ do
       let template  = "Foo {{#bar}}{{bar}}{{/bar}}{{^bar}}BAR{{/bar}}"

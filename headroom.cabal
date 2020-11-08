@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f07c8da66e0babc17168e8ef4e8ef15cfd875ac3ce42c0c3023302bde8cd17d4
+-- hash: cc549f597348b4a9f239a63b287efc73a8ca7196118f82d26ff6d7a47fc85ba9
 
 name:           headroom
 version:        0.3.2.0
@@ -245,7 +245,6 @@ test-suite spec
       Headroom.TypesSpec
       Headroom.UI.ProgressSpec
       Headroom.VariablesSpec
-      Test.Utils
       Paths_headroom
   hs-source-dirs:
       test
