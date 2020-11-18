@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.3.2.0 (not released yet, TBD)
-- Bump _LTS Haskell_ to `16.21`
+- Bump _LTS Haskell_ to `16.22`
 - Minor improvements & bugfixes
 
 ## 0.3.1.0 (released 2020-08-18)
