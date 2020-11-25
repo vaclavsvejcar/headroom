@@ -86,6 +86,7 @@ tests:
       - pcre-light
       - QuickCheck
       - time
+    build-tools: hspec-discover
 
   doctest:
     main: Main.hs

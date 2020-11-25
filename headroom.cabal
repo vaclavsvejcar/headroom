@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cc549f597348b4a9f239a63b287efc73a8ca7196118f82d26ff6d7a47fc85ba9
+-- hash: 3ad29fd26d8cdd22903560fba5cdce69121c53c5065bb10a4a63978bc1d139a7
 
 name:           headroom
 version:        0.3.2.0
@@ -249,6 +249,8 @@ test-suite spec
   hs-source-dirs:
       test
   ghc-options: -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns
+  build-tool-depends:
+      hspec-discover:hspec-discover
   build-depends:
       QuickCheck
     , aeson
