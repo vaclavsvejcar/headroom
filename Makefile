@@ -7,6 +7,12 @@ clean:
 dist: fresh
 	stack sdist
 
+.PHONY: hlint
+hlint:
+	hlint ./app
+	hlint ./src
+	hlint ./test
+
 .PHONY: pretty
 pretty: 
 	find ./app -name '*.hs' | xargs stylish-haskell -i -v
@@ -20,7 +26,7 @@ pretty:
 fresh: clean build
 
 .PHONY: build
-build: pretty
+build: hlint pretty
 	stack build
 	stack test
 	stack haddock

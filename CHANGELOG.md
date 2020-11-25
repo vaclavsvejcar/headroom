@@ -2,8 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.3.2.0 (not released yet, TBD)
-- Bump _LTS Haskell_ to `16.22`
+- [#56] Move CI from Travis to GitHub Actions
 - Minor improvements & bugfixes
+- Bump _LTS Haskell_ to `16.23`
 
 ## 0.3.1.0 (released 2020-08-18)
 - [#48] Decouple IO actions for easier testing

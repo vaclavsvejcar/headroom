@@ -1,0 +1,122 @@
+name: Binary Release
+
+on:
+  # Trigger the workflow on the new 'v*' tag created
+  push:
+    tags:
+      - "v*"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  create_release:
+    name: Create Github Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+
+      - name: Output Release URL File
+        run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+      - name: Save Release URL File for publish
+        uses: actions/upload-artifact@v1
+        with:
+          name: release_url
+          path: release_url.txt
+
+  build_artifact:
+    needs: [create_release]
+    name: ${{ matrix.os }}/GHC ${{ matrix.ghc }}/${{ github.ref }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        ghc:
+          # - "8.8.3"
+          - "8.10.2"
+        cabal: ["3.2"]
+        # exclude:
+        #   - os: windows-latest
+        #     ghc: 8.8.3
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set tag name
+        uses: little-core-labs/get-git-tag@v3.0.1
+        id: tag
+        with:
+          tagRegex: "v(.*)"
+          tagRegexGroup: 1
+
+      - name: Setup Haskell
+        uses: actions/setup-haskell@v1.1.4
+        id: setup-haskell-cabal
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: ${{ matrix.cabal }}
+
+      - name: Freeze
+        run: |
+          cabal freeze
+
+      - name: Cache ~/.cabal/store
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+          key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+
+      - name: Build binary
+        run: |
+          mkdir dist
+          cabal install exe:headroom --install-method=copy --overwrite-policy=always --installdir=dist
+
+      - if: matrix.os == 'windows-latest'
+        name: Set extension to .exe on Windows
+        run: echo "EXT=.exe" >> $GITHUB_ENV
+
+      - name: Set binary path name
+        run: echo "BINARY_PATH=./dist/headroom${{ env.EXT }}" >> $GITHUB_ENV
+
+      - name: Strip binary
+        run: strip ${{ env.BINARY_PATH }}
+
+      # - name: Compress binary
+      #   uses: svenstaro/upx-action@v2
+      #   with:
+      #     file: dist/headroom
+
+      - name: Load Release URL File from release job
+        uses: actions/download-artifact@v1
+        with:
+          name: release_url
+
+      - name: Get Release File Name & Upload URL
+        id: get_release_info
+        run: |
+          echo "::set-output name=upload_url::$(cat release_url/release_url.txt)"
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: ${{ env.BINARY_PATH }}
+          asset_name: headroom-${{ steps.tag.outputs.tag }}-${{ runner.os }}-ghc-${{ matrix.ghc }}${{ env.EXT }}
+          asset_content_type: application/octet-stream
