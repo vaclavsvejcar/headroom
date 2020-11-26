@@ -1,6 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.3.3.0 (not released yet)
+
 ## 0.3.2.0 (released 2020-11-26)
 - [#56] Move CI from Travis to GitHub Actions
 - Minor improvements & bugfixes
