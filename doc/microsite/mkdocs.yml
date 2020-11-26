@@ -1,10 +1,10 @@
-site_name: Headroom v0.3.1.0
+site_name: Headroom v0.3.2.0
 copyright: Copyright (c) 2020 norcane
 
 nav:
   - Home:
     - Overview: index.md
-    - What's new in v0.3.1.0?: whats-new.md
+    - What's new in v0.3.2.0?: whats-new.md
   - Documentation:
       - Installation: documentation/installation.md
       - Basic Concepts: documentation/basic-concepts.md
@@ -31,6 +31,7 @@ markdown_extensions:
       use_pygments: true
   - toc:
       permalink: true
+  - admonition
 
 repo_name: vaclavsvejcar/headroom
 repo_url: https://github.com/vaclavsvejcar/headroom

@@ -13,6 +13,9 @@ Pre-built binaries _(x64)_ are available for _GNU/Linux_ and _macOS_ and can be 
 ## From Source Code
 Headroom is written in [Haskell][web:haskell], so you can install it from source code either using [Cabal][web:cabal] or [Stack][web:stack].
 
+!!! note
+    You might need to install the _pcre C library_ dependencies, if you're getting errors during the build. This can be done either by `brew install pcre` on _macOS_, or `apt-get install libpcre3-dev` (or similar) on _GNU/Linux_.
+
 ### Using Cabal
 1. install [Cabal][web:cabal] for your platform
 1. run `cabal install headroom`
