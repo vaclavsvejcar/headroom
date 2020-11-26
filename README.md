@@ -1,6 +1,6 @@
 <p align="center"><img src ="https://github.com/vaclavsvejcar/headroom/blob/master/doc/assets/logo.png?raw=true" width="200" /></p>
 
-[![Build Status](https://travis-ci.com/vaclavsvejcar/headroom.svg?branch=master)](https://travis-ci.com/vaclavsvejcar/headroom)
+![CI](https://github.com/vaclavsvejcar/headroom/workflows/CI/badge.svg)
 [![Hackage version](http://img.shields.io/hackage/v/headroom.svg)](https://hackage.haskell.org/package/headroom)
 [![Stackage version](https://www.stackage.org/package/headroom/badge/lts?label=Stackage)](https://www.stackage.org/package/headroom)
 
