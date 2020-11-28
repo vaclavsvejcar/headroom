@@ -7,6 +7,10 @@ clean:
 dist: fresh
 	stack sdist
 
+.PHONY: headroom
+headroom:
+	headroom run -c
+
 .PHONY: hlint
 hlint:
 	hlint ./app
@@ -26,7 +30,7 @@ pretty:
 fresh: clean build
 
 .PHONY: build
-build: hlint pretty
+build: hlint headroom pretty
 	stack build
 	stack test
 	stack haddock
