@@ -1,0 +1,16 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "headroom:lib"
+
+    - path: "./app/Main.hs"
+      component: "headroom:exe:headroom"
+
+    - path: "./app/Paths_headroom.hs"
+      component: "headroom:exe:headroom"
+
+    - path: "./doctest"
+      component: "headroom:test:doctest"
+
+    - path: "./test"
+      component: "headroom:test:spec"

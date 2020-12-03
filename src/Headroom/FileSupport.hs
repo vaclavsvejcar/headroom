@@ -176,15 +176,19 @@ findBlockHeader :: Text
                 -- ^ line number offset (adds to resulting position)
                 -> Maybe (Int, Int)
                 -- ^ header position @(startLine + offset, endLine + offset)@
-findBlockHeader startsWith endsWith = go Nothing Nothing
+findBlockHeader startsWith endsWith = go Nothing Nothing 0
  where
   isStart = T.isPrefixOf startsWith
   isEnd   = T.isSuffixOf endsWith
-  go _ _ (x : _) i | isStart x && isEnd x = Just (i, i)
-  go _ _ (x : xs) i | isStart x           = go (Just i) Nothing xs (i + 1)
-  go (Just start) _ (x : _) i | isEnd x   = Just (start, i)
-  go start end (_ : xs) i                 = go start end xs (i + 1)
-  go _     _   []       _                 = Nothing
+  oneLiner line = isStart line && isEnd line
+  ind curr line | isStart line = curr + (1 :: Integer)
+  ind curr line | isEnd line   = curr - (1 :: Integer)
+  ind curr _                   = curr
+  go Nothing _ 0 (x : _) i | oneLiner x    = Just (i, i)
+  go Nothing _ 0 (x : xs) i | ind 0 x == 1 = go (Just i) Nothing 1 xs (i + 1)
+  go (Just s) _ 1 (x : _) i | ind 1 x == 0 = Just (s, i)
+  go s e l (x : xs) i                      = go s e (ind l x) xs (i + 1)
+  go _ _ _ []       _                      = Nothing
 
 
 -- | Finds header in the form of /single-line comment/ syntax, which is
