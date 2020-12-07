@@ -18,6 +18,12 @@ __Headroom__ also offers much more than just [adding, replacing or dropping][doc
 - __Extended Functionality__ - _Headroom_ supports [extended functionality][doc:extended-functionality] for selected types of source code files, such as extracting extra data from processed source code files.
 - __Copyright Year Updater__ - _Headroom_ is good not only for basic license header management, but also for further processing of generated headers. Do you need to [update years in your copyrights][doc:post-processing]? No problem!
 
+## Installation
+You can get _Headroom_ via one of the following options:
+1. download pre-built binary for _GNU/Linux_ or _macOS_ (x64) from [releases page][meta:releases]
+1. install _Headroom_ via [Homebrew][web:homebrew]: `brew install norcane/tools/headroom`
+1. build from source code - see [project microsite][web:headroom] for more details
+
 ## Adopters
 Here is the list of projects using _Headroom_. If you're using _Headroom_ and aren't on the list, feel free to [submit new issue][meta:new-issue] or [pull request][meta:pulls].
 
@@ -33,7 +39,9 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 [hackage:headroom]: https://hackage.haskell.org/package/headroom
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
 [meta:pulls]: https://github.com/vaclavsvejcar/headroom/pulls
+[meta:releases]: https://github.com/vaclavsvejcar/headroom/releases
 [web:headroom]: https://doc.norcane.com/headroom/latest/
+[web:homebrew]: https://brew.sh
 [doc:configuration]: https://doc.norcane.com/headroom/latest/documentation/configuration/
 [doc:extended-functionality]: https://doc.norcane.com/headroom/latest/documentation/extended-functionality/
 [doc:post-processing]: https://doc.norcane.com/headroom/latest/documentation/post-processing/
