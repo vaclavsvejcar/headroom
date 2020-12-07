@@ -377,9 +377,13 @@ data HeaderConfig (p :: Phase) = HeaderConfig
   { hcFileExtensions   :: p ::: [Text]
   -- ^ list of file extensions (without dot)
   , hcMarginTopCode    :: p ::: Int
+  -- ^ margin between header top and preceding code (if present)
   , hcMarginTopFile    :: p ::: Int
+  -- ^ margin between header top and start of file (if no code is between)
   , hcMarginBottomCode :: p ::: Int
+  -- ^ margin between header bottom and following code (if present)
   , hcMarginBottomFile :: p ::: Int
+  -- ^ margin between header bottom and end of file (if no code is between)
   , hcPutAfter         :: p ::: [Regex]
   -- ^ /regexp/ patterns after which to put the header
   , hcPutBefore        :: p ::: [Regex]
@@ -527,9 +531,13 @@ data ConfigurationKey
   | CkHeaderSyntax FileType
   -- ^ no configuration for header syntax
   | CkMarginTopCode FileType
+  -- ^ no configuration for margin between header top and preceding code
   | CkMarginTopFile FileType
+  -- ^ no configuration for margin between header top and start of file
   | CkMarginBottomCode FileType
+  -- ^ no configuration for margin between header bottom and following code
   | CkMarginBottomFile FileType
+  -- ^ no configuration for margin between header bottom and end of file
   | CkPutAfter FileType
   -- ^ no configuration for @put-after@
   | CkPutBefore FileType
