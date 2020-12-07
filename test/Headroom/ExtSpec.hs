@@ -21,7 +21,8 @@ spec = do
   describe "extractVariables" $ do
     it "extracts variables specific for Haskell file type" $ do
       let samplesDir = "test-data" </> "code-samples"
-          config     = HeaderConfig ["hs"] 0 0 [] [] (LineComment "--")
+          comment    = LineComment "--"
+          config     = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
           meta       = Nothing
           expected   = mkVariables
             [ ( "_haskell_module_copyright"
@@ -41,7 +42,8 @@ spec = do
 
     it "extracts variables specific for Java file type" $ do
       let samplesDir = "test-data" </> "code-samples"
-          config     = HeaderConfig ["java"] 0 0 [] [] (BlockComment "/*" "*/")
+          comment    = BlockComment "/*" "*/"
+          config     = HeaderConfig ["java"] 0 0 0 0 [] [] comment
           meta       = Nothing
           expected   = mkVariables [("_java_package_name", "foo")]
       sample <- readFileUtf8 $ samplesDir </> "java" </> "sample1.java"
@@ -49,7 +51,8 @@ spec = do
 
     it "extracts variables specific for PureScript file type" $ do
       let samplesDir = "test-data" </> "code-samples"
-          config     = HeaderConfig ["purs"] 0 0 [] [] (LineComment "--")
+          comment    = LineComment "--"
+          config     = HeaderConfig ["purs"] 0 0 0 0 [] [] comment
           meta       = Nothing
           expected   = mkVariables [("_purescript_module_name", "Test")]
       sample <- readFileUtf8 $ samplesDir </> "purescript" </> "full.purs"

@@ -32,26 +32,34 @@ import           Test.Hspec
 spec :: Spec
 spec = do
   let samplesDir = "test-data" </> "code-samples"
-      lHeaderConfig pb pa = HeaderConfig ["hs"] 0 0 pb pa (LineComment "--")
-      bHeaderConfig = bHeaderConfigM 0 0
-      bHeaderConfigM mb ma pb pa =
-        HeaderConfig ["hs"] mb ma pb pa (BlockComment "{-|" "-}")
+      lHeaderConfig pb pa =
+        HeaderConfig ["hs"] 0 0 0 0 pb pa (LineComment "--")
+      bHeaderConfig = bHeaderConfigM 0 0 0 0
+      bHeaderConfigM mtc mtf mbc mbf pb pa =
+        HeaderConfig ["hs"] mtc mtf mbc mbf pb pa (BlockComment "{-|" "-}")
 
   describe "addHeader" $ do
     let fileInfo config = FileInfo Haskell config Nothing mempty
 
-    it "adds header at the beginning of text" $ do
+    it "adds header at the beginning of text (with no margin)" $ do
       let info     = fileInfo $ bHeaderConfig [] []
           header   = "HEADER"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "HEADER\n1\n2\nbefore\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
-    it "adds header at the beginning of text (with correct margins)" $ do
-      let info     = fileInfo $ bHeaderConfigM 2 2 [] []
+    it "adds header at the beginning of text (with margin-top-file)" $ do
+      let info     = fileInfo $ bHeaderConfigM 0 1 0 0 [] []
           header   = "HEADER"
           sample   = "1\n2\nbefore\nafter\n4\n"
-          expected = "HEADER\n\n\n1\n2\nbefore\nafter\n4\n"
+          expected = "\nHEADER\n1\n2\nbefore\nafter\n4\n"
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at the beginning of text (with both margins)" $ do
+      let info     = fileInfo $ bHeaderConfigM 2 1 2 1 [] []
+          header   = "HEADER"
+          sample   = "1\n2\nbefore\nafter\n4\n"
+          expected = "\nHEADER\n\n\n1\n2\nbefore\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
     it "adds header at correct position" $ do
@@ -61,18 +69,26 @@ spec = do
           expected = "1\n2\nbefore\n{-| HEADER -}\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
-    it "adds header at correct position (with correct margins)" $ do
-      let info = fileInfo $ bHeaderConfigM 2 2 [[re|^before|]] [[re|^after|]]
+    it "adds header at correct position (with both margins)" $ do
+      let info =
+            fileInfo $ bHeaderConfigM 2 1 2 1 [[re|^before|]] [[re|^after|]]
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore\nafter\n4\n"
           expected = "1\n2\nbefore\n\n\n{-| HEADER -}\n\n\nafter\n4\n"
       addHeader info header sample `shouldBe` expected
 
-    it "adds header at the end of text (with correct margins)" $ do
-      let info     = fileInfo $ bHeaderConfigM 2 2 [[re|^before|]] []
+    it "adds header at the end of text (with no margin)" $ do
+      let info     = fileInfo $ bHeaderConfig [[re|^before|]] []
           header   = "{-| HEADER -}"
           sample   = "1\n2\nbefore"
-          expected = "1\n2\nbefore\n\n\n{-| HEADER -}"
+          expected = "1\n2\nbefore\n{-| HEADER -}"
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at the end of text (with both margins)" $ do
+      let info     = fileInfo $ bHeaderConfigM 2 1 2 1 [[re|^before|]] []
+          header   = "{-| HEADER -}"
+          sample   = "1\n2\nbefore"
+          expected = "1\n2\nbefore\n\n\n{-| HEADER -}\n"
       addHeader info header sample `shouldBe` expected
 
     it "does nothing if header is already present" $ do

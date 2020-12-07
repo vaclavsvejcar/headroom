@@ -1,6 +1,7 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StrictData        #-}
 
 {-|
 Module      : Headroom.Template.Mustache
@@ -30,7 +31,10 @@ import           Text.Mustache.Render           ( SubstitutionError(..) )
 
 
 -- | The /Mustache/ template.
-data Mustache = Mustache MU.Template Text
+data Mustache = Mustache
+  { mCompiledTemplate :: MU.Template
+  , mRawTemplate      :: Text
+  }
   deriving Show
 
 
@@ -39,14 +43,14 @@ instance Template Mustache where
   templateExtensions = "mustache" :| []
   parseTemplate      = parseTemplate'
   renderTemplate     = renderTemplate'
-  rawTemplate        = rawTemplate'
+  rawTemplate        = mRawTemplate
 
 
 parseTemplate' :: MonadThrow m => Maybe Text -> Text -> m Mustache
 parseTemplate' name raw = case MU.compileTemplate templateName raw of
   Left  err -> throwM . ParseError $ tshow err
   Right res -> pure $ Mustache res raw
-  where templateName = T.unpack . fromMaybe "" $ name
+  where templateName = T.unpack . fromMaybe T.empty $ name
 
 
 renderTemplate' :: MonadThrow m => Variables -> Mustache -> m Text
@@ -61,8 +65,3 @@ renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _) _) =
       in  if length errs == length errs'
             then throwM $ MissingVariables (T.pack name) errs'
             else pure rendered
-
-
-rawTemplate' :: Mustache -> Text
-rawTemplate' (Mustache _ raw) = raw
-

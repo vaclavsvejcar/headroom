@@ -27,5 +27,6 @@ license-headers:
   haskell:
     put-after: ["^{-#"]
     put-before: ["^module"]
-    margin-after: 1
-    margin-before: 1
+    margin-top-code: 1
+    margin-bottom-code: 1
+    margin-bottom-file: 1

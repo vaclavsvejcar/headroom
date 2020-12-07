@@ -30,7 +30,8 @@ spec = do
 
   describe "extractVariables" $ do
     it "extracts variables from Haskell source code with Haddock header" $ do
-      let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
+      let comment   = BlockComment "{-|" "-}"
+          config    = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
           meta      = Nothing
           headerPos = Just (1, 13)
           expected  = mkVariables
@@ -49,7 +50,8 @@ spec = do
       extractVariables config meta headerPos sample `shouldBe` expected
 
     it "extracts variables from Haskell source code without Haddock header" $ do
-      let config    = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-|" "-}")
+      let comment   = BlockComment "{-|" "-}"
+          config    = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
           meta      = Nothing
           headerPos = Nothing
           expected  = mkVariables [("_haskell_module_name", "Test")]

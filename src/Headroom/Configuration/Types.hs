@@ -374,17 +374,17 @@ instance Monoid PtConfiguration where
 
 -- | Configuration for specific license header.
 data HeaderConfig (p :: Phase) = HeaderConfig
-  { hcFileExtensions :: p ::: [Text]
+  { hcFileExtensions   :: p ::: [Text]
   -- ^ list of file extensions (without dot)
-  , hcMarginAfter    :: p ::: Int
-  -- ^ number of empty lines to put after header
-  , hcMarginBefore   :: p ::: Int
-  -- ^ number of empty lines to put before header
-  , hcPutAfter       :: p ::: [Regex]
+  , hcMarginTopCode    :: p ::: Int
+  , hcMarginTopFile    :: p ::: Int
+  , hcMarginBottomCode :: p ::: Int
+  , hcMarginBottomFile :: p ::: Int
+  , hcPutAfter         :: p ::: [Regex]
   -- ^ /regexp/ patterns after which to put the header
-  , hcPutBefore      :: p ::: [Regex]
+  , hcPutBefore        :: p ::: [Regex]
   -- ^ /regexp/ patterns before which to put the header
-  , hcHeaderSyntax   :: p ::: HeaderSyntax
+  , hcHeaderSyntax     :: p ::: HeaderSyntax
   -- ^ syntax of the license header comment
   }
 
@@ -401,14 +401,16 @@ deriving instance Show PtHeaderConfig
 
 instance FromJSON PtHeaderConfig where
   parseJSON = withObject "PartialHeaderConfig" $ \obj -> do
-    hcFileExtensions <- Last <$> obj .:? "file-extensions"
-    hcMarginAfter    <- Last <$> obj .:? "margin-after"
-    hcMarginBefore   <- Last <$> obj .:? "margin-before"
-    hcPutAfter       <- Last <$> obj .:? "put-after"
-    hcPutBefore      <- Last <$> obj .:? "put-before"
-    blockComment     <- obj .:? "block-comment"
-    lineComment      <- obj .:? "line-comment"
-    hcHeaderSyntax   <- pure . Last $ headerSyntax blockComment lineComment
+    hcFileExtensions   <- Last <$> obj .:? "file-extensions"
+    hcMarginTopCode    <- Last <$> obj .:? "margin-top-code"
+    hcMarginTopFile    <- Last <$> obj .:? "margin-top-file"
+    hcMarginBottomCode <- Last <$> obj .:? "margin-bottom-code"
+    hcMarginBottomFile <- Last <$> obj .:? "margin-bottom-file"
+    hcPutAfter         <- Last <$> obj .:? "put-after"
+    hcPutBefore        <- Last <$> obj .:? "put-before"
+    blockComment       <- obj .:? "block-comment"
+    lineComment        <- obj .:? "line-comment"
+    hcHeaderSyntax     <- pure . Last $ headerSyntax blockComment lineComment
     pure HeaderConfig { .. }
    where
     headerSyntax (Just (BlockComment' s e)) Nothing = Just $ BlockComment s e
@@ -417,16 +419,18 @@ instance FromJSON PtHeaderConfig where
     headerSyntax _ _ = throw MixedHeaderSyntax
 
 instance Monoid PtHeaderConfig where
-  mempty = HeaderConfig mempty mempty mempty mempty mempty mempty
+  mempty = HeaderConfig mempty mempty mempty mempty mempty mempty mempty mempty
 
 instance Semigroup PtHeaderConfig where
   x <> y = HeaderConfig
-    { hcFileExtensions = hcFileExtensions x <> hcFileExtensions y
-    , hcMarginAfter    = hcMarginAfter x <> hcMarginAfter y
-    , hcMarginBefore   = hcMarginBefore x <> hcMarginBefore y
-    , hcPutAfter       = hcPutAfter x <> hcPutAfter y
-    , hcPutBefore      = hcPutBefore x <> hcPutBefore y
-    , hcHeaderSyntax   = hcHeaderSyntax x <> hcHeaderSyntax y
+    { hcFileExtensions   = hcFileExtensions x <> hcFileExtensions y
+    , hcMarginTopCode    = hcMarginTopCode x <> hcMarginTopCode y
+    , hcMarginTopFile    = hcMarginTopFile x <> hcMarginTopFile y
+    , hcMarginBottomCode = hcMarginBottomCode x <> hcMarginBottomCode y
+    , hcMarginBottomFile = hcMarginBottomFile x <> hcMarginBottomFile y
+    , hcPutAfter         = hcPutAfter x <> hcPutAfter y
+    , hcPutBefore        = hcPutBefore x <> hcPutBefore y
+    , hcHeaderSyntax     = hcHeaderSyntax x <> hcHeaderSyntax y
     }
 
 
@@ -522,10 +526,10 @@ data ConfigurationKey
   -- ^ no configuration for @file-extensions@
   | CkHeaderSyntax FileType
   -- ^ no configuration for header syntax
-  | CkMarginAfter FileType
-  -- ^ no configuration for @margin-after@
-  | CkMarginBefore FileType
-  -- ^ no configuration for @margin-before@
+  | CkMarginTopCode FileType
+  | CkMarginTopFile FileType
+  | CkMarginBottomCode FileType
+  | CkMarginBottomFile FileType
   | CkPutAfter FileType
   -- ^ no configuration for @put-after@
   | CkPutBefore FileType
@@ -569,12 +573,21 @@ displayException' = T.unpack . \case
       (withFT "comment-syntax" fileType)
       (Just "block-comment|line-comment")
       Nothing
-    CkMarginAfter fileType -> missingConfig (withFT "margin-after" fileType)
-                                            (Just "margin-after")
-                                            Nothing
-    CkMarginBefore fileType -> missingConfig
-      (withFT "margin-before" fileType)
-      (Just "margin-before")
+    CkMarginTopCode fileType -> missingConfig
+      (withFT "margin-top-code" fileType)
+      (Just "margin-top-code")
+      Nothing
+    CkMarginTopFile fileType -> missingConfig
+      (withFT "margin-top-file" fileType)
+      (Just "margin-top-file")
+      Nothing
+    CkMarginBottomCode fileType -> missingConfig
+      (withFT "margin-bottom-code" fileType)
+      (Just "margin-bottom-code")
+      Nothing
+    CkMarginBottomFile fileType -> missingConfig
+      (withFT "margin-bottom-file" fileType)
+      (Just "margin-bottom-file")
       Nothing
     CkPutAfter fileType ->
       missingConfig (withFT "put-after" fileType) (Just "put-after") Nothing

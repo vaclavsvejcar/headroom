@@ -22,7 +22,7 @@ spec = do
 
   describe "extractVariables" $ do
     it "extracts variables from PureScript source code" $ do
-      let config    = HeaderConfig ["purs"] 0 0 [] [] (LineComment "--")
+      let config    = HeaderConfig ["purs"] 0 0 0 0 [] [] (LineComment "--")
           meta      = Nothing
           headerPos = Just (1, 13)
           expected  = mkVariables [("_purescript_module_name", "Test")]

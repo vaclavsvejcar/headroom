@@ -79,8 +79,10 @@ license-headers:
   ## C configuration
   c:
     file-extensions: ["c"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^#include"]
     block-comment:
@@ -90,8 +92,10 @@ license-headers:
   ## C++ configuration
   cpp:
     file-extensions: ["cpp"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^#include"]
     block-comment:
@@ -101,8 +105,10 @@ license-headers:
   ## CSS configuration
   css:
     file-extensions: ["css"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ['([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)']
     block-comment:
@@ -112,8 +118,10 @@ license-headers:
   ## Haskell configuration
   haskell:
     file-extensions: ["hs"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^module"]
     block-comment:
@@ -123,8 +131,10 @@ license-headers:
   ## HTML configuration
   html:
     file-extensions: ["htm", "html"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^(<!DOCTYPE|<[a-zA-Z])"]
     block-comment:
@@ -134,8 +144,10 @@ license-headers:
   ## Java configuration
   java:
     file-extensions: ["java"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^package"]
     block-comment:
@@ -145,8 +157,10 @@ license-headers:
   ## JS configuration
   js:
     file-extensions: ["js"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: []
     block-comment:
@@ -156,8 +170,10 @@ license-headers:
   ## PureScript configuration
   purescript:
     file-extensions: ["purs"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^module"]
     line-comment:
@@ -166,8 +182,10 @@ license-headers:
   ## Rust configuration
   rust:
     file-extensions: ["rs"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^use"]
     block-comment:
@@ -177,8 +195,10 @@ license-headers:
   ## Scala configuration
   scala:
     file-extensions: ["scala"]
-    margin-after: 0
-    margin-before: 0
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
     put-after: []
     put-before: ["^package"]
     block-comment:
@@ -188,8 +208,10 @@ license-headers:
   ## Shell configuration
   shell:
     file-extensions: ["sh"]
-    margin-after: 1
-    margin-before: 1
+    margin-top-code: 1
+    margin-top-file: 0
+    margin-bottom-code: 1
+    margin-bottom-file: 0
     put-after: ["^#!"]
     put-before: []
     line-comment:

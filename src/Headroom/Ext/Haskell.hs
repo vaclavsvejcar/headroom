@@ -47,6 +47,7 @@ import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
 import           RIO.Lens                       ( ix )
 import qualified RIO.List                      as L
+import qualified RIO.Text                      as T
 
 
 -- | Extracts name of /Haskell/ module from given source code file content.
@@ -97,7 +98,7 @@ extractVariables _ meta headerPos text = (mkVariables . catMaybes)
   ]
  where
   HaddockModuleHeader {..} = extractModuleHeader headerText meta
-  headerText               = maybe "" (\(s, e) -> cut s e text) headerPos
+  headerText               = maybe T.empty (\(s, e) -> cut s e text) headerPos
   cut s e = fromLines . L.take (e - s) . L.drop s . toLines
 
 

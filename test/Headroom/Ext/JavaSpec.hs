@@ -28,7 +28,8 @@ spec = do
 
   describe "extractVariables" $ do
     it "extracts variables from Java source code" $ do
-      let config    = HeaderConfig ["java"] 0 0 [] [] (BlockComment "/*" "*/")
+      let comment   = BlockComment "/*" "*/"
+          config    = HeaderConfig ["java"] 0 0 0 0 [] [] comment
           meta      = Nothing
           headerPos = Just (0, 2)
           expected  = mkVariables [("_java_package_name", "foo")]

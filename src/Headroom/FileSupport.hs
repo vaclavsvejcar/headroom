@@ -93,10 +93,10 @@ addHeader FileInfo {..} header text                 = result
   HeaderConfig {..}       = fiHeaderConfig
   before'                 = stripLinesEnd before
   middle'                 = stripLinesStart middle
-  margin [] _    = []
-  margin _  size = replicate size ""
-  marginBefore = margin before' hcMarginBefore
-  marginAfter  = margin (middle' <> after) hcMarginAfter
+  margin [] _      mOuter = replicate mOuter T.empty
+  margin _  mInner _      = replicate mInner T.empty
+  marginBefore = margin before' hcMarginTopCode hcMarginTopFile
+  marginAfter  = margin (middle' <> after) hcMarginBottomCode hcMarginBottomFile
   result       = fromLines $ concat joined
   joined       = [before', marginBefore, [header], marginAfter, middle', after]
 
@@ -143,7 +143,7 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 --
 -- >>> :set -XFlexibleContexts
 -- >>> :set -XTypeFamilies
--- >>> let hc = HeaderConfig ["hs"] 0 0 [] [] (BlockComment "{-" "-}")
+-- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment "{-" "-}")
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
 -- Just (2,2)
 findHeader :: CtHeaderConfig
