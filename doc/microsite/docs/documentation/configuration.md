@@ -80,8 +80,10 @@ This configuration allows to modify the behaviour how _license headers_ are dete
 ## Haskell configuration
 haskell:
   file-extensions: ["hs"]
-  margin-after: 0
-  margin-before: 0
+  margin-top-code: 0
+  margin-top-file: 0
+  margin-bottom-code: 0
+  margin-bottom-file: 0
   put-after: []
   put-before: ["^module"]
   block-comment:
@@ -92,7 +94,11 @@ haskell:
 If the default configuration for selected _file type_ doesn't suit your needs, you can override following settings:
 
 1. __list of file extensions__ - if you need to match selected _file type_ with different set of file extensions, override the `file-extensions` option.
-1. __margin before/after license header__ - if you want to put blank lines before and/or after license headers, use the `margin-after` or `margin-before` option, where the value is number of blank lines.
+1. __margin around license header__ - if you want to add blank lines before and/or after generated license header, you can use one of the following options:
+    - `margin-top-code` - defines margin (in no. of empty lines) between generated header and code above it, but only **IF** header is **NOT** the first thing in file.
+    - `margin-top-file` - defines margin (in no. of empty lines) between generated header the very top of the file, but only **IF** header **IS** the first thing in file.
+    - `margin-bottom-code` - defines margin (in no. of empty lines) between generated header and code below it, but only **IF** header is **NOT** the last thing in file.
+    - `margin-bottom-file` - defines margin (in no. of empty lines) between generated header the very end of the file, but only **IF** header **IS** the last thing in file.
 1. __put header before/after pattern__ - you can define before and/or after which pattern _Headroom_ will put the license header (such as before the line starting with `module` in _Haskell_ code).
 1. __syntax of header comment__ - you can decided if your license header will be defined using multiple single-line comments (such as `//` in _C/C++_ or `--` in _Haskell_) or block comment (such as `{- -}` in Haskell). To define block comment, use the `block-comment` option with `starts-with` and `ends-with` sub-options, to use single-line comment, use `line-comment` option with `prefixed-by` sub-option.
 

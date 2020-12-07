@@ -53,10 +53,18 @@ variables:
 ## configuration keys are:
 ##
 ##  - file-extensions    = List of file extensions valid for given file type.
-##  - margin-after       = Number of blank lines to put AFTER the rendered
-##                         license header text.
-##  - margin-before      = Number of blank lines to put BEFORE the rendered
-##                         license header text.
+##  - margin-top-code    = Margin (in no. of empty lines) between generated
+##                         header and code above it, but only IF header is NOT
+##                         the first thing in file.
+##  - margin-top-file    = Margin (in no. of empty lines) between generated
+##                         header the very top of the file, but only IF header
+##                         IS the first thing in file.
+##  - margin-bottom-code = Margin (in no. of empty lines) between generated
+##                         header and code below it, but only IF header is NOT
+##                         the last thing in file.
+##  - margin-bottom-file = Margin (in no. of empty lines) between generated
+##                         header the very end of the file, but only IF header
+##                         IS the last thing in file.
 ##  - put-after          = List of regexp patterns, where the license header is
 ##                         placed AFTER the very last line matching one of the
 ##                         given regular expressions. If no match found, header

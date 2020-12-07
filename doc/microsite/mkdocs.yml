@@ -1,16 +1,17 @@
-site_name: Headroom v0.3.2.0
+site_name: Headroom v0.4.0.0
 copyright: Copyright (c) 2020 norcane
 
 nav:
   - Home:
     - Overview: index.md
-    - What's new in v0.3.2.0?: whats-new.md
+    - What's new in v0.4.0.0?: whats-new.md
+    - Migration Guide from v0.3.2.0: migration-guide.md
   - Documentation:
       - Installation: documentation/installation.md
       - Basic Concepts: documentation/basic-concepts.md
       - Project Setup Guide: documentation/project-setup-guide.md
       - Running Headroom: documentation/running-headroom.md
-      - Configuration: documentation/configuration.md
+      - Configuration Overview: documentation/configuration.md
       - Extended Functionality: documentation/extended-functionality.md
       - Post-processing Functions: documentation/post-processing.md
   - License:
