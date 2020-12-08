@@ -144,6 +144,8 @@ makeHeaderConfig fileType pt = do
   pure HeaderConfig { .. }
 
 
+------------------------------  Private Functions  -----------------------------
+
 makeHeaderFnConfigs :: MonadThrow m => PtHeaderFnConfigs -> m CtHeaderFnConfigs
 makeHeaderFnConfigs pt = do
   hfcsUpdateCopyright <- makeHeaderFnConfig (pt ^. hfcsUpdateCopyrightL)
@@ -167,9 +169,6 @@ makeUpdateCopyrightConfig :: MonadThrow m
 makeUpdateCopyrightConfig pt = do
   let uccSelectedAuthors = lastOrNothing $ pt ^. uccSelectedAuthorsL
   pure UpdateCopyrightConfig { .. }
-
-
-------------------------------  Private Functions  -----------------------------
 
 
 lastOrError :: MonadThrow m => ConfigurationKey -> Last a -> m a

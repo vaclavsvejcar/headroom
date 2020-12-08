@@ -25,9 +25,14 @@ module Headroom.Meta
 where
 
 import           Data.Version                   ( showVersion )
+import           Headroom.Meta.Version          ( Version(..)
+                                                , parseVersion
+                                                , printVersion
+                                                )
 import           Headroom.Template.Mustache     ( Mustache )
 import           Paths_headroom                 ( version )
 import           RIO
+import           RIO.Partial                    ( fromJust )
 import qualified RIO.Text                      as T
 
 
@@ -36,8 +41,8 @@ type TemplateType = Mustache
 
 
 -- | Application version, as specified in @headroom.cabal@ file.
-buildVersion :: Text
-buildVersion = T.pack . showVersion $ version
+buildVersion :: Version
+buildVersion = fromJust . parseVersion . T.pack . showVersion $ version
 
 
 -- | Full product description.
@@ -47,7 +52,8 @@ productDesc = "manage your source code license headers"
 
 -- | Product info.
 productInfo :: Text
-productInfo = mconcat [productName, ", v", buildVersion, " :: ", website]
+productInfo =
+  mconcat [productName, ", v", printVersion buildVersion, " :: ", website]
 
 
 -- | Product name.

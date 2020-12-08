@@ -1,9 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.4.0.0 (not released yet)
+## 0.4.0.0 (in development)
 - [#57] FIXED: Comment in code block breaks header detection for Haskell/Haddock
 - [#58] (BREAKING CHANGE) Extend configuration for defining header margins
+- [#59] Check compatibility of loaded YAML configuration
 - Bump _LTS Haskell_ to `16.25`
 
 ## 0.3.2.0 (released 2020-11-26)
