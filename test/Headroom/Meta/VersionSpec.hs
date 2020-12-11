@@ -33,6 +33,11 @@ spec = do
       printVersion (Version 1 2 3 4) `shouldBe` "1.2.3.4"
 
 
+  describe "printVersionP" $ do
+    it "pretty prints given version (with 'v' prefix)" $ do
+      printVersionP (Version 1 2 3 4) `shouldBe` "v1.2.3.4"
+
+
   describe "pvp" $ do
     it "produces correct Version using QuasiQuotes" $ do
       [pvp|0.1.2.3|] `shouldBe` Version 0 1 2 3

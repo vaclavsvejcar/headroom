@@ -22,6 +22,7 @@ module Headroom.Meta.Version
   ( Version(..)
   , parseVersion
   , printVersion
+  , printVersionP
   , pvp
   )
 where
@@ -38,6 +39,7 @@ import           RIO
 import qualified RIO.Text                      as T
 
 
+---------------------------------  DATA TYPES  ---------------------------------
 
 -- | Type safe representation of /PVP/ version.
 data Version = Version
@@ -67,6 +69,8 @@ instance FromJSON Version where
   parseJSON other      = error . errorMsg . tshow $ other
 
 
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
+
 -- | Parses 'Version' from given text.
 --
 -- >>> parseVersion "0.3.2.0"
@@ -93,6 +97,15 @@ printVersion :: Version
              -- ^ textual representation
 printVersion (Version ma1 ma2 mi p) = T.intercalate "." chunks
   where chunks = tshow <$> [ma1, ma2, mi, p]
+
+
+-- | Similar to 'printVersion', but adds the @v@ prefix in front of the version
+-- number.
+--
+-- >>> printVersionP (Version 0 3 2 0)
+-- "v0.3.2.0"
+printVersionP :: Version -> Text
+printVersionP = ("v" <>) . printVersion
 
 
 -- | QuasiQuoter for defining 'Version' values checked at compile time.

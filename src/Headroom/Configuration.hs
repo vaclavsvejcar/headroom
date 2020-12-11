@@ -57,7 +57,9 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 )
 import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Meta                  ( configBreakingChanges )
+import           Headroom.Meta                  ( buildVersion
+                                                , configBreakingChanges
+                                                )
 import           RIO
 import qualified RIO.ByteString                as B
 
@@ -67,11 +69,13 @@ suffixLenses ''HeaderFnConfigs
 suffixLenses ''UpdateCopyrightConfig
 
 
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
+
 -- | Loads and parses application configuration from given /YAML/ file.
 loadConfiguration :: (MonadIO m, MonadThrow m) => FilePath -> m PtConfiguration
 loadConfiguration path = do
   content <- liftIO $ B.readFile path
-  _       <- checkCompatibility configBreakingChanges content
+  _       <- checkCompatibility configBreakingChanges buildVersion content
   parseConfiguration content
 
 
@@ -145,7 +149,7 @@ makeHeaderConfig fileType pt = do
   pure HeaderConfig { .. }
 
 
-------------------------------  Private Functions  -----------------------------
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
 makeHeaderFnConfigs :: MonadThrow m => PtHeaderFnConfigs -> m CtHeaderFnConfigs
 makeHeaderFnConfigs pt = do

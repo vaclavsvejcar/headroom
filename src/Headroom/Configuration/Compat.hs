@@ -34,7 +34,7 @@ import           Headroom.Meta                  ( buildVersion
                                                 , webDocMigration
                                                 )
 import           Headroom.Meta.Version          ( Version(..)
-                                                , printVersion
+                                                , printVersionP
                                                 , pvp
                                                 )
 import           Headroom.Types                 ( fromHeadroomError
@@ -64,6 +64,8 @@ instance FromJSON VersionWrapper where
 data VersionError
   = CannotParseVersion
   -- ^ cannot parse version info from given YAML configuration
+  | NewerVersionDetected Version
+  -- ^ configuration has newer version than Headroom
   | UnsupportedVersion [Version] Version
   -- ^ given YAML configuration is not compatible
   deriving (Eq, Show)
@@ -82,23 +84,37 @@ instance Exception VersionError where
 checkCompatibility :: MonadThrow m
                    => [Version]
                    -- ^ list of versions with breaking changes in configuration
+                   -> Version
+                   -- ^ current Headroom version
                    -> ByteString
                    -- ^ raw, not yet parsed YAML configuration
-                   -> m ()
-                   -- ^ result of the operation
-checkCompatibility configBreakingVersions raw = do
+                   -> m Version
+                   -- ^ detected compatible version or error
+checkCompatibility breakingVersions current raw = do
   VersionWrapper {..} <- parseWrapper
-  case newerVersions configBreakingVersions vVersion of
-    []       -> pure ()
-    versions -> throwM $ UnsupportedVersion versions vVersion
+  _                   <- checkBreakingChanges breakingVersions vVersion
+  _                   <- checkNewerVersion current vVersion
+  pure vVersion
  where
-  newerVersions vs v = L.filter (v <) . L.sort $ vs
   parseWrapper = case Y.decodeEither' raw of
     Left  _       -> throwM CannotParseVersion
     Right version -> pure version
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+checkBreakingChanges :: MonadThrow m => [Version] -> Version -> m ()
+checkBreakingChanges vs v = case L.filter (v <) . L.sort $ vs of
+  []    -> pure ()
+  newer -> throwM $ UnsupportedVersion newer v
+
+
+checkNewerVersion :: MonadThrow m => Version -> Version -> m ()
+checkNewerVersion current checked = if current < checked then err else ok
+ where
+  err = throwM $ NewerVersionDetected checked
+  ok  = pure ()
+
 
 displayException' :: VersionError -> String
 displayException' = T.unpack . \case
@@ -112,15 +128,24 @@ displayException' = T.unpack . \case
     , "\t- "
     , webDocMigration [pvp|0.4.0.0|]
     ]
+  NewerVersionDetected version -> mconcat
+    [ "Your YAML configuration file ("
+    , configFileName
+    , ") has newer version '"
+    , printVersionP version
+    , "' than your current Headroom version '"
+    , printVersionP buildVersion
+    , "'. Please upgrade Headroom first."
+    ]
   UnsupportedVersion versions version ->
     mconcat
         [ "Your YAML configuration file ("
         , configFileName
-        , ") has version 'v"
-        , printVersion version
+        , ") has version '"
+        , printVersionP version
         , "' (set by 'version' field), which is incompatible with current "
-        , "Headroom version 'v"
-        , printVersion buildVersion
+        , "Headroom version '"
+        , printVersionP buildVersion
         , "'. Please do migration steps from following migration guides "
         , "(in same order):"
         ]
