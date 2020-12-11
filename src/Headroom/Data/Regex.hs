@@ -40,7 +40,6 @@ import           Data.Aeson                     ( FromJSON(..)
 import           Headroom.Types                 ( fromHeadroomError
                                                 , toHeadroomError
                                                 )
-import           Language.Haskell.TH     hiding ( match )
 import           Language.Haskell.TH.Quote      ( QuasiQuoter(..) )
 import           RIO
 import qualified RIO.Text                      as T
@@ -90,6 +89,9 @@ re = QuasiQuoter { quoteExp  = quoteExpRegex
                  , quoteType = undefined
                  , quoteDec  = undefined
                  }
+ where
+  quoteExpRegex txt = [| compileUnsafe . T.pack $ txt |]
+    where !_ = compileUnsafe . T.pack $ txt -- check at compile time
 
 
 -- | Replaces all occurences of given /regex/.
@@ -124,13 +126,6 @@ compileUnsafe :: Text
 compileUnsafe raw = case compile raw of
   Left  err -> error . displayException $ err
   Right res -> res
-
-
-------------------------------  PRIVATE FUNCTIONS  -----------------------------
-
-quoteExpRegex :: String -> ExpQ
-quoteExpRegex txt = [| compileUnsafe . T.pack $ txt |]
-  where !_ = compileUnsafe . T.pack $ txt -- check at compile time
 
 
 ---------------------------------  Error Types  --------------------------------

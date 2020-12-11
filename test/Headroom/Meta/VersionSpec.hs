@@ -1,5 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+
 module Headroom.Meta.VersionSpec
   ( spec
   )
@@ -29,4 +31,9 @@ spec = do
   describe "printVersion" $ do
     it "pretty prints given version" $ do
       printVersion (Version 1 2 3 4) `shouldBe` "1.2.3.4"
+
+
+  describe "pvp" $ do
+    it "produces correct Version using QuasiQuotes" $ do
+      [pvp|0.1.2.3|] `shouldBe` Version 0 1 2 3
 

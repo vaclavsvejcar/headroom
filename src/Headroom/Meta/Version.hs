@@ -1,7 +1,9 @@
+{-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE StrictData        #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 {-|
 Module      : Headroom.Meta.Version
@@ -20,15 +22,21 @@ module Headroom.Meta.Version
   ( Version(..)
   , parseVersion
   , printVersion
+  , pvp
   )
 where
 
+import           Data.Aeson                     ( FromJSON(..)
+                                                , Value(String)
+                                                )
 import           Headroom.Data.Regex            ( match
                                                 , re
                                                 )
 import qualified Headroom.Data.TextExtra       as T
+import           Language.Haskell.TH.Quote      ( QuasiQuoter(..) )
 import           RIO
 import qualified RIO.Text                      as T
+
 
 
 -- | Type safe representation of /PVP/ version.
@@ -44,6 +52,7 @@ data Version = Version
   }
   deriving (Eq, Show)
 
+
 instance Ord Version where
   compare (Version a1 b1 c1 d1) (Version a2 b2 c2 d2) = go pairs
    where
@@ -51,6 +60,11 @@ instance Ord Version where
     go [] = EQ
     go ((x, y) : xs) | x /= y    = compare x y
                      | otherwise = go xs
+
+
+instance FromJSON Version where
+  parseJSON (String s) = maybe (error . errorMsg $ s) pure (parseVersion s)
+  parseJSON other      = error . errorMsg . tshow $ other
 
 
 -- | Parses 'Version' from given text.
@@ -79,3 +93,34 @@ printVersion :: Version
              -- ^ textual representation
 printVersion (Version ma1 ma2 mi p) = T.intercalate "." chunks
   where chunks = tshow <$> [ma1, ma2, mi, p]
+
+
+-- | QuasiQuoter for defining 'Version' values checked at compile time.
+--
+-- >>> [pvp|1.2.3.4|]
+-- Version {vMajor1 = 1, vMajor2 = 2, vMinor = 3, vPatch = 4}
+pvp :: QuasiQuoter
+pvp = QuasiQuoter { quoteExp  = quoteExpVersion
+                  , quotePat  = undefined
+                  , quoteType = undefined
+                  , quoteDec  = undefined
+                  }
+ where
+  quoteExpVersion txt = [| parseVersionUnsafe . T.pack $ txt |]
+    where !_ = parseVersionUnsafe . T.pack $ txt -- check at compile time
+
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+parseVersionUnsafe :: Text -> Version
+parseVersionUnsafe raw = case parseVersion raw of
+  Nothing  -> error . errorMsg $ raw
+  Just res -> res
+
+errorMsg :: Text -> String
+errorMsg raw = mconcat
+  [ "Value '"
+  , T.unpack raw
+  , "' is not valid PVP version string. Please define correct version in "
+  , "format 'MAJOR1.MAJOR2.MINOR.PATCH' (e.g. '0.4.1.2')."
+  ]

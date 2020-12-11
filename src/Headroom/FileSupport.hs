@@ -71,7 +71,7 @@ extractFileInfo :: FileType
 extractFileInfo fiFileType fiHeaderConfig meta text =
   let fiHeaderPos = findHeader fiHeaderConfig text
       fiVariables =
-        extractVariables fiFileType fiHeaderConfig meta fiHeaderPos text
+          extractVariables fiFileType fiHeaderConfig meta fiHeaderPos text
   in  FileInfo { .. }
 
 
@@ -294,6 +294,8 @@ splitInput fstSplit sndSplit input = (before, middle, after)
   inLines           = toLines input
   len               = L.length inLines
 
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
 stripLinesEnd :: [Text] -> [Text]
 stripLinesEnd = toLines . T.stripEnd . fromLines

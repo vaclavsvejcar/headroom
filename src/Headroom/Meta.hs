@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 
 {-|
 Module      : Headroom.Meta
@@ -17,10 +18,14 @@ version, etc.
 module Headroom.Meta
   ( TemplateType
   , buildVersion
+  , configBreakingChanges
+  , configFileName
   , productDesc
   , productInfo
   , productName
-  , website
+  , webDoc
+  , webDocMigration
+  , webRepo
   )
 where
 
@@ -28,6 +33,7 @@ import           Data.Version                   ( showVersion )
 import           Headroom.Meta.Version          ( Version(..)
                                                 , parseVersion
                                                 , printVersion
+                                                , pvp
                                                 )
 import           Headroom.Template.Mustache     ( Mustache )
 import           Paths_headroom                 ( version )
@@ -45,6 +51,17 @@ buildVersion :: Version
 buildVersion = fromJust . parseVersion . T.pack . showVersion $ version
 
 
+-- | List of versions that made breaking changes into YAML configuration and
+-- require some migration steps to be performed by end-user.
+configBreakingChanges :: [Version]
+configBreakingChanges = [[pvp|0.4.0.0|]]
+
+
+-- | Name of the YAML configuration file.
+configFileName :: IsString a => a
+configFileName = ".headroom.yaml"
+
+
 -- | Full product description.
 productDesc :: Text
 productDesc = "manage your source code license headers"
@@ -53,7 +70,7 @@ productDesc = "manage your source code license headers"
 -- | Product info.
 productInfo :: Text
 productInfo =
-  mconcat [productName, ", v", printVersion buildVersion, " :: ", website]
+  mconcat [productName, ", v", printVersion buildVersion, " :: ", webRepo]
 
 
 -- | Product name.
@@ -61,6 +78,16 @@ productName :: Text
 productName = "headroom"
 
 
--- | Homepage website of the product.
-website :: Text
-website = "https://github.com/vaclavsvejcar/headroom"
+-- | Product documentation website for given version.
+webDoc :: Version -> Text
+webDoc v = "http://doc.norcane.com/headroom/v" <> printVersion v
+
+
+-- | Product migration guide for given version.
+webDocMigration :: Version -> Text
+webDocMigration v = webDoc v <> "/migration-guide"
+
+
+-- | Product source code repository.
+webRepo :: Text
+webRepo = "https://github.com/vaclavsvejcar/headroom"

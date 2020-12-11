@@ -85,6 +85,7 @@ import           Headroom.HeaderFn              ( mkConfiguredEnv
                                                 , postProcessHeader
                                                 )
 import           Headroom.Meta                  ( TemplateType
+                                                , configFileName
                                                 , productInfo
                                                 )
 import           Headroom.Template              ( Template(..) )
@@ -425,7 +426,9 @@ loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
       , fromString path
       , "' not found. You can either specify all required parameter by "
       , "command line arguments, or generate one using "
-      , "'headroom gen -c >.headroom.yaml'. See official documentation "
+      , "'headroom gen -c >"
+      , configFileName
+      , "'. See official documentation "
       , "for more details."
       ]
     pure Nothing
@@ -437,7 +440,7 @@ finalConfiguration = do
   logInfo $ display productInfo
   defaultConfig' <- Just <$> parseConfiguration defaultConfig
   cmdLineConfig  <- Just <$> optionsToConfiguration
-  yamlConfig     <- loadConfigurationSafe ".headroom.yaml"
+  yamlConfig     <- loadConfigurationSafe configFileName
   let mergedConfig =
         mconcat . catMaybes $ [defaultConfig', yamlConfig, cmdLineConfig]
   config <- makeConfiguration mergedConfig

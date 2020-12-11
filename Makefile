@@ -31,6 +31,5 @@ fresh: clean build
 
 .PHONY: build
 build: hlint headroom pretty
-	stack build
 	stack test
 	stack haddock

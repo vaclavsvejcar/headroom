@@ -38,6 +38,11 @@ import           Headroom.Command.Utils         ( bootstrap )
 import           Headroom.Configuration         ( makeHeadersConfig
                                                 , parseConfiguration
                                                 )
+import           Headroom.Configuration.Enrich  ( Enrich(..)
+                                                , replaceEmptyValue
+                                                , withArray
+                                                , withText
+                                                )
 import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , LicenseType(..)
                                                 )
@@ -54,8 +59,11 @@ import           Headroom.FileSystem            ( FileSystem(..)
                                                 )
 import           Headroom.FileType              ( fileTypeByExt )
 import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Meta                  ( TemplateType )
-import           Headroom.Serialization         ( prettyPrintYAML )
+import           Headroom.Meta                  ( TemplateType
+                                                , buildVersion
+                                                , configFileName
+                                                )
+import           Headroom.Meta.Version          ( printVersion )
 import           Headroom.Template              ( Template(..) )
 import           Headroom.Types                 ( fromHeadroomError
                                                 , toHeadroomError
@@ -67,11 +75,11 @@ import           RIO
 import qualified RIO.Char                      as C
 import           RIO.FilePath                   ( (</>) )
 import qualified RIO.List                      as L
-import qualified RIO.Map                       as M
 import qualified RIO.NonEmpty                  as NE
 import qualified RIO.Text                      as T
-import qualified RIO.Text.Partial              as TP
 
+
+---------------------------------  DATA TYPES  ---------------------------------
 
 -- | /RIO/ Environment for the @init@ command.
 data Env = Env
@@ -81,6 +89,7 @@ data Env = Env
   , envPaths       :: Paths
   }
 
+
 -- | Paths to various locations of file system.
 data Paths = Paths
   { pConfigFile   :: FilePath
@@ -89,23 +98,26 @@ data Paths = Paths
 
 suffixLenses ''Env
 
+
 instance HasLogFunc Env where
   logFuncL = envLogFuncL
+
 
 instance Has CommandInitOptions Env where
   hasLens = envInitOptionsL
 
+
 instance Has (FileSystem (RIO Env)) Env where
   hasLens = envFileSystemL
+
 
 instance Has Paths Env where
   hasLens = envPathsL
 
---------------------------------------------------------------------------------
 
 env' :: CommandInitOptions -> LogFunc -> IO Env
 env' opts logFunc = do
-  let paths = Paths { pConfigFile   = ".headroom.yaml"
+  let paths = Paths { pConfigFile   = configFileName
                     , pTemplatesDir = "headroom-templates"
                     }
   pure $ Env { envLogFunc     = logFunc
@@ -113,6 +125,9 @@ env' opts logFunc = do
              , envInitOptions = opts
              , envPaths       = paths
              }
+
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Handler for @init@ command.
 commandInit :: CommandInitOptions
@@ -128,6 +143,7 @@ commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
   True -> do
     paths <- viewL
     throwM . AppConfigAlreadyExists $ pConfigFile paths
+
 
 -- | Recursively scans provided source paths for known file types for which
 -- templates can be generated.
@@ -149,6 +165,22 @@ findSupportedFileTypes = do
       logInfo $ "Found supported file types: " <> displayShow fileTypes
       pure fileTypes
 
+
+-- | Checks whether application config file already exists.
+doesAppConfigExist :: ( HasLogFunc env
+                      , Has (FileSystem (RIO env)) env
+                      , Has Paths env
+                      )
+                   => RIO env Bool
+doesAppConfigExist = do
+  FileSystem {..} <- viewL
+  Paths {..}      <- viewL
+  logInfo "Verifying that there's no existing Headroom configuration..."
+  fsDoesFileExist pConfigFile
+
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
 createTemplates :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
                 => [FileType]
                 -> RIO env ()
@@ -157,6 +189,7 @@ createTemplates fileTypes = do
   Paths {..} <- viewL
   mapM_ (\(p, lf) -> createTemplate pTemplatesDir lf p)
         (zipWithProgress $ fmap (cioLicenseType opts, ) fileTypes)
+
 
 createTemplate :: (HasLogFunc env)
                => FilePath
@@ -172,38 +205,22 @@ createTemplate templatesDir (licenseType, fileType) progress = do
     [display progress, " Creating template file in ", fromString filePath]
   writeFileUtf8 filePath template
 
+
 createConfigFile :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
                  => RIO env ()
 createConfigFile = do
   opts         <- viewL
   p@Paths {..} <- viewL
   logInfo $ "Creating YAML config file in " <> fromString pConfigFile
-  writeFileUtf8 pConfigFile (configuration opts p)
+  writeFileUtf8 pConfigFile $ enrich (modify opts p) configFileStub
  where
-  configuration opts paths =
-    let withSourcePaths = TP.replace
-          "source-paths: []"
-          (toYamlList "source-paths" $ cioSourcePaths opts)
-        withTemplatePaths = TP.replace
-          "template-paths: []"
-          (toYamlList "template-paths" [pTemplatesDir paths])
-    in  withTemplatePaths . withSourcePaths $ configFileStub
-  toYamlList field list =
-    T.stripEnd . prettyPrintYAML $ M.fromList [(field :: Text, list)]
+  modify opts paths = mconcat
+    [ replaceEmptyValue "version" $ withText (printVersion buildVersion)
+    , replaceEmptyValue "source-paths" $ withArray (cioSourcePaths opts)
+    , replaceEmptyValue "template-paths" $ withArray [pTemplatesDir paths]
+    ]
 
--- | Checks whether application config file already exists.
-doesAppConfigExist :: ( HasLogFunc env
-                      , Has (FileSystem (RIO env)) env
-                      , Has Paths env
-                      )
-                   => RIO env Bool
-doesAppConfigExist = do
-  FileSystem {..} <- viewL
-  Paths {..}      <- viewL
-  logInfo "Verifying that there's no existing Headroom configuration..."
-  fsDoesFileExist pConfigFile
 
--- | Creates directory for template files.
 makeTemplatesDir :: ( HasLogFunc env
                     , Has (FileSystem (RIO env)) env
                     , Has Paths env
@@ -216,7 +233,7 @@ makeTemplatesDir = do
   fsCreateDirectory pTemplatesDir
 
 
----------------------------------  Error Types  --------------------------------
+---------------------------------  ERROR TYPES  --------------------------------
 
 -- | Exception specific to the "Headroom.Command.Init" module
 data CommandInitError
@@ -228,10 +245,12 @@ data CommandInitError
   -- ^ no supported file types found on source paths
   deriving (Eq, Show)
 
+
 instance Exception CommandInitError where
   displayException = displayException'
   toException      = toHeadroomError
   fromException    = fromHeadroomError
+
 
 displayException' :: CommandInitError -> String
 displayException' = T.unpack . \case

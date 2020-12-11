@@ -32,6 +32,7 @@ where
 
 import           Data.Monoid                    ( Last(..) )
 import qualified Data.Yaml                     as Y
+import           Headroom.Configuration.Compat  ( checkCompatibility )
 import           Headroom.Configuration.Types   ( Configuration(..)
                                                 , ConfigurationError(..)
                                                 , ConfigurationKey(..)
@@ -56,6 +57,7 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 )
 import           Headroom.Data.Lens             ( suffixLenses )
 import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Meta                  ( configBreakingChanges )
 import           RIO
 import qualified RIO.ByteString                as B
 
@@ -66,17 +68,16 @@ suffixLenses ''UpdateCopyrightConfig
 
 
 -- | Loads and parses application configuration from given /YAML/ file.
-loadConfiguration :: MonadIO m
-                  => FilePath
-                  -- ^ path to /YAML/ configuration file
-                  -> m PtConfiguration
-                  -- ^ parsed configuration
-loadConfiguration path = liftIO $ B.readFile path >>= parseConfiguration
+loadConfiguration :: (MonadIO m, MonadThrow m) => FilePath -> m PtConfiguration
+loadConfiguration path = do
+  content <- liftIO $ B.readFile path
+  _       <- checkCompatibility configBreakingChanges content
+  parseConfiguration content
 
 
 -- | Parses application configuration from given raw input in /YAML/ format.
 parseConfiguration :: MonadThrow m
-                   => B.ByteString
+                   => ByteString
                    -- ^ raw input to parse
                    -> m PtConfiguration
                    -- ^ parsed application configuration

@@ -2,6 +2,13 @@
 ## Configuration Changes
 Following breaking changes needs to be done in your current `.headroom.yaml` configuration file in order to make it compatible with version _v0.4.0.0_:
 
+### Bump Configuration Version
+Because this version brings breaking changes to configuration, it's necessary to bump version (`version` field ) or add the field if missing in the `.headroom.yaml` to declare it's compatible with _Headroom_ `v0.4.0.0`:
+
+```yaml
+version: 0.4.0.0
+```
+
 ### Rename `margin-before` and `margin-after` keys
 As part of [this new feature][github/issueP/58], `margin-before` and `margin-after` configuration options were renamed as following:
 

@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 94633bf36f11d0b0920d870507b3d68087b70cd5a478c1084f643e7ab665cf4e
+-- hash: 04e9d2dc2bcc596ae5900ea9611720c7e13cfcfb3759535f638ed041dec000b6
 
 name:           headroom
 version:        0.4.0.0
@@ -135,6 +135,8 @@ library
       Headroom.Command.Types
       Headroom.Command.Utils
       Headroom.Configuration
+      Headroom.Configuration.Compat
+      Headroom.Configuration.Enrich
       Headroom.Configuration.Types
       Headroom.Data.EnumExtra
       Headroom.Data.Has
@@ -227,6 +229,8 @@ test-suite spec
       Headroom.Command.InitSpec
       Headroom.Command.ReadersSpec
       Headroom.Command.RunSpec
+      Headroom.Configuration.CompatSpec
+      Headroom.Configuration.EnrichSpec
       Headroom.ConfigurationSpec
       Headroom.Data.EnumExtraSpec
       Headroom.Data.RegexSpec
