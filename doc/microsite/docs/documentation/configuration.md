@@ -7,10 +7,14 @@ Headroom uses three different sources of configuration, where the next one event
 ## YAML Configuration
 The _YAML_ configuration file, located in `.headroom.yaml`, is the main and most capable configuration source for _Headroom_. Don't forget to check the _default YAML configuration_ in [embedded/default-config.yaml][file:embedded/default-config.yaml], both to know more about all possible configuration keys (it's well documented there), but also to know which value you need to override when in your custom `.headroom.yaml`.
 
+### Configuration Version
+When _Headroom_ is loading your `.headroom.yaml` file, it first checks whether your configuration is compatible with your version of _Headroom_. This is done by checking the `version` field. If you generated your configuration using _Headroom's_ `init` or `gen` command, then this field was automatically set to correct value. You don't need to care about this field unless you upgrade your _Headroom_ version, in case that this field will need to be updated, you'll be always informed by corresponding [migration guide][doc:migration-guide].
+
 ### Top Level Overview
 From top-level perspective, the _YAML_ configuration has the following structure:
 
 ```yaml
+version: 1.2.3.4        ## Version of Headroom the configuration is compatible with
 run-mode: ...           ## Default mode of the 'run' command
 excluded-paths: []      ## Path(s) to exclude from 'source-paths'
 source-paths: []        ## Path(s) to source code files to process headers in
@@ -139,8 +143,9 @@ _Headroom_ can manage license headers only for supported types of source code fi
 If you miss support for file type you use, feel free to [open new issue][meta:new-issue].
 
 
-[doc:extended-functionality]: doc:extended-functionality.md
-[doc:running-headroom#run-command]: doc:running-headroom.md#run-command
-[doc:post-processing]: doc:post-processing.md
+[doc:extended-functionality]: extended-functionality.md
+[doc:migration-guide]: ../migration-guide.md
+[doc:running-headroom#run-command]: running-headroom.md#run-command
+[doc:post-processing]: post-processing.md
 [file:embedded/default-config.yaml]: https://github.com/vaclavsvejcar/headroom/blob/master/embedded/default-config.yaml
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
