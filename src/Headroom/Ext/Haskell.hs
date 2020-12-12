@@ -17,7 +17,7 @@ Portability : POSIX
 This module provides support for extracting /Haskell/-specific info from the
 parsed /source code files/ as /template variables/. Such info includes
 /module name/ and selected fields from /Haddock module header/
-(see "Headroom.FileSupport.Haskell.Haddock").
+(see "Headroom.Header.Haskell.Haddock").
 -}
 
 module Headroom.Ext.Haskell

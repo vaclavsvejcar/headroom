@@ -66,12 +66,6 @@ import           Headroom.Embedded              ( defaultConfig
                                                 , licenseTemplate
                                                 )
 import           Headroom.Ext                   ( extractTemplateMeta )
-import           Headroom.FileSupport           ( addHeader
-                                                , dropHeader
-                                                , extractFileInfo
-                                                , replaceHeader
-                                                )
-import           Headroom.FileSupport.Types     ( FileInfo(..) )
 import           Headroom.FileSystem            ( FileSystem(..)
                                                 , excludePaths
                                                 , fileExtension
@@ -81,6 +75,12 @@ import           Headroom.FileType              ( configByFileType
                                                 , fileTypeByExt
                                                 )
 import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Header                ( addHeader
+                                                , dropHeader
+                                                , extractFileInfo
+                                                , replaceHeader
+                                                )
+import           Headroom.Header.Types          ( FileInfo(..) )
 import           Headroom.HeaderFn              ( mkConfiguredEnv
                                                 , postProcessHeader
                                                 )

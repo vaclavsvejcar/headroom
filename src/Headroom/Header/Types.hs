@@ -2,18 +2,18 @@
 {-# LANGUAGE StrictData        #-}
 
 {-|
-Module      : Headroom.FileSupport.Types
-Description : Data types for "Headroom.FileSupport"
+Module      : Headroom.Header.Types
+Description : Data types for "Headroom.Header"
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-This module contains data types for "Headroom.FileSupport" module.
+This module contains data types for "Headroom.Header" module.
 -}
 
-module Headroom.FileSupport.Types
+module Headroom.Header.Types
   ( -- * Data Types
     FileInfo(..)
   )

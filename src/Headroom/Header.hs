@@ -4,7 +4,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 {-|
-Module      : Headroom.FileSupport
+Module      : Headroom.Header
 Description : License header manipulation
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -16,7 +16,7 @@ This module is the heart of /Headroom/ as it contains functions for working with
 the /license headers/ and the /source code files/.
 -}
 
-module Headroom.FileSupport
+module Headroom.Header
   ( -- * File info extraction
     extractFileInfo
     -- * License header manipulation
@@ -45,8 +45,8 @@ import           Headroom.Data.TextExtra        ( fromLines
                                                 , toLines
                                                 )
 import           Headroom.Ext                   ( extractVariables )
-import           Headroom.FileSupport.Types     ( FileInfo(..) )
 import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Header.Types          ( FileInfo(..) )
 import           Headroom.Types                 ( TemplateMeta(..) )
 import           RIO
 import qualified RIO.List                      as L

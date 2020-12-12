@@ -4,7 +4,8 @@
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeFamilies      #-}
-module Headroom.FileSupportSpec
+
+module Headroom.HeaderSpec
   ( spec
   )
 where
@@ -19,10 +20,10 @@ import           Headroom.Configuration.Types   ( Configuration(..)
                                                 )
 import           Headroom.Data.Regex            ( re )
 import           Headroom.Embedded              ( defaultConfig )
-import           Headroom.FileSupport
-import           Headroom.FileSupport.Types     ( FileInfo(..) )
 import           Headroom.FileSystem            ( loadFile )
 import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Header
+import           Headroom.Header.Types          ( FileInfo(..) )
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           RIO.FilePath                   ( (</>) )
