@@ -8,17 +8,17 @@ module Headroom.HeaderFnSpec
   )
 where
 
-import           Headroom.Configuration.Types   ( HeaderFnConfig(..)
-                                                , HeaderFnConfigs(..)
-                                                , UpdateCopyrightConfig(..)
-                                                )
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.TextExtra        ( fromLines )
+import           Headroom.Configuration.Types        ( HeaderFnConfig(..)
+                                                     , HeaderFnConfigs(..)
+                                                     , UpdateCopyrightConfig(..)
+                                                     )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.TextExtra             ( fromLines )
 import           Headroom.HeaderFn
 import           Headroom.HeaderFn.Types
 import           Headroom.HeaderFn.UpdateCopyright
-import           Headroom.Types                 ( CurrentYear(..) )
-import           Headroom.Variables             ( mkVariables )
+import           Headroom.Types                      ( CurrentYear(..) )
+import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           Test.Hspec
 

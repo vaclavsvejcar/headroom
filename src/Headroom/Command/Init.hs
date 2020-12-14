@@ -33,50 +33,50 @@ module Headroom.Command.Init
   )
 where
 
-import           Headroom.Command.Types         ( CommandInitOptions(..) )
-import           Headroom.Command.Utils         ( bootstrap )
-import           Headroom.Configuration         ( makeHeadersConfig
-                                                , parseConfiguration
-                                                )
-import           Headroom.Configuration.Enrich  ( Enrich(..)
-                                                , replaceEmptyValue
-                                                , withArray
-                                                , withText
-                                                )
-import           Headroom.Configuration.Types   ( Configuration(..)
-                                                , LicenseType(..)
-                                                )
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses )
-import           Headroom.Embedded              ( configFileStub
-                                                , defaultConfig
-                                                , licenseTemplate
-                                                )
-import           Headroom.FileSystem            ( FileSystem(..)
-                                                , fileExtension
-                                                , findFiles
-                                                , mkFileSystem
-                                                )
-import           Headroom.FileType              ( fileTypeByExt )
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Meta                  ( TemplateType
-                                                , buildVersion
-                                                , configFileName
-                                                )
-import           Headroom.Meta.Version          ( printVersion )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( fromHeadroomError
-                                                , toHeadroomError
-                                                )
-import           Headroom.UI                    ( Progress(..)
-                                                , zipWithProgress
-                                                )
+import           Headroom.Command.Types              ( CommandInitOptions(..) )
+import           Headroom.Command.Utils              ( bootstrap )
+import           Headroom.Configuration              ( makeHeadersConfig
+                                                     , parseConfiguration
+                                                     )
+import           Headroom.Configuration.Enrich       ( Enrich(..)
+                                                     , replaceEmptyValue
+                                                     , withArray
+                                                     , withText
+                                                     )
+import           Headroom.Configuration.Types        ( Configuration(..)
+                                                     , LicenseType(..)
+                                                     )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Lens                  ( suffixLenses )
+import           Headroom.Embedded                   ( configFileStub
+                                                     , defaultConfig
+                                                     , licenseTemplate
+                                                     )
+import           Headroom.FileSystem                 ( FileSystem(..)
+                                                     , fileExtension
+                                                     , findFiles
+                                                     , mkFileSystem
+                                                     )
+import           Headroom.FileType                   ( fileTypeByExt )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Meta                       ( TemplateType
+                                                     , buildVersion
+                                                     , configFileName
+                                                     )
+import           Headroom.Meta.Version               ( printVersion )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( fromHeadroomError
+                                                     , toHeadroomError
+                                                     )
+import           Headroom.UI                         ( Progress(..)
+                                                     , zipWithProgress
+                                                     )
 import           RIO
-import qualified RIO.Char                      as C
-import           RIO.FilePath                   ( (</>) )
-import qualified RIO.List                      as L
-import qualified RIO.NonEmpty                  as NE
-import qualified RIO.Text                      as T
+import qualified RIO.Char                           as C
+import           RIO.FilePath                        ( (</>) )
+import qualified RIO.List                           as L
+import qualified RIO.NonEmpty                       as NE
+import qualified RIO.Text                           as T
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

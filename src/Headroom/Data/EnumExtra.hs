@@ -19,8 +19,8 @@ from/to textual representation, etc.
 module Headroom.Data.EnumExtra where
 
 import           RIO
-import qualified RIO.List                      as L
-import qualified RIO.Text                      as T
+import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
 
 -- | Enum data type, capable to (de)serialize itself from/to string
 -- representation. Can be automatically derived by /GHC/ using the

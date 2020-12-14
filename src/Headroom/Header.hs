@@ -33,24 +33,24 @@ module Headroom.Header
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeaderConfig
-                                                , HeaderConfig(..)
-                                                , HeaderSyntax(..)
-                                                )
-import           Headroom.Data.Lens             ( suffixLensesFor )
-import           Headroom.Data.Regex            ( Regex
-                                                , match
-                                                )
-import           Headroom.Data.TextExtra        ( fromLines
-                                                , toLines
-                                                )
-import           Headroom.Ext                   ( extractVariables )
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Header.Types          ( FileInfo(..) )
-import           Headroom.Types                 ( TemplateMeta(..) )
+import           Headroom.Configuration.Types        ( CtHeaderConfig
+                                                     , HeaderConfig(..)
+                                                     , HeaderSyntax(..)
+                                                     )
+import           Headroom.Data.Lens                  ( suffixLensesFor )
+import           Headroom.Data.Regex                 ( Regex
+                                                     , match
+                                                     )
+import           Headroom.Data.TextExtra             ( fromLines
+                                                     , toLines
+                                                     )
+import           Headroom.Ext                        ( extractVariables )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Header.Types               ( FileInfo(..) )
+import           Headroom.Types                      ( TemplateMeta(..) )
 import           RIO
-import qualified RIO.List                      as L
-import qualified RIO.Text                      as T
+import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
 
 
 suffixLensesFor ["fiHeaderPos"] ''FileInfo

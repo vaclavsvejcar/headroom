@@ -6,18 +6,17 @@ module Headroom.Ext.Haskell.HaddockSpec
   )
 where
 
-import           Headroom.Configuration.Types   ( LicenseType(..) )
-import           Headroom.Data.TextExtra        ( fromLines )
-import           Headroom.Embedded              ( licenseTemplate )
+import           Headroom.Configuration.Types        ( LicenseType(..) )
+import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.Embedded                   ( licenseTemplate )
 import           Headroom.Ext.Haskell.Haddock
-import           Headroom.FileSystem            ( loadFile )
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.TemplateSupport.Mustache
-                                                ( Mustache(..) )
-import           Headroom.Types                 ( HaddockFieldOffsets(..) )
+import           Headroom.FileSystem                 ( loadFile )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.TemplateSupport.Mustache   ( Mustache(..) )
+import           Headroom.Types                      ( HaddockFieldOffsets(..) )
 import           RIO
-import           RIO.FilePath                   ( (</>) )
+import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
 
 

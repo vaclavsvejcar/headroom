@@ -29,18 +29,17 @@ module Headroom.Meta
   )
 where
 
-import           Data.Version                   ( showVersion )
-import           Headroom.Meta.Version          ( Version(..)
-                                                , parseVersion
-                                                , printVersion
-                                                , pvp
-                                                )
-import           Headroom.TemplateSupport.Mustache
-                                                ( Mustache )
-import           Paths_headroom                 ( version )
+import           Data.Version                        ( showVersion )
+import           Headroom.Meta.Version               ( Version(..)
+                                                     , parseVersion
+                                                     , printVersion
+                                                     , pvp
+                                                     )
+import           Headroom.TemplateSupport.Mustache   ( Mustache )
+import           Paths_headroom                      ( version )
 import           RIO
-import           RIO.Partial                    ( fromJust )
-import qualified RIO.Text                      as T
+import           RIO.Partial                         ( fromJust )
+import qualified RIO.Text                           as T
 
 
 -- | Type of the template format used for license headers.

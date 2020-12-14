@@ -25,27 +25,27 @@ module Headroom.Command.Gen
 where
 
 
-import           Headroom.Command.Types         ( Command(..)
-                                                , CommandGenOptions(..)
-                                                )
-import           Headroom.Command.Utils         ( bootstrap )
-import           Headroom.Configuration.Enrich  ( Enrich(..)
-                                                , replaceEmptyValue
-                                                , withText
-                                                )
-import           Headroom.Configuration.Types   ( GenMode(..) )
-import           Headroom.Data.Lens             ( suffixLensesFor )
-import           Headroom.Embedded              ( configFileStub
-                                                , licenseTemplate
-                                                )
-import           Headroom.Meta                  ( buildVersion )
-import           Headroom.Meta.Version          ( printVersion )
-import           Headroom.Types                 ( fromHeadroomError
-                                                , toHeadroomError
-                                                )
-import           Prelude                        ( putStrLn )
+import           Headroom.Command.Types              ( Command(..)
+                                                     , CommandGenOptions(..)
+                                                     )
+import           Headroom.Command.Utils              ( bootstrap )
+import           Headroom.Configuration.Enrich       ( Enrich(..)
+                                                     , replaceEmptyValue
+                                                     , withText
+                                                     )
+import           Headroom.Configuration.Types        ( GenMode(..) )
+import           Headroom.Data.Lens                  ( suffixLensesFor )
+import           Headroom.Embedded                   ( configFileStub
+                                                     , licenseTemplate
+                                                     )
+import           Headroom.Meta                       ( buildVersion )
+import           Headroom.Meta.Version               ( printVersion )
+import           Headroom.Types                      ( fromHeadroomError
+                                                     , toHeadroomError
+                                                     )
+import           Prelude                             ( putStrLn )
 import           RIO
-import qualified RIO.Text                      as T
+import qualified RIO.Text                           as T
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

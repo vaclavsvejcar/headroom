@@ -19,9 +19,9 @@ module Headroom.Header.Types
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeaderConfig )
-import           Headroom.FileType.Types        ( FileType )
-import           Headroom.Variables.Types       ( Variables )
+import           Headroom.Configuration.Types        ( CtHeaderConfig )
+import           Headroom.FileType.Types             ( FileType )
+import           Headroom.Variables.Types            ( Variables )
 import           RIO
 
 

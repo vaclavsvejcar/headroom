@@ -21,14 +21,14 @@ module Headroom.TemplateSupport.Mustache
   )
 where
 
-import           Headroom.TemplateSupport       ( TemplateError(..)
-                                                , TemplateSupport(..)
-                                                )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Headroom.TemplateSupport            ( TemplateError(..)
+                                                     , TemplateSupport(..)
+                                                     )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
-import qualified RIO.Text                      as T
-import qualified Text.Mustache                 as MU
-import           Text.Mustache.Render           ( SubstitutionError(..) )
+import qualified RIO.Text                           as T
+import qualified Text.Mustache                      as MU
+import           Text.Mustache.Render                ( SubstitutionError(..) )
 
 
 -- | The /Mustache/ template.

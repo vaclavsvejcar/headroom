@@ -30,38 +30,38 @@ module Headroom.Configuration
   )
 where
 
-import           Data.Monoid                    ( Last(..) )
-import qualified Data.Yaml                     as Y
-import           Headroom.Configuration.Compat  ( checkCompatibility )
-import           Headroom.Configuration.Types   ( Configuration(..)
-                                                , ConfigurationError(..)
-                                                , ConfigurationKey(..)
-                                                , CtConfiguration
-                                                , CtHeaderConfig
-                                                , CtHeaderFnConfig
-                                                , CtHeaderFnConfigs
-                                                , CtHeadersConfig
-                                                , CtUpdateCopyrightConfig
-                                                , HeaderConfig(..)
-                                                , HeaderFnConfig(..)
-                                                , HeaderFnConfigs(..)
-                                                , HeadersConfig(..)
-                                                , Phase(..)
-                                                , PtConfiguration
-                                                , PtHeaderConfig
-                                                , PtHeaderFnConfig
-                                                , PtHeaderFnConfigs
-                                                , PtHeadersConfig
-                                                , PtUpdateCopyrightConfig
-                                                , UpdateCopyrightConfig(..)
-                                                )
-import           Headroom.Data.Lens             ( suffixLenses )
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Meta                  ( buildVersion
-                                                , configBreakingChanges
-                                                )
+import           Data.Monoid                         ( Last(..) )
+import qualified Data.Yaml                          as Y
+import           Headroom.Configuration.Compat       ( checkCompatibility )
+import           Headroom.Configuration.Types        ( Configuration(..)
+                                                     , ConfigurationError(..)
+                                                     , ConfigurationKey(..)
+                                                     , CtConfiguration
+                                                     , CtHeaderConfig
+                                                     , CtHeaderFnConfig
+                                                     , CtHeaderFnConfigs
+                                                     , CtHeadersConfig
+                                                     , CtUpdateCopyrightConfig
+                                                     , HeaderConfig(..)
+                                                     , HeaderFnConfig(..)
+                                                     , HeaderFnConfigs(..)
+                                                     , HeadersConfig(..)
+                                                     , Phase(..)
+                                                     , PtConfiguration
+                                                     , PtHeaderConfig
+                                                     , PtHeaderFnConfig
+                                                     , PtHeaderFnConfigs
+                                                     , PtHeadersConfig
+                                                     , PtUpdateCopyrightConfig
+                                                     , UpdateCopyrightConfig(..)
+                                                     )
+import           Headroom.Data.Lens                  ( suffixLenses )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Meta                       ( buildVersion
+                                                     , configBreakingChanges
+                                                     )
 import           RIO
-import qualified RIO.ByteString                as B
+import qualified RIO.ByteString                     as B
 
 
 suffixLenses ''HeaderFnConfig

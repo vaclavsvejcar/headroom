@@ -10,23 +10,23 @@ module Headroom.HeaderSpec
   )
 where
 
-import           Headroom.Configuration         ( makeHeadersConfig
-                                                , parseConfiguration
-                                                )
-import           Headroom.Configuration.Types   ( Configuration(..)
-                                                , HeaderConfig(..)
-                                                , HeaderSyntax(..)
-                                                , HeadersConfig(..)
-                                                )
-import           Headroom.Data.Regex            ( re )
-import           Headroom.Embedded              ( defaultConfig )
-import           Headroom.FileSystem            ( loadFile )
-import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Configuration              ( makeHeadersConfig
+                                                     , parseConfiguration
+                                                     )
+import           Headroom.Configuration.Types        ( Configuration(..)
+                                                     , HeaderConfig(..)
+                                                     , HeaderSyntax(..)
+                                                     , HeadersConfig(..)
+                                                     )
+import           Headroom.Data.Regex                 ( re )
+import           Headroom.Embedded                   ( defaultConfig )
+import           Headroom.FileSystem                 ( loadFile )
+import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header
-import           Headroom.Header.Types          ( FileInfo(..) )
-import           Headroom.Variables             ( mkVariables )
+import           Headroom.Header.Types               ( FileInfo(..) )
+import           Headroom.Variables                  ( mkVariables )
 import           RIO
-import           RIO.FilePath                   ( (</>) )
+import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
 
 

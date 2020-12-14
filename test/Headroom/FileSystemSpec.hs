@@ -6,12 +6,12 @@ module Headroom.FileSystemSpec
   )
 where
 
-import           Headroom.Data.Regex            ( re )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.FileSystem
 import           RIO
-import           RIO.FilePath                   ( (</>) )
-import           RIO.List                       ( sort )
-import qualified RIO.List                      as L
+import           RIO.FilePath                        ( (</>) )
+import           RIO.List                            ( sort )
+import qualified RIO.List                           as L
 import           Test.Hspec
 
 

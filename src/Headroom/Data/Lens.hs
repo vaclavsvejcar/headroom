@@ -18,14 +18,14 @@ module Headroom.Data.Lens
   )
 where
 
-import qualified Language.Haskell.TH.Lib       as TH
-import qualified Language.Haskell.TH.Syntax    as TH
-import           Lens.Micro.TH                  ( DefName(..)
-                                                , lensField
-                                                , lensRules
-                                                , lensRulesFor
-                                                , makeLensesWith
-                                                )
+import qualified Language.Haskell.TH.Lib            as TH
+import qualified Language.Haskell.TH.Syntax         as TH
+import           Lens.Micro.TH                       ( DefName(..)
+                                                     , lensField
+                                                     , lensRules
+                                                     , lensRulesFor
+                                                     , makeLensesWith
+                                                     )
 import           RIO
 
 

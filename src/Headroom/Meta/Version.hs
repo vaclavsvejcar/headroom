@@ -27,16 +27,16 @@ module Headroom.Meta.Version
   )
 where
 
-import           Data.Aeson                     ( FromJSON(..)
-                                                , Value(String)
-                                                )
-import           Headroom.Data.Regex            ( match
-                                                , re
-                                                )
-import qualified Headroom.Data.TextExtra       as T
-import           Language.Haskell.TH.Quote      ( QuasiQuoter(..) )
+import           Data.Aeson                          ( FromJSON(..)
+                                                     , Value(String)
+                                                     )
+import           Headroom.Data.Regex                 ( match
+                                                     , re
+                                                     )
+import qualified Headroom.Data.TextExtra            as T
+import           Language.Haskell.TH.Quote           ( QuasiQuoter(..) )
 import           RIO
-import qualified RIO.Text                      as T
+import qualified RIO.Text                           as T
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

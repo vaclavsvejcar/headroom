@@ -69,25 +69,25 @@ module Headroom.Configuration.Types
   )
 where
 
-import           Control.Exception              ( throw )
-import           Data.Aeson                     ( FromJSON(..)
-                                                , Value(String)
-                                                , genericParseJSON
-                                                , withObject
-                                                , (.!=)
-                                                , (.:?)
-                                                )
-import           Data.Monoid                    ( Last(..) )
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Data.Regex            ( Regex(..) )
-import           Headroom.FileType.Types        ( FileType )
-import           Headroom.Serialization         ( aesonOptions )
-import           Headroom.Types                 ( fromHeadroomError
-                                                , toHeadroomError
-                                                )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Control.Exception                   ( throw )
+import           Data.Aeson                          ( FromJSON(..)
+                                                     , Value(String)
+                                                     , genericParseJSON
+                                                     , withObject
+                                                     , (.!=)
+                                                     , (.:?)
+                                                     )
+import           Data.Monoid                         ( Last(..) )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
+import           Headroom.Data.Regex                 ( Regex(..) )
+import           Headroom.FileType.Types             ( FileType )
+import           Headroom.Serialization              ( aesonOptions )
+import           Headroom.Types                      ( fromHeadroomError
+                                                     , toHeadroomError
+                                                     )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
-import qualified RIO.Text                      as T
+import qualified RIO.Text                           as T
 
 
 ------------------------------------  Phase  -----------------------------------

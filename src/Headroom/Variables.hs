@@ -27,16 +27,16 @@ module Headroom.Variables
   )
 where
 
-import           Headroom.Meta                  ( TemplateType )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( CurrentYear(..)
-                                                , fromHeadroomError
-                                                , toHeadroomError
-                                                )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Headroom.Meta                       ( TemplateType )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( CurrentYear(..)
+                                                     , fromHeadroomError
+                                                     , toHeadroomError
+                                                     )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
-import qualified RIO.HashMap                   as HM
-import qualified RIO.Text                      as T
+import qualified RIO.HashMap                        as HM
+import qualified RIO.Text                           as T
 
 
 -- | Constructor function for 'Variables' data type.

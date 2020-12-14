@@ -6,7 +6,7 @@ module Headroom.ConfigurationSpec
 where
 
 import           Headroom.Configuration
-import           Headroom.Embedded              ( defaultConfig )
+import           Headroom.Embedded                   ( defaultConfig )
 import           RIO
 import           Test.Hspec
 

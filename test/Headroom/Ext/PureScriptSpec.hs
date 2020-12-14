@@ -5,14 +5,14 @@ module Headroom.Ext.PureScriptSpec
   )
 where
 
-import           Headroom.Configuration.Types   ( HeaderConfig(..)
-                                                , HeaderSyntax(..)
-                                                )
+import           Headroom.Configuration.Types        ( HeaderConfig(..)
+                                                     , HeaderSyntax(..)
+                                                     )
 import           Headroom.Ext.PureScript
-import           Headroom.FileSystem            ( loadFile )
-import           Headroom.Variables             ( mkVariables )
+import           Headroom.FileSystem                 ( loadFile )
+import           Headroom.Variables                  ( mkVariables )
 import           RIO
-import           RIO.FilePath                   ( (</>) )
+import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
 
 

@@ -18,11 +18,11 @@ processed /PureScript/ source code file.
 
 module Headroom.Ext.PureScript where
 
-import           Headroom.Configuration.Types   ( CtHeaderConfig )
-import           Headroom.Ext.Haskell           ( extractModuleName )
-import           Headroom.Types                 ( TemplateMeta(..) )
-import           Headroom.Variables             ( mkVariables )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Headroom.Configuration.Types        ( CtHeaderConfig )
+import           Headroom.Ext.Haskell                ( extractModuleName )
+import           Headroom.Types                      ( TemplateMeta(..) )
+import           Headroom.Variables                  ( mkVariables )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 
 

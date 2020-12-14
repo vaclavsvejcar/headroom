@@ -29,25 +29,25 @@ module Headroom.Ext.Haskell
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeaderConfig )
-import           Headroom.Data.Regex            ( match
-                                                , re
-                                                )
-import           Headroom.Data.TextExtra        ( fromLines
-                                                , toLines
-                                                )
-import           Headroom.Ext.Haskell.Haddock   ( HaddockModuleHeader(..)
-                                                , extractFieldOffsets
-                                                , extractModuleHeader
-                                                )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( TemplateMeta(..) )
-import           Headroom.Variables             ( mkVariables )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Headroom.Configuration.Types        ( CtHeaderConfig )
+import           Headroom.Data.Regex                 ( match
+                                                     , re
+                                                     )
+import           Headroom.Data.TextExtra             ( fromLines
+                                                     , toLines
+                                                     )
+import           Headroom.Ext.Haskell.Haddock        ( HaddockModuleHeader(..)
+                                                     , extractFieldOffsets
+                                                     , extractModuleHeader
+                                                     )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( TemplateMeta(..) )
+import           Headroom.Variables                  ( mkVariables )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
-import           RIO.Lens                       ( ix )
-import qualified RIO.List                      as L
-import qualified RIO.Text                      as T
+import           RIO.Lens                            ( ix )
+import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
 
 
 -- | Extracts name of /Haskell/ module from given source code file content.

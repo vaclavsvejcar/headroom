@@ -22,18 +22,18 @@ module Headroom.Embedded.TH
   )
 where
 
-import           Data.FileEmbed                 ( embedStringFile )
-import           Headroom.Configuration.Types   ( LicenseType(..) )
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Meta                  ( TemplateType )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Language.Haskell.TH.Syntax     ( Exp
-                                                , Q
-                                                )
+import           Data.FileEmbed                      ( embedStringFile )
+import           Headroom.Configuration.Types        ( LicenseType(..) )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Meta                       ( TemplateType )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Language.Haskell.TH.Syntax          ( Exp
+                                                     , Q
+                                                     )
 import           RIO
-import qualified RIO.NonEmpty                  as NE
-import qualified RIO.Text                      as T
+import qualified RIO.NonEmpty                       as NE
+import qualified RIO.Text                           as T
 
 
 -- | Embeds stub configuration file to source code.

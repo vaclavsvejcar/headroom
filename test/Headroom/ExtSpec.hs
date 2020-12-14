@@ -5,14 +5,14 @@ module Headroom.ExtSpec
   )
 where
 
-import           Headroom.Configuration.Types   ( HeaderConfig(..)
-                                                , HeaderSyntax(..)
-                                                )
+import           Headroom.Configuration.Types        ( HeaderConfig(..)
+                                                     , HeaderSyntax(..)
+                                                     )
 import           Headroom.Ext
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Variables             ( mkVariables )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Variables                  ( mkVariables )
 import           RIO
-import           RIO.FilePath                   ( (</>) )
+import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
 
 

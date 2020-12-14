@@ -9,7 +9,7 @@ where
 
 import           Headroom.TemplateSupport
 import           Headroom.TemplateSupport.Mustache
-import           Headroom.Variables             ( mkVariables )
+import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           Test.Hspec
 

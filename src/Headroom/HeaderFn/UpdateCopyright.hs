@@ -29,18 +29,18 @@ module Headroom.HeaderFn.UpdateCopyright
   )
 where
 
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Regex            ( re
-                                                , replace
-                                                )
-import           Headroom.Data.TextExtra        ( mapLines
-                                                , read
-                                                )
-import           Headroom.HeaderFn.Types        ( HeaderFn(..) )
-import           Headroom.Types                 ( CurrentYear(..) )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Regex                 ( re
+                                                     , replace
+                                                     )
+import           Headroom.Data.TextExtra             ( mapLines
+                                                     , read
+                                                     )
+import           Headroom.HeaderFn.Types             ( HeaderFn(..) )
+import           Headroom.Types                      ( CurrentYear(..) )
 import           RIO
-import qualified RIO.NonEmpty                  as NE
-import qualified RIO.Text                      as T
+import qualified RIO.NonEmpty                       as NE
+import qualified RIO.Text                           as T
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

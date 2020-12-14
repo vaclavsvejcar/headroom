@@ -34,26 +34,25 @@ module Headroom.HeaderFn
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeaderFnConfigs
-                                                , HeaderFnConfig(..)
-                                                , HeaderFnConfigs(..)
-                                                , UpdateCopyrightConfig(..)
-                                                )
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses
-                                                , suffixLensesFor
-                                                )
-import           Headroom.HeaderFn.Types        ( HeaderFn(..) )
-import           Headroom.HeaderFn.UpdateCopyright
-                                                ( SelectedAuthors(..)
-                                                , UpdateCopyrightMode(..)
-                                                , updateCopyright
-                                                )
-import           Headroom.Meta                  ( TemplateType )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( CurrentYear(..) )
-import           Headroom.Variables.Types       ( Variables(..) )
-import           Lens.Micro                     ( traverseOf )
+import           Headroom.Configuration.Types        ( CtHeaderFnConfigs
+                                                     , HeaderFnConfig(..)
+                                                     , HeaderFnConfigs(..)
+                                                     , UpdateCopyrightConfig(..)
+                                                     )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Lens                  ( suffixLenses
+                                                     , suffixLensesFor
+                                                     )
+import           Headroom.HeaderFn.Types             ( HeaderFn(..) )
+import           Headroom.HeaderFn.UpdateCopyright   ( SelectedAuthors(..)
+                                                     , UpdateCopyrightMode(..)
+                                                     , updateCopyright
+                                                     )
+import           Headroom.Meta                       ( TemplateType )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( CurrentYear(..) )
+import           Headroom.Variables.Types            ( Variables(..) )
+import           Lens.Micro                          ( traverseOf )
 import           RIO
 
 

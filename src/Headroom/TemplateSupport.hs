@@ -25,12 +25,12 @@ module Headroom.TemplateSupport
   )
 where
 
-import           Headroom.Types                 ( fromHeadroomError
-                                                , toHeadroomError
-                                                )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Headroom.Types                      ( fromHeadroomError
+                                                     , toHeadroomError
+                                                     )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
-import qualified RIO.Text                      as T
+import qualified RIO.Text                           as T
 
 
 -- | /Type class/ representing supported template file.

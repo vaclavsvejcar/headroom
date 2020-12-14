@@ -24,25 +24,25 @@ module Headroom.Configuration.Compat
   )
 where
 
-import           Data.Aeson                     ( FromJSON(..)
-                                                , withObject
-                                                , (.:)
-                                                )
-import qualified Data.Yaml                     as Y
-import           Headroom.Meta                  ( buildVersion
-                                                , configFileName
-                                                , webDocMigration
-                                                )
-import           Headroom.Meta.Version          ( Version(..)
-                                                , printVersionP
-                                                , pvp
-                                                )
-import           Headroom.Types                 ( fromHeadroomError
-                                                , toHeadroomError
-                                                )
+import           Data.Aeson                          ( FromJSON(..)
+                                                     , withObject
+                                                     , (.:)
+                                                     )
+import qualified Data.Yaml                          as Y
+import           Headroom.Meta                       ( buildVersion
+                                                     , configFileName
+                                                     , webDocMigration
+                                                     )
+import           Headroom.Meta.Version               ( Version(..)
+                                                     , printVersionP
+                                                     , pvp
+                                                     )
+import           Headroom.Types                      ( fromHeadroomError
+                                                     , toHeadroomError
+                                                     )
 import           RIO
-import qualified RIO.List                      as L
-import qualified RIO.Text                      as T
+import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

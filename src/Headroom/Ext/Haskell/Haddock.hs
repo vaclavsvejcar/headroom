@@ -28,23 +28,23 @@ module Headroom.Ext.Haskell.Haddock
   )
 where
 
-import           Control.Applicative            ( Alternative(..) )
-import           Control.Monad                  ( ap )
-import           Data.Default.Class             ( Default(..) )
-import           Headroom.Data.Regex            ( re
-                                                , replace
-                                                , scan
-                                                )
-import           Headroom.Data.TextExtra        ( fromLines
-                                                , toLines
-                                                )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( HaddockFieldOffsets(..)
-                                                , TemplateMeta(..)
-                                                )
+import           Control.Applicative                 ( Alternative(..) )
+import           Control.Monad                       ( ap )
+import           Data.Default.Class                  ( Default(..) )
+import           Headroom.Data.Regex                 ( re
+                                                     , replace
+                                                     , scan
+                                                     )
+import           Headroom.Data.TextExtra             ( fromLines
+                                                     , toLines
+                                                     )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( HaddockFieldOffsets(..)
+                                                     , TemplateMeta(..)
+                                                     )
 import           RIO
-import qualified RIO.Char                      as C
-import qualified RIO.Text                      as T
+import qualified RIO.Char                           as C
+import qualified RIO.Text                           as T
 
 
 -- | Extracted fields from the /Haddock module header/.

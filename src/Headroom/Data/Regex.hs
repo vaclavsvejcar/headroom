@@ -34,18 +34,18 @@ module Headroom.Data.Regex
   )
 where
 
-import           Data.Aeson                     ( FromJSON(..)
-                                                , Value(String)
-                                                )
-import           Headroom.Types                 ( fromHeadroomError
-                                                , toHeadroomError
-                                                )
-import           Language.Haskell.TH.Quote      ( QuasiQuoter(..) )
+import           Data.Aeson                          ( FromJSON(..)
+                                                     , Value(String)
+                                                     )
+import           Headroom.Types                      ( fromHeadroomError
+                                                     , toHeadroomError
+                                                     )
+import           Language.Haskell.TH.Quote           ( QuasiQuoter(..) )
 import           RIO
-import qualified RIO.Text                      as T
-import qualified Text.Regex.PCRE.Heavy         as PH
-import qualified Text.Regex.PCRE.Light         as PL
-import qualified Text.Regex.PCRE.Light.Char8   as PLC
+import qualified RIO.Text                           as T
+import qualified Text.Regex.PCRE.Heavy              as PH
+import qualified Text.Regex.PCRE.Light              as PL
+import qualified Text.Regex.PCRE.Light.Char8        as PLC
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

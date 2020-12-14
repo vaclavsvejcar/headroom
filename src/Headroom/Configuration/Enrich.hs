@@ -29,12 +29,12 @@ module Headroom.Configuration.Enrich
   )
 where
 
-import           Data.Aeson                     ( ToJSON(..) )
-import           Headroom.Serialization         ( prettyPrintYAML )
+import           Data.Aeson                          ( ToJSON(..) )
+import           Headroom.Serialization              ( prettyPrintYAML )
 import           RIO
-import qualified RIO.Map                       as M
-import qualified RIO.Text                      as T
-import qualified RIO.Text.Partial              as TP
+import qualified RIO.Map                            as M
+import qualified RIO.Text                           as T
+import qualified RIO.Text.Partial                   as TP
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

@@ -8,11 +8,11 @@ module Headroom.HeaderFn.UpdateCopyrightSpec
   )
 where
 
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.TextExtra        ( fromLines )
-import           Headroom.HeaderFn              ( runHeaderFn )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.HeaderFn                   ( runHeaderFn )
 import           Headroom.HeaderFn.UpdateCopyright
-import           Headroom.Types                 ( CurrentYear(..) )
+import           Headroom.Types                      ( CurrentYear(..) )
 import           RIO
 import           Test.Hspec
 

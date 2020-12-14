@@ -20,22 +20,22 @@ module Headroom.Command
   )
 where
 
-import           Headroom.Command.Readers       ( licenseReader
-                                                , licenseTypeReader
-                                                , regexReader
-                                                )
-import           Headroom.Command.Types         ( Command(..) )
-import           Headroom.Configuration.Types   ( LicenseType
-                                                , RunMode(..)
-                                                , TemplateSource(..)
-                                                )
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Meta                  ( productDesc
-                                                , productInfo
-                                                )
+import           Headroom.Command.Readers            ( licenseReader
+                                                     , licenseTypeReader
+                                                     , regexReader
+                                                     )
+import           Headroom.Command.Types              ( Command(..) )
+import           Headroom.Configuration.Types        ( LicenseType
+                                                     , RunMode(..)
+                                                     , TemplateSource(..)
+                                                     )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
+import           Headroom.Meta                       ( productDesc
+                                                     , productInfo
+                                                     )
 import           Options.Applicative
 import           RIO
-import qualified RIO.Text                      as T
+import qualified RIO.Text                           as T
 
 
 -- | Parses command line arguments.

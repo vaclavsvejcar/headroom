@@ -22,15 +22,15 @@ module Headroom.FileType
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeaderConfig
-                                                , CtHeadersConfig
-                                                , HeaderConfig(..)
-                                                , HeadersConfig(..)
-                                                )
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Configuration.Types        ( CtHeaderConfig
+                                                     , CtHeadersConfig
+                                                     , HeaderConfig(..)
+                                                     , HeadersConfig(..)
+                                                     )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
+import           Headroom.FileType.Types             ( FileType(..) )
 import           RIO
-import qualified RIO.List                      as L
+import qualified RIO.List                           as L
 
 
 

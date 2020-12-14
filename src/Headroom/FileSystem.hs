@@ -40,25 +40,25 @@ module Headroom.FileSystem
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeadersConfig )
-import           Headroom.Data.Regex            ( Regex
-                                                , match
-                                                )
-import           Headroom.FileType              ( listExtensions )
-import           Headroom.FileType.Types        ( FileType )
+import           Headroom.Configuration.Types        ( CtHeadersConfig )
+import           Headroom.Data.Regex                 ( Regex
+                                                     , match
+                                                     )
+import           Headroom.FileType                   ( listExtensions )
+import           Headroom.FileType.Types             ( FileType )
 import           RIO
-import           RIO.Directory                  ( createDirectory
-                                                , doesDirectoryExist
-                                                , doesFileExist
-                                                , getCurrentDirectory
-                                                , getDirectoryContents
-                                                )
-import           RIO.FilePath                   ( isExtensionOf
-                                                , takeExtension
-                                                , (</>)
-                                                )
-import qualified RIO.List                      as L
-import qualified RIO.Text                      as T
+import           RIO.Directory                       ( createDirectory
+                                                     , doesDirectoryExist
+                                                     , doesFileExist
+                                                     , getCurrentDirectory
+                                                     , getDirectoryContents
+                                                     )
+import           RIO.FilePath                        ( isExtensionOf
+                                                     , takeExtension
+                                                     , (</>)
+                                                     )
+import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
 
 
 --------------------------------  TYPE ALIASES  --------------------------------

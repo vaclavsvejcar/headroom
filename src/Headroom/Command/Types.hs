@@ -21,13 +21,13 @@ module Headroom.Command.Types
   )
 where
 
-import           Headroom.Configuration.Types   ( GenMode
-                                                , LicenseType
-                                                , RunMode
-                                                , TemplateSource
-                                                )
-import           Headroom.Data.Regex            ( Regex )
-import           Headroom.FileType.Types        ( FileType )
+import           Headroom.Configuration.Types        ( GenMode
+                                                     , LicenseType
+                                                     , RunMode
+                                                     , TemplateSource
+                                                     )
+import           Headroom.Data.Regex                 ( Regex )
+import           Headroom.FileType.Types             ( FileType )
 import           RIO
 
 

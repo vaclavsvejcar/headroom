@@ -15,7 +15,7 @@ This module contains data types for "Headroom.FileType" modules.
 
 module Headroom.FileType.Types where
 
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           RIO
 
 -- | Supported type of source code file.

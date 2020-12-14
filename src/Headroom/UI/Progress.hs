@@ -20,9 +20,9 @@ module Headroom.UI.Progress
 where
 
 import           RIO
-import qualified RIO.List                      as L
-import qualified RIO.Text                      as T
-import           Text.Printf                    ( printf )
+import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
+import           Text.Printf                         ( printf )
 
 
 -- | Progress indication. First argument is current progress, second the maximum

@@ -23,16 +23,16 @@ module Headroom.Ext.Java
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeaderConfig )
-import           Headroom.Data.Regex            ( match
-                                                , re
-                                                )
-import           Headroom.Data.TextExtra        ( toLines )
-import           Headroom.Types                 ( TemplateMeta(..) )
-import           Headroom.Variables             ( mkVariables )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Headroom.Configuration.Types        ( CtHeaderConfig )
+import           Headroom.Data.Regex                 ( match
+                                                     , re
+                                                     )
+import           Headroom.Data.TextExtra             ( toLines )
+import           Headroom.Types                      ( TemplateMeta(..) )
+import           Headroom.Variables                  ( mkVariables )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
-import           RIO.Lens                       ( ix )
+import           RIO.Lens                            ( ix )
 
 
 -- | Extracts name of /Java/ package from given source code file content.

@@ -9,8 +9,8 @@ module Headroom.HeaderFn.TypesSpec
   )
 where
 
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.HeaderFn              ( runHeaderFn )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.HeaderFn                   ( runHeaderFn )
 import           Headroom.HeaderFn.Types
 import           RIO
 import           Test.Hspec

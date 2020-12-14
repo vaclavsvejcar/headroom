@@ -8,9 +8,9 @@ module Headroom.Configuration.CompatSpec
 where
 
 import           Headroom.Configuration.Compat
-import           Headroom.Meta.Version          ( Version(..)
-                                                , pvp
-                                                )
+import           Headroom.Meta.Version               ( Version(..)
+                                                     , pvp
+                                                     )
 import           RIO
 import           Test.Hspec
 

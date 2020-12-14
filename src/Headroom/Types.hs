@@ -28,8 +28,8 @@ module Headroom.Types
   )
 where
 
-import           Data.Default.Class             ( Default(..) )
-import           Data.Typeable                  ( cast )
+import           Data.Default.Class                  ( Default(..) )
+import           Data.Typeable                       ( cast )
 import           RIO
 
 

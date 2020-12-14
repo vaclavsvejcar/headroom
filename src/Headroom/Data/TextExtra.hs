@@ -23,7 +23,7 @@ module Headroom.Data.TextExtra
 where
 
 import           RIO
-import qualified RIO.Text                      as T
+import qualified RIO.Text                           as T
 
 
 -- | Maps given function over individual lines of the given text.

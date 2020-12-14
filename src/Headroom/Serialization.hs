@@ -24,14 +24,14 @@ module Headroom.Serialization
   )
 where
 
-import           Data.Aeson                     ( Options
-                                                , ToJSON(..)
-                                                , defaultOptions
-                                                , fieldLabelModifier
-                                                )
-import qualified Data.Yaml.Pretty              as YP
+import           Data.Aeson                          ( Options
+                                                     , ToJSON(..)
+                                                     , defaultOptions
+                                                     , fieldLabelModifier
+                                                     )
+import qualified Data.Yaml.Pretty                   as YP
 import           RIO
-import qualified RIO.Char                      as C
+import qualified RIO.Char                           as C
 
 
 

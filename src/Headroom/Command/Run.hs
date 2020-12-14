@@ -33,78 +33,78 @@ module Headroom.Command.Run
   )
 where
 
-import           Data.Time.Calendar             ( toGregorian )
-import           Data.Time.Clock                ( getCurrentTime )
-import           Data.Time.Clock.POSIX          ( getPOSIXTime )
-import           Data.Time.LocalTime            ( getCurrentTimeZone
-                                                , localDay
-                                                , utcToLocalTime
-                                                )
-import           Headroom.Command.Types         ( CommandRunOptions(..) )
-import           Headroom.Command.Utils         ( bootstrap )
-import           Headroom.Configuration         ( loadConfiguration
-                                                , makeConfiguration
-                                                , parseConfiguration
-                                                )
-import           Headroom.Configuration.Types   ( Configuration(..)
-                                                , CtConfiguration
-                                                , CtHeaderFnConfigs
-                                                , HeaderConfig(..)
-                                                , HeaderSyntax(..)
-                                                , LicenseType(..)
-                                                , PtConfiguration
-                                                , RunMode(..)
-                                                , TemplateSource(..)
-                                                )
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses
-                                                , suffixLensesFor
-                                                )
-import           Headroom.Data.TextExtra        ( mapLines )
-import           Headroom.Embedded              ( defaultConfig
-                                                , licenseTemplate
-                                                )
-import           Headroom.Ext                   ( extractTemplateMeta )
-import           Headroom.FileSystem            ( FileSystem(..)
-                                                , excludePaths
-                                                , fileExtension
-                                                , mkFileSystem
-                                                )
-import           Headroom.FileType              ( configByFileType
-                                                , fileTypeByExt
-                                                )
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Header                ( addHeader
-                                                , dropHeader
-                                                , extractFileInfo
-                                                , replaceHeader
-                                                )
-import           Headroom.Header.Types          ( FileInfo(..) )
-import           Headroom.HeaderFn              ( mkConfiguredEnv
-                                                , postProcessHeader
-                                                )
-import           Headroom.Meta                  ( TemplateType
-                                                , configFileName
-                                                , productInfo
-                                                )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( CurrentYear(..)
-                                                , TemplateMeta(..)
-                                                )
-import           Headroom.UI                    ( Progress(..)
-                                                , zipWithProgress
-                                                )
-import           Headroom.Variables             ( compileVariables
-                                                , dynamicVariables
-                                                , parseVariables
-                                                )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Data.Time.Calendar                  ( toGregorian )
+import           Data.Time.Clock                     ( getCurrentTime )
+import           Data.Time.Clock.POSIX               ( getPOSIXTime )
+import           Data.Time.LocalTime                 ( getCurrentTimeZone
+                                                     , localDay
+                                                     , utcToLocalTime
+                                                     )
+import           Headroom.Command.Types              ( CommandRunOptions(..) )
+import           Headroom.Command.Utils              ( bootstrap )
+import           Headroom.Configuration              ( loadConfiguration
+                                                     , makeConfiguration
+                                                     , parseConfiguration
+                                                     )
+import           Headroom.Configuration.Types        ( Configuration(..)
+                                                     , CtConfiguration
+                                                     , CtHeaderFnConfigs
+                                                     , HeaderConfig(..)
+                                                     , HeaderSyntax(..)
+                                                     , LicenseType(..)
+                                                     , PtConfiguration
+                                                     , RunMode(..)
+                                                     , TemplateSource(..)
+                                                     )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Lens                  ( suffixLenses
+                                                     , suffixLensesFor
+                                                     )
+import           Headroom.Data.TextExtra             ( mapLines )
+import           Headroom.Embedded                   ( defaultConfig
+                                                     , licenseTemplate
+                                                     )
+import           Headroom.Ext                        ( extractTemplateMeta )
+import           Headroom.FileSystem                 ( FileSystem(..)
+                                                     , excludePaths
+                                                     , fileExtension
+                                                     , mkFileSystem
+                                                     )
+import           Headroom.FileType                   ( configByFileType
+                                                     , fileTypeByExt
+                                                     )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Header                     ( addHeader
+                                                     , dropHeader
+                                                     , extractFileInfo
+                                                     , replaceHeader
+                                                     )
+import           Headroom.Header.Types               ( FileInfo(..) )
+import           Headroom.HeaderFn                   ( mkConfiguredEnv
+                                                     , postProcessHeader
+                                                     )
+import           Headroom.Meta                       ( TemplateType
+                                                     , configFileName
+                                                     , productInfo
+                                                     )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( CurrentYear(..)
+                                                     , TemplateMeta(..)
+                                                     )
+import           Headroom.UI                         ( Progress(..)
+                                                     , zipWithProgress
+                                                     )
+import           Headroom.Variables                  ( compileVariables
+                                                     , dynamicVariables
+                                                     , parseVariables
+                                                     )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
-import           RIO.FilePath                   ( takeBaseName )
-import qualified RIO.List                      as L
-import qualified RIO.Map                       as M
-import qualified RIO.Text                      as T
+import           RIO.FilePath                        ( takeBaseName )
+import qualified RIO.List                           as L
+import qualified RIO.Map                            as M
+import qualified RIO.Text                           as T
 
 
 suffixLensesFor ["cHeaderFnConfigs"] ''Configuration

@@ -21,12 +21,12 @@ module Headroom.Embedded
   )
 where
 
-import           Headroom.Configuration.Types   ( LicenseType(..) )
-import           Headroom.Embedded.TH           ( embedConfigFile
-                                                , embedDefaultConfig
-                                                , embedTemplate
-                                                )
-import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Configuration.Types        ( LicenseType(..) )
+import           Headroom.Embedded.TH                ( embedConfigFile
+                                                     , embedDefaultConfig
+                                                     , embedTemplate
+                                                     )
+import           Headroom.FileType.Types             ( FileType(..) )
 import           RIO
 
 

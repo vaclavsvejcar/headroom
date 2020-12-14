@@ -14,32 +14,32 @@ module Headroom.Command.RunSpec
 where
 
 import           Headroom.Command.Run
-import           Headroom.Configuration.Types   ( CtHeaderFnConfigs
-                                                , HeaderFnConfig(..)
-                                                , HeaderFnConfigs(..)
-                                                , HeaderSyntax(..)
-                                                , LicenseType(..)
-                                                , UpdateCopyrightConfig(..)
-                                                )
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses
-                                                , suffixLensesFor
-                                                )
-import           Headroom.Data.TextExtra        ( fromLines )
-import           Headroom.FileSystem            ( FileSystem(..) )
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Meta                  ( TemplateType )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( CurrentYear(..) )
-import           Headroom.Variables             ( mkVariables )
-import           RIO                     hiding ( assert )
-import qualified RIO.Map                       as M
-import qualified RIO.NonEmpty                  as NE
-import qualified RIO.Text                      as T
+import           Headroom.Configuration.Types        ( CtHeaderFnConfigs
+                                                     , HeaderFnConfig(..)
+                                                     , HeaderFnConfigs(..)
+                                                     , HeaderSyntax(..)
+                                                     , LicenseType(..)
+                                                     , UpdateCopyrightConfig(..)
+                                                     )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Lens                  ( suffixLenses
+                                                     , suffixLensesFor
+                                                     )
+import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.FileSystem                 ( FileSystem(..) )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Meta                       ( TemplateType )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( CurrentYear(..) )
+import           Headroom.Variables                  ( mkVariables )
+import           RIO                          hiding ( assert )
+import qualified RIO.Map                            as M
+import qualified RIO.NonEmpty                       as NE
+import qualified RIO.Text                           as T
 import           Test.Hspec
-import           Test.Hspec.QuickCheck          ( prop )
-import           Test.QuickCheck         hiding ( sample )
+import           Test.Hspec.QuickCheck               ( prop )
+import           Test.QuickCheck              hiding ( sample )
 import           Test.QuickCheck.Monadic
 
 

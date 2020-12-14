@@ -11,17 +11,17 @@ module Headroom.Command.InitSpec
 where
 
 import           Headroom.Command.Init
-import           Headroom.Command.Types         ( CommandInitOptions(..) )
-import           Headroom.Configuration.Types   ( LicenseType(..) )
-import           Headroom.Data.Has              ( Has(..) )
-import           Headroom.Data.Lens             ( suffixLenses
-                                                , suffixLensesFor
-                                                )
-import           Headroom.FileSystem            ( FileSystem(..) )
-import           Headroom.FileType.Types        ( FileType(..) )
+import           Headroom.Command.Types              ( CommandInitOptions(..) )
+import           Headroom.Configuration.Types        ( LicenseType(..) )
+import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Lens                  ( suffixLenses
+                                                     , suffixLensesFor
+                                                     )
+import           Headroom.FileSystem                 ( FileSystem(..) )
+import           Headroom.FileType.Types             ( FileType(..) )
 import           RIO
-import           RIO.FilePath                   ( (</>) )
-import qualified RIO.List                      as L
+import           RIO.FilePath                        ( (</>) )
+import qualified RIO.List                           as L
 import           Test.Hspec
 
 

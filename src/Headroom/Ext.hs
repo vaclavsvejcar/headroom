@@ -23,14 +23,14 @@ module Headroom.Ext
   )
 where
 
-import           Headroom.Configuration.Types   ( CtHeaderConfig )
-import qualified Headroom.Ext.Haskell          as Haskell
-import qualified Headroom.Ext.Java             as Java
-import qualified Headroom.Ext.PureScript       as PureScript
-import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.TemplateSupport       ( TemplateSupport(..) )
-import           Headroom.Types                 ( TemplateMeta(..) )
-import           Headroom.Variables.Types       ( Variables(..) )
+import           Headroom.Configuration.Types        ( CtHeaderConfig )
+import qualified Headroom.Ext.Haskell               as Haskell
+import qualified Headroom.Ext.Java                  as Java
+import qualified Headroom.Ext.PureScript            as PureScript
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Types                      ( TemplateMeta(..) )
+import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 
 

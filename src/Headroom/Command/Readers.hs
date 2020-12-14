@@ -23,17 +23,17 @@ module Headroom.Command.Readers
   )
 where
 
-import           Data.Either.Combinators        ( maybeToRight )
-import           Headroom.Configuration.Types   ( LicenseType )
-import           Headroom.Data.EnumExtra        ( EnumExtra(..) )
-import           Headroom.Data.Regex            ( Regex(..)
-                                                , compile
-                                                )
-import           Headroom.FileType.Types        ( FileType(..) )
+import           Data.Either.Combinators             ( maybeToRight )
+import           Headroom.Configuration.Types        ( LicenseType )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
+import           Headroom.Data.Regex                 ( Regex(..)
+                                                     , compile
+                                                     )
+import           Headroom.FileType.Types             ( FileType(..) )
 import           Options.Applicative
 import           RIO
-import qualified RIO.Text                      as T
-import qualified RIO.Text.Partial              as TP
+import qualified RIO.Text                           as T
+import qualified RIO.Text.Partial                   as TP
 
 
 -- | Reader for tuple of 'LicenseType' and 'FileType'.

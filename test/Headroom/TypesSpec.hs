@@ -5,7 +5,7 @@ module Headroom.TypesSpec
   )
 where
 
-import           Headroom.Variables             ( mkVariables )
+import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           Test.Hspec
 

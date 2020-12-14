@@ -7,7 +7,7 @@ where
 
 import           Headroom.Serialization
 import           RIO
-import qualified RIO.Map                       as M
+import qualified RIO.Map                            as M
 import           Test.Hspec
 
 
