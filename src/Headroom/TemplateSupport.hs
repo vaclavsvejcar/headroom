@@ -5,20 +5,22 @@
 {-# LANGUAGE StrictData          #-}
 
 {-|
-Module      : Headroom.Template
-Description : Generic representation of supported template type
+Module      : Headroom.TemplateSupport
+Description : Extensible templating support
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Module providing generic representation of supported template type, using
-the 'Template' /type class/.
+Module providing interface for working with template files in extensible way.
+Supported template is represented by the 'TemplateSupport' /type class/.
 -}
 
-module Headroom.Template
-  ( Template(..)
+module Headroom.TemplateSupport
+  ( -- * Extendable Template Support
+    TemplateSupport(..)
+    -- * Error Data Types
   , TemplateError(..)
   )
 where
@@ -31,8 +33,8 @@ import           RIO
 import qualified RIO.Text                      as T
 
 
--- | Type class representing generic license header template support.
-class Template t where
+-- | /Type class/ representing supported template file.
+class TemplateSupport t where
 
   -- | Returns list of supported file extensions for this template type.
   templateExtensions :: NonEmpty Text
@@ -77,10 +79,12 @@ data TemplateError
   -- ^ error parsing raw template text
   deriving (Eq, Show, Typeable)
 
+
 instance Exception TemplateError where
   displayException = displayException'
   toException      = toHeadroomError
   fromException    = fromHeadroomError
+
 
 displayException' :: TemplateError -> String
 displayException' = T.unpack . \case

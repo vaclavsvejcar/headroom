@@ -28,7 +28,7 @@ import qualified Headroom.Ext.Haskell          as Haskell
 import qualified Headroom.Ext.Java             as Java
 import qualified Headroom.Ext.PureScript       as PureScript
 import           Headroom.FileType.Types        ( FileType(..) )
-import           Headroom.Template              ( Template(..) )
+import           Headroom.TemplateSupport       ( TemplateSupport(..) )
 import           Headroom.Types                 ( TemplateMeta(..) )
 import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
@@ -61,7 +61,7 @@ extractVariables fileType = case fileType of
 
 -- | Extracts medatata from given /template/ for selected /file type/, which
 -- might be later required by the 'extractVariables' function.
-extractTemplateMeta :: (Template t)
+extractTemplateMeta :: TemplateSupport t
                     => FileType
                     -- ^ /file type/ for which this template will be used
                     -> t

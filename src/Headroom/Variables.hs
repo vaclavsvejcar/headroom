@@ -28,7 +28,7 @@ module Headroom.Variables
 where
 
 import           Headroom.Meta                  ( TemplateType )
-import           Headroom.Template              ( Template(..) )
+import           Headroom.TemplateSupport       ( TemplateSupport(..) )
 import           Headroom.Types                 ( CurrentYear(..)
                                                 , fromHeadroomError
                                                 , toHeadroomError

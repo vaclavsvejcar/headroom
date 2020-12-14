@@ -50,7 +50,7 @@ import           Headroom.HeaderFn.UpdateCopyright
                                                 , updateCopyright
                                                 )
 import           Headroom.Meta                  ( TemplateType )
-import           Headroom.Template              ( Template(..) )
+import           Headroom.TemplateSupport       ( TemplateSupport(..) )
 import           Headroom.Types                 ( CurrentYear(..) )
 import           Headroom.Variables.Types       ( Variables(..) )
 import           Lens.Micro                     ( traverseOf )

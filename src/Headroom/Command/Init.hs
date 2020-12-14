@@ -64,7 +64,7 @@ import           Headroom.Meta                  ( TemplateType
                                                 , configFileName
                                                 )
 import           Headroom.Meta.Version          ( printVersion )
-import           Headroom.Template              ( Template(..) )
+import           Headroom.TemplateSupport       ( TemplateSupport(..) )
 import           Headroom.Types                 ( fromHeadroomError
                                                 , toHeadroomError
                                                 )

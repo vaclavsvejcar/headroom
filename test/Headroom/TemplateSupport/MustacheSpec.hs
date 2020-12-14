@@ -2,13 +2,13 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications    #-}
-module Headroom.Template.MustacheSpec
+module Headroom.TemplateSupport.MustacheSpec
   ( spec
   )
 where
 
-import           Headroom.Template
-import           Headroom.Template.Mustache
+import           Headroom.TemplateSupport
+import           Headroom.TemplateSupport.Mustache
 import           Headroom.Variables             ( mkVariables )
 import           RIO
 import           Test.Hspec

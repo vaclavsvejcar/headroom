@@ -35,7 +35,8 @@ import           Headroom.Meta.Version          ( Version(..)
                                                 , printVersion
                                                 , pvp
                                                 )
-import           Headroom.Template.Mustache     ( Mustache )
+import           Headroom.TemplateSupport.Mustache
+                                                ( Mustache )
 import           Paths_headroom                 ( version )
 import           RIO
 import           RIO.Partial                    ( fromJust )

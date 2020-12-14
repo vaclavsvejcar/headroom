@@ -4,7 +4,7 @@
 {-# LANGUAGE StrictData        #-}
 
 {-|
-Module      : Headroom.Template.Mustache
+Module      : Headroom.TemplateSupport.Mustache
 Description : Implementation of /Mustache/ template support
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -16,13 +16,13 @@ This module provides support for <https://mustache.github.io Mustache>
 templates.
 -}
 
-module Headroom.Template.Mustache
+module Headroom.TemplateSupport.Mustache
   ( Mustache(..)
   )
 where
 
-import           Headroom.Template              ( Template(..)
-                                                , TemplateError(..)
+import           Headroom.TemplateSupport       ( TemplateError(..)
+                                                , TemplateSupport(..)
                                                 )
 import           Headroom.Variables.Types       ( Variables(..) )
 import           RIO
@@ -40,7 +40,7 @@ data Mustache = Mustache
 
 
 -- | Support for /Mustache/ templates.
-instance Template Mustache where
+instance TemplateSupport Mustache where
   templateExtensions = "mustache" :| []
   parseTemplate      = parseTemplate'
   renderTemplate     = renderTemplate'
