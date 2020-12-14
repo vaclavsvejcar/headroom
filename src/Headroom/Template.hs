@@ -34,7 +34,6 @@ import qualified RIO.Text                      as T
 -- | Type class representing generic license header template support.
 class Template t where
 
-
   -- | Returns list of supported file extensions for this template type.
   templateExtensions :: NonEmpty Text
                      -- ^ list of supported file extensions
@@ -68,7 +67,7 @@ class Template t where
               -- ^ raw template text
 
 
----------------------------------  Error Types  --------------------------------
+---------------------------------  ERROR TYPES  --------------------------------
 
 -- | Error during processing template.
 data TemplateError

@@ -12,7 +12,8 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-This module provides support for <https://mustache.github.io Mustache> templates.
+This module provides support for <https://mustache.github.io Mustache>
+templates.
 -}
 
 module Headroom.Template.Mustache
