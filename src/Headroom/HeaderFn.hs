@@ -49,7 +49,7 @@ import           Headroom.HeaderFn.UpdateCopyright   ( SelectedAuthors(..)
                                                      , updateCopyright
                                                      )
 import           Headroom.Meta                       ( TemplateType )
-import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           Lens.Micro                          ( traverseOf )

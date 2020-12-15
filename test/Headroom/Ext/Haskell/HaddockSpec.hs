@@ -12,8 +12,8 @@ import           Headroom.Embedded                   ( licenseTemplate )
 import           Headroom.Ext.Haskell.Haddock
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.TemplateSupport            ( TemplateSupport(..) )
-import           Headroom.TemplateSupport.Mustache   ( Mustache(..) )
+import           Headroom.Template                   ( Template(..) )
+import           Headroom.Template.Mustache          ( Mustache(..) )
 import           Headroom.Types                      ( HaddockFieldOffsets(..) )
 import           RIO
 import           RIO.FilePath                        ( (</>) )

@@ -27,7 +27,7 @@ import           Headroom.Configuration.Types        ( LicenseType(..) )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Meta                       ( TemplateType )
-import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Template                   ( Template(..) )
 import           Language.Haskell.TH.Syntax          ( Exp
                                                      , Q
                                                      )

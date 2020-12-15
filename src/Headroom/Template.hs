@@ -5,7 +5,7 @@
 {-# LANGUAGE StrictData          #-}
 
 {-|
-Module      : Headroom.TemplateSupport
+Module      : Headroom.Template
 Description : Extensible templating support
 Copyright   : (c) 2019-2020 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -14,12 +14,12 @@ Stability   : experimental
 Portability : POSIX
 
 Module providing interface for working with template files in extensible way.
-Supported template is represented by the 'TemplateSupport' /type class/.
+Supported template is represented by the 'Template' /type class/.
 -}
 
-module Headroom.TemplateSupport
+module Headroom.Template
   ( -- * Extendable Template Support
-    TemplateSupport(..)
+    Template(..)
     -- * Error Data Types
   , TemplateError(..)
   )
@@ -34,7 +34,7 @@ import qualified RIO.Text                           as T
 
 
 -- | /Type class/ representing supported template file.
-class TemplateSupport t where
+class Template t where
 
   -- | Returns list of supported file extensions for this template type.
   templateExtensions :: NonEmpty Text

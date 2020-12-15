@@ -38,7 +38,7 @@ import           Headroom.Data.Regex                 ( re
 import           Headroom.Data.TextExtra             ( fromLines
                                                      , toLines
                                                      )
-import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( HaddockFieldOffsets(..)
                                                      , TemplateMeta(..)
                                                      )
@@ -70,7 +70,7 @@ data HaddockModuleHeader = HaddockModuleHeader
 -- | Extracts /offsets/ for selected haddock fields (i.e. number of chars
 -- between start of line and field value). This is needed to properly format
 -- multi-line field values rendered in new /license headers/.
-extractFieldOffsets :: TemplateSupport t
+extractFieldOffsets :: Template t
                     => t
                     -- ^ parsed /template/
                     -> HaddockFieldOffsets

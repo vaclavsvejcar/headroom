@@ -40,7 +40,7 @@ import           Headroom.Ext.Haskell.Haddock        ( HaddockModuleHeader(..)
                                                      , extractFieldOffsets
                                                      , extractModuleHeader
                                                      )
-import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( TemplateMeta(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
@@ -103,7 +103,7 @@ extractVariables _ meta headerPos text = (mkVariables . catMaybes)
 
 
 -- | Extracts template metadata specific for /Haskell/.
-extractTemplateMeta :: TemplateSupport t
+extractTemplateMeta :: Template t
                     => t
                     -- ^ parsed /template/
                     -> TemplateMeta

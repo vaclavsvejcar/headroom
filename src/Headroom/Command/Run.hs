@@ -88,7 +88,7 @@ import           Headroom.Meta                       ( TemplateType
                                                      , configFileName
                                                      , productInfo
                                                      )
-import           Headroom.TemplateSupport            ( TemplateSupport(..) )
+import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( CurrentYear(..)
                                                      , TemplateMeta(..)
                                                      )
