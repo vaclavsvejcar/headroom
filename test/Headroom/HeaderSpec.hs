@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeFamilies      #-}
 
 module Headroom.HeaderSpec
@@ -20,10 +21,15 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      )
 import           Headroom.Data.Regex                 ( re )
 import           Headroom.Embedded                   ( defaultConfig )
+import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header
-import           Headroom.Header.Types               ( FileInfo(..) )
+import           Headroom.Header.Types               ( FileInfo(..)
+                                                     , TemplateInfo(..)
+                                                     )
+import           Headroom.Template                   ( emptyTemplate )
+import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
@@ -142,8 +148,9 @@ spec = do
 
   describe "extractFileInfo" $ do
     it "extracts FileInfo from given raw input" $ do
+      template <- emptyTemplate @_ @Mustache
       let config   = bHeaderConfig [] []
-          meta     = Nothing
+          ti       = TemplateInfo config NoExtData Haskell template
           expected = FileInfo
             Haskell
             config
@@ -162,7 +169,7 @@ spec = do
               ]
             )
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      extractFileInfo Haskell config meta sample `shouldBe` expected
+      extractFileInfo ti sample `shouldBe` expected
 
 
   describe "findHeader" $ do

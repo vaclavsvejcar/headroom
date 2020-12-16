@@ -21,7 +21,7 @@ Support for extracting data from /Haddock module headers/ present in
 
 module Headroom.Ext.Haskell.Haddock
   ( HaddockModuleHeader(..)
-  , extractFieldOffsets
+  , extractOffsets
   , extractModuleHeader
   , indentField
   , stripCommentSyntax
@@ -30,7 +30,6 @@ where
 
 import           Control.Applicative                 ( Alternative(..) )
 import           Control.Monad                       ( ap )
-import           Data.Default.Class                  ( Default(..) )
 import           Headroom.Data.Regex                 ( re
                                                      , replace
                                                      , scan
@@ -38,14 +37,14 @@ import           Headroom.Data.Regex                 ( re
 import           Headroom.Data.TextExtra             ( fromLines
                                                      , toLines
                                                      )
-import           Headroom.Template                   ( Template(..) )
-import           Headroom.Types                      ( HaddockFieldOffsets(..)
-                                                     , TemplateMeta(..)
+import           Headroom.Ext.Types                  ( ExtData(..)
+                                                     , HaddockOffsets(..)
+                                                     , HaskellExtData'(..)
                                                      )
+import           Headroom.Template                   ( Template(..) )
 import           RIO
 import qualified RIO.Char                           as C
 import qualified RIO.Text                           as T
-
 
 -- | Extracted fields from the /Haddock module header/.
 data HaddockModuleHeader = HaddockModuleHeader
@@ -67,18 +66,19 @@ data HaddockModuleHeader = HaddockModuleHeader
   deriving (Eq, Show)
 
 
+
 -- | Extracts /offsets/ for selected haddock fields (i.e. number of chars
 -- between start of line and field value). This is needed to properly format
 -- multi-line field values rendered in new /license headers/.
-extractFieldOffsets :: Template t
-                    => t
-                    -- ^ parsed /template/
-                    -> HaddockFieldOffsets
-                    -- ^ extracted field offsets
-extractFieldOffsets template = HaddockFieldOffsets { .. }
- where
-  hfoCopyright = extractCopyrightOffset text
-  text         = stripCommentSyntax . rawTemplate $ template
+extractOffsets :: Template a
+               => a
+               -- ^ parsed /template/
+               -> HaddockOffsets
+               -- ^ extracted offsets
+extractOffsets template =
+  let hoCopyright = extractCopyrightOffset templateText
+  in  HaddockOffsets { .. }
+  where templateText = stripCommentSyntax . rawTemplate $ template
 
 
 extractCopyrightOffset :: Text -> Maybe Int
@@ -90,12 +90,12 @@ extractCopyrightOffset text = case scan [re|\h*Copyright\h*:\h*|] text of
 -- | Extracts metadata from given /Haddock/ module header.
 extractModuleHeader :: Text
                     -- ^ text containing /Haddock/ module header
-                    -> Maybe TemplateMeta
+                    -> ExtData
                     -- ^ extracted metadata from corresponding /template/
                     -> HaddockModuleHeader
                     -- ^ extracted metadata
-extractModuleHeader text meta =
-  let hmhCopyright   = indent hfoCopyright <$> extractField "Copyright"
+extractModuleHeader text extData =
+  let hmhCopyright   = indent hoCopyright <$> extractField "Copyright"
       hmhLicense     = extractField "License"
       hmhMaintainer  = extractField "Maintainer"
       hmhPortability = extractField "Portability"
@@ -109,9 +109,9 @@ extractModuleHeader text meta =
   extractField name = fmap (T.strip . T.pack) (lookup name fields')
   process = Just . T.strip . T.pack
   indent c t = T.strip $ indentField c t
-  HaddockFieldOffsets {..} = case meta of
-    Just (HaskellTemplateMeta offsets') -> offsets'
-    _ -> def
+  HaddockOffsets {..} = case extData of
+    HaskellExtData (HaskellExtData' offsets') -> offsets'
+    _ -> HaddockOffsets Nothing
 
 
 -- | Adds correct indentation to multi-line /Haddock/ field values. It's usually

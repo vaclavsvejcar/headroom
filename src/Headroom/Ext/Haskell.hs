@@ -24,12 +24,11 @@ module Headroom.Ext.Haskell
   ( -- * Variables Extraction
     extractModuleName
   , extractVariables
-    -- * Template Metadata Extraction
-  , extractTemplateMeta
+    -- * Extended Support Data Extraction
+  , extractExtData
   )
 where
 
-import           Headroom.Configuration.Types        ( CtHeaderConfig )
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
@@ -37,17 +36,21 @@ import           Headroom.Data.TextExtra             ( fromLines
                                                      , toLines
                                                      )
 import           Headroom.Ext.Haskell.Haddock        ( HaddockModuleHeader(..)
-                                                     , extractFieldOffsets
                                                      , extractModuleHeader
+                                                     , extractOffsets
                                                      )
+import           Headroom.Ext.Types                  ( ExtData(..)
+                                                     , HaskellExtData'(..)
+                                                     )
+import           Headroom.Header.Types               ( TemplateInfo(..) )
 import           Headroom.Template                   ( Template(..) )
-import           Headroom.Types                      ( TemplateMeta(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 import           RIO.Lens                            ( ix )
 import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
+
 
 
 -- | Extracts name of /Haskell/ module from given source code file content.
@@ -76,17 +79,15 @@ extractModuleName = go . toLines
 -- * @___haskell_module_name__@ - name of the /Haskell/ module
 -- * @___haskell_module_longdesc__@ - long description of /Haddock/ module
 -- * @___haskell_module_shortdesc__@ - @Description@ field of /Haddock/ module header
-extractVariables :: CtHeaderConfig
-                 -- ^ license header configuration
-                 -> Maybe TemplateMeta
-                 -- ^ extracted metadata from corresponding /template/
+extractVariables :: TemplateInfo
+                 -- ^ template info
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
                  -> Text
                  -- ^ input text
                  -> Variables
                  -- ^ extracted variables
-extractVariables _ meta headerPos text = (mkVariables . catMaybes)
+extractVariables TemplateInfo {..} headerPos text = (mkVariables . catMaybes)
   [ ("_haskell_module_copyright", ) <$> hmhCopyright
   , ("_haskell_module_license", ) <$> hmhLicense
   , ("_haskell_module_maintainer", ) <$> hmhMaintainer
@@ -97,16 +98,18 @@ extractVariables _ meta headerPos text = (mkVariables . catMaybes)
   , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
   ]
  where
-  HaddockModuleHeader {..} = extractModuleHeader headerText meta
+  HaddockModuleHeader {..} = extractModuleHeader headerText tiExtData
   headerText               = maybe T.empty (\(s, e) -> cut s e text) headerPos
   cut s e = fromLines . L.take (e - s) . L.drop s . toLines
 
 
--- | Extracts template metadata specific for /Haskell/.
-extractTemplateMeta :: Template t
-                    => t
-                    -- ^ parsed /template/
-                    -> TemplateMeta
-                    -- ^ extracted template metadata
-extractTemplateMeta template = HaskellTemplateMeta offsets
-  where offsets = extractFieldOffsets template
+-- | Extract data for extended support from template specific for /Haskell/.
+extractExtData :: Template a
+               => a
+               -- ^ parsed /template/
+               -> ExtData
+               -- ^ extracted data
+extractExtData template =
+  let hedHaddockOffsets = extractOffsets template
+      extData           = HaskellExtData' { .. }
+  in  HaskellExtData extData

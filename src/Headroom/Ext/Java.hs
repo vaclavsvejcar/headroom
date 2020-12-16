@@ -23,12 +23,11 @@ module Headroom.Ext.Java
   )
 where
 
-import           Headroom.Configuration.Types        ( CtHeaderConfig )
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
 import           Headroom.Data.TextExtra             ( toLines )
-import           Headroom.Types                      ( TemplateMeta(..) )
+import           Headroom.Header.Types               ( TemplateInfo )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
@@ -54,15 +53,13 @@ extractPackageName = go . toLines
 -- __List of Extracted Variables:__
 --
 -- * @___java_package_name__@ - name of the /Java/ package
-extractVariables :: CtHeaderConfig
-                 -- ^ license header configuration
-                 -> Maybe TemplateMeta
-                 -- ^ extracted metadata from corresponding /template/
+extractVariables :: TemplateInfo
+                 -- ^ template info
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
                  -> Text
                  -- ^ input text
                  -> Variables
                  -- ^ extracted variables
-extractVariables _ _ _ text = (mkVariables . catMaybes)
+extractVariables _ _ text = (mkVariables . catMaybes)
   [("_java_package_name", ) <$> extractPackageName text]

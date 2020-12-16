@@ -45,9 +45,9 @@ import           Headroom.Data.TextExtra             ( fromLines
                                                      , toLines
                                                      )
 import           Headroom.Ext                        ( extractVariables )
-import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.Header.Types               ( FileInfo(..) )
-import           Headroom.Types                      ( TemplateMeta(..) )
+import           Headroom.Header.Types               ( FileInfo(..)
+                                                     , TemplateInfo(..)
+                                                     )
 import           RIO
 import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
@@ -58,20 +58,17 @@ suffixLensesFor ["fiHeaderPos"] ''FileInfo
 
 -- | Extracts info about the processed file to be later used by the header
 -- detection/manipulation functions.
-extractFileInfo :: FileType
-                -- ^ type of the detected file
-                -> CtHeaderConfig
-                -- ^ license header configuration
-                -> Maybe TemplateMeta
-                -- ^ metadata extracted from /template/
+extractFileInfo :: TemplateInfo
+                -- ^ template info
                 -> Text
                 -- ^ text used for detection
                 -> FileInfo
                 -- ^ resulting file info
-extractFileInfo fiFileType fiHeaderConfig meta text =
-  let fiHeaderPos = findHeader fiHeaderConfig text
-      fiVariables =
-          extractVariables fiFileType fiHeaderConfig meta fiHeaderPos text
+extractFileInfo ti@TemplateInfo {..} text =
+  let fiFileType     = tiFileType
+      fiHeaderConfig = tiConfig
+      fiHeaderPos    = findHeader fiHeaderConfig text
+      fiVariables    = extractVariables ti fiHeaderPos text
   in  FileInfo { .. }
 
 

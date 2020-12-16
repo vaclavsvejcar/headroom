@@ -20,6 +20,8 @@ Supported template is represented by the 'Template' /type class/.
 module Headroom.Template
   ( -- * Extendable Template Support
     Template(..)
+    -- * Helper Functions
+  , emptyTemplate
     -- * Error Data Types
   , TemplateError(..)
   )
@@ -34,7 +36,7 @@ import qualified RIO.Text                           as T
 
 
 -- | /Type class/ representing supported template file.
-class Template t where
+class Template a where
 
   -- | Returns list of supported file extensions for this template type.
   templateExtensions :: NonEmpty Text
@@ -47,7 +49,7 @@ class Template t where
                 -- ^ name of the template (optional)
                 -> Text
                 -- ^ raw template text
-                -> m t
+                -> m a
                 -- ^ parsed template
 
 
@@ -55,7 +57,7 @@ class Template t where
   renderTemplate :: MonadThrow m
                  => Variables
                  -- ^ values of variables to replace
-                 -> t
+                 -> a
                  -- ^ parsed template to render
                  -> m Text
                  -- ^ rendered template text
@@ -63,10 +65,17 @@ class Template t where
 
   -- | Returns the raw text of the template, same that has been parsed by
   -- 'parseTemplate' method.
-  rawTemplate :: t
+  rawTemplate :: a
               -- ^ template for which to return raw template text
               -> Text
               -- ^ raw template text
+
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
+
+-- | Returns empty template of selected type.
+emptyTemplate :: (MonadThrow m, Template a) => m a
+emptyTemplate = parseTemplate Nothing T.empty
 
 
 ---------------------------------  ERROR TYPES  --------------------------------

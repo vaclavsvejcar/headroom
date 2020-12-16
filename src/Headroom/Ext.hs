@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 {-|
 Module      : Headroom.Ext
@@ -18,20 +19,33 @@ available to template via /template variables/
 -}
 
 module Headroom.Ext
-  ( extractVariables
-  , extractTemplateMeta
+  ( extractExtData
+  , extractVariables
   )
 where
 
-import           Headroom.Configuration.Types        ( CtHeaderConfig )
 import qualified Headroom.Ext.Haskell               as Haskell
 import qualified Headroom.Ext.Java                  as Java
 import qualified Headroom.Ext.PureScript            as PureScript
+import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Header.Types               ( TemplateInfo(..) )
 import           Headroom.Template                   ( Template(..) )
-import           Headroom.Types                      ( TemplateMeta(..) )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
+
+
+-- | Extracts some data for extended support specific to the given 'FileType'
+-- from the 'Template'.
+extractExtData :: Template a
+               => FileType
+               -- ^ /file type/ for which this template will be used
+               -> a
+               -- ^ parsed /header template/
+               -> ExtData
+               -- ^ extracted data
+extractExtData Haskell = Haskell.extractExtData
+extractExtData _       = const NoExtData
 
 
 -- | Extracts variables specific to the file type (if supported), e.g. module
@@ -40,33 +54,15 @@ import           RIO
 -- * /Haskell/ - implemented in "Headroom.Ext.Haskell"
 -- * /Java/ - implemented in "Headroom.Ext.Java"
 -- * /PureScript/ - implemented in "Headroom.Ext.PureScript"
-extractVariables :: FileType
-                 -- ^ type of the file
-                 -> CtHeaderConfig
-                 -- ^ license header configuration
-                 -> Maybe TemplateMeta
-                 -- ^ extracted metadata from corresponding /template/
+extractVariables :: TemplateInfo
+                 -- ^ template info
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
                  -> Text
                  -- ^ text of the source code file
                  -> Variables
                  -- ^ extracted variables
-extractVariables fileType = case fileType of
-  Haskell    -> Haskell.extractVariables
-  Java       -> Java.extractVariables
-  PureScript -> PureScript.extractVariables
-  _          -> mempty
-
-
--- | Extracts medatata from given /template/ for selected /file type/, which
--- might be later required by the 'extractVariables' function.
-extractTemplateMeta :: Template t
-                    => FileType
-                    -- ^ /file type/ for which this template will be used
-                    -> t
-                    -- ^ parsed /template/
-                    -> Maybe TemplateMeta
-                    -- ^ extracted template metadata
-extractTemplateMeta Haskell tmpl = Just $ Haskell.extractTemplateMeta tmpl
-extractTemplateMeta _       _    = Nothing
+extractVariables ti@(tiFileType -> Haskell   ) = Haskell.extractVariables ti
+extractVariables ti@(tiFileType -> Java      ) = Java.extractVariables ti
+extractVariables ti@(tiFileType -> PureScript) = PureScript.extractVariables ti
+extractVariables _                             = mempty

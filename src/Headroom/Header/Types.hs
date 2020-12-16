@@ -16,11 +16,14 @@ This module contains data types for "Headroom.Header" module.
 module Headroom.Header.Types
   ( -- * Data Types
     FileInfo(..)
+  , TemplateInfo(..)
   )
 where
 
 import           Headroom.Configuration.Types        ( CtHeaderConfig )
+import           Headroom.Ext.Types                  ( ExtData )
 import           Headroom.FileType.Types             ( FileType )
+import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Variables.Types            ( Variables )
 import           RIO
 
@@ -37,3 +40,16 @@ data FileInfo = FileInfo
   -- ^ additional extracted variables
   }
   deriving (Eq, Show)
+
+
+-- | Represents info about concrete header template.
+data TemplateInfo = TemplateInfo
+  { tiConfig   :: CtHeaderConfig
+  -- ^ header configuration
+  , tiExtData  :: ExtData
+  -- ^ additional data for /extended support/
+  , tiFileType :: FileType
+  -- ^ type of the file this template is for
+  , tiTemplate :: TemplateType
+  -- ^ parsed template
+  }

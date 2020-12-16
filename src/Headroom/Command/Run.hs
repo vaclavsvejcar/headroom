@@ -65,22 +65,22 @@ import           Headroom.Data.TextExtra             ( mapLines )
 import           Headroom.Embedded                   ( defaultConfig
                                                      , licenseTemplate
                                                      )
-import           Headroom.Ext                        ( extractTemplateMeta )
 import           Headroom.FileSystem                 ( FileSystem(..)
                                                      , excludePaths
                                                      , fileExtension
                                                      , mkFileSystem
                                                      )
-import           Headroom.FileType                   ( configByFileType
-                                                     , fileTypeByExt
-                                                     )
+import           Headroom.FileType                   ( fileTypeByExt )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header                     ( addHeader
                                                      , dropHeader
                                                      , extractFileInfo
                                                      , replaceHeader
                                                      )
-import           Headroom.Header.Types               ( FileInfo(..) )
+import           Headroom.Header.TemplateInfo        ( mkTemplateInfo )
+import           Headroom.Header.Types               ( FileInfo(..)
+                                                     , TemplateInfo(..)
+                                                     )
 import           Headroom.HeaderFn                   ( mkConfiguredEnv
                                                      , postProcessHeader
                                                      )
@@ -89,9 +89,7 @@ import           Headroom.Meta                       ( TemplateType
                                                      , productInfo
                                                      )
 import           Headroom.Template                   ( Template(..) )
-import           Headroom.Types                      ( CurrentYear(..)
-                                                     , TemplateMeta(..)
-                                                     )
+import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.UI                         ( Progress(..)
                                                      , zipWithProgress
                                                      )
@@ -109,8 +107,6 @@ import qualified RIO.Text                           as T
 
 suffixLensesFor ["cHeaderFnConfigs"] ''Configuration
 
-
-type TemplatesMap = Map FileType (Maybe TemplateMeta, TemplateType)
 
 -- | Action to be performed based on the selected 'RunMode'.
 data RunAction = RunAction
@@ -200,7 +196,7 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   let isCheck = cRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
-  templates          <- withTemplateMeta <$> loadTemplates
+  templates          <- loadTemplates
   sourceFiles        <- findSourceFiles (M.keys templates)
   (total, processed) <- processSourceFiles templates sourceFiles
   endTS              <- liftIO getPOSIXTime
@@ -254,24 +250,21 @@ processSourceFiles :: ( Has CtConfiguration env
                       , Has CurrentYear env
                       , HasLogFunc env
                       )
-                   => TemplatesMap
+                   => Map FileType TemplateInfo
                    -> [FilePath]
                    -> RIO env (Int, Int)
 processSourceFiles templates paths = do
   Configuration {..} <- viewL
   year               <- viewL
   let dVars        = dynamicVariables year
-      withFileType = mapMaybe (findFileType cLicenseHeaders) paths
-      withTemplate = mapMaybe (uncurry findTemplate) withFileType
+      withTemplate = mapMaybe (template cLicenseHeaders) paths
   cVars     <- compileVariables (dVars <> cVariables)
   processed <- mapM (process cVars dVars) (zipWithProgress withTemplate)
   pure (L.length withTemplate, L.length . filter (== True) $ processed)
  where
-  findFileType conf path =
-    fmap (, path) (fileExtension path >>= fileTypeByExt conf)
-  findTemplate ft p = (, ft, p) <$> M.lookup ft templates
-  process cVars dVars (pr, ((tm, tt), ft, p)) =
-    processSourceFile cVars dVars pr tm tt ft p
+  fileType c p = fileExtension p >>= fileTypeByExt c
+  template c p = (, p) <$> (fileType c p >>= \ft -> M.lookup ft templates)
+  process cVars dVars (pr, (ti, p)) = processSourceFile cVars dVars pr ti p
 
 
 processSourceFile :: ( Has CommandRunOptions env
@@ -283,23 +276,17 @@ processSourceFile :: ( Has CommandRunOptions env
                   => Variables
                   -> Variables
                   -> Progress
-                  -> Maybe TemplateMeta
-                  -> TemplateType
-                  -> FileType
+                  -> TemplateInfo
                   -> FilePath
                   -> RIO env Bool
-processSourceFile cVars dVars progress meta template fileType path = do
+processSourceFile cVars dVars progress ti@TemplateInfo {..} path = do
   Configuration {..}     <- viewL @CtConfiguration
   CommandRunOptions {..} <- viewL
   fileContent            <- readFileUtf8 path
-  let fileInfo@FileInfo {..} = extractFileInfo
-        fileType
-        (configByFileType cLicenseHeaders fileType)
-        meta
-        fileContent
-      variables = dVars <> cVars <> fiVariables
-      syntax    = hcHeaderSyntax fiHeaderConfig
-  header'        <- renderTemplate variables template
+  let fileInfo@FileInfo {..} = extractFileInfo ti fileContent
+      variables              = dVars <> cVars <> fiVariables
+      syntax                 = hcHeaderSyntax fiHeaderConfig
+  header'        <- renderTemplate variables tiTemplate
   header         <- postProcessHeader' syntax variables header'
   RunAction {..} <- chooseAction fileInfo header
   let result  = raFunc fileContent
@@ -388,17 +375,13 @@ loadTemplates :: ( Has CtConfiguration env
                  , Has (FileSystem (RIO env)) env
                  , HasLogFunc env
                  )
-              => RIO env (Map FileType TemplateType)
+              => RIO env (Map FileType TemplateInfo)
 loadTemplates = do
   Configuration {..} <- viewL @CtConfiguration
-  case cTemplateSource of
+  templates          <- case cTemplateSource of
     TemplateFiles    paths       -> loadTemplateFiles paths
     BuiltInTemplates licenseType -> loadBuiltInTemplates licenseType
-
-
-withTemplateMeta :: Map FileType TemplateType -> TemplatesMap
-withTemplateMeta = M.fromList . go . M.toList
-  where go = fmap (\(k, v) -> (k, (extractTemplateMeta k v, v)))
+  pure $ M.mapWithKey (mkTemplateInfo cLicenseHeaders) templates
 
 
 -- | Takes path to the template file and returns detected type of the template.

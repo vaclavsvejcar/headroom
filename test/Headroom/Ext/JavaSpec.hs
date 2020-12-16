@@ -9,11 +9,15 @@ import           Headroom.Configuration.Types        ( HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
 import           Headroom.Ext.Java
+import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileSystem                 ( loadFile )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Header.Types               ( TemplateInfo(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
+
 
 
 spec :: Spec
@@ -30,8 +34,8 @@ spec = do
     it "extracts variables from Java source code" $ do
       let comment   = BlockComment "/*" "*/"
           config    = HeaderConfig ["java"] 0 0 0 0 [] [] comment
-          meta      = Nothing
+          ti        = TemplateInfo config NoExtData Java undefined
           headerPos = Just (0, 2)
           expected  = mkVariables [("_java_package_name", "foo")]
       sample <- loadFile $ codeSamples </> "java" </> "sample1.java"
-      extractVariables config meta headerPos sample `shouldBe` expected
+      extractVariables ti headerPos sample `shouldBe` expected

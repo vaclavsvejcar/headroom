@@ -1,5 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
+
 module Headroom.Ext.HaskellSpec
   ( spec
   )
@@ -9,7 +11,12 @@ import           Headroom.Configuration.Types        ( HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
 import           Headroom.Ext.Haskell
+import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileSystem                 ( loadFile )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Header.Types               ( TemplateInfo(..) )
+import           Headroom.Template                   ( emptyTemplate )
+import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
@@ -30,9 +37,10 @@ spec = do
 
   describe "extractVariables" $ do
     it "extracts variables from Haskell source code with Haddock header" $ do
+      template <- emptyTemplate @_ @Mustache
       let comment   = BlockComment "{-|" "-}"
           config    = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
-          meta      = Nothing
+          ti        = TemplateInfo config NoExtData Haskell template
           headerPos = Just (1, 13)
           expected  = mkVariables
             [ ( "_haskell_module_copyright"
@@ -47,14 +55,15 @@ spec = do
             , ("_haskell_module_shortdesc"  , "Short description")
             ]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariables config meta headerPos sample `shouldBe` expected
+      extractVariables ti headerPos sample `shouldBe` expected
 
     it "extracts variables from Haskell source code without Haddock header" $ do
+      template <- emptyTemplate @_ @Mustache
       let comment   = BlockComment "{-|" "-}"
           config    = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
-          meta      = Nothing
+          ti        = TemplateInfo config NoExtData Haskell template
           headerPos = Nothing
           expected  = mkVariables [("_haskell_module_name", "Test")]
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
-      extractVariables config meta headerPos sample `shouldBe` expected
+      extractVariables ti headerPos sample `shouldBe` expected
 

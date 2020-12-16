@@ -18,9 +18,8 @@ processed /PureScript/ source code file.
 
 module Headroom.Ext.PureScript where
 
-import           Headroom.Configuration.Types        ( CtHeaderConfig )
 import           Headroom.Ext.Haskell                ( extractModuleName )
-import           Headroom.Types                      ( TemplateMeta(..) )
+import           Headroom.Header.Types               ( TemplateInfo )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
@@ -31,17 +30,15 @@ import           RIO
 -- __List of Extracted Variables:__
 --
 -- * @___purescript_module_name__@ - name of the /PureScript/ module
-extractVariables :: CtHeaderConfig
-                 -- ^ license header configuration
-                 -> Maybe TemplateMeta
-                 -- ^ extracted metadata from corresponding /template/
+extractVariables :: TemplateInfo
+                 -- ^ template info
                  -> Maybe (Int, Int)
                  -- ^ license header position @(startLine, endLine)@
                  -> Text
                  -- ^ input text
                  -> Variables
                  -- ^ extracted variables
-extractVariables _ _ _ text = (mkVariables . catMaybes)
+extractVariables _ _ text = (mkVariables . catMaybes)
   [("_purescript_module_name", ) <$> extractModuleName text]
 
 

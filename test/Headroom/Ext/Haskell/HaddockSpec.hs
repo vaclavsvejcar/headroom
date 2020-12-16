@@ -10,11 +10,13 @@ import           Headroom.Configuration.Types        ( LicenseType(..) )
 import           Headroom.Data.TextExtra             ( fromLines )
 import           Headroom.Embedded                   ( licenseTemplate )
 import           Headroom.Ext.Haskell.Haddock
+import           Headroom.Ext.Types                  ( ExtData(..)
+                                                     , HaddockOffsets(..)
+                                                     )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Template.Mustache          ( Mustache(..) )
-import           Headroom.Types                      ( HaddockFieldOffsets(..) )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
@@ -24,11 +26,11 @@ spec :: Spec
 spec = do
   let codeSamples = "test-data" </> "code-samples"
 
-  describe "extractFieldOffsets" $ do
+  describe "extractOffsets" $ do
     it "extract offsets for selected fields of module header" $ do
       template <- parseTemplate @Mustache Nothing $ licenseTemplate BSD3 Haskell
-      let expected = HaddockFieldOffsets { hfoCopyright = Just 14 }
-      extractFieldOffsets template `shouldBe` expected
+      let expected = HaddockOffsets { hoCopyright = Just 14 }
+      extractOffsets template `shouldBe` expected
 
 
   describe "extractModuleHeader" $ do
@@ -48,7 +50,7 @@ spec = do
               \commentary with @some markup@."
           }
       sample <- loadFile $ codeSamples </> "haskell" </> "header.hs"
-      extractModuleHeader sample Nothing `shouldBe` expected
+      extractModuleHeader sample NoExtData `shouldBe` expected
 
 
   describe "stripCommentSyntax" $ do
