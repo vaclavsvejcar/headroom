@@ -33,15 +33,27 @@ spec = do
 
 
   describe "mapLines" $ do
-    it "should return same output for identity function" $ do
+    it "returns same output for identity function" $ do
       let sample = fromLines ["foo zz", "bar", "xx"]
       mapLines id sample `shouldBe` sample
 
-    it "should map all lines using the function" $ do
+    it "maps all lines using the function" $ do
       let sample   = fromLines ["foo zz", "bar", "xx"]
           fn       = ("L: " <>)
           expected = fromLines ["L: foo zz", "L: bar", "L: xx"]
       mapLines fn sample `shouldBe` expected
+
+
+  describe "mapLinesF" $ do
+    it "returns same output for identity function" $ do
+      let sample = fromLines ["foo zz", "bar", "xx"]
+      mapLinesF (Just <$> id) sample `shouldBe` sample
+
+    it "maps all lines using the function" $ do
+      let sample   = fromLines ["foo zz", "bar", "xx"]
+          fn       = \l -> if l == "bar" then Nothing else Just ("L: " <> l)
+          expected = fromLines ["L: foo zz", "L: xx"]
+      mapLinesF fn sample `shouldBe` expected
 
 
   describe "read" $ do

@@ -18,6 +18,7 @@ module Headroom.Data.TextExtra
   , commonLinesPrefix
     -- * Working with text lines
   , mapLines
+  , mapLinesF
   , fromLines
   , toLines
   )
@@ -56,11 +57,28 @@ mapLines :: (Text -> Text)
          -> Text
          -- ^ input text
          -> Text
-         -- ^ result text
-mapLines fn = fromLines . go . toLines
+         -- ^ resulting text
+mapLines fn = mapLinesF (Just <$> fn)
+
+
+-- | Similar to 'mapLines', but the mapping function returns 'Foldable', which
+-- gives some more control over outcome. After mapping over all individual
+-- lines, results are folded and concatenated, which allows for example
+-- filtering out some lines.
+--
+-- >>> mapLinesF (\l -> if l == "bar" then Nothing else Just l) "foo\nbar"
+-- "foo"
+mapLinesF :: Foldable t
+          => (Text -> t Text)
+          -- ^ function to map over inividual lines
+          -> Text
+          -- ^ input text
+          -> Text
+          -- ^ resulting text
+mapLinesF f = fromLines . concat . (toList <$>) . go . toLines
  where
   go []       = []
-  go (x : xs) = fn x : go xs
+  go (x : xs) = f x : go xs
 
 
 -- | Same as 'readMaybe', but takes 'Text' as input instead of 'String'.

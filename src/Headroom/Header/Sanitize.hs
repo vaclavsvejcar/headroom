@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 {-|
 Module      : Headroom.Header.Sanitize
@@ -19,12 +20,14 @@ sure that license header syntax is not broken.
 
 module Headroom.Header.Sanitize
   ( findPrefix
+  , sanitizeHeaderSyntax
   )
 where
 
 import           Headroom.Configuration.Types        ( HeaderSyntax(..) )
 import           Headroom.Data.TextExtra             ( commonLinesPrefix
                                                      , fromLines
+                                                     , mapLinesF
                                                      , toLines
                                                      )
 import           RIO
@@ -59,3 +62,45 @@ findPrefix syntax text = case syntax of
   linePrefix = prefix
   blockPrefix xs@(_ : _) _ = prefix $ tail (init xs)
   blockPrefix []         p = p
+
+
+-- | Sanitizes given header text to make sure that each comment line starts with
+-- appropriate prefix (if defined within given 'HeaderSyntax'). For block
+-- comments, this is to make it visually unified, but for line comments it's
+-- necessary in order not to break syntax of target source code file.
+--
+-- >>> sanitizeHeaderSyntax (LineComment "--" (Just "--")) "-- foo\nbar"
+-- "-- foo\n-- bar"
+sanitizeHeaderSyntax :: HeaderSyntax
+                     -- ^ header syntax definition that may contain prefix
+                     -> Text
+                     -- ^ header to sanitize
+                     -> Text
+                     -- ^ sanitized header
+sanitizeHeaderSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
+ where
+  addPrefix Nothing l = Just l
+  addPrefix (Just p) l | p `T.isPrefixOf` l = Just l
+                       | otherwise          = Just $ p <> " " <> l
+  mPrefix = case syntax of
+    BlockComment _ _ p -> p
+    LineComment _ p    -> p
+
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+mapCommentLines :: Foldable t
+                => HeaderSyntax
+                -> (Text -> t Text)
+                -> Text
+                -> Text
+mapCommentLines syntax f = mapLinesF mapLine
+ where
+  mapLine line | isCommentBody syntax line = toList . f $ line
+               | otherwise                 = [line]
+
+
+isCommentBody :: HeaderSyntax -> Text -> Bool
+isCommentBody (LineComment _ _   ) _ = True
+isCommentBody (BlockComment s e _) l = not startOrEnd
+  where startOrEnd = s `T.isPrefixOf` l || e `T.isSuffixOf` l
