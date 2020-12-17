@@ -15,6 +15,7 @@ Module containing bunch of useful functions for working with text.
 
 module Headroom.Data.TextExtra
   ( read
+  , commonLinesPrefix
     -- * Working with text lines
   , mapLines
   , fromLines
@@ -24,6 +25,26 @@ where
 
 import           RIO
 import qualified RIO.Text                           as T
+
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
+
+-- | Similar to 'T.commonPrefixes', but tries to find common prefix for all
+-- lines in given text.
+--
+-- >>> commonLinesPrefix "-- first\n-- second\n-- third"
+-- Just "-- "
+commonLinesPrefix :: Text
+                  -- ^ lines of text to find prefix for
+                  -> Maybe Text
+                  -- ^ found longest common prefixs
+commonLinesPrefix text = go (toLines text) Nothing
+ where
+  go []       acc        = acc
+  go (x : xs) Nothing    = go xs (Just x)
+  go (x : xs) (Just acc) = case T.commonPrefixes x acc of
+    Just (n, _, _) -> go xs (Just n)
+    _              -> Nothing
 
 
 -- | Maps given function over individual lines of the given text.

@@ -1,5 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 {-|
 Module      : Headroom.Header.TemplateInfo
@@ -18,13 +20,26 @@ module Headroom.Header.TemplateInfo
   )
 where
 
-import           Headroom.Configuration.Types        ( CtHeadersConfig )
+import           Headroom.Configuration.Types        ( CtHeadersConfig
+                                                     , HeaderConfig
+                                                     )
+import           Headroom.Data.Lens                  ( suffixLensesFor )
 import           Headroom.Ext                        ( extractExtData )
 import           Headroom.FileType                   ( configByFileType )
 import           Headroom.FileType.Types             ( FileType )
+import           Headroom.Header.Sanitize            ( findPrefix )
 import           Headroom.Header.Types               ( TemplateInfo(..) )
 import           Headroom.Meta                       ( TemplateType )
+import           Headroom.Template                   ( Template(..) )
+import           RIO
 
+
+-----------------------------------  LENSES  -----------------------------------
+
+suffixLensesFor ["hcHeaderSyntax"] ''HeaderConfig
+
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Constructs new 'TemplateInfo' from provided data.
 mkTemplateInfo :: CtHeadersConfig
@@ -36,8 +51,11 @@ mkTemplateInfo :: CtHeadersConfig
                -> TemplateInfo
                -- ^ resulting template info
 mkTemplateInfo configs fileType template =
-  let tiConfig   = configByFileType configs fileType
+  let tiConfig   = withP (configByFileType configs fileType)
       tiExtData  = extractExtData fileType template
       tiFileType = fileType
       tiTemplate = template
   in  TemplateInfo { .. }
+ where
+  withP config = config & (hcHeaderSyntaxL %~ headerSyntax)
+  headerSyntax hs = findPrefix hs (rawTemplate template)

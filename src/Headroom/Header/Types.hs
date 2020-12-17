@@ -53,3 +53,4 @@ data TemplateInfo = TemplateInfo
   , tiTemplate :: TemplateType
   -- ^ parsed template
   }
+  deriving (Eq, Show)

@@ -25,7 +25,8 @@ spec = do
 
   describe "extractVariables" $ do
     it "extracts variables from PureScript source code" $ do
-      let config    = HeaderConfig ["purs"] 0 0 0 0 [] [] (LineComment "--")
+      let syntax    = LineComment "--" Nothing
+          config    = HeaderConfig ["purs"] 0 0 0 0 [] [] syntax
           ti        = TemplateInfo config NoExtData Java undefined
           headerPos = Just (1, 13)
           expected  = mkVariables [("_purescript_module_name", "Test")]

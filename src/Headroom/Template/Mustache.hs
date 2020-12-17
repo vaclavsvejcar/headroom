@@ -38,6 +38,9 @@ data Mustache = Mustache
   }
   deriving Show
 
+instance Eq Mustache where
+  a == b = mRawTemplate a == mRawTemplate b
+
 
 -- | Support for /Mustache/ templates.
 instance Template Mustache where

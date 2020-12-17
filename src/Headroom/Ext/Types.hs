@@ -31,6 +31,7 @@ data ExtData
   -- ^ additional data for /Haskell/ extended support
   | NoExtData
   -- ^ no additional data for extended support available
+  deriving (Eq, Show)
 
 
 -- | Offsets for selected fields extracted from /Haddock module header/.

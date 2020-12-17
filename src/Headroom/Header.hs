@@ -140,7 +140,7 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 --
 -- >>> :set -XFlexibleContexts
 -- >>> :set -XTypeFamilies
--- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment "{-" "-}")
+-- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment "{-" "-}" Nothing)
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
 -- Just (2,2)
 findHeader :: CtHeaderConfig
@@ -150,8 +150,8 @@ findHeader :: CtHeaderConfig
            -> Maybe (Int, Int)
            -- ^ header position @(startLine, endLine)@
 findHeader HeaderConfig {..} input = case hcHeaderSyntax of
-  BlockComment start end -> findBlockHeader start end inLines splitAt
-  LineComment prefix     -> findLineHeader prefix inLines splitAt
+  BlockComment start end _ -> findBlockHeader start end inLines splitAt
+  LineComment prefix _     -> findLineHeader prefix inLines splitAt
  where
   (before, headerArea, _) = splitInput hcPutAfter hcPutBefore input
   splitAt                 = L.length before

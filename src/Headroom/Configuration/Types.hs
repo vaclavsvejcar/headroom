@@ -112,9 +112,9 @@ type family (p :: Phase) ::: a where
 
 -- | Syntax of the license header comment.
 data HeaderSyntax
-  = BlockComment Text Text
+  = BlockComment Text Text (Maybe Text)
   -- ^ block (multi-line) comment syntax (e.g. @/* */@)
-  | LineComment Text
+  | LineComment Text (Maybe Text)
   -- ^ single line comment syntax (e.g. @//@)
   deriving (Eq, Show)
 
@@ -414,13 +414,13 @@ instance FromJSON PtHeaderConfig where
     hcPutBefore        <- Last <$> obj .:? "put-before"
     blockComment       <- obj .:? "block-comment"
     lineComment        <- obj .:? "line-comment"
-    hcHeaderSyntax     <- pure . Last $ headerSyntax blockComment lineComment
+    hcHeaderSyntax     <- pure . Last $ syntax blockComment lineComment
     pure HeaderConfig { .. }
    where
-    headerSyntax (Just (BlockComment' s e)) Nothing = Just $ BlockComment s e
-    headerSyntax Nothing (Just (LineComment' p)) = Just $ LineComment p
-    headerSyntax Nothing Nothing = Nothing
-    headerSyntax _ _ = throw MixedHeaderSyntax
+    syntax (Just (BlockComment' s e)) Nothing = Just $ BlockComment s e Nothing
+    syntax Nothing (Just (LineComment' p)) = Just $ LineComment p Nothing
+    syntax Nothing Nothing = Nothing
+    syntax _ _ = throw MixedHeaderSyntax
 
 instance Monoid PtHeaderConfig where
   mempty = HeaderConfig mempty mempty mempty mempty mempty mempty mempty mempty

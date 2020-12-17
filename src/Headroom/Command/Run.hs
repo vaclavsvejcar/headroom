@@ -484,7 +484,7 @@ postProcessHeader' syntax vars rawHeader = do
 -- | Ensures that all lines in license header starts with /line-comment/ syntax
 -- if such syntax is used for license header.
 --
--- >>> sanitizeHeader (LineComment "--") "-- foo\nbar\n-- baz"
+-- >>> sanitizeHeader (LineComment "--" Nothing) "-- foo\nbar\n-- baz"
 -- "-- foo\n-- bar\n-- baz"
 sanitizeHeader :: HeaderSyntax
                -- ^ syntax of the license header comments
@@ -492,8 +492,8 @@ sanitizeHeader :: HeaderSyntax
                -- ^ input text to sanitize
                -> Text
                -- ^ sanitized text
-sanitizeHeader (BlockComment _ _      ) text = text
-sanitizeHeader (LineComment prefixedBy) text = mapLines process text
+sanitizeHeader BlockComment{}             text = text
+sanitizeHeader (LineComment prefixedBy _) text = mapLines process text
  where
   process line | T.isPrefixOf prefixedBy line = line
                | otherwise                    = prefixedBy <> " " <> line

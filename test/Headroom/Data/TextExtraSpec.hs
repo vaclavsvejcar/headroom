@@ -8,11 +8,30 @@ where
 
 import           Headroom.Data.TextExtra
 import           RIO
+import qualified RIO.Text                           as T
 import           Test.Hspec
 
 
 spec :: Spec
 spec = do
+
+  describe "commonLinesPrefix" $ do
+    it "returns longest common prefix for lines of text" $ do
+      let text = fromLines ["-- foo", "-- bar", "-- xx"]
+      commonLinesPrefix text `shouldBe` Just "-- "
+
+    it "returns Nothing if not all elements starts with same prefix" $ do
+      let text = fromLines ["-- foo", "bar", "-- xx"]
+      commonLinesPrefix text `shouldBe` Nothing
+
+    it "returns Nothing if no common prefix found" $ do
+      let text = fromLines ["foo", "bar", "hello"]
+      commonLinesPrefix text `shouldBe` Nothing
+
+    it "returns Nothing if input is empty" $ do
+      commonLinesPrefix T.empty `shouldBe` Nothing
+
+
   describe "mapLines" $ do
     it "should return same output for identity function" $ do
       let sample = fromLines ["foo zz", "bar", "xx"]

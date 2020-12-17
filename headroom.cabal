@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0f153c50096de2e7ef69a8c94af41e30abff9ad8161d4e54b76631e62eed01ca
+-- hash: 150fab4c6e56b06459d6d91f1b62b056bf3cc7b6dabf3567586fb867ffb3e8a6
 
 name:           headroom
 version:        0.4.0.0
@@ -155,6 +155,7 @@ library
       Headroom.FileType
       Headroom.FileType.Types
       Headroom.Header
+      Headroom.Header.Sanitize
       Headroom.Header.TemplateInfo
       Headroom.Header.Types
       Headroom.HeaderFn
@@ -180,7 +181,6 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
-    , data-default-class
     , either
     , file-embed
     , microlens
@@ -244,6 +244,8 @@ test-suite spec
       Headroom.ExtSpec
       Headroom.FileSystemSpec
       Headroom.FileTypeSpec
+      Headroom.Header.SanitizeSpec
+      Headroom.Header.TemplateInfoSpec
       Headroom.HeaderFn.TypesSpec
       Headroom.HeaderFn.UpdateCopyrightSpec
       Headroom.HeaderFnSpec

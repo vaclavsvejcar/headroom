@@ -38,12 +38,20 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
-  let samplesDir = "test-data" </> "code-samples"
-      lHeaderConfig pb pa =
-        HeaderConfig ["hs"] 0 0 0 0 pb pa (LineComment "--")
-      bHeaderConfig = bHeaderConfigM 0 0 0 0
-      bHeaderConfigM mtc mtf mbc mbf pb pa =
-        HeaderConfig ["hs"] mtc mtf mbc mbf pb pa (BlockComment "{-|" "-}")
+  let
+    samplesDir = "test-data" </> "code-samples"
+    lHeaderConfig pb pa =
+      HeaderConfig ["hs"] 0 0 0 0 pb pa (LineComment "--" Nothing)
+    bHeaderConfig = bHeaderConfigM 0 0 0 0
+    bHeaderConfigM mtc mtf mbc mbf pb pa = HeaderConfig
+      ["hs"]
+      mtc
+      mtf
+      mbc
+      mbf
+      pb
+      pa
+      (BlockComment "{-|" "-}" Nothing)
 
   describe "addHeader" $ do
     let fileInfo config = FileInfo Haskell config Nothing mempty

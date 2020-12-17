@@ -22,13 +22,10 @@ module Headroom.Types
   , fromHeadroomError
   , toHeadroomError
     -- * Other Data Types
-  , TemplateMeta(..)
-  , HaddockFieldOffsets(..)
   , CurrentYear(..)
   )
 where
 
-import           Data.Default.Class                  ( Default(..) )
 import           Data.Typeable                       ( cast )
 import           RIO
 
@@ -69,19 +66,3 @@ newtype CurrentYear = CurrentYear
   -- ^ value of current year
   }
   deriving (Eq, Show)
-
-
--- | Offsets for selected fields extracted from /Haddock module header/.
-data HaddockFieldOffsets = HaddockFieldOffsets
-  { hfoCopyright :: Maybe Int
-  -- ^ offset for /Copyright/ field
-  }
-  deriving (Eq, Show)
-
-instance Default HaddockFieldOffsets where
-  def = HaddockFieldOffsets { hfoCopyright = Nothing }
-
--- | Metadata parsed from raw /template/, specific for selected /file type/.
-data TemplateMeta = HaskellTemplateMeta HaddockFieldOffsets
-  deriving (Eq, Show)
-
