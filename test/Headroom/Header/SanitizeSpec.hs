@@ -30,25 +30,25 @@ spec = do
       findPrefix syntax sample `shouldBe` expected
 
 
-  describe "sanitizeHeaderSyntax" $ do
+  describe "sanitizeSyntax" $ do
     it "sanitizes syntax for line comment with prefix" $ do
       let syntax   = LineComment "--" (Just "--")
           sample   = fromLines ["-- first", "second", "-- third"]
           expected = fromLines ["-- first", "-- second", "-- third"]
-      sanitizeHeaderSyntax syntax sample `shouldBe` expected
+      sanitizeSyntax syntax sample `shouldBe` expected
 
     it "sanitizes syntax for block comment with prefix" $ do
       let syntax   = BlockComment "/*" "*/" (Just " *")
           sample   = fromLines ["/*", " * first", "second", " */"]
           expected = fromLines ["/*", " * first", " * second", " */"]
-      sanitizeHeaderSyntax syntax sample `shouldBe` expected
+      sanitizeSyntax syntax sample `shouldBe` expected
 
     it "does nothing for already valid header" $ do
       let syntax = LineComment "--" (Just "--")
           sample = fromLines ["-- first", "-- second", "-- third"]
-      sanitizeHeaderSyntax syntax sample `shouldBe` sample
+      sanitizeSyntax syntax sample `shouldBe` sample
 
     it "does nothing when prefix is unknown" $ do
       let syntax = LineComment "--" Nothing
           sample = fromLines ["-- first", "second", "-- third"]
-      sanitizeHeaderSyntax syntax sample `shouldBe` sample
+      sanitizeSyntax syntax sample `shouldBe` sample

@@ -29,7 +29,6 @@ module Headroom.Command.Run
   , typeOfTemplate
     -- * License Header Post-processing
   , postProcessHeader'
-  , sanitizeHeader
   )
 where
 
@@ -61,7 +60,6 @@ import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
-import           Headroom.Data.TextExtra             ( mapLines )
 import           Headroom.Embedded                   ( defaultConfig
                                                      , licenseTemplate
                                                      )
@@ -77,6 +75,7 @@ import           Headroom.Header                     ( addHeader
                                                      , extractFileInfo
                                                      , replaceHeader
                                                      )
+import           Headroom.Header.Sanitize            ( sanitizeSyntax )
 import           Headroom.Header.TemplateInfo        ( mkTemplateInfo )
 import           Headroom.Header.Types               ( FileInfo(..)
                                                      , TemplateInfo(..)
@@ -462,7 +461,7 @@ currentYear = do
 -- | Performs post-processing on rendered /license header/, based on given
 -- configuration. Currently the main points are to:
 --
---  1. sanitize possibly corrupted comment syntax ('sanitizeHeader')
+--  1. sanitize possibly corrupted comment syntax ('sanitizeSyntax')
 --  2. apply /license header functions/ ('postProcessHeader')
 postProcessHeader' :: (Has CtHeaderFnConfigs env, Has CurrentYear env)
                    => HeaderSyntax
@@ -477,23 +476,4 @@ postProcessHeader' syntax vars rawHeader = do
   configs <- viewL @CtHeaderFnConfigs
   year    <- viewL
   cEnv    <- mkConfiguredEnv year vars configs
-  let processed = sanitizeHeader syntax . postProcessHeader cEnv $ rawHeader
-  pure processed
-
-
--- | Ensures that all lines in license header starts with /line-comment/ syntax
--- if such syntax is used for license header.
---
--- >>> sanitizeHeader (LineComment "--" Nothing) "-- foo\nbar\n-- baz"
--- "-- foo\n-- bar\n-- baz"
-sanitizeHeader :: HeaderSyntax
-               -- ^ syntax of the license header comments
-               -> Text
-               -- ^ input text to sanitize
-               -> Text
-               -- ^ sanitized text
-sanitizeHeader BlockComment{}             text = text
-sanitizeHeader (LineComment prefixedBy _) text = mapLines process text
- where
-  process line | T.isPrefixOf prefixedBy line = line
-               | otherwise                    = prefixedBy <> " " <> line
+  pure . sanitizeSyntax syntax . postProcessHeader cEnv $ rawHeader

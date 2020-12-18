@@ -111,21 +111,8 @@ spec = do
             , "-- Copyright (c) 2017-2020 2nd Author"
             ]
           vars   = mkVariables [("sndAuthor", "2nd Author")]
-          syntax = LineComment "--" Nothing
+          syntax = LineComment "--" (Just "--")
       runRIO env (postProcessHeader' syntax vars sample) `shouldReturn` expected
-
-
-  describe "sanitizeHeader" $ do
-    it "does nothing when block comment syntax used" $ do
-      let sample = fromLines ["{-", "foo", "bar", "-}"]
-          syntax = BlockComment "{-" "-}" Nothing
-      sanitizeHeader syntax sample `shouldBe` sample
-
-    it "adds missing single-line comment syntax" $ do
-      let sample   = fromLines ["-- first", "second", "-- third"]
-          syntax   = LineComment "--" Nothing
-          expected = fromLines ["-- first", "-- second", "-- third"]
-      sanitizeHeader syntax sample `shouldBe` expected
 
 
 env :: TestEnv

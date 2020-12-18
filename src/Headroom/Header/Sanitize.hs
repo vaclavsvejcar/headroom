@@ -21,7 +21,7 @@ sure that license header syntax is not broken.
 
 module Headroom.Header.Sanitize
   ( findPrefix
-  , sanitizeHeaderSyntax
+  , sanitizeSyntax
   )
 where
 
@@ -65,15 +65,15 @@ findPrefix syntax text = case syntax of
 -- comments, this is to make it visually unified, but for line comments it's
 -- necessary in order not to break syntax of target source code file.
 --
--- >>> sanitizeHeaderSyntax (LineComment "--" (Just "--")) "-- foo\nbar"
+-- >>> sanitizeSyntax (LineComment "--" (Just "--")) "-- foo\nbar"
 -- "-- foo\n-- bar"
-sanitizeHeaderSyntax :: HeaderSyntax
+sanitizeSyntax :: HeaderSyntax
                      -- ^ header syntax definition that may contain prefix
-                     -> Text
+               -> Text
                      -- ^ header to sanitize
-                     -> Text
+               -> Text
                      -- ^ sanitized header
-sanitizeHeaderSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
+sanitizeSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
  where
   addPrefix Nothing l = Just l
   addPrefix (Just p) l | p `T.isPrefixOf` l = Just l

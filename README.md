@@ -21,7 +21,7 @@ __Headroom__ also offers much more than just [adding, replacing or dropping][doc
 ## Installation
 You can get _Headroom_ via one of the following options:
 1. download pre-built binary for _GNU/Linux_ or _macOS_ (x64) from [releases page][meta:releases]
-1. install _Headroom_ via [Homebrew][web:homebrew]: `brew install norcane/tools/headroom`
+1. install using [Homebrew][web:homebrew]: `brew install norcane/tools/headroom`
 1. build from source code - see [project microsite][web:headroom] for more details
 
 ## Adopters
