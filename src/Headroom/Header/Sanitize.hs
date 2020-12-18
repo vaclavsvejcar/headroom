@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -31,9 +32,6 @@ import           Headroom.Data.TextExtra             ( commonLinesPrefix
                                                      , toLines
                                                      )
 import           RIO
-import           RIO.List.Partial                    ( init
-                                                     , tail
-                                                     )
 import qualified RIO.Text                           as T
 
 
@@ -54,14 +52,12 @@ findPrefix :: HeaderSyntax
            -> HeaderSyntax
            -- ^ input 'HeaderSyntax' with added prefix (if found)
 findPrefix syntax text = case syntax of
-  LineComment s _    -> LineComment s (linePrefix filtered)
-  BlockComment s e p -> BlockComment s e (blockPrefix filtered p)
+  BlockComment s e _ -> BlockComment s e prefix
+  LineComment s _    -> LineComment s prefix
  where
-  filtered = filter (not . T.null . T.strip) . toLines $ text
-  prefix t = fmap T.stripEnd (commonLinesPrefix . fromLines $ t)
-  linePrefix = prefix
-  blockPrefix xs@(_ : _) _ = prefix $ tail (init xs)
-  blockPrefix []         p = p
+  filtered = filter cond . toLines $ text
+  cond     = \t -> (not . T.null . T.strip $ t) && isCommentBody syntax t
+  prefix   = fmap T.stripEnd (commonLinesPrefix . fromLines $ filtered)
 
 
 -- | Sanitizes given header text to make sure that each comment line starts with
@@ -94,10 +90,9 @@ mapCommentLines :: Foldable t
                 -> (Text -> t Text)
                 -> Text
                 -> Text
-mapCommentLines syntax f = mapLinesF mapLine
- where
-  mapLine line | isCommentBody syntax line = toList . f $ line
-               | otherwise                 = [line]
+mapCommentLines syntax f = mapLinesF $ \case
+  line | isCommentBody syntax line -> toList . f $ line
+       | otherwise                 -> [line]
 
 
 isCommentBody :: HeaderSyntax -> Text -> Bool
