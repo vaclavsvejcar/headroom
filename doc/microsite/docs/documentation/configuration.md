@@ -91,8 +91,8 @@ haskell:
   put-after: []
   put-before: ["^module"]
   block-comment:
-    starts-with: "{-|"
-    ends-with: "-}"
+    starts-with: ^{-\|
+    ends-with: (?<!#)-}$
 ```
 
 If the default configuration for selected _file type_ doesn't suit your needs, you can override following settings:
@@ -104,7 +104,7 @@ If the default configuration for selected _file type_ doesn't suit your needs, y
     - `margin-bottom-code` - defines margin (in no. of empty lines) between generated header and code below it, but only **IF** header is **NOT** the last thing in file.
     - `margin-bottom-file` - defines margin (in no. of empty lines) between generated header the very end of the file, but only **IF** header **IS** the last thing in file.
 1. __put header before/after pattern__ - you can define before and/or after which pattern _Headroom_ will put the license header (such as before the line starting with `module` in _Haskell_ code).
-1. __syntax of header comment__ - you can decided if your license header will be defined using multiple single-line comments (such as `//` in _C/C++_ or `--` in _Haskell_) or block comment (such as `{- -}` in Haskell). To define block comment, use the `block-comment` option with `starts-with` and `ends-with` sub-options, to use single-line comment, use `line-comment` option with `prefixed-by` sub-option.
+1. __ syntax of header comment__ - license header can be represented by either single block comment (such as `{- -}` in Haskell) or bunch of single line comments (such as `//` in _C/C++_ or `--` in _Haskell_). Block comment can be defined by using the use the `block-comment` option with `starts-with` and `ends-with` sub-options, line comment by `line-comment` option with `prefixed-by` sub-option. Note that all these options expects valid regular expressions.
 
 ### `post-process` key
 This is the configuration for _post-processing functions_. See more details in [Post-processing functions][doc:post-processing] chapter.

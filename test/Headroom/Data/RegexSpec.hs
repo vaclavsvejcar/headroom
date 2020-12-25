@@ -20,3 +20,12 @@ spec = do
       match regex "foz" `shouldSatisfy` isNothing
       match regex "foosdas" `shouldSatisfy` isJust
       match regex "barfoo" `shouldSatisfy` isJust
+
+
+  describe "isMatch" $ do
+    it "checks if regular expression matches against given sample" $ do
+      let regex = [re|foo|bar|]
+      isMatch regex "foz" `shouldBe` False
+      isMatch regex "xxx" `shouldBe` False
+      isMatch regex "foosdas" `shouldBe` True
+      isMatch regex "barfoo" `shouldBe` True

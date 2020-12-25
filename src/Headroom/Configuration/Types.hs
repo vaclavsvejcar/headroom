@@ -112,17 +112,17 @@ type family (p :: Phase) ::: a where
 
 -- | Syntax of the license header comment.
 data HeaderSyntax
-  = BlockComment Text Text (Maybe Text)
+  = BlockComment Regex Regex (Maybe Text)
   -- ^ block (multi-line) comment syntax (e.g. @/* */@)
-  | LineComment Text (Maybe Text)
+  | LineComment Regex (Maybe Text)
   -- ^ single line comment syntax (e.g. @//@)
   deriving (Eq, Show)
 
 -- | Internal representation of the block style of 'HeaderSyntax'.
 data BlockComment' = BlockComment'
-  { bcStartsWith :: Text
+  { bcStartsWith :: Regex
   -- ^ starting pattern (e.g. @/*@)
-  , bcEndsWith   :: Text
+  , bcEndsWith   :: Regex
   -- ^ ending pattern (e.g. @*/@)
   }
   deriving (Eq, Generic, Show)
@@ -132,7 +132,7 @@ instance FromJSON BlockComment' where
 
 -- | Internal representation of the line style of 'HeaderSyntax'.
 newtype LineComment' = LineComment'
-  { lcPrefixedBy :: Text
+  { lcPrefixedBy :: Regex
   -- ^ prefix of the comment line (e.g. @//@)
   }
   deriving (Eq, Generic, Show)

@@ -39,7 +39,7 @@ import           Headroom.Configuration.Types        ( CtHeaderConfig
                                                      )
 import           Headroom.Data.Lens                  ( suffixLensesFor )
 import           Headroom.Data.Regex                 ( Regex
-                                                     , match
+                                                     , isMatch
                                                      )
 import           Headroom.Data.TextExtra             ( fromLines
                                                      , toLines
@@ -140,7 +140,9 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 --
 -- >>> :set -XFlexibleContexts
 -- >>> :set -XTypeFamilies
--- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment "{-" "-}" Nothing)
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment [re|^{-|] [re|(?<!#)-}$|] Nothing)
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
 -- Just (2,2)
 findHeader :: CtHeaderConfig
@@ -161,11 +163,13 @@ findHeader HeaderConfig {..} input = case hcHeaderSyntax of
 -- | Finds header in the form of /multi-line comment/ syntax, which is delimited
 -- with starting and ending pattern.
 --
--- >>> findBlockHeader "{-" "-}" ["", "{- HEADER -}", "", ""] 0
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> findBlockHeader [re|^{-|] [re|(?<!#)-}$|] ["", "{- HEADER -}", "", ""] 0
 -- Just (1,1)
-findBlockHeader :: Text
+findBlockHeader :: Regex
                 -- ^ starting pattern (e.g. @{-@ or @/*@)
-                -> Text
+                -> Regex
                 -- ^ ending pattern (e.g. @-}@ or @*/@)
                 -> [Text]
                 -- ^ lines of text in which to detect the header
@@ -175,8 +179,8 @@ findBlockHeader :: Text
                 -- ^ header position @(startLine + offset, endLine + offset)@
 findBlockHeader startsWith endsWith = go Nothing Nothing 0
  where
-  isStart = T.isPrefixOf startsWith
-  isEnd   = T.isSuffixOf endsWith
+  isStart = isMatch startsWith
+  isEnd   = isMatch endsWith
   oneLiner line = isStart line && isEnd line
   ind curr line | isStart line = curr + (1 :: Integer)
   ind curr line | isEnd line   = curr - (1 :: Integer)
@@ -191,9 +195,11 @@ findBlockHeader startsWith endsWith = go Nothing Nothing 0
 -- | Finds header in the form of /single-line comment/ syntax, which is
 -- delimited with the prefix pattern.
 --
--- >>> findLineHeader "--" ["", "a", "-- first", "-- second", "foo"] 0
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> findLineHeader [re|^--|] ["", "a", "-- first", "-- second", "foo"] 0
 -- Just (2,3)
-findLineHeader :: Text
+findLineHeader :: Regex
                -- ^ prefix pattern (e.g. @--@ or @//@)
                -> [Text]
                -- ^ lines of text in which to detect the header
@@ -203,7 +209,7 @@ findLineHeader :: Text
                -- ^ header position @(startLine + offset, endLine + offset)@
 findLineHeader prefix = go Nothing
  where
-  isPrefix = T.isPrefixOf prefix
+  isPrefix = isMatch prefix
   go Nothing (x : xs) i | isPrefix x      = go (Just i) xs (i + 1)
   go Nothing (_ : xs) i                   = go Nothing xs (i + 1)
   go (Just start) (x : xs) i | isPrefix x = go (Just start) xs (i + 1)
@@ -225,7 +231,7 @@ firstMatching :: [Regex]
               -- ^ matching line number
 firstMatching patterns input = go input 0
  where
-  cond x = any (\r -> isJust $ match r x) patterns
+  cond x = any (`isMatch` x) patterns
   go (x : _) i | cond x = Just i
   go (_ : xs) i         = go xs (i + 1)
   go []       _         = Nothing
@@ -245,7 +251,7 @@ lastMatching :: [Regex]
              -- ^ matching line number
 lastMatching patterns input = go input 0 Nothing
  where
-  cond x = any (\r -> isJust $ match r x) patterns
+  cond x = any (`isMatch` x) patterns
   go (x : xs) i _ | cond x = go xs (i + 1) (Just i)
   go (_ : xs) i pos        = go xs (i + 1) pos
   go []       _ pos        = pos

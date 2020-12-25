@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TypeApplications  #-}
 
 module Headroom.Ext.HaskellSpec
@@ -10,6 +11,7 @@ where
 import           Headroom.Configuration.Types        ( HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Ext.Haskell
 import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileSystem                 ( loadFile )
@@ -38,7 +40,7 @@ spec = do
   describe "extractVariables" $ do
     it "extracts variables from Haskell source code with Haddock header" $ do
       template <- emptyTemplate @_ @Mustache
-      let comment   = BlockComment "{-|" "-}" Nothing
+      let comment   = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
           config    = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
           ti        = TemplateInfo config NoExtData Haskell template
           headerPos = Just (1, 13)
@@ -59,7 +61,7 @@ spec = do
 
     it "extracts variables from Haskell source code without Haddock header" $ do
       template <- emptyTemplate @_ @Mustache
-      let comment   = BlockComment "{-|" "-}" Nothing
+      let comment   = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
           config    = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
           ti        = TemplateInfo config NoExtData Haskell template
           headerPos = Nothing

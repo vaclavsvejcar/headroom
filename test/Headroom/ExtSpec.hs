@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TypeApplications  #-}
 
 module Headroom.ExtSpec
@@ -10,6 +11,7 @@ where
 import           Headroom.Configuration.Types        ( HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Ext
 import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
@@ -28,7 +30,7 @@ spec = do
     it "extracts variables specific for Haskell file type" $ do
       template <- emptyTemplate @_ @Mustache
       let samplesDir = "test-data" </> "code-samples"
-          comment    = LineComment "--" Nothing
+          comment    = LineComment [re|^--|] Nothing
           config     = HeaderConfig ["hs"] 0 0 0 0 [] [] comment
           ti         = TemplateInfo config NoExtData Haskell template
           expected   = mkVariables
@@ -49,7 +51,7 @@ spec = do
     it "extracts variables specific for Java file type" $ do
       template <- emptyTemplate @_ @Mustache
       let samplesDir = "test-data" </> "code-samples"
-          comment    = BlockComment "/*" "*/" Nothing
+          comment    = BlockComment [re|^\/\*|] [re|\*\/$|] Nothing
           config     = HeaderConfig ["java"] 0 0 0 0 [] [] comment
           ti         = TemplateInfo config NoExtData Java template
           expected   = mkVariables [("_java_package_name", "foo")]
@@ -59,7 +61,7 @@ spec = do
     it "extracts variables specific for PureScript file type" $ do
       template <- emptyTemplate @_ @Mustache
       let samplesDir = "test-data" </> "code-samples"
-          comment    = LineComment "--" Nothing
+          comment    = LineComment [re|^--|] Nothing
           config     = HeaderConfig ["purs"] 0 0 0 0 [] [] comment
           ti         = TemplateInfo config NoExtData PureScript template
           expected   = mkVariables [("_purescript_module_name", "Test")]

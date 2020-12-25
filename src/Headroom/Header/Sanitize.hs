@@ -26,6 +26,7 @@ module Headroom.Header.Sanitize
 where
 
 import           Headroom.Configuration.Types        ( HeaderSyntax(..) )
+import           Headroom.Data.Regex                 ( isMatch )
 import           Headroom.Data.TextExtra             ( commonLinesPrefix
                                                      , fromLines
                                                      , mapLinesF
@@ -43,8 +44,10 @@ import qualified RIO.Text                           as T
 -- syntax (just the syntax for comment itself - like @//@ or @--@). If such
 -- prefix is found, it's then added to the input 'HeaderSyntax'.
 --
--- >>> findPrefix (BlockComment "/*" "*/" Nothing) "/*\n * foo\n * bar\n */"
--- BlockComment "/*" "*/" (Just " *")
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> findPrefix (BlockComment [re|^\/\*|] [re|\*\/$|] Nothing) "/*\n * foo\n * bar\n */"
+-- BlockComment "^\\/\\*" "\\*\\/$" (Just " *")
 findPrefix :: HeaderSyntax
            -- ^ describes comment syntax of the header
            -> Text
@@ -65,7 +68,9 @@ findPrefix syntax text = case syntax of
 -- comments, this is to make it visually unified, but for line comments it's
 -- necessary in order not to break syntax of target source code file.
 --
--- >>> sanitizeSyntax (LineComment "--" (Just "--")) "-- foo\nbar"
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> sanitizeSyntax (LineComment [re|^--|] (Just "--")) "-- foo\nbar"
 -- "-- foo\n-- bar"
 sanitizeSyntax :: HeaderSyntax
                      -- ^ header syntax definition that may contain prefix
@@ -97,5 +102,4 @@ mapCommentLines syntax f = mapLinesF $ \case
 
 isCommentBody :: HeaderSyntax -> Text -> Bool
 isCommentBody (LineComment _ _   ) _ = True
-isCommentBody (BlockComment s e _) l = not startOrEnd
-  where startOrEnd = s `T.isPrefixOf` l || e `T.isSuffixOf` l
+isCommentBody (BlockComment s e _) l = not $ isMatch s l || isMatch e l

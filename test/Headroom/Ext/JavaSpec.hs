@@ -1,5 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+
 module Headroom.Ext.JavaSpec
   ( spec
   )
@@ -8,6 +10,7 @@ where
 import           Headroom.Configuration.Types        ( HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Ext.Java
 import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileSystem                 ( loadFile )
@@ -17,7 +20,6 @@ import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
-
 
 
 spec :: Spec
@@ -32,7 +34,7 @@ spec = do
 
   describe "extractVariables" $ do
     it "extracts variables from Java source code" $ do
-      let comment   = BlockComment "/*" "*/" Nothing
+      let comment   = BlockComment [re|^\/\*|] [re|\*\/$|] Nothing
           config    = HeaderConfig ["java"] 0 0 0 0 [] [] comment
           ti        = TemplateInfo config NoExtData Java undefined
           headerPos = Just (0, 2)

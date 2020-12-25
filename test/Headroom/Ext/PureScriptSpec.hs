@@ -1,5 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+
 module Headroom.Ext.PureScriptSpec
   ( spec
   )
@@ -8,6 +10,7 @@ where
 import           Headroom.Configuration.Types        ( HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Ext.PureScript
 import           Headroom.Ext.Types                  ( ExtData(..) )
 import           Headroom.FileSystem                 ( loadFile )
@@ -19,13 +22,14 @@ import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
 
 
+
 spec :: Spec
 spec = do
   let codeSamples = "test-data" </> "code-samples"
 
   describe "extractVariables" $ do
     it "extracts variables from PureScript source code" $ do
-      let syntax    = LineComment "--" Nothing
+      let syntax    = LineComment [re|^--|] Nothing
           config    = HeaderConfig ["purs"] 0 0 0 0 [] [] syntax
           ti        = TemplateInfo config NoExtData Java undefined
           headerPos = Just (1, 13)

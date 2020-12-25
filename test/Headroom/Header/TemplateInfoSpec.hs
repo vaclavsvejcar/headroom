@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeFamilies      #-}
@@ -19,6 +20,7 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , LicenseType(..)
                                                      )
 import           Headroom.Data.Lens                  ( suffixLensesFor )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Embedded                   ( defaultConfig
                                                      , licenseTemplate
                                                      )
@@ -41,7 +43,7 @@ spec = do
       template       <- parseTemplate Nothing (licenseTemplate BSD3 Java)
       defaultConfig' <- parseConfiguration defaultConfig
       config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
-      let comment  = BlockComment "/*" "*/" (Just " *")
+      let comment  = BlockComment [re|^\/\*|] [re|\*\/$|] (Just " *")
           actual   = mkTemplateInfo config Java template
           expected = actual & tiConfigL . hcHeaderSyntaxL .~ comment
       mkTemplateInfo config Java template `shouldBe` expected

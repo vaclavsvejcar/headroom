@@ -10,7 +10,11 @@ version: 0.4.0.0
 ```
 
 ### Rename `margin-before` and `margin-after` keys
-As part of [this new feature][github/issueP/58], `margin-before` and `margin-after` configuration options were renamed as following:
+
+!!! info
+    This change is part of [feature #58][github/issue/58], see also [related documentation][doc:configuration#license-headers-key].
+
+Configuration keys `margin-before` and `margin-after` configuration options were renamed as following:
 
 - `margin-before` - must be renamed to `margin-top-code` in all occurences
 - `margin-after` - must be renamed to `margin-bottom-code` in all occurences
@@ -19,9 +23,22 @@ As part of [this new feature][github/issueP/58], `margin-before` and `margin-aft
 [doc:v0.3.2.0]: https://doc.norcane.com/headroom/v0.3.2.0/
 [github/issueP/58]: https://github.com/vaclavsvejcar/headroom/issues/58
 
+### Change `starts-with`, `ends-with` and `prefixed-by` to regular expressions
+
+!!! info
+    This change is part of [feature #61][github/issue/61], see also [related documentation][doc:configuration#license-headers-key].
+
+Configuration keys `starts-with`/`ends-with` (under `block-comment` key) and `prefixed-by` (under `line-comment`) now expects _regular expressions_ instead of plain text. Therefore, if you use any of these keys in your custom configuration, you have to change them to regular expressions. Few examples are below:
+
+- change `/*` to `^\/\*`
+- change `*/` to `\*\/$`
+
 ## List of all Migration Guides
 
 - [from `v0.3.2.0` to `v0.4.0.0`][v0320-v0400]
 
 
+[github/issue/58]: https://github.com/vaclavsvejcar/headroom/issues/58
+[github/issue/61]: https://github.com/vaclavsvejcar/headroom/issues/61
+[doc:configuration#license-headers-key]: documentation/configuration.md#license-headers-key
 [v0320-v0400]: https://doc.norcane.com/headroom/v0.4.0.0/migration-guide

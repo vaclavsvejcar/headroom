@@ -26,6 +26,7 @@ module Headroom.Data.Regex
     -- * Regex Functions
   , compile
   , match
+  , isMatch
   , re
   , replace
   , scan
@@ -45,13 +46,25 @@ import           RIO
 import qualified RIO.Text                           as T
 import qualified Text.Regex.PCRE.Heavy              as PH
 import qualified Text.Regex.PCRE.Light              as PL
+import qualified Text.Regex.PCRE.Light.Base         as PL
+                                                     ( Regex(..) )
 import qualified Text.Regex.PCRE.Light.Char8        as PLC
+
 
 
 ---------------------------------  DATA TYPES  ---------------------------------
 
 -- | Represents compiled /regex/, encapsulates the actual implementation.
-newtype Regex = Regex PL.Regex deriving (Eq, Show)
+newtype Regex = Regex PL.Regex
+
+
+instance Eq Regex where
+  Regex (PL.Regex _ r1) == Regex (PL.Regex _ r2) = r1 == r2
+
+
+instance Show Regex where
+  show (Regex (PL.Regex _ r)) = show r
+
 
 instance FromJSON Regex where
   parseJSON (String s) = pure . compileUnsafe $ s
@@ -72,7 +85,7 @@ compile raw = either (throwM . CompilationFailed raw . T.pack) pure compile'
   where compile' = Regex <$> PH.compileM (encodeUtf8 raw) [PLC.utf8]
 
 
--- | Same as 'match', but works with 'Text' and uses no additional options.
+-- | Same as 'PLC.match', but works with 'Text' and uses no additional options.
 match :: Regex
       -- ^ a PCRE regular expression value produced by compile
       -> Text
@@ -80,6 +93,17 @@ match :: Regex
       -> Maybe [Text]
       -- ^ the result value
 match (Regex r) subject = fmap T.pack <$> PLC.match r (T.unpack subject) []
+
+
+-- | Same as 'match', but instead of returning matched text it only indicates
+-- whether the given text matches the pattern or not.
+isMatch :: Regex
+        -- ^ a PCRE regular expression value produced by compile
+        -> Text
+        -- ^ the subject text to match against
+        -> Bool
+        -- ^ the result value
+isMatch regex subject = isJust $ match regex subject
 
 
 -- | A QuasiQuoter for regular expressions that does a compile time check.

@@ -2,12 +2,14 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
+
 module Headroom.Command.RunSpec
   ( spec
   )
@@ -26,6 +28,7 @@ import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Data.TextExtra             ( fromLines )
 import           Headroom.FileSystem                 ( FileSystem(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
@@ -111,7 +114,7 @@ spec = do
             , "-- Copyright (c) 2017-2020 2nd Author"
             ]
           vars   = mkVariables [("sndAuthor", "2nd Author")]
-          syntax = LineComment "--" (Just "--")
+          syntax = LineComment [re|^--|] (Just "--")
       runRIO env (postProcessHeader' syntax vars sample) `shouldReturn` expected
 
 

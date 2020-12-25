@@ -84,12 +84,15 @@ variables:
 ##                         multi-line (block) comment syntax (such as '/* */').
 ##                         Has two mandatory fields:
 ##      starts-with        = Defines how the license header comment starts.
+##                           Expects valid regular expression.
 ##      ends-with          = Defines how the license header comment ends.
+##                           Expects valid regular expression.
 ##                         NOTE: cannot be used together with 'line-comment'.
 ##  - line-comment       = Defines that the license header is rendered using the
 ##                         single-line comment syntax (such as '//').
 ##                         Has one mandatory field:
 ##      prefixed-by        = Defines how the license header comment starts.
+##                           Expects valid regular expression.
 license-headers:
   ## C configuration
   c:
@@ -101,8 +104,8 @@ license-headers:
     put-after: []
     put-before: ["^#include"]
     block-comment:
-      starts-with: "/*"
-      ends-with: "*/"
+      starts-with: ^\/\*
+      ends-with: \*\/$
 
   ## C++ configuration
   cpp:
@@ -114,8 +117,8 @@ license-headers:
     put-after: []
     put-before: ["^#include"]
     block-comment:
-      starts-with: "/*"
-      ends-with: "*/"
+      starts-with: ^\/\*
+      ends-with: \*\/$
 
   ## CSS configuration
   css:
@@ -127,8 +130,8 @@ license-headers:
     put-after: []
     put-before: ['([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)']
     block-comment:
-      starts-with: "/*"
-      ends-with: "*/"
+      starts-with: ^\/\*
+      ends-with: \*\/$
 
   ## Haskell configuration
   haskell:
@@ -140,8 +143,8 @@ license-headers:
     put-after: []
     put-before: ["^module"]
     block-comment:
-      starts-with: "{-|"
-      ends-with: "-}"
+      starts-with: ^{-\|
+      ends-with: (?<!#)-}$
 
   ## HTML configuration
   html:
@@ -153,8 +156,8 @@ license-headers:
     put-after: []
     put-before: ["^(<!DOCTYPE|<[a-zA-Z])"]
     block-comment:
-      starts-with: "<!--"
-      ends-with: "-->"
+      starts-with: ^<!--
+      ends-with: -->$
 
   ## Java configuration
   java:
@@ -166,8 +169,8 @@ license-headers:
     put-after: []
     put-before: ["^package"]
     block-comment:
-      starts-with: "/*"
-      ends-with: "*/"
+      starts-with: ^\/\*
+      ends-with: \*\/$
 
   ## JS configuration
   js:
@@ -179,8 +182,8 @@ license-headers:
     put-after: []
     put-before: []
     block-comment:
-      starts-with: "/*"
-      ends-with: "*/"
+      starts-with: ^\/\*
+      ends-with: \*\/$
 
   ## PureScript configuration
   purescript:
@@ -192,7 +195,7 @@ license-headers:
     put-after: []
     put-before: ["^module"]
     line-comment:
-      prefixed-by: "--"
+      prefixed-by: ^--
 
   ## Rust configuration
   rust:
@@ -204,8 +207,8 @@ license-headers:
     put-after: []
     put-before: ["^use"]
     block-comment:
-      starts-with: "/*"
-      ends-with: "*/"
+      starts-with: ^\/\*
+      ends-with: \*\/$
 
   ## Scala configuration
   scala:
@@ -217,8 +220,8 @@ license-headers:
     put-after: []
     put-before: ["^package"]
     block-comment:
-      starts-with: "/*"
-      ends-with: "*/"
+      starts-with: ^\/\*
+      ends-with: \*\/$
 
   ## Shell configuration
   shell:
@@ -230,7 +233,7 @@ license-headers:
     put-after: ["^#!"]
     put-before: []
     line-comment:
-      prefixed-by: "#"
+      prefixed-by: ^#
 
 ## Configuration for post-processing license header functions. These functions
 ## allows to modify/enhance already rendered license headers, e.g. update years

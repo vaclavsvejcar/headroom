@@ -38,20 +38,20 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
-  let
-    samplesDir = "test-data" </> "code-samples"
-    lHeaderConfig pb pa =
-      HeaderConfig ["hs"] 0 0 0 0 pb pa (LineComment "--" Nothing)
-    bHeaderConfig = bHeaderConfigM 0 0 0 0
-    bHeaderConfigM mtc mtf mbc mbf pb pa = HeaderConfig
-      ["hs"]
-      mtc
-      mtf
-      mbc
-      mbf
-      pb
-      pa
-      (BlockComment "{-|" "-}" Nothing)
+  let samplesDir = "test-data" </> "code-samples"
+      lHeaderConfig pb pa =
+        HeaderConfig ["hs"] 0 0 0 0 pb pa (LineComment [re|^--|] Nothing)
+      bHeaderConfig = bHeaderConfigM 0 0 0 0
+      bHeaderConfigM mtc mtf mbc mbf pb pa = HeaderConfig
+        ["hs"]
+        mtc
+        mtf
+        mbc
+        mbf
+        pb
+        pa
+        (BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing)
+
 
   describe "addHeader" $ do
     let fileInfo config = FileInfo Haskell config Nothing mempty
@@ -262,47 +262,50 @@ spec = do
 
 
   describe "findBlockHeader" $ do
+    let s = [re|^{-\||]
+        e = [re|(?<!#)-}$|]
+
     it "finds single line header" $ do
       let sample = ["", "{-| single line -}", "", ""]
-      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Just (1, 1)
+      findBlockHeader s e sample 0 `shouldBe` Just (1, 1)
 
     it "finds multi line header" $ do
       let sample = ["", "{-| multi", "line -}", "", ""]
-      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Just (1, 2)
+      findBlockHeader s e sample 0 `shouldBe` Just (1, 2)
 
     it "finds only the first occurence of header" $ do
       let sample = ["{-| this", "and this -}", "", "{-| no this -}"]
-      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Just (0, 1)
+      findBlockHeader s e sample 0 `shouldBe` Just (0, 1)
 
     it "finds nothing if no header is present" $ do
       let sample = ["foo", "bar"]
-      findBlockHeader "{-|" "-}" sample 0 `shouldBe` Nothing
+      findBlockHeader s e sample 0 `shouldBe` Nothing
 
 
   describe "findLineHeader" $ do
     it "finds single line header" $ do
       let sample = ["-- foo", ""]
-      findLineHeader "--" sample 0 `shouldBe` Just (0, 0)
+      findLineHeader [re|^--|] sample 0 `shouldBe` Just (0, 0)
 
     it "finds single line header with nothing surrounding it" $ do
       let sample = ["-- foo"]
-      findLineHeader "--" sample 0 `shouldBe` Just (0, 0)
+      findLineHeader [re|^--|] sample 0 `shouldBe` Just (0, 0)
 
     it "finds multi line header with nothing surrounding it" $ do
       let sample = ["-- 3", "-- 3"]
-      findLineHeader "--" sample 0 `shouldBe` Just (0, 1)
+      findLineHeader [re|^--|] sample 0 `shouldBe` Just (0, 1)
 
     it "finds multi line header" $ do
       let sample = ["", "a", "-- first", "--second", "foo"]
-      findLineHeader "--" sample 0 `shouldBe` Just (2, 3)
+      findLineHeader [re|^--|] sample 0 `shouldBe` Just (2, 3)
 
     it "finds only the first occurence of header" $ do
       let sample = ["a", "-- this one", "-- and this", "", "-- not this"]
-      findLineHeader "--" sample 0 `shouldBe` Just (1, 2)
+      findLineHeader [re|^--|] sample 0 `shouldBe` Just (1, 2)
 
     it "finds nothing if no header is present" $ do
       let sample = ["foo", "bar"]
-      findLineHeader "--" sample 0 `shouldBe` Nothing
+      findLineHeader [re|^--|] sample 0 `shouldBe` Nothing
 
 
   describe "lastMatching" $ do
