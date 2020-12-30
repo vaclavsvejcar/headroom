@@ -65,6 +65,7 @@ library:
     - aeson
     - either
     - file-embed
+    - generic-data
     - microlens
     - microlens-th
     - mustache

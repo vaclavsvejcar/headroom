@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE DeriveAnyClass       #-}
 {-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE DerivingVia          #-}
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE LambdaCase           #-}
@@ -78,6 +79,7 @@ import           Data.Aeson                          ( FromJSON(..)
                                                      , (.:?)
                                                      )
 import           Data.Monoid                         ( Last(..) )
+import           Generic.Data                        ( Generically(..) )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.Data.Regex                 ( Regex(..) )
 import           Headroom.FileType.Types             ( FileType )
@@ -226,20 +228,17 @@ deriving instance Eq CtUpdateCopyrightConfig
 deriving instance Eq PtUpdateCopyrightConfig
 deriving instance Show CtUpdateCopyrightConfig
 deriving instance Show PtUpdateCopyrightConfig
+deriving instance Generic PtUpdateCopyrightConfig
+
+deriving via (Generically PtUpdateCopyrightConfig)
+         instance Semigroup PtUpdateCopyrightConfig
+deriving via (Generically PtUpdateCopyrightConfig)
+         instance Monoid PtUpdateCopyrightConfig
 
 instance FromJSON PtUpdateCopyrightConfig where
   parseJSON = withObject "PtUpdateCopyrightConfig" $ \obj -> do
     uccSelectedAuthors <- Last <$> obj .:? "selected-authors-only"
     pure UpdateCopyrightConfig { .. }
-
-instance Semigroup PtUpdateCopyrightConfig where
-  x <> y = UpdateCopyrightConfig
-    { uccSelectedAuthors = uccSelectedAuthors x <> uccSelectedAuthors y
-    }
-
-instance Monoid PtUpdateCopyrightConfig where
-  mempty = UpdateCopyrightConfig mempty
-
 
 -------------------------------  HeaderFnConfig  -------------------------------
 
@@ -262,14 +261,12 @@ deriving instance (Eq (c 'Complete)) => Eq (CtHeaderFnConfig c)
 deriving instance (Eq (c 'Partial)) => Eq (PtHeaderFnConfig c)
 deriving instance (Show (c 'Complete)) => Show (CtHeaderFnConfig c)
 deriving instance (Show (c 'Partial)) => Show (PtHeaderFnConfig c)
+deriving instance Generic (PtHeaderFnConfig c)
 
-instance Semigroup (c 'Partial) => Semigroup (PtHeaderFnConfig c) where
-  x <> y = HeaderFnConfig { hfcEnabled = hfcEnabled x <> hfcEnabled y
-                          , hfcConfig  = hfcConfig x <> hfcConfig y
-                          }
-
-instance Monoid (c 'Partial) => Monoid (PtHeaderFnConfig c) where
-  mempty = HeaderFnConfig mempty mempty
+deriving via (Generically (PtHeaderFnConfig c))
+         instance Semigroup (c 'Partial) => Semigroup (PtHeaderFnConfig c)
+deriving via (Generically (PtHeaderFnConfig c))
+         instance Monoid (c 'Partial) => Monoid (PtHeaderFnConfig c)
 
 instance (FromJSON (c 'Partial), Monoid (c 'Partial)) => FromJSON (PtHeaderFnConfig c) where
   parseJSON = withObject "PtHeaderFnConfig" $ \obj -> do
@@ -297,14 +294,12 @@ deriving instance Eq CtHeaderFnConfigs
 deriving instance Eq PtHeaderFnConfigs
 deriving instance Show CtHeaderFnConfigs
 deriving instance Show PtHeaderFnConfigs
+deriving instance Generic PtHeaderFnConfigs
 
-instance Semigroup PtHeaderFnConfigs where
-  x <> y = HeaderFnConfigs
-    { hfcsUpdateCopyright = hfcsUpdateCopyright x <> hfcsUpdateCopyright y
-    }
-
-instance Monoid PtHeaderFnConfigs where
-  mempty = HeaderFnConfigs mempty
+deriving via (Generically PtHeaderFnConfigs)
+         instance Semigroup PtHeaderFnConfigs
+deriving via (Generically PtHeaderFnConfigs)
+         instance Monoid PtHeaderFnConfigs
 
 instance FromJSON PtHeaderFnConfigs where
   parseJSON = withObject "PtHeaderFnConfigs" $ \obj -> do
@@ -342,6 +337,13 @@ deriving instance Eq CtConfiguration
 deriving instance Eq PtConfiguration
 deriving instance Show CtConfiguration
 deriving instance Show PtConfiguration
+deriving instance Generic PtConfiguration
+
+deriving via (Generically PtConfiguration)
+         instance Semigroup PtConfiguration
+deriving via (Generically PtConfiguration)
+         instance Monoid PtConfiguration
+
 
 instance FromJSON PtConfiguration where
   parseJSON = withObject "PtConfiguration" $ \obj -> do
@@ -354,20 +356,6 @@ instance FromJSON PtConfiguration where
     cHeaderFnConfigs <- obj .:? "post-process" .!= mempty
     pure Configuration { .. }
     where get = fmap . fmap
-
-instance Semigroup PtConfiguration where
-  x <> y = Configuration
-    { cRunMode         = cRunMode x <> cRunMode y
-    , cSourcePaths     = cSourcePaths x <> cSourcePaths y
-    , cExcludedPaths   = cExcludedPaths x <> cExcludedPaths y
-    , cTemplateSource  = cTemplateSource x <> cTemplateSource y
-    , cVariables       = cVariables x <> cVariables y
-    , cLicenseHeaders  = cLicenseHeaders x <> cLicenseHeaders y
-    , cHeaderFnConfigs = cHeaderFnConfigs x <> cHeaderFnConfigs y
-    }
-
-instance Monoid PtConfiguration where
-  mempty = Configuration mempty mempty mempty mempty mempty mempty mempty
 
 
 --------------------------------  HeaderConfig  --------------------------------
@@ -402,6 +390,12 @@ deriving instance Eq CtHeaderConfig
 deriving instance Eq PtHeaderConfig
 deriving instance Show CtHeaderConfig
 deriving instance Show PtHeaderConfig
+deriving instance Generic PtHeaderConfig
+
+deriving via (Generically PtHeaderConfig)
+         instance Semigroup PtHeaderConfig
+deriving via (Generically PtHeaderConfig)
+         instance Monoid PtHeaderConfig
 
 instance FromJSON PtHeaderConfig where
   parseJSON = withObject "PartialHeaderConfig" $ \obj -> do
@@ -421,22 +415,6 @@ instance FromJSON PtHeaderConfig where
     syntax Nothing (Just (LineComment' p)) = Just $ LineComment p Nothing
     syntax Nothing Nothing = Nothing
     syntax _ _ = throw MixedHeaderSyntax
-
-instance Monoid PtHeaderConfig where
-  mempty = HeaderConfig mempty mempty mempty mempty mempty mempty mempty mempty
-
-instance Semigroup PtHeaderConfig where
-  x <> y = HeaderConfig
-    { hcFileExtensions   = hcFileExtensions x <> hcFileExtensions y
-    , hcMarginTopCode    = hcMarginTopCode x <> hcMarginTopCode y
-    , hcMarginTopFile    = hcMarginTopFile x <> hcMarginTopFile y
-    , hcMarginBottomCode = hcMarginBottomCode x <> hcMarginBottomCode y
-    , hcMarginBottomFile = hcMarginBottomFile x <> hcMarginBottomFile y
-    , hcPutAfter         = hcPutAfter x <> hcPutAfter y
-    , hcPutBefore        = hcPutBefore x <> hcPutBefore y
-    , hcHeaderSyntax     = hcHeaderSyntax x <> hcHeaderSyntax y
-    }
-
 
 --------------------------------  HeadersConfig  -------------------------------
 
@@ -476,6 +454,12 @@ deriving instance Eq CtHeadersConfig
 deriving instance Eq PtHeadersConfig
 deriving instance Show CtHeadersConfig
 deriving instance Show PtHeadersConfig
+deriving instance Generic PtHeadersConfig
+
+deriving via (Generically PtHeadersConfig)
+         instance Semigroup PtHeadersConfig
+deriving via (Generically PtHeadersConfig)
+         instance Monoid PtHeadersConfig
 
 instance FromJSON PtHeadersConfig where
   parseJSON = withObject "PartialHeadersConfig" $ \obj -> do
@@ -491,35 +475,6 @@ instance FromJSON PtHeadersConfig where
     hscScala      <- obj .:? "scala" .!= mempty
     hscShell      <- obj .:? "shell" .!= mempty
     pure HeadersConfig { .. }
-
-
-instance Semigroup PtHeadersConfig where
-  x <> y = HeadersConfig { hscC          = hscC x <> hscC y
-                         , hscCpp        = hscCpp x <> hscCpp y
-                         , hscCss        = hscCss x <> hscCss y
-                         , hscHaskell    = hscHaskell x <> hscHaskell y
-                         , hscHtml       = hscHtml x <> hscHtml y
-                         , hscJava       = hscJava x <> hscJava y
-                         , hscJs         = hscJs x <> hscJs y
-                         , hscPureScript = hscPureScript x <> hscPureScript y
-                         , hscRust       = hscRust x <> hscRust y
-                         , hscScala      = hscScala x <> hscScala y
-                         , hscShell      = hscShell x <> hscShell y
-                         }
-
-
-instance Monoid PtHeadersConfig where
-  mempty = HeadersConfig mempty
-                         mempty
-                         mempty
-                         mempty
-                         mempty
-                         mempty
-                         mempty
-                         mempty
-                         mempty
-                         mempty
-                         mempty
 
 
 ---------------------------------  Error Types  --------------------------------
