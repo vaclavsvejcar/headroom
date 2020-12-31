@@ -138,9 +138,7 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- Based on the 'HeaderSyntax' specified in given 'HeaderConfig', this function
 -- delegates its work to either 'findBlockHeader' or 'findLineHeader'.
 --
--- >>> :set -XFlexibleContexts
--- >>> :set -XTypeFamilies
--- >>> :set -XQuasiQuotes
+-- >>> :set -XFlexibleContexts -XTypeFamilies -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment [re|^{-|] [re|(?<!#)-}$|] Nothing)
 -- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
@@ -219,8 +217,8 @@ findLineHeader prefix = go Nothing
 
 -- | Finds very first line that matches the given /regex/ (numbered from zero).
 --
--- >>> import Headroom.Data.Regex (re)
 -- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
 -- >>> firstMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
 -- Just 1
 firstMatching :: [Regex]
@@ -239,8 +237,8 @@ firstMatching patterns input = go input 0
 
 -- | Finds very last line that matches the given /regex/ (numbered from zero).
 --
--- >>> import Headroom.Data.Regex (re)
 -- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
 -- >>> lastMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
 -- Just 2
 lastMatching :: [Regex]
@@ -268,8 +266,8 @@ lastMatching patterns input = go input 0 Nothing
 -- If both first and second patterns are empty, then all lines are returned in
 -- the middle list.
 --
--- >>> import Headroom.Data.Regex (re)
 -- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
 --
 -- >>> splitInput [[re|->|]] [[re|<-|]] "text\n->\nRESULT\n<-\nfoo"
 -- (["text","->"],["RESULT"],["<-","foo"])

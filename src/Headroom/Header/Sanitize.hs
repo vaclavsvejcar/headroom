@@ -73,11 +73,11 @@ findPrefix syntax text = case syntax of
 -- >>> sanitizeSyntax (LineComment [re|^--|] (Just "--")) "-- foo\nbar"
 -- "-- foo\n-- bar"
 sanitizeSyntax :: HeaderSyntax
-                     -- ^ header syntax definition that may contain prefix
+               -- ^ header syntax definition that may contain prefix
                -> Text
-                     -- ^ header to sanitize
+               -- ^ header to sanitize
                -> Text
-                     -- ^ sanitized header
+               -- ^ sanitized header
 sanitizeSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
  where
   addPrefix Nothing l = Just l
