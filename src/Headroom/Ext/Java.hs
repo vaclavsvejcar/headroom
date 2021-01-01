@@ -6,7 +6,7 @@
 {-|
 Module      : Headroom.Ext.Java
 Description : Extended support for /Java/ source code files
-Copyright   : (c) 2019-2020 Vaclav Svejcar
+Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental

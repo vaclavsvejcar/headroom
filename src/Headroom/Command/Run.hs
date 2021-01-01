@@ -12,7 +12,7 @@
 {-|
 Module      : Headroom.Command.Run
 Description : Handler for the @run@ command.
-Copyright   : (c) 2019-2020 Vaclav Svejcar
+Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
@@ -345,7 +345,7 @@ loadTemplateFiles paths' = do
   withTypes <- catMaybes <$> mapM (\p -> fmap (, p) <$> typeOfTemplate p) paths
   parsed    <- mapM
     (\(t, p) ->
-      (t, ) <$> ((T.strip <$> fsLoadFile p) >>= parseTemplate (Just $ T.pack p))
+      (t, ) <$> (fsLoadFile p >>= parseTemplate (Just $ T.pack p) . T.strip)
     )
     withTypes
   logInfo

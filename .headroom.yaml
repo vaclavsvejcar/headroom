@@ -1,29 +1,16 @@
 ## This is the configuration file for Headroom.
 ## See https://github.com/vaclavsvejcar/headroom for more details.
 
-## Defines with which version of Headroom this configuration is compatible.
-## Headroom uses this field to detect whether your configuration doesn't need
-## any manual migration steps in case that it's older than your current Headroom
-## version. You don't need to touch this field unless explicitly stated in
-## migration guide during upgrading Headroom to new version.
 version: 0.4.0.0
-
-## Defines the behaviour how to handle license headers, possible options are:
-##   - add     = (default) adds license header to files with no existing header
-##   - drop    = drops existing license header from without replacement
-##   - replace = adds or replaces existing license header
 run-mode: replace
 
-## Paths to source code files (either files or directories).
 source-paths:
   - app
   - src
 
-## Paths to template files (either files or directories).
 template-paths:
   - doc/templates
 
-## Variables (key-value) to replace in templates.
 variables:
   author: Vaclav Svejcar
   license: BSD-3-Clause
@@ -37,3 +24,9 @@ license-headers:
     margin-top-code: 1
     margin-bottom-code: 1
     margin-bottom-file: 1
+
+post-process:
+  update-copyright:
+    enabled: true
+    config:
+      selected-authors-only: ["{{ author }}"]

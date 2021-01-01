@@ -248,5 +248,8 @@ post-process:
   update-copyright:
     enabled: false
     config:
-      ## If used, updates copyright statements of selected authors only.
+      ## If used, updates copyright statements of selected authors only. You can
+      ## not only use list of concrete names, but also any variable defined in
+      ## 'variables' section.
       # selected-authors-only: ["John Smith"]
+      # selected-authors-only: ["{{ author }}"]
