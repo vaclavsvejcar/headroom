@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 95a8c42722e863dc73fb81fd01159a9efd2c6807179ac29d8df4fc93aaec0224
+-- hash: 532eae3ff35483f635b05077db045f58407ef89db874a692648cbd0d308a43c7
 
 name:           headroom
 version:        0.4.0.0
@@ -15,7 +15,7 @@ homepage:       https://github.com/vaclavsvejcar/headroom
 bug-reports:    https://github.com/vaclavsvejcar/headroom/issues
 author:         Vaclav Svejcar
 maintainer:     vaclav.svejcar@gmail.com
-copyright:      Copyright (c) 2019-2020 Vaclav Svejcar
+copyright:      Copyright (c) 2019-2021 Vaclav Svejcar
 license:        BSD-3-Clause
 license-file:   LICENSE
 build-type:     Simple
