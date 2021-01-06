@@ -21,7 +21,7 @@ module Headroom.Header.Types
 where
 
 import           Headroom.Configuration.Types        ( CtHeaderConfig )
-import           Headroom.Ext.Types                  ( ExtData )
+import           Headroom.FileSupport.TemplateData   ( TemplateData )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Variables.Types            ( Variables )
@@ -44,13 +44,13 @@ data FileInfo = FileInfo
 
 -- | Represents info about concrete header template.
 data TemplateInfo = TemplateInfo
-  { tiConfig   :: CtHeaderConfig
+  { tiConfig       :: CtHeaderConfig
   -- ^ header configuration
-  , tiExtData  :: ExtData
-  -- ^ additional data for /extended support/
-  , tiFileType :: FileType
+  , tiTemplateData :: TemplateData
+  -- ^ extra template data extracted by the correcponding file type support
+  , tiFileType     :: FileType
   -- ^ type of the file this template is for
-  , tiTemplate :: TemplateType
+  , tiTemplate     :: TemplateType
   -- ^ parsed template
   }
   deriving (Eq, Show)

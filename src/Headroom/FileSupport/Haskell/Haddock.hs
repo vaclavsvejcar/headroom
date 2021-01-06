@@ -7,7 +7,7 @@
 {-# LANGUAGE StrictData        #-}
 
 {-|
-Module      : Headroom.Ext.Haskell.Haddock
+Module      : Headroom.FileSupport.Haskell.Haddock
 Description : Extraction of /Haddock module header/ fields
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -19,7 +19,7 @@ Support for extracting data from /Haddock module headers/ present in
 /Haskell source code files/ or /templates/.
 -}
 
-module Headroom.Ext.Haskell.Haddock
+module Headroom.FileSupport.Haskell.Haddock
   ( HaddockModuleHeader(..)
   , extractOffsets
   , extractModuleHeader
@@ -37,9 +37,9 @@ import           Headroom.Data.Regex                 ( re
 import           Headroom.Data.TextExtra             ( fromLines
                                                      , toLines
                                                      )
-import           Headroom.Ext.Types                  ( ExtData(..)
-                                                     , HaddockOffsets(..)
-                                                     , HaskellExtData'(..)
+import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
+                                                     , HaskellTemplateData'(..)
+                                                     , TemplateData(..)
                                                      )
 import           Headroom.Template                   ( Template(..) )
 import           RIO
@@ -90,7 +90,7 @@ extractCopyrightOffset text = case scan [re|\h*Copyright\h*:\h*|] text of
 -- | Extracts metadata from given /Haddock/ module header.
 extractModuleHeader :: Text
                     -- ^ text containing /Haddock/ module header
-                    -> ExtData
+                    -> TemplateData
                     -- ^ extracted metadata from corresponding /template/
                     -> HaddockModuleHeader
                     -- ^ extracted metadata
@@ -110,7 +110,7 @@ extractModuleHeader text extData =
   process = Just . T.strip . T.pack
   indent c t = T.strip $ indentField c t
   HaddockOffsets {..} = case extData of
-    HaskellExtData (HaskellExtData' offsets') -> offsets'
+    HaskellTemplateData (HaskellTemplateData' offsets') -> offsets'
     _ -> HaddockOffsets Nothing
 
 

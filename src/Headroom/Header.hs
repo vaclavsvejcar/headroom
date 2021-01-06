@@ -44,7 +44,8 @@ import           Headroom.Data.Regex                 ( Regex
 import           Headroom.Data.TextExtra             ( fromLines
                                                      , toLines
                                                      )
-import           Headroom.Ext                        ( extractVariables )
+import           Headroom.FileSupport                ( fileSupport )
+import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.Header.Types               ( FileInfo(..)
                                                      , TemplateInfo(..)
                                                      )
@@ -68,8 +69,9 @@ extractFileInfo ti@TemplateInfo {..} text =
   let fiFileType     = tiFileType
       fiHeaderConfig = tiConfig
       fiHeaderPos    = findHeader fiHeaderConfig text
-      fiVariables    = extractVariables ti fiHeaderPos text
+      fiVariables    = fsExtractVariables ti fiHeaderPos text
   in  FileInfo { .. }
+  where FileSupport {..} = fileSupport tiFileType
 
 
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if

@@ -6,7 +6,7 @@
 
 Would you like to have nice, up-to-date license/copyright headers in your source code files but hate to manage them manually? Then __Headroom__ is the right tool for you. Define your license header as [Mustache][web:mustache] template, put any template variables into [YAML][wiki:yaml] configuarion file, and you're ready to go!
 
-__Headroom__ also offers much more than just [adding, replacing or dropping][doc:running-headroom] license headers. It can also [update years in copyrights][doc:post-processing] for you, provides [extended functionality][doc:extended-functionality] for some source code file types, and much more!
+__Headroom__ also offers much more than just [adding, replacing or dropping][doc:running-headroom] license headers. It can also [update years in copyrights][doc:post-processing] for you, provides [content-aware templates][doc:templates] for some source code file types, and much more!
 
 [![asciicast](https://asciinema.org/a/4Pfxdss0V4msFjjt2z6mgCZCp.svg)](https://asciinema.org/a/4Pfxdss0V4msFjjt2z6mgCZCp)
 
@@ -15,7 +15,7 @@ __Headroom__ also offers much more than just [adding, replacing or dropping][doc
 - __Powerful Customization__ - Default [configuration][doc:configuration] should cover most use-cases, but if you need to put empty lines before/after generated header, use different comment style of headers, you can customize the configuration to match exactly your needs.
 - __Built-in OSS License Headers__ - If you want to use license header for one of the popular OSS licenses, then __Headroom__ can [generate them for you][doc:running-headroom#gen-command] - no need to search for them on web.
 - __Automatic Initialization for OSS Projects__ - Setting up external tools like _Headroom_ for your project can be boring. Fortunately, _Headroom_ can [initialize itself][doc:running-headroom#init-command] for your project, by generating configuration file and template files.
-- __Extended Functionality__ - _Headroom_ supports [extended functionality][doc:extended-functionality] for selected types of source code files, such as extracting extra data from processed source code files.
+- __Content-aware Templates__ - for selected file types, _Headroom_ [exposes additional info][[doc:templates] about processed file using template variables, so you can use info like _Java_ package name in your templates.
 - __Copyright Year Updater__ - _Headroom_ is good not only for basic license header management, but also for further processing of generated headers. Do you need to [update years in your copyrights][doc:post-processing]? No problem!
 
 ## Installation
@@ -43,7 +43,7 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 [web:headroom]: https://doc.norcane.com/headroom/latest/
 [web:homebrew]: https://brew.sh
 [doc:configuration]: https://doc.norcane.com/headroom/latest/documentation/configuration/
-[doc:extended-functionality]: https://doc.norcane.com/headroom/latest/documentation/extended-functionality/
+[doc:templates]: https://doc.norcane.com/headroom/latest/documentation/templates/
 [doc:post-processing]: https://doc.norcane.com/headroom/latest/documentation/post-processing/
 [doc:running-headroom]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/
 [doc:running-headroom#gen-command]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/#gen-command

@@ -46,4 +46,4 @@ spec = do
       let comment  = BlockComment [re|^\/\*|] [re|\*\/$|] (Just " *")
           actual   = mkTemplateInfo config Java template
           expected = actual & tiConfigL . hcHeaderSyntaxL .~ comment
-      mkTemplateInfo config Java template `shouldBe` expected
+      actual `shouldBe` expected

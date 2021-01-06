@@ -63,7 +63,7 @@ This is the main point where you define values for variables present in template
 - __static variables__ - Variables that are defined by user and which values the same for all processed source code files (e.g. `author` variable that holds author's name).
 - __dynamic variables__ - Variables that are defined by _Headroom_ and which values can vary file from file. Convention is that these variables are prefixed by _underscore_, so you can spot them easily. Below is the list of general _dynamic variables_, provided by _Headroom_:
     - `_current_year` - value of the current year (e.g. `2020`)
-More _dynamic variables_ might be exposed for individual processed files by the [Extended functionality][doc:extended-functionality] for selected types of source code files.
+More _dynamic variables_ might be exposed for individual processed files by the [content-aware templates][doc:templates] for selected types of source code files.
 
 Also note that you can use __reference other variables in variables__, as long as you
 - don't call them recursively
@@ -143,7 +143,7 @@ _Headroom_ can manage license headers only for supported types of source code fi
 If you miss support for file type you use, feel free to [open new issue][meta:new-issue].
 
 
-[doc:extended-functionality]: extended-functionality.md
+[doc:templates]: templates.md
 [doc:migration-guide]: ../migration-guide.md
 [doc:running-headroom#run-command]: running-headroom.md#run-command
 [doc:post-processing]: post-processing.md

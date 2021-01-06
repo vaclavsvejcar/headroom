@@ -1,7 +1,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
-module Headroom.Ext.Haskell.HaddockSpec
+
+module Headroom.FileSupport.Haskell.HaddockSpec
   ( spec
   )
 where
@@ -9,9 +10,9 @@ where
 import           Headroom.Configuration.Types        ( LicenseType(..) )
 import           Headroom.Data.TextExtra             ( fromLines )
 import           Headroom.Embedded                   ( licenseTemplate )
-import           Headroom.Ext.Haskell.Haddock
-import           Headroom.Ext.Types                  ( ExtData(..)
-                                                     , HaddockOffsets(..)
+import           Headroom.FileSupport.Haskell.Haddock
+import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
+                                                     , TemplateData(..)
                                                      )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
@@ -50,7 +51,7 @@ spec = do
               \commentary with @some markup@."
           }
       sample <- loadFile $ codeSamples </> "haskell" </> "header.hs"
-      extractModuleHeader sample NoExtData `shouldBe` expected
+      extractModuleHeader sample NoTemplateData `shouldBe` expected
 
 
   describe "stripCommentSyntax" $ do
@@ -80,5 +81,4 @@ spec = do
           expected = fromLines ["first", "  second", "  third"]
           offset   = Just 2
       indentField offset sample `shouldBe` expected
-
 

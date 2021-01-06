@@ -12,7 +12,7 @@ __Headroom__ also offers much more than just adding, replacing or dropping licen
 - __Powerful Customization__ - Default [configuration][rel:configuration] should cover most use-cases, but if you need to put empty lines before/after generated header, use different comment style of headers, you can customize the configuration to match exactly your needs.
 - __Built-in OSS License Headers__ - If you want to use license header for one of the popular OSS licenses, then _Headroom_ can [generate them for you][rel:running-headroom#gen-command]: documentation/running-headroom.md - no need to search for them on web.
 - __Automatic Initialization for OSS Projects__ - Setting up external tools like _Headroom_ for your project can be boring. Fortunately, _Headroom_ can [initialize itself][rel:running-headroom#init-command] for your project, by generating configuration file and template files.
-- __Extended Functionality__ - _Headroom_ supports [extended functionality][rel:extended-functionality] for selected types of source code files, such as extracting extra data from processed source code files.
+- __Content-aware Templates__ - for selected file types, _Headroom_ [exposes additional info][[rel:templates] about processed file using template variables, so you can use info like _Java_ package name in your templates.
 - __Copyright Year Updater__ - _Headroom_ is good not only for basic license header management, but also for further processing of generated headers. Do you need to [update years in your copyrights][rel:post-processing]? No problem!
 
 
@@ -27,7 +27,7 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
 [meta:pulls]: https://github.com/vaclavsvejcar/headroom/pulls
 [rel:configuration]: documentation/configuration.md
-[rel:extended-functionality]: documentation/extended-functionality.md
+[rel:templates]: documentation/templates.md
 [rel:post-processing]: documentation/post-processing.md
 [rel:running-headroom]: documentation/running-headroom.md
 [rel:running-headroom#gen-command]: documentation/running-headroom.md#gen-command

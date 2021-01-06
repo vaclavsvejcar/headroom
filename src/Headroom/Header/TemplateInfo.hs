@@ -24,7 +24,8 @@ import           Headroom.Configuration.Types        ( CtHeadersConfig
                                                      , HeaderConfig
                                                      )
 import           Headroom.Data.Lens                  ( suffixLensesFor )
-import           Headroom.Ext                        ( extractExtData )
+import           Headroom.FileSupport                ( fileSupport )
+import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileType                   ( configByFileType )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Header.Sanitize            ( findPrefix )
@@ -51,11 +52,12 @@ mkTemplateInfo :: CtHeadersConfig
                -> TemplateInfo
                -- ^ resulting template info
 mkTemplateInfo configs fileType template =
-  let tiConfig   = withP (configByFileType configs fileType)
-      tiExtData  = extractExtData fileType template
-      tiFileType = fileType
-      tiTemplate = template
+  let tiConfig       = withP (configByFileType configs fileType)
+      tiTemplateData = fsExtractTemplateData template
+      tiFileType     = fileType
+      tiTemplate     = template
   in  TemplateInfo { .. }
  where
   withP config = config & (hcHeaderSyntaxL %~ headerSyntax)
   headerSyntax hs = findPrefix hs (rawTemplate template)
+  FileSupport {..} = fileSupport fileType

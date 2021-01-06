@@ -21,7 +21,7 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      )
 import           Headroom.Data.Regex                 ( re )
 import           Headroom.Embedded                   ( defaultConfig )
-import           Headroom.Ext.Types                  ( ExtData(..) )
+import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header
@@ -158,7 +158,7 @@ spec = do
     it "extracts FileInfo from given raw input" $ do
       template <- emptyTemplate @_ @Mustache
       let config   = bHeaderConfig [] []
-          ti       = TemplateInfo config NoExtData Haskell template
+          ti       = TemplateInfo config NoTemplateData Haskell template
           expected = FileInfo
             Haskell
             config

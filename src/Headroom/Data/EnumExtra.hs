@@ -12,7 +12,7 @@ Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Provides extended functionality for enum-like types, e.g. reading/writing
+Provides extra functionality for enum-like types, e.g. reading/writing
 from/to textual representation, etc.
 -}
 
@@ -21,6 +21,7 @@ module Headroom.Data.EnumExtra where
 import           RIO
 import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
+
 
 -- | Enum data type, capable to (de)serialize itself from/to string
 -- representation. Can be automatically derived by /GHC/ using the
