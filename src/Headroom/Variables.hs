@@ -18,8 +18,7 @@ Module containing costructor and useful functions for the 'Variables' data type.
 
 module Headroom.Variables
   ( -- * Constructing Variables
-    empty
-  , mkVariables
+    mkVariables
   , dynamicVariables
     -- * Parsing Variables
   , parseVariables
@@ -39,10 +38,6 @@ import           RIO
 import qualified RIO.HashMap                        as HM
 import qualified RIO.Text                           as T
 
-
--- | Empty variables.
-empty :: Variables
-empty = mkVariables []
 
 -- | Constructor function for 'Variables' data type.
 --

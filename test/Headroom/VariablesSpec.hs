@@ -16,11 +16,6 @@ import           Test.Hspec
 spec :: Spec
 spec = do
 
-  describe "empty" $ do
-    it "returns empty Variables" $ do
-      empty `shouldBe` mkVariables []
-
-
   describe "mkVariables" $ do
     it "constructs new Variables" $ do
       let sample   = [("key1", "value1")]

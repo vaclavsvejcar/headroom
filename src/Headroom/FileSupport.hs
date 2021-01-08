@@ -26,7 +26,6 @@ import qualified Headroom.FileSupport.PureScript    as PureScript
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
-import qualified Headroom.Variables                 as Variables
 import           RIO
 
 
@@ -52,6 +51,6 @@ fileSupport Shell      = basicSupport Shell
 basicSupport :: FileType -> FileSupport
 basicSupport fileType = FileSupport
   { fsExtractTemplateData = const NoTemplateData
-  , fsExtractVariables    = const . const . const $ Variables.empty
+  , fsExtractVariables    = const . const . const $ mempty
   , fsFileType            = fileType
   }
