@@ -35,6 +35,16 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 * for end-user documentation, [official project microsite][web:headroom]
 * for _Haskell API_ documentation, see [Headroom on Hackage][hackage:headroom]
 
+### Running microsite locally
+If you need to show microsite documetation for unreleased version of _Headroom_ (e.g. for `master` branch), you can run it locally using [MkDocs][web:mkdocs] tool:
+
+```
+$ cd doc/microsite/
+$ mkdcs serve
+```
+
+Documentation is then available on http://127.0.0.1:8000.
+
 [i25]: https://github.com/vaclavsvejcar/headroom/issues/25
 [hackage:headroom]: https://hackage.haskell.org/package/headroom
 [meta:new-issue]: https://github.com/vaclavsvejcar/headroom/issues/new
@@ -48,5 +58,6 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 [doc:running-headroom]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/
 [doc:running-headroom#gen-command]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/#gen-command
 [doc:running-headroom#init-command]: https://doc.norcane.com/headroom/latest/documentation/running-headroom/#init-command
+[web:mkdocs]: https://www.mkdocs.org
 [web:mustache]: https://mustache.github.io
 [wiki:yaml]: https://en.wikipedia.org/wiki/YAML
