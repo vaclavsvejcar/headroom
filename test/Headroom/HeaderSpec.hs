@@ -3,8 +3,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeFamilies      #-}
+
 
 module Headroom.HeaderSpec
   ( spec
@@ -18,23 +20,32 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      , HeadersConfig(..)
+                                                     , LicenseType(..)
                                                      )
+import           Headroom.Data.Lens                  ( suffixLensesFor )
 import           Headroom.Data.Regex                 ( re )
-import           Headroom.Embedded                   ( defaultConfig )
+import           Headroom.Embedded                   ( defaultConfig
+                                                     , licenseTemplate
+                                                     )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header
 import           Headroom.Header.Types               ( FileInfo(..)
-                                                     , TemplateInfo(..)
+                                                     , HeaderTemplate(..)
                                                      )
-import           Headroom.Template                   ( emptyTemplate )
+import           Headroom.Template                   ( Template(..)
+                                                     , emptyTemplate
+                                                     )
 import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
 
+
+suffixLensesFor ["htConfig"] ''HeaderTemplate
+suffixLensesFor ["hcHeaderSyntax"] ''HeaderConfig
 
 spec :: Spec
 spec = do
@@ -51,6 +62,17 @@ spec = do
         pb
         pa
         (BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing)
+
+
+  describe "extractHeaderTemplate" $ do
+    it "creates HeaderTemplate from given data" $ do
+      template       <- parseTemplate Nothing (licenseTemplate BSD3 Java)
+      defaultConfig' <- parseConfiguration defaultConfig
+      config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
+      let comment  = BlockComment [re|^\/\*|] [re|\*\/$|] (Just " *")
+          actual   = extractHeaderTemplate config Java template
+          expected = actual & htConfigL . hcHeaderSyntaxL .~ comment
+      actual `shouldBe` expected
 
 
   describe "addHeader" $ do
@@ -158,7 +180,7 @@ spec = do
     it "extracts FileInfo from given raw input" $ do
       template <- emptyTemplate @_ @Mustache
       let config   = bHeaderConfig [] []
-          ti       = TemplateInfo config NoTemplateData Haskell template
+          ht       = HeaderTemplate config NoTemplateData Haskell template
           expected = FileInfo
             Haskell
             config
@@ -177,7 +199,7 @@ spec = do
               ]
             )
       sample <- readFileUtf8 $ samplesDir </> "haskell" </> "full.hs"
-      extractFileInfo ti sample `shouldBe` expected
+      extractFileInfo ht sample `shouldBe` expected
 
 
   describe "findHeader" $ do

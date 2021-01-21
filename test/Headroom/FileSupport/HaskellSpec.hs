@@ -24,7 +24,7 @@ import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.Header.TemplateInfo        ( mkTemplateInfo )
+import           Headroom.Header                     ( extractHeaderTemplate )
 import           Headroom.Template                   ( Template(..)
                                                      , emptyTemplate
                                                      )
@@ -56,7 +56,7 @@ spec = do
       defaultConfig' <- parseConfiguration defaultConfig
       config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
       sample         <- loadFile $ codeSamples </> "full.hs"
-      let ti        = mkTemplateInfo config Haskell template
+      let ht        = extractHeaderTemplate config Haskell template
           headerPos = Just (1, 13)
           expected  = mkVariables
             [ ( "_haskell_module_copyright"
@@ -70,7 +70,7 @@ spec = do
             , ("_haskell_module_longdesc"   , "long\ndescription")
             , ("_haskell_module_shortdesc"  , "Short description")
             ]
-      fsExtractVariables fileSupport ti headerPos sample `shouldBe` expected
+      fsExtractVariables fileSupport ht headerPos sample `shouldBe` expected
 
 
   describe "fsFileType" $ do

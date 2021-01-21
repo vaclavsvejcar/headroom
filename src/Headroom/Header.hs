@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 {-|
 Module      : Headroom.Header
@@ -17,8 +18,10 @@ the /license headers/ and the /source code files/.
 -}
 
 module Headroom.Header
-  ( -- * File info extraction
-    extractFileInfo
+  ( -- * Header template extraction
+    extractHeaderTemplate
+    -- * File info extraction
+  , extractFileInfo
     -- * License header manipulation
   , addHeader
   , dropHeader
@@ -34,6 +37,7 @@ module Headroom.Header
 where
 
 import           Headroom.Configuration.Types        ( CtHeaderConfig
+                                                     , CtHeadersConfig
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
@@ -46,32 +50,59 @@ import           Headroom.Data.TextExtra             ( fromLines
                                                      )
 import           Headroom.FileSupport                ( fileSupport )
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
+import           Headroom.FileType                   ( configByFileType )
+import           Headroom.FileType.Types             ( FileType )
+import           Headroom.Header.Sanitize            ( findPrefix )
 import           Headroom.Header.Types               ( FileInfo(..)
-                                                     , TemplateInfo(..)
+                                                     , HeaderTemplate(..)
                                                      )
+import           Headroom.Meta                       ( TemplateType )
+import           Headroom.Template                   ( Template(..) )
 import           RIO
 import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
 
 
 suffixLensesFor ["fiHeaderPos"] ''FileInfo
+suffixLensesFor ["hcHeaderSyntax"] ''HeaderConfig
+
+
+-- | Constructs new 'HeaderTemplate' from provided data.
+extractHeaderTemplate :: CtHeadersConfig
+                      -- ^ configuration for license headers
+                      -> FileType
+                      -- ^ type of source code files this template is for
+                      -> TemplateType
+                      -- ^ parsed template
+                      -> HeaderTemplate
+                      -- ^ resulting template info
+extractHeaderTemplate configs fileType template =
+  let htConfig       = withP (configByFileType configs fileType)
+      htTemplateData = fsExtractTemplateData template
+      htFileType     = fileType
+      htTemplate     = template
+  in  HeaderTemplate { .. }
+ where
+  withP config = config & (hcHeaderSyntaxL %~ headerSyntax)
+  headerSyntax hs = findPrefix hs (rawTemplate template)
+  FileSupport {..} = fileSupport fileType
 
 
 -- | Extracts info about the processed file to be later used by the header
 -- detection/manipulation functions.
-extractFileInfo :: TemplateInfo
+extractFileInfo :: HeaderTemplate
                 -- ^ template info
                 -> Text
                 -- ^ text used for detection
                 -> FileInfo
                 -- ^ resulting file info
-extractFileInfo ti@TemplateInfo {..} text =
-  let fiFileType     = tiFileType
-      fiHeaderConfig = tiConfig
+extractFileInfo ht@HeaderTemplate {..} text =
+  let fiFileType     = htFileType
+      fiHeaderConfig = htConfig
       fiHeaderPos    = findHeader fiHeaderConfig text
-      fiVariables    = fsExtractVariables ti fiHeaderPos text
+      fiVariables    = fsExtractVariables ht fiHeaderPos text
   in  FileInfo { .. }
-  where FileSupport {..} = fileSupport tiFileType
+  where FileSupport {..} = fileSupport htFileType
 
 
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if

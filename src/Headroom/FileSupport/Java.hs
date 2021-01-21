@@ -36,7 +36,7 @@ import           Headroom.Data.TextExtra             ( toLines )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.Header.Types               ( TemplateInfo )
+import           Headroom.Header.Types               ( HeaderTemplate )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
@@ -62,6 +62,6 @@ extractPackageName = go . toLines
   go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^package (.*);$|] x)
 
 
-extractVariables :: TemplateInfo -> Maybe (Int, Int) -> Text -> Variables
+extractVariables :: HeaderTemplate -> Maybe (Int, Int) -> Text -> Variables
 extractVariables _ _ text = (mkVariables . catMaybes)
   [("_java_package_name", ) <$> extractPackageName text]

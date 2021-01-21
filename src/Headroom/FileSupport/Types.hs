@@ -26,7 +26,7 @@ where
 
 import           Headroom.FileSupport.TemplateData   ( TemplateData )
 import           Headroom.FileType.Types             ( FileType )
-import           Headroom.Header.Types               ( TemplateInfo )
+import           Headroom.Header.Types               ( HeaderTemplate )
 import           Headroom.Template                   ( Template )
 import           Headroom.Variables.Types            ( Variables )
 import           RIO
@@ -52,8 +52,8 @@ type ExtractTemplateDataFn
 
 -- | Type of a function that extracts variables from processed source code file.
 type ExtractVariablesFn
-  =  TemplateInfo
-  -- ^ template info
+  =  HeaderTemplate
+  -- ^ header template
   -> Maybe (Int, Int)
   -- ^ header position as @(startLine, endLine)@
   -> Text

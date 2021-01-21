@@ -16,7 +16,7 @@ This module contains data types for "Headroom.Header" module.
 module Headroom.Header.Types
   ( -- * Data Types
     FileInfo(..)
-  , TemplateInfo(..)
+  , HeaderTemplate(..)
   )
 where
 
@@ -43,14 +43,14 @@ data FileInfo = FileInfo
 
 
 -- | Represents info about concrete header template.
-data TemplateInfo = TemplateInfo
-  { tiConfig       :: CtHeaderConfig
+data HeaderTemplate = HeaderTemplate
+  { htConfig       :: CtHeaderConfig
   -- ^ header configuration
-  , tiTemplateData :: TemplateData
+  , htTemplateData :: TemplateData
   -- ^ extra template data extracted by the correcponding file type support
-  , tiFileType     :: FileType
+  , htFileType     :: FileType
   -- ^ type of the file this template is for
-  , tiTemplate     :: TemplateType
+  , htTemplate     :: TemplateType
   -- ^ parsed template
   }
   deriving (Eq, Show)

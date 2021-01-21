@@ -17,7 +17,7 @@ import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.Header.TemplateInfo        ( mkTemplateInfo )
+import           Headroom.Header                     ( extractHeaderTemplate )
 import           Headroom.Template                   ( emptyTemplate )
 import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Variables                  ( mkVariables )
@@ -42,10 +42,10 @@ spec = do
       defaultConfig' <- parseConfiguration defaultConfig
       config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
       sample         <- loadFile $ codeSamples </> "full.purs"
-      let ti        = mkTemplateInfo config PureScript template
+      let ht        = extractHeaderTemplate config PureScript template
           headerPos = Just (1, 13)
           expected  = mkVariables [("_purescript_module_name", "Test")]
-      fsExtractVariables fileSupport ti headerPos sample `shouldBe` expected
+      fsExtractVariables fileSupport ht headerPos sample `shouldBe` expected
 
 
   describe "fsFileType" $ do

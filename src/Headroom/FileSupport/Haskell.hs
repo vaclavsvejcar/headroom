@@ -57,7 +57,7 @@ import           Headroom.FileSupport.TemplateData   ( HaskellTemplateData'(..)
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 
 import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.Header.Types               ( TemplateInfo(..) )
+import           Headroom.Header.Types               ( HeaderTemplate(..) )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
@@ -86,8 +86,8 @@ extractTemplateData template =
   in  HaskellTemplateData templateData
 
 
-extractVariables :: TemplateInfo -> Maybe (Int, Int) -> Text -> Variables
-extractVariables TemplateInfo {..} headerPos text = (mkVariables . catMaybes)
+extractVariables :: HeaderTemplate -> Maybe (Int, Int) -> Text -> Variables
+extractVariables HeaderTemplate {..} headerPos text = (mkVariables . catMaybes)
   [ ("_haskell_module_copyright", ) <$> hmhCopyright
   , ("_haskell_module_license", ) <$> hmhLicense
   , ("_haskell_module_maintainer", ) <$> hmhMaintainer
@@ -98,7 +98,7 @@ extractVariables TemplateInfo {..} headerPos text = (mkVariables . catMaybes)
   , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
   ]
  where
-  HaddockModuleHeader {..} = extractModuleHeader headerText tiTemplateData
+  HaddockModuleHeader {..} = extractModuleHeader headerText htTemplateData
   headerText               = maybe T.empty (\(s, e) -> cut s e text) headerPos
   cut s e = fromLines . L.take (e - s) . L.drop s . toLines
 
