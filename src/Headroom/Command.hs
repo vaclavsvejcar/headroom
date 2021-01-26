@@ -32,19 +32,38 @@ import           Headroom.Configuration.Types        ( LicenseType
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.Meta                       ( productDesc
                                                      , productInfo
+                                                     , buildVersion
                                                      )
 import           Options.Applicative
 import           RIO
 import qualified RIO.Text                           as T
+import           Headroom.Meta.Version               ( printVersion )
 
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Parses command line arguments.
 commandParser :: ParserInfo Command
 commandParser = info
-  (commands <**> helper)
+  (helper <*> versionP <*> commandP)
   (fullDesc <> progDesc (T.unpack productDesc) <> header (T.unpack productInfo))
+
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+versionP :: Parser (a -> a)
+versionP = versionInfoP <*> versionNumP
  where
-  commands   = subparser (runCommand <> genCommand <> initCommand)
+  versionInfoP = infoOption (T.unpack productInfo)
+                            (long "version" <> help "show version info")
+  versionNumP = infoOption
+    (T.unpack . printVersion $ buildVersion)
+    (long "numeric-version" <> help "show only version number")
+
+
+commandP :: Parser Command
+commandP = subparser (runCommand <> genCommand <> initCommand)
+ where
   runCommand = command
     "run"
     (info (runOptions <**> helper)
@@ -60,6 +79,7 @@ commandParser = info
     (info (initOptions <**> helper)
           (progDesc "initialize current project for Headroom")
     )
+
 
 runOptions :: Parser Command
 runOptions =
@@ -125,6 +145,7 @@ runOptions =
     <*> switch (long "debug" <> help "produce more verbose output")
     <*> switch (long "dry-run" <> help "execute dry run (no changes to files)")
 
+
 genOptions :: Parser Command
 genOptions =
   Gen
@@ -141,6 +162,7 @@ genOptions =
             <> help "generate template for license and file type"
             )
           )
+
 
 initOptions :: Parser Command
 initOptions =
