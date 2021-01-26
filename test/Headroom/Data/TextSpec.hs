@@ -1,12 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
-module Headroom.Data.TextExtraSpec
+module Headroom.Data.TextSpec
   ( spec
   )
 where
 
-import           Headroom.Data.TextExtra
+import           Headroom.Data.Text
 import           RIO
 import qualified RIO.Text                           as T
 import           Test.Hspec

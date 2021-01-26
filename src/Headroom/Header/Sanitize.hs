@@ -27,7 +27,7 @@ where
 
 import           Headroom.Configuration.Types        ( HeaderSyntax(..) )
 import           Headroom.Data.Regex                 ( isMatch )
-import           Headroom.Data.TextExtra             ( commonLinesPrefix
+import           Headroom.Data.Text                  ( commonLinesPrefix
                                                      , fromLines
                                                      , mapLinesF
                                                      , toLines

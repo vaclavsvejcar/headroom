@@ -13,7 +13,7 @@ import           Headroom.Configuration.Types        ( HeaderFnConfig(..)
                                                      , UpdateCopyrightConfig(..)
                                                      )
 import           Headroom.Data.Has                   ( Has(..) )
-import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.HeaderFn
 import           Headroom.HeaderFn.Types
 import           Headroom.HeaderFn.UpdateCopyright

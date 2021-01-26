@@ -33,7 +33,7 @@ import           Data.Aeson                          ( FromJSON(..)
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
-import qualified Headroom.Data.TextExtra            as T
+import qualified Headroom.Data.Text                 as T
 import           Language.Haskell.TH.Quote           ( QuasiQuoter(..) )
 import           RIO
 import qualified RIO.Text                           as T

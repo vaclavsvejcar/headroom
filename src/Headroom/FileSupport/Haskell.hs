@@ -43,7 +43,7 @@ where
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
-import           Headroom.Data.TextExtra             ( fromLines
+import           Headroom.Data.Text                  ( fromLines
                                                      , toLines
                                                      )
 import           Headroom.FileSupport.Haskell.Haddock

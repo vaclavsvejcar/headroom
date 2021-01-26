@@ -34,7 +34,7 @@ import           Headroom.Data.Regex                 ( re
                                                      , replace
                                                      , scan
                                                      )
-import           Headroom.Data.TextExtra             ( fromLines
+import           Headroom.Data.Text                  ( fromLines
                                                      , toLines
                                                      )
 import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)

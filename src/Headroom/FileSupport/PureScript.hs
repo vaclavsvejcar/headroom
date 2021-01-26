@@ -34,7 +34,7 @@ where
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
-import           Headroom.Data.TextExtra             ( toLines )
+import           Headroom.Data.Text                  ( toLines )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileType.Types             ( FileType(..) )

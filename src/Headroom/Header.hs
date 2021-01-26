@@ -45,7 +45,7 @@ import           Headroom.Data.Lens                  ( suffixLensesFor )
 import           Headroom.Data.Regex                 ( Regex
                                                      , isMatch
                                                      )
-import           Headroom.Data.TextExtra             ( fromLines
+import           Headroom.Data.Text                  ( fromLines
                                                      , toLines
                                                      )
 import           Headroom.FileSupport                ( fileSupport )

@@ -30,14 +30,14 @@ import           Headroom.Configuration.Types        ( LicenseType
                                                      , TemplateSource(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
-import           Headroom.Meta                       ( productDesc
+import           Headroom.Meta                       ( buildVersion
+                                                     , productDesc
                                                      , productInfo
-                                                     , buildVersion
                                                      )
+import           Headroom.Meta.Version               ( printVersion )
 import           Options.Applicative
 import           RIO
 import qualified RIO.Text                           as T
-import           Headroom.Meta.Version               ( printVersion )
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------

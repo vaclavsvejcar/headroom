@@ -33,7 +33,7 @@ import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Regex                 ( re
                                                      , replace
                                                      )
-import           Headroom.Data.TextExtra             ( mapLines
+import           Headroom.Data.Text                  ( mapLines
                                                      , read
                                                      )
 import           Headroom.HeaderFn.Types             ( HeaderFn(..) )

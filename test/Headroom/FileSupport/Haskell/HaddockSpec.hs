@@ -8,7 +8,7 @@ module Headroom.FileSupport.Haskell.HaddockSpec
 where
 
 import           Headroom.Configuration.Types        ( LicenseType(..) )
-import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.Embedded                   ( licenseTemplate )
 import           Headroom.FileSupport.Haskell.Haddock
 import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)

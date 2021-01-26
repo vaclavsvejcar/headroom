@@ -9,7 +9,7 @@ module Headroom.HeaderFn.UpdateCopyrightSpec
 where
 
 import           Headroom.Data.Has                   ( Has(..) )
-import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.HeaderFn                   ( runHeaderFn )
 import           Headroom.HeaderFn.UpdateCopyright
 import           Headroom.Types                      ( CurrentYear(..) )

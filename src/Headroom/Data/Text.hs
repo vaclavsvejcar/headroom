@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Headroom.Data.TextExtra
+Module      : Headroom.Data.Text
 Description : Additional utilities for text manipulation
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -13,7 +13,7 @@ Portability : POSIX
 Module containing bunch of useful functions for working with text.
 -}
 
-module Headroom.Data.TextExtra
+module Headroom.Data.Text
   ( read
   , commonLinesPrefix
     -- * Working with text lines

@@ -29,7 +29,7 @@ import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
 import           Headroom.Data.Regex                 ( re )
-import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.FileSystem                 ( FileSystem(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Meta                       ( TemplateType )

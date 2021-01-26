@@ -9,7 +9,7 @@ where
 
 import           Headroom.Configuration.Types        ( HeaderSyntax(..) )
 import           Headroom.Data.Regex                 ( re )
-import           Headroom.Data.TextExtra             ( fromLines )
+import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.Header.Sanitize
 import           RIO
 import           Test.Hspec
