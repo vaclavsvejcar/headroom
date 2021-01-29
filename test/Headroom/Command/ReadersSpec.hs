@@ -20,14 +20,11 @@ import           Test.QuickCheck
 
 spec :: Spec
 spec = do
-  describe "parseLicenseAndFileType" $ do
-    prop "should parse license and file type from raw input"
-         prop_parseLicenseAndFileType
-
+  describe "parseLicense" $ do
+    prop "should parse license and file type from raw input" prop_parseLicense
  where
-  licenseTypes = fmap (T.toLower . enumToText) (allValues @LicenseType)
-  fileTypes = fmap (T.toLower . enumToText) (allValues @FileType)
-  licenseAndFileTypesGen = elements
-    $ concatMap (\lt -> fmap (\ft -> lt <> ":" <> ft) fileTypes) licenseTypes
-  prop_parseLicenseAndFileType =
-    forAll licenseAndFileTypesGen (isJust . parseLicenseAndFileType)
+  licenseTypes           = T.toLower . enumToText <$> allValues @LicenseType
+  fileTypes              = T.toLower . enumToText <$> allValues @FileType
+  together               = \lt -> fmap (\ft -> lt <> ":" <> ft) fileTypes
+  licenseAndFileTypesGen = elements $ concatMap together licenseTypes
+  prop_parseLicense      = forAll licenseAndFileTypesGen (isJust . parseLicense)

@@ -38,6 +38,7 @@ where
 import           Data.Aeson                          ( FromJSON(..)
                                                      , Value(String)
                                                      )
+import           Data.Coerce                         ( coerce )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -127,7 +128,8 @@ replace :: Regex
         -- ^ text to replace in
         -> Text
         -- ^ resulting text
-replace (Regex regex) = PH.gsub regex
+--replace (Regex regex) = PH.gsub regex
+replace = PH.gsub . coerce
 
 
 -- | Searches the text for all occurences of given /regex/.
@@ -137,7 +139,7 @@ scan :: Regex
      -- ^ input text
      -> [(Text, [Text])]
      -- ^ found occurences (as @[(fullMatch, [groups])]@)
-scan (Regex regex) = PH.scan regex
+scan = PH.scan . coerce
 
 
 -- | Compiles the given text into /regex/ in runtime. Note that if the /regex/

@@ -19,7 +19,7 @@ module Headroom.Command.Readers
   ( licenseReader
   , licenseTypeReader
   , regexReader
-  , parseLicenseAndFileType
+  , parseLicense
   )
 where
 
@@ -38,9 +38,9 @@ import qualified RIO.Text.Partial                   as TP
 
 -- | Reader for tuple of 'LicenseType' and 'FileType'.
 licenseReader :: ReadM (LicenseType, FileType)
-licenseReader = eitherReader parseLicense
+licenseReader = eitherReader parseLicense'
  where
-  parseLicense raw = maybeToRight errMsg (parseLicenseAndFileType $ T.pack raw)
+  parseLicense' raw = maybeToRight errMsg (parseLicense $ T.pack raw)
   errMsg = T.unpack $ mconcat
     [ "invalid license/file type, must be in format 'licenseType:fileType' "
     , "(e.g. bsd3:haskell)"
@@ -64,19 +64,17 @@ licenseTypeReader = eitherReader parseLicenseType
 
 -- | Reader for 'Regex'.
 regexReader :: ReadM Regex
-regexReader = eitherReader parse
-  where parse input = mapLeft displayException (compile . T.pack $ input)
+regexReader =
+  let parse input = mapLeft displayException (compile . T.pack $ input)
+  in  eitherReader parse
 
 
 -- | Parses 'LicenseType' and 'FileType' from the input string,
 -- formatted as @licenseType:fileType@.
 --
--- >>> parseLicenseAndFileType "bsd3:haskell"
+-- >>> parseLicense "bsd3:haskell"
 -- Just (BSD3,Haskell)
-parseLicenseAndFileType :: Text -> Maybe (LicenseType, FileType)
-parseLicenseAndFileType raw
-  | [rawLicenseType, rawFileType] <- TP.splitOn ":" raw = do
-    licenseType <- textToEnum rawLicenseType
-    fileType    <- textToEnum rawFileType
-    pure (licenseType, fileType)
-  | otherwise = Nothing
+parseLicense :: Text -> Maybe (LicenseType, FileType)
+parseLicense raw
+  | [lt, ft] <- TP.splitOn ":" raw = (,) <$> textToEnum lt <*> textToEnum ft
+  | otherwise                      = Nothing

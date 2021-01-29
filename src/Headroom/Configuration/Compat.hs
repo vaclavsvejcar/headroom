@@ -47,15 +47,12 @@ import qualified RIO.Text                           as T
 
 ---------------------------------  DATA TYPES  ---------------------------------
 
-data VersionWrapper = VersionWrapper
-  { vVersion :: Version
-  }
-  deriving (Eq, Show)
+newtype VersionObj = VersionObj Version deriving (Eq, Show)
 
-instance FromJSON VersionWrapper where
-  parseJSON = withObject "VersionWrapper" $ \obj -> do
-    vVersion <- obj .: "version"
-    pure VersionWrapper { .. }
+instance FromJSON VersionObj where
+  parseJSON = withObject "VersionObj" $ \obj -> do
+    version <- obj .: "version"
+    pure $ VersionObj version
 
 
 ---------------------------------  ERROR TYPES  --------------------------------
@@ -91,14 +88,13 @@ checkCompatibility :: MonadThrow m
                    -> m Version
                    -- ^ detected compatible version or error
 checkCompatibility breakingVersions current raw = do
-  VersionWrapper {..} <- parseWrapper
-  _                   <- checkBreakingChanges breakingVersions vVersion
-  _                   <- checkNewerVersion current vVersion
-  pure vVersion
+  VersionObj version <- parseObj
+  _                  <- checkBreakingChanges breakingVersions version
+  _                  <- checkNewerVersion current version
+  pure version
  where
-  parseWrapper = case Y.decodeEither' raw of
-    Left  _       -> throwM CannotParseVersion
-    Right version -> pure version
+  parseObj = either (const . throwM $ CannotParseVersion) pure decoded
+  decoded  = Y.decodeEither' raw
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
@@ -110,10 +106,8 @@ checkBreakingChanges vs v = case L.filter (v <) . L.sort $ vs of
 
 
 checkNewerVersion :: MonadThrow m => Version -> Version -> m ()
-checkNewerVersion current checked = if current < checked then err else ok
- where
-  err = throwM $ NewerVersionDetected checked
-  ok  = pure ()
+checkNewerVersion current checked =
+  if current < checked then throwM $ NewerVersionDetected checked else pure ()
 
 
 displayException' :: VersionError -> String

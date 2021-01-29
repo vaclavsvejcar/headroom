@@ -21,17 +21,24 @@ where
 
 import           RIO
 
+
 -- | Implementation of the /Has type class/ pattern.
 class Has a t where
+
   {-# MINIMAL getter, modifier | hasLens #-}
+
+
   getter :: t -> a
   getter = getConst . hasLens Const
+
 
   modifier :: (a -> a) -> t -> t
   modifier f t = runIdentity (hasLens (Identity . f) t)
 
+
   hasLens :: Lens' t a
   hasLens afa t = (\a -> modifier (const a) t) <$> afa (getter t)
+
 
   viewL :: MonadReader t m => m a
   viewL = view hasLens
