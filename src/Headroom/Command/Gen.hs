@@ -2,6 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
 {-# LANGUAGE TemplateHaskell       #-}
 
 {-|
@@ -25,6 +26,7 @@ module Headroom.Command.Gen
 where
 
 
+import           Data.String.Interpolate             ( iii )
 import           Headroom.Command.Types              ( Command(..)
                                                      , CommandGenOptions(..)
                                                      )
@@ -46,6 +48,7 @@ import           Headroom.Types                      ( fromHeadroomError
 import           Prelude                             ( putStrLn )
 import           RIO
 import qualified RIO.Text                           as T
+
 
 
 ---------------------------------  DATA TYPES  ---------------------------------
@@ -114,8 +117,9 @@ instance Exception CommandGenError where
   fromException    = fromHeadroomError
 
 displayException' :: CommandGenError -> String
-displayException' = T.unpack . \case
-  NoGenModeSelected -> mconcat
-    [ "Please select at least one option what to generate "
-    , "(see --help for details)"
-    ]
+displayException' = \case
+  NoGenModeSelected -> [iii|
+      Please select at least one option what to generate
+      (see --help for details)
+    |]
+

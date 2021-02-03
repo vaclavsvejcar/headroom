@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 474ac43686d7b5fc372fdd9085bf94666dd993f519e4cccdabb61f6538fa350b
+-- hash: d8c2a7d45a079f822b339cba956754b3b4e3b36f42a7a4fca8a71d2322ff53cc
 
 name:           headroom
 version:        0.4.0.0
@@ -191,6 +191,7 @@ library
     , pcre-heavy
     , pcre-light
     , rio
+    , string-interpolate
     , template-haskell
     , time
     , yaml

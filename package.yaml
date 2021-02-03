@@ -71,6 +71,7 @@ library:
     - mustache
     - pcre-light
     - pcre-heavy
+    - string-interpolate
     - template-haskell
     - time
     - yaml

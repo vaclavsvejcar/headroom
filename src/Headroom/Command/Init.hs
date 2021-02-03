@@ -4,6 +4,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
@@ -33,6 +34,7 @@ module Headroom.Command.Init
   )
 where
 
+import           Data.String.Interpolate             ( iii )
 import           Headroom.Command.Types              ( CommandInitOptions(..) )
 import           Headroom.Command.Utils              ( bootstrap )
 import           Headroom.Configuration              ( makeHeadersConfig
@@ -253,12 +255,13 @@ instance Exception CommandInitError where
 
 
 displayException' :: CommandInitError -> String
-displayException' = T.unpack . \case
-  AppConfigAlreadyExists path -> appConfigAlreadyExists path
-  NoProvidedSourcePaths       -> noProvidedSourcePaths
-  NoSupportedFileType         -> noSupportedFileType
- where
-  appConfigAlreadyExists path =
-    mconcat ["Configuration file '", T.pack path, "' already exists"]
-  noProvidedSourcePaths = "No source code paths (files or directories) defined"
-  noSupportedFileType   = "No supported file type found in scanned source paths"
+displayException' = \case
+  AppConfigAlreadyExists path -> [iii|
+      Configuration file '#{path}' already exists
+    |]
+  NoProvidedSourcePaths -> [iii|
+      No source code paths (files or directories) defined
+    |]
+  NoSupportedFileType -> [iii|
+      No supported file type found in scanned source paths
+    |]

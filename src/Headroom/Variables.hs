@@ -1,6 +1,7 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE StrictData        #-}
 {-# LANGUAGE TypeApplications  #-}
 
@@ -27,6 +28,7 @@ module Headroom.Variables
   )
 where
 
+import           Data.String.Interpolate             ( iii )
 import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( CurrentYear(..)
@@ -114,5 +116,7 @@ instance Exception VariablesError where
 
 
 displayException' :: VariablesError -> String
-displayException' = T.unpack . \case
-  InvalidVariable raw -> ("Cannot parse variable key=value from: " <> raw)
+displayException' = \case
+  InvalidVariable raw -> [iii|
+      Cannot parse variable in format KEY=VALUE from: #{raw}
+    |]

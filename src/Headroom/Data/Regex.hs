@@ -39,6 +39,7 @@ import           Data.Aeson                          ( FromJSON(..)
                                                      , Value(String)
                                                      )
 import           Data.Coerce                         ( coerce )
+import           Data.String.Interpolate             ( iii )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -50,7 +51,6 @@ import qualified Text.Regex.PCRE.Light              as PL
 import qualified Text.Regex.PCRE.Light.Base         as PL
                                                      ( Regex(..) )
 import qualified Text.Regex.PCRE.Light.Char8        as PLC
-
 
 
 ---------------------------------  DATA TYPES  ---------------------------------
@@ -167,6 +167,7 @@ instance Exception RegexError where
   fromException    = fromHeadroomError
 
 displayException' :: RegexError -> String
-displayException' = T.unpack . \case
-  CompilationFailed raw reason ->
-    mconcat ["Cannot compile regex from input '", raw, "', reason: ", reason]
+displayException' = \case
+  CompilationFailed raw reason -> [iii|
+      Cannot compile regex from input '#{raw}', reason: #{reason}
+    |]

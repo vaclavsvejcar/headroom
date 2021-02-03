@@ -28,9 +28,11 @@ import           Data.Aeson                          ( FromJSON(..)
                                                      , withObject
                                                      , (.:)
                                                      )
+import           Data.String.Interpolate             ( iii )
 import qualified Data.Yaml                          as Y
 import           Headroom.Meta                       ( buildVersion
                                                      , configFileName
+                                                     , productName
                                                      , webDocMigration
                                                      )
 import           Headroom.Meta.Version               ( Version(..)
@@ -111,38 +113,28 @@ checkNewerVersion current checked =
 
 
 displayException' :: VersionError -> String
-displayException' = T.unpack . \case
-  CannotParseVersion -> mconcat
-    [ "Cannot find 'version' key in your YAML configuration file ("
-    , configFileName
-    , "), which is "
-    , "required to check compatibility of configuration file. This "
-    , "functionality has been added in version 'v0.4.0.0', please check "
-    , "following migration guide for more details:\n"
-    , "\t- "
-    , webDocMigration [pvp|0.4.0.0|]
-    ]
-  NewerVersionDetected version -> mconcat
-    [ "Your YAML configuration file ("
-    , configFileName
-    , ") has newer version '"
-    , printVersionP version
-    , "' than your current Headroom version '"
-    , printVersionP buildVersion
-    , "'. Please upgrade Headroom first."
-    ]
-  UnsupportedVersion versions version ->
-    mconcat
-        [ "Your YAML configuration file ("
-        , configFileName
-        , ") has version '"
-        , printVersionP version
-        , "' (set by 'version' field), which is incompatible with current "
-        , "Headroom version '"
-        , printVersionP buildVersion
-        , "'. Please do migration steps from following migration guides "
-        , "(in same order):"
-        ]
-      <> mconcat steps
-    where steps = fmap (\v -> "\n\t- " <> webDocMigration v) versions
-
+displayException' = \case
+  CannotParseVersion -> [iii|
+      Cannot find 'version' key in #{configFileName :: String} configuration
+      file. This field is required to check whether your current configuration
+      is compatible with installed version of #{productName}. This functionality
+      has been added in version 0.4.0.0, please see following migration guide
+      for more details on how to proceed:
+      #{"\n\t" <> webDocMigration v0400}
+    |]
+  NewerVersionDetected version -> [iii|
+      The version set in your #{configFileName :: String} configuration file
+      (#{printVersionP version}) is newer than version of installed
+      #{productName} (#{printVersionP buildVersion}). Please upgrade
+      #{productName} first.
+    |]
+  UnsupportedVersion versions version -> [iii|
+      Your #{configFileName :: String} configuration file has version
+      #{printVersionP version}, which is incompatible with current version of
+      #{productName} (#{printVersionP buildVersion}). Please perform steps
+      described in these migration guides first (in given order):
+      #{migrationGuides versions}
+    |]
+ where
+  v0400           = [pvp|0.4.0.0|]
+  migrationGuides = mconcat . fmap (\v -> "\n\t- " <> webDocMigration v)

@@ -2,6 +2,7 @@
 {-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE NoImplicitPrelude   #-}
 {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE StrictData          #-}
 
 {-|
@@ -27,6 +28,7 @@ module Headroom.Template
   )
 where
 
+import           Data.String.Interpolate             ( iii )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -96,10 +98,10 @@ instance Exception TemplateError where
 
 
 displayException' :: TemplateError -> String
-displayException' = T.unpack . \case
-  MissingVariables name variables -> missingVariables name variables
-  ParseError msg                  -> parseError msg
- where
-  missingVariables name variables =
-    mconcat ["Missing variables for '", name, "': ", T.pack $ show variables]
-  parseError msg = "Error parsing template: " <> msg
+displayException' = \case
+  MissingVariables name variables -> [iii|
+      Missing variables for #{name}: #{variables}
+    |]
+  ParseError msg -> [iii|
+      Error parsing template: #{msg}
+    |]
