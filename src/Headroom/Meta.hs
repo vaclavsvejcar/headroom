@@ -24,6 +24,7 @@ module Headroom.Meta
   , productInfo
   , productName
   , webDoc
+  , webDocConfigCurr
   , webDocMigration
   , webRepo
   )
@@ -81,6 +82,11 @@ productName = "headroom"
 -- | Product documentation website for given version.
 webDoc :: Version -> Text
 webDoc v = "http://doc.norcane.com/headroom/v" <> printVersion v
+
+
+-- | Link to configuration documentation for current version.
+webDocConfigCurr :: Text
+webDocConfigCurr = webDoc buildVersion <> "/documentation/configuration/"
 
 
 -- | Product migration guide for given version.

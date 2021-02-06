@@ -2,6 +2,7 @@
 ## See https://github.com/vaclavsvejcar/headroom for more details.
 
 version: 0.4.0.0
+
 run-mode: replace
 
 source-paths:

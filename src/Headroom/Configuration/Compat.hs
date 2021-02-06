@@ -44,7 +44,6 @@ import           Headroom.Types                      ( fromHeadroomError
                                                      )
 import           RIO
 import qualified RIO.List                           as L
-import qualified RIO.Text                           as T
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

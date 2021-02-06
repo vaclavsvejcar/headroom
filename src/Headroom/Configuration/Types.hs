@@ -7,6 +7,7 @@
 {-# LANGUAGE LambdaCase           #-}
 {-# LANGUAGE NoImplicitPrelude    #-}
 {-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE QuasiQuotes          #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE StrictData           #-}
@@ -79,10 +80,14 @@ import           Data.Aeson                          ( FromJSON(..)
                                                      , (.:?)
                                                      )
 import           Data.Monoid                         ( Last(..) )
+import           Data.String.Interpolate             ( i
+                                                     , iii
+                                                     )
 import           Generic.Data                        ( Generically(..) )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.Data.Regex                 ( Regex(..) )
 import           Headroom.FileType.Types             ( FileType )
+import           Headroom.Meta                       ( webDocConfigCurr )
 import           Headroom.Serialization              ( aesonOptions )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
@@ -525,6 +530,7 @@ instance Exception ConfigurationError where
   toException      = toHeadroomError
   fromException    = fromHeadroomError
 
+
 displayException' :: ConfigurationError -> String
 displayException' = T.unpack . \case
   MissingConfiguration key -> case key of
@@ -578,24 +584,21 @@ displayException' = T.unpack . \case
     CkEnabled -> missingConfig "enabled" (Just "enabled") Nothing
   MixedHeaderSyntax -> mixedHeaderSyntax
  where
-  withFT msg fileType = msg <> " (" <> T.pack (show fileType) <> ")"
-  mixedHeaderSyntax = mconcat
-    [ "Invalid configuration, combining 'block-comment' with 'line-comment' "
-    , "is not allowed. Either use 'block-comment' to define multi-line "
-    , "comment header, or 'line-comment' to define header composed of "
-    , "multiple single-line comments."
-    ]
+  withFT msg fileType = [i|#{msg :: Text} (#{fileType})|]
+  mixedHeaderSyntax = [iii|
+      Invalid configuration, combining 'block-comment' with 'line-comment'
+      is not allowed. Either use 'block-comment' to define multi-line
+      comment header, or 'line-comment' to define header composed of
+      multiple single-line comments.
+    |]
 
 
 missingConfig :: Text -> Maybe Text -> Maybe Text -> Text
-missingConfig desc yaml cli = mconcat
-  [ "Missing configuration for '"
-  , desc
-  , "' ("
-  , options
-  , "). See official documentation for more details."
-  ]
+missingConfig desc yaml cli = [iii|
+    Missing configuration for '#{desc}' (#{options}). See following page for
+    more details: #{webDocConfigCurr}
+  |]
  where
-  cliText  = fmap (\c -> "command line option '" <> c <> "'") cli
-  yamlText = fmap (\y -> "YAML option '" <> y <> "'") yaml
+  cliText  = fmap (\c -> [i|command line option '#{c}'|]) cli
+  yamlText = fmap (\c -> [i|YAML option '#{c}'|]) yaml
   options  = T.intercalate " or " . catMaybes $ [cliText, yamlText]
