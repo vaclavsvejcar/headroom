@@ -68,6 +68,7 @@ library:
     - generic-data
     - microlens
     - microlens-th
+    - mtl
     - mustache
     - pcre-light
     - pcre-heavy
@@ -84,6 +85,7 @@ tests:
       - aeson
       - headroom
       - hspec
+      - mtl
       - pcre-light
       - QuickCheck
       - time
