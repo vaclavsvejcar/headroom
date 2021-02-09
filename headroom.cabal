@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d8c2a7d45a079f822b339cba956754b3b4e3b36f42a7a4fca8a71d2322ff53cc
+-- hash: c859020ed2775a9e93d827dcc1f673e19630d0583533e3b77149a524357bf17d
 
 name:           headroom
 version:        0.4.0.0
@@ -164,6 +164,7 @@ library
       Headroom.Meta
       Headroom.Meta.Version
       Headroom.Serialization
+      Headroom.SourceCode
       Headroom.Template
       Headroom.Template.Mustache
       Headroom.Types
@@ -186,6 +187,7 @@ library
     , generic-data
     , microlens
     , microlens-th
+    , mtl
     , mustache
     , optparse-applicative
     , pcre-heavy
@@ -252,6 +254,7 @@ test-suite spec
       Headroom.HeaderSpec
       Headroom.Meta.VersionSpec
       Headroom.SerializationSpec
+      Headroom.SourceCodeSpec
       Headroom.Template.MustacheSpec
       Headroom.TypesSpec
       Headroom.UI.ProgressSpec
@@ -268,6 +271,7 @@ test-suite spec
     , base >=4.7 && <5
     , headroom
     , hspec
+    , mtl
     , optparse-applicative
     , pcre-light
     , rio
