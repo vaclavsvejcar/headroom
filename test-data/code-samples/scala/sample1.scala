@@ -8,4 +8,5 @@ package foo
 
 object Hello extends App {
     println("Hello, world!")
+    // line comment
 }

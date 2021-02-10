@@ -21,14 +21,13 @@ spec = do
   describe "fsSyntaxAnalysis" $ do
     it "correctly detects comment starts/ends" $ do
       let samples =
-            [ ("non comment line"             , (False, False))
-            , ("# single line comment"       , (True, True))
-            , ("not # single line comment"   , (False, False))
+            [ ("non comment line"         , (False, False))
+            , ("# single line comment"    , (True, True))
+            , ("not # single line comment", (False, False))
             ]
       all checkSyntaxAnalysis samples `shouldBe` True
 
  where
   checkSyntaxAnalysis (l, (s, e)) =
-    let FileSupport {..}    = fileSupport
-        SyntaxAnalysis {..} = fsSyntaxAnalysis
+    let SyntaxAnalysis {..} = fsSyntaxAnalysis fileSupport
     in  saIsCommentStart l == s && saIsCommentEnd l == e

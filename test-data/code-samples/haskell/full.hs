@@ -16,5 +16,13 @@ description
 {-# LANGUAGE OverloadedStrings #-}
 module Test where
 
+{- single line block comment -}
+
+{-
+multi line block comment
+-}
+
 foo :: String
 foo = "Hello, world!"
+
+-- line comment
