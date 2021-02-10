@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c859020ed2775a9e93d827dcc1f673e19630d0583533e3b77149a524357bf17d
+-- hash: ffc6b2cfb2206c0fe656d42a10bd35b5befd32f2e724d111a28f1b1f3481a719
 
 name:           headroom
 version:        0.4.0.0
@@ -146,10 +146,18 @@ library
       Headroom.Embedded
       Headroom.Embedded.TH
       Headroom.FileSupport
+      Headroom.FileSupport.C
+      Headroom.FileSupport.CPP
+      Headroom.FileSupport.CSS
       Headroom.FileSupport.Haskell
       Headroom.FileSupport.Haskell.Haddock
+      Headroom.FileSupport.HTML
       Headroom.FileSupport.Java
+      Headroom.FileSupport.JS
       Headroom.FileSupport.PureScript
+      Headroom.FileSupport.Rust
+      Headroom.FileSupport.Scala
+      Headroom.FileSupport.Shell
       Headroom.FileSupport.TemplateData
       Headroom.FileSupport.Types
       Headroom.FileSystem
@@ -241,10 +249,18 @@ test-suite spec
       Headroom.Data.EnumExtraSpec
       Headroom.Data.RegexSpec
       Headroom.Data.TextSpec
+      Headroom.FileSupport.CPPSpec
+      Headroom.FileSupport.CSpec
+      Headroom.FileSupport.CSSSpec
       Headroom.FileSupport.Haskell.HaddockSpec
       Headroom.FileSupport.HaskellSpec
+      Headroom.FileSupport.HTMLSpec
       Headroom.FileSupport.JavaSpec
+      Headroom.FileSupport.JSSpec
       Headroom.FileSupport.PureScriptSpec
+      Headroom.FileSupport.RustSpec
+      Headroom.FileSupport.ScalaSpec
+      Headroom.FileSupport.ShellSpec
       Headroom.FileSystemSpec
       Headroom.FileTypeSpec
       Headroom.Header.SanitizeSpec

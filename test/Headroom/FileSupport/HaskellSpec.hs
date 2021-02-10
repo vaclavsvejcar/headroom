@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE RecordWildCards  #-}
 
 module Headroom.FileSupport.HaskellSpec
   ( spec
@@ -21,7 +22,9 @@ import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
                                                      , HaskellTemplateData'(..)
                                                      , TemplateData(..)
                                                      )
-import           Headroom.FileSupport.Types          ( FileSupport(..) )
+import           Headroom.FileSupport.Types          ( FileSupport(..)
+                                                     , SyntaxAnalysis(..)
+                                                     )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header                     ( extractHeaderTemplate )
@@ -39,6 +42,19 @@ import           Test.Hspec
 spec :: Spec
 spec = do
   let codeSamples = "test-data" </> "code-samples" </> "haskell"
+
+
+  describe "fsSyntaxAnalysis" $ do
+    it "correctly detects comment starts/ends" $ do
+      let samples =
+            [ ("non comment line"             , (False, False))
+            , ("-- single line comment"       , (True, True))
+            , ("not -- single line comment"   , (False, False))
+            , ("{- block comment start"       , (True, False))
+            , ("block comment end -}"         , (False, True))
+            , ("{- block comment start/end -}", (True, True))
+            ]
+      all checkSyntaxAnalysis samples `shouldBe` True
 
 
   describe "fsExtractTemplateData" $ do
@@ -76,3 +92,9 @@ spec = do
   describe "fsFileType" $ do
     it "matches correct type for Haskell" $ do
       fsFileType fileSupport `shouldBe` Haskell
+
+ where
+  checkSyntaxAnalysis (l, (s, e)) =
+    let FileSupport {..}    = fileSupport
+        SyntaxAnalysis {..} = fsSyntaxAnalysis
+    in  saIsCommentStart l == s && saIsCommentEnd l == e

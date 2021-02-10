@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE RecordWildCards  #-}
 
 module Headroom.FileSupport.PureScriptSpec
   ( spec
@@ -14,7 +15,9 @@ import           Headroom.Configuration.Types        ( Configuration(..) )
 import           Headroom.Embedded                   ( defaultConfig )
 import           Headroom.FileSupport.PureScript
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
-import           Headroom.FileSupport.Types          ( FileSupport(..) )
+import           Headroom.FileSupport.Types          ( FileSupport(..)
+                                                     , SyntaxAnalysis(..)
+                                                     )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header                     ( extractHeaderTemplate )
@@ -29,6 +32,20 @@ import           Test.Hspec
 spec :: Spec
 spec = do
   let codeSamples = "test-data" </> "code-samples" </> "purescript"
+
+
+  describe "fsSyntaxAnalysis" $ do
+    it "correctly detects comment starts/ends" $ do
+      let samples =
+            [ ("non comment line"             , (False, False))
+            , ("-- single line comment"       , (True, True))
+            , ("not -- single line comment"   , (False, False))
+            , ("{- block comment start"       , (True, False))
+            , ("block comment end -}"         , (False, True))
+            , ("{- block comment start/end -}", (True, True))
+            ]
+      all checkSyntaxAnalysis samples `shouldBe` True
+
 
   describe "fsExtractTemplateData" $ do
     it "doesn't provide any custom data for PureScript" $ do
@@ -51,3 +68,9 @@ spec = do
   describe "fsFileType" $ do
     it "matches correct type for PureScript" $ do
       fsFileType fileSupport `shouldBe` PureScript
+
+ where
+  checkSyntaxAnalysis (l, (s, e)) =
+    let FileSupport {..}    = fileSupport
+        SyntaxAnalysis {..} = fsSyntaxAnalysis
+    in  saIsCommentStart l == s && saIsCommentEnd l == e
