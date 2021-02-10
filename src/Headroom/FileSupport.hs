@@ -1,4 +1,7 @@
+{-# LANGUAGE MultiWayIf        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 {-|
 Module      : Headroom.FileSupport
@@ -17,9 +20,13 @@ file type and exposed as instance of 'FileSupport' data type.
 
 module Headroom.FileSupport
   ( fileSupport
+  , analyzeSourceCode
   )
 where
 
+import           Control.Monad.State                 ( get
+                                                     , put
+                                                     )
 import qualified Headroom.FileSupport.C             as C
 import qualified Headroom.FileSupport.CPP           as CPP
 import qualified Headroom.FileSupport.CSS           as CSS
@@ -31,8 +38,16 @@ import qualified Headroom.FileSupport.PureScript    as PureScript
 import qualified Headroom.FileSupport.Rust          as Rust
 import qualified Headroom.FileSupport.Scala         as Scala
 import qualified Headroom.FileSupport.Shell         as Shell
-import           Headroom.FileSupport.Types          ( FileSupport(..) )
+import           Headroom.FileSupport.Types          ( FileSupport(..)
+                                                     , SyntaxAnalysis(..)
+                                                     )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.SourceCode                 ( LineType(..)
+                                                     , SourceCode
+                                                     , fromText
+                                                     )
+import           RIO
+import qualified RIO.Text                           as T
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
@@ -50,3 +65,25 @@ fileSupport PureScript = PureScript.fileSupport
 fileSupport Rust       = Rust.fileSupport
 fileSupport Scala      = Scala.fileSupport
 fileSupport Shell      = Shell.fileSupport
+
+
+analyzeSourceCode :: FileSupport -> Text -> SourceCode
+analyzeSourceCode fs = fromText state0 process
+ where
+  SyntaxAnalysis {..} = fsSyntaxAnalysis fs
+  state0              = 0 :: Int
+  process (T.strip -> l) = do
+    cs <- get
+    let isStart   = saIsCommentStart
+        isEnd     = saIsCommentEnd
+        tpe       = \c -> if c > 0 then Comment else Code
+        (ns, res) = if
+          | isStart l && isEnd l -> (cs, Comment)
+          | isStart l            -> (cs + 1, Comment)
+          | isEnd l              -> (cs - 1, tpe cs)
+          | cs > 0               -> (cs, Comment)
+          | otherwise            -> (0, Code)
+    put ns
+    pure res
+
+

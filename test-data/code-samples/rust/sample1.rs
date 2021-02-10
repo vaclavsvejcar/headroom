@@ -5,4 +5,5 @@
  fn main() {
     /* This is not header */
     println!("Hello World!");
+    // line comment
 }

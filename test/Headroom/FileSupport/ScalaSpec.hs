@@ -32,6 +32,5 @@ spec = do
 
  where
   checkSyntaxAnalysis (l, (s, e)) =
-    let FileSupport {..}    = fileSupport
-        SyntaxAnalysis {..} = fsSyntaxAnalysis
+    let SyntaxAnalysis {..} = fsSyntaxAnalysis fileSupport
     in  saIsCommentStart l == s && saIsCommentEnd l == e
