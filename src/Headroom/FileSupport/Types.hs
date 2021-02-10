@@ -18,13 +18,16 @@ Data types for "Headroom.FileSupport" module in separated module
 module Headroom.FileSupport.Types
   ( -- * Data Types
     FileSupport(..)
+  , SyntaxAnalysis(..)
+    -- * Smart Constructors
+  , defaultFileSupport
     -- * Function Type Aliases
   , ExtractTemplateDataFn
   , ExtractVariablesFn
   )
 where
 
-import           Headroom.FileSupport.TemplateData   ( TemplateData )
+import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Header.Types               ( HeaderTemplate )
 import           Headroom.Template                   ( Template )
@@ -32,11 +35,19 @@ import           Headroom.Variables.Types            ( Variables )
 import           RIO
 
 
--- | Represents set of functions that every file support needs to implement.
+-- | Set of functions that every file support needs to implement.
 data FileSupport = FileSupport
-  { fsExtractTemplateData :: ExtractTemplateDataFn
+  { fsSyntaxAnalysis      :: SyntaxAnalysis
+  , fsExtractTemplateData :: ExtractTemplateDataFn
   , fsExtractVariables    :: ExtractVariablesFn
   , fsFileType            :: FileType
+  }
+
+
+-- | Set of functions used to analyze source code.
+data SyntaxAnalysis = SyntaxAnalysis
+  { saIsCommentStart :: Text -> Bool
+  , saIsCommentEnd   :: Text -> Bool
   }
 
 
@@ -60,3 +71,19 @@ type ExtractVariablesFn
   -- ^ text of processed source code file
   -> Variables
   -- ^ extracted variables
+
+
+-- | Default implementation of 'FileSupport' that doesn't extract any variables
+-- or template data.
+defaultFileSupport :: FileType
+                   -- ^ type of the source code file
+                   -> SyntaxAnalysis
+                   -- ^ function that analyzes source code
+                   -> FileSupport
+                   -- ^ resulting 'FileSupport'
+defaultFileSupport fileType syntaxAnalysis = FileSupport
+  { fsSyntaxAnalysis      = syntaxAnalysis
+  , fsExtractTemplateData = const NoTemplateData
+  , fsExtractVariables    = const . const . const $ mempty
+  , fsFileType            = fileType
+  }

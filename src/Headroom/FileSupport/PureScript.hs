@@ -31,12 +31,15 @@ module Headroom.FileSupport.PureScript
   )
 where
 
-import           Headroom.Data.Regex                 ( match
+import           Headroom.Data.Regex                 ( isMatch
+                                                     , match
                                                      , re
                                                      )
 import           Headroom.Data.Text                  ( toLines )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
-import           Headroom.FileSupport.Types          ( FileSupport(..) )
+import           Headroom.FileSupport.Types          ( FileSupport(..)
+                                                     , SyntaxAnalysis(..)
+                                                     )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate )
 import           Headroom.Variables                  ( mkVariables )
@@ -49,13 +52,21 @@ import           RIO.Lens                            ( ix )
 
 -- | Implementation of 'FileSupport' for /PureScript/.
 fileSupport :: FileSupport
-fileSupport = FileSupport { fsExtractTemplateData = const NoTemplateData
+fileSupport = FileSupport { fsSyntaxAnalysis      = syntaxAnalysis
+                          , fsExtractTemplateData = const NoTemplateData
                           , fsExtractVariables    = extractVariables
                           , fsFileType            = PureScript
                           }
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+syntaxAnalysis :: SyntaxAnalysis
+syntaxAnalysis = SyntaxAnalysis
+  { saIsCommentStart = isMatch [re|^{-(?!\h*#)|^--|]
+  , saIsCommentEnd   = isMatch [re|^\h*-}|\w+\h*-}|^--|]
+  }
+
 
 extractVariables :: HeaderTemplate -> Maybe (Int, Int) -> Text -> Variables
 extractVariables _ _ text = (mkVariables . catMaybes)

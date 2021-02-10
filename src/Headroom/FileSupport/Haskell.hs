@@ -40,7 +40,8 @@ module Headroom.FileSupport.Haskell
   )
 where
 
-import           Headroom.Data.Regex                 ( match
+import           Headroom.Data.Regex                 ( isMatch
+                                                     , match
                                                      , re
                                                      )
 import           Headroom.Data.Text                  ( fromLines
@@ -54,7 +55,9 @@ import           Headroom.FileSupport.Haskell.Haddock
 import           Headroom.FileSupport.TemplateData   ( HaskellTemplateData'(..)
                                                      , TemplateData(..)
                                                      )
-import           Headroom.FileSupport.Types          ( FileSupport(..) )
+import           Headroom.FileSupport.Types          ( FileSupport(..)
+                                                     , SyntaxAnalysis(..)
+                                                     )
 
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate(..) )
@@ -71,13 +74,21 @@ import qualified RIO.Text                           as T
 
 -- | Implementation of 'FileSupport' for /Haskell/.
 fileSupport :: FileSupport
-fileSupport = FileSupport { fsExtractTemplateData = extractTemplateData
+fileSupport = FileSupport { fsSyntaxAnalysis      = syntaxAnalysis
+                          , fsExtractTemplateData = extractTemplateData
                           , fsExtractVariables    = extractVariables
                           , fsFileType            = Haskell
                           }
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+syntaxAnalysis :: SyntaxAnalysis
+syntaxAnalysis = SyntaxAnalysis
+  { saIsCommentStart = isMatch [re|^{-(?!\h*#)|^--|]
+  , saIsCommentEnd   = isMatch [re|^\h*-}|\w+\h*-}|^--|]
+  }
+
 
 extractTemplateData :: Template a => a -> TemplateData
 extractTemplateData template =

@@ -29,12 +29,15 @@ module Headroom.FileSupport.Java
   )
 where
 
-import           Headroom.Data.Regex                 ( match
+import           Headroom.Data.Regex                 ( isMatch
+                                                     , match
                                                      , re
                                                      )
 import           Headroom.Data.Text                  ( toLines )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
-import           Headroom.FileSupport.Types          ( FileSupport(..) )
+import           Headroom.FileSupport.Types          ( FileSupport(..)
+                                                     , SyntaxAnalysis(..)
+                                                     )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate )
 import           Headroom.Variables                  ( mkVariables )
@@ -47,13 +50,20 @@ import           RIO.Lens                            ( ix )
 
 -- | Implementation of 'FileSupport' for /Java/.
 fileSupport :: FileSupport
-fileSupport = FileSupport { fsExtractTemplateData = const NoTemplateData
+fileSupport = FileSupport { fsSyntaxAnalysis      = syntaxAnalysis
+                          , fsExtractTemplateData = const NoTemplateData
                           , fsExtractVariables    = extractVariables
                           , fsFileType            = Java
                           }
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+syntaxAnalysis :: SyntaxAnalysis
+syntaxAnalysis = SyntaxAnalysis { saIsCommentStart = isMatch [re|^\/\*|^\/\/|]
+                                , saIsCommentEnd   = isMatch [re|\*\/$|^\/\/|]
+                                }
+
 
 extractPackageName :: Text -> Maybe Text
 extractPackageName = go . toLines

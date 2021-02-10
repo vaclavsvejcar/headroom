@@ -20,37 +20,33 @@ module Headroom.FileSupport
   )
 where
 
+import qualified Headroom.FileSupport.C             as C
+import qualified Headroom.FileSupport.CPP           as CPP
+import qualified Headroom.FileSupport.CSS           as CSS
 import qualified Headroom.FileSupport.Haskell       as Haskell
+import qualified Headroom.FileSupport.HTML          as HTML
 import qualified Headroom.FileSupport.Java          as Java
+import qualified Headroom.FileSupport.JS            as JS
 import qualified Headroom.FileSupport.PureScript    as PureScript
-import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
+import qualified Headroom.FileSupport.Rust          as Rust
+import qualified Headroom.FileSupport.Scala         as Scala
+import qualified Headroom.FileSupport.Shell         as Shell
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
-import           RIO
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Returns 'FileSupport' for corresponding 'FileType'.
 fileSupport :: FileType -> FileSupport
-fileSupport C          = basicSupport C
-fileSupport CPP        = basicSupport CPP
-fileSupport CSS        = basicSupport CSS
+fileSupport C          = C.fileSupport
+fileSupport CPP        = CPP.fileSupport
+fileSupport CSS        = CSS.fileSupport
 fileSupport Haskell    = Haskell.fileSupport
-fileSupport HTML       = basicSupport HTML
-fileSupport JS         = basicSupport JS
+fileSupport HTML       = HTML.fileSupport
 fileSupport Java       = Java.fileSupport
+fileSupport JS         = JS.fileSupport
 fileSupport PureScript = PureScript.fileSupport
-fileSupport Rust       = basicSupport Rust
-fileSupport Scala      = basicSupport Scala
-fileSupport Shell      = basicSupport Shell
-
-
-------------------------------  PRIVATE FUNCTIONS  -----------------------------
-
-basicSupport :: FileType -> FileSupport
-basicSupport fileType = FileSupport
-  { fsExtractTemplateData = const NoTemplateData
-  , fsExtractVariables    = const . const . const $ mempty
-  , fsFileType            = fileType
-  }
+fileSupport Rust       = Rust.fileSupport
+fileSupport Scala      = Scala.fileSupport
+fileSupport Shell      = Shell.fileSupport
