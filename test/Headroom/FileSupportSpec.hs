@@ -242,7 +242,7 @@ spec = do
     it "analyzes Shell source code" $ do
       sample <- loadFile $ codeSamples </> "shell" </> "sample1.sh"
       let expected = SourceCode
-            [ (Comment, "#!/bin/bash")
+            [ (Code   , "#!/bin/bash")
             , (Code   , "")
             , (Comment, "# This is")
             , (Comment, "# header")

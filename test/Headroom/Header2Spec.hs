@@ -1,18 +1,32 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Headroom.Header2Spec
   ( spec
   )
 where
 
+import           Headroom.Configuration              ( makeHeadersConfig
+                                                     , parseConfiguration
+                                                     )
+import           Headroom.Configuration.Types        ( Configuration(..)
+                                                     , HeadersConfig(..)
+                                                     )
 import           Headroom.Data.Regex                 ( re )
+import           Headroom.Embedded                   ( defaultConfig )
+import           Headroom.FileSupport                ( analyzeSourceCode
+                                                     , fileSupport
+                                                     )
+import           Headroom.FileSystem                 ( loadFile )
+import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header2
 import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
                                                      )
 import           RIO
+import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec                   hiding ( after
                                                      , before
                                                      )
@@ -20,6 +34,48 @@ import           Test.Hspec                   hiding ( after
 
 spec :: Spec
 spec = do
+
+  describe "findHeader" $ do
+    it "correctly detects headers using default YAML configuration" $ do
+      let path       = "test-data" </> "code-samples"
+          loadSample = \ft p ->
+            analyzeSourceCode (fileSupport ft) <$> loadFile (path </> p)
+      defaultConfig'     <- parseConfiguration defaultConfig
+      HeadersConfig {..} <- makeHeadersConfig (cLicenseHeaders defaultConfig')
+      sampleC1           <- loadSample C $ "c" </> "sample1.c"
+      sampleC2           <- loadSample C $ "c" </> "sample2.c"
+      sampleCpp1         <- loadSample CPP $ "cpp" </> "sample1.cpp"
+      sampleCpp2         <- loadSample CPP $ "cpp" </> "sample2.cpp"
+      sampleCss1         <- loadSample CSS $ "css" </> "sample1.css"
+      sampleCss2         <- loadSample CSS $ "css" </> "sample2.css"
+      sampleHs1          <- loadSample Haskell $ "haskell" </> "sample1.hs"
+      sampleHs2          <- loadSample Haskell $ "haskell" </> "sample2.hs"
+      sampleHtml1        <- loadSample HTML $ "html" </> "sample1.html"
+      sampleHtml2        <- loadSample HTML $ "html" </> "sample2.html"
+      sampleJava1        <- loadSample Java $ "java" </> "sample1.java"
+      sampleJava2        <- loadSample Java $ "java" </> "sample2.java"
+      sampleJs1          <- loadSample JS $ "js" </> "sample1.js"
+      sampleRust1        <- loadSample Rust $ "rust" </> "sample1.rs"
+      sampleScala1       <- loadSample Scala $ "scala" </> "sample1.scala"
+      sampleScala2       <- loadSample Scala $ "scala" </> "sample2.scala"
+      sampleShell1       <- loadSample Shell $ "shell" </> "sample1.sh"
+      findHeader hscC sampleC1 `shouldBe` Just (1, 3)
+      findHeader hscC sampleC2 `shouldBe` Nothing
+      findHeader hscCpp sampleCpp1 `shouldBe` Just (1, 3)
+      findHeader hscCpp sampleCpp2 `shouldBe` Nothing
+      findHeader hscCss sampleCss1 `shouldBe` Just (1, 4)
+      findHeader hscCss sampleCss2 `shouldBe` Nothing
+      findHeader hscHaskell sampleHs1 `shouldBe` Just (1, 3)
+      findHeader hscHaskell sampleHs2 `shouldBe` Nothing
+      findHeader hscHtml sampleHtml1 `shouldBe` Just (1, 4)
+      findHeader hscHtml sampleHtml2 `shouldBe` Nothing
+      findHeader hscJava sampleJava1 `shouldBe` Just (0, 2)
+      findHeader hscJava sampleJava2 `shouldBe` Nothing
+      findHeader hscJs sampleJs1 `shouldBe` Just (0, 2)
+      findHeader hscRust sampleRust1 `shouldBe` Just (0, 2)
+      findHeader hscScala sampleScala1 `shouldBe` Just (0, 2)
+      findHeader hscScala sampleScala2 `shouldBe` Nothing
+      findHeader hscShell sampleShell1 `shouldBe` Just (2, 3)
 
   describe "findBlockHeader" $ do
     let s = [re|^{-\||]

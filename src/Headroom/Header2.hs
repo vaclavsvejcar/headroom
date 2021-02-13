@@ -1,25 +1,57 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Headroom.Header2
   ( -- * Copyright Header Detection
-    findBlockHeader
+    findHeader
+  , findBlockHeader
   , findLineHeader
   , splitSource
   )
 where
 
 import           Data.Coerce                         ( coerce )
+import           Headroom.Configuration.Types        ( CtHeaderConfig
+                                                     , HeaderConfig(..)
+                                                     , HeaderSyntax(..)
+                                                     )
 import           Headroom.Data.Regex                 ( Regex
                                                      , isMatch
                                                      )
-import           Headroom.SourceCode                 ( LineType(..)
+import           Headroom.SourceCode                 ( CodeLine
+                                                     , LineType(..)
                                                      , SourceCode(..)
                                                      , firstMatching
                                                      , lastMatching
                                                      )
 import           RIO
 import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
+
+
+-- | Finds header position in given text, where position is represented by
+-- line number of first and last line of the header (numbered from zero).
+-- Based on the 'HeaderSyntax' specified in given 'HeaderConfig', this function
+-- delegates its work to either 'findBlockHeader' or 'findLineHeader'.
+--
+-- >>> :set -XFlexibleContexts -XTypeFamilies -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment [re|^{-|] [re|(?<!#)-}$|] Nothing)
+-- >>> findHeader hc $ SourceCode [(Code, "foo"), (Code, "bar"), (Comment, "{- HEADER -}")]
+-- Just (2,2)
+findHeader :: CtHeaderConfig
+           -- ^ appropriate header configuration
+           -> SourceCode
+           -- ^ text in which to detect the header
+           -> Maybe (Int, Int)
+           -- ^ header position @(startLine, endLine)@
+findHeader HeaderConfig {..} input = case hcHeaderSyntax of
+  BlockComment start end _ -> findBlockHeader start end headerArea splitAt
+  LineComment prefix _     -> findLineHeader prefix headerArea splitAt
+ where
+  (before, headerArea, _) = splitSource hcPutAfter hcPutBefore input
+  splitAt                 = length (coerce before :: [CodeLine])
 
 
 -- | Finds header in the form of /multi-line comment/ syntax, which is delimited
@@ -43,9 +75,10 @@ findBlockHeader :: Regex
 findBlockHeader start end sc offset = mapT2 (+ offset) <$> position
  where
   ls          = zip [0 ..] $ coerce sc
+  isMatch'    = \p t -> isMatch p . T.strip $ t
   allComments = all (\(_, (lt, _)) -> lt == Comment)
-  hasStart    = maybe False (\(_, (_, t)) -> isMatch start t) . L.headMaybe
-  hasEnd      = maybe False (\(_, (_, t)) -> isMatch end t) . L.lastMaybe
+  hasStart    = maybe False (\(_, (_, t)) -> isMatch' start t) . L.headMaybe
+  hasEnd      = maybe False (\(_, (_, t)) -> isMatch' end t) . L.lastMaybe
   position    = (,) <$> (header >>= L.headMaybe) <*> (header >>= L.lastMaybe)
   header =
     (fmap . fmap) fst
@@ -73,10 +106,11 @@ findLineHeader :: Regex
 findLineHeader prefix sc offset = mapT2 (+ offset) <$> position
  where
   ls       = zip [0 ..] $ coerce sc
+  isMatch' = \p t -> isMatch p . T.strip $ t
   position = (,) <$> (header >>= L.headMaybe) <*> (header >>= L.lastMaybe)
   header =
     (fmap . fmap) fst
-      . L.find (all (\(_, (lt, t)) -> lt == Comment && isMatch prefix t))
+      . L.find (all (\(_, (lt, t)) -> lt == Comment && isMatch' prefix t))
       . L.groupBy (\(_, (lt1, _)) (_, (lt2, _)) -> lt1 == lt2)
       $ ls
 
