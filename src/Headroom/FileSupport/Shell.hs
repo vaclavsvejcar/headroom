@@ -39,6 +39,6 @@ fileSupport = defaultFileSupport Shell syntaxAnalysis
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
 syntaxAnalysis :: SyntaxAnalysis
-syntaxAnalysis = SyntaxAnalysis { saIsCommentStart = isMatch [re|^#|]
-                                , saIsCommentEnd   = isMatch [re|^#|]
+syntaxAnalysis = SyntaxAnalysis { saIsCommentStart = isMatch [re|^#(?!!)|]
+                                , saIsCommentEnd   = isMatch [re|^#(?!!)|]
                                 }
