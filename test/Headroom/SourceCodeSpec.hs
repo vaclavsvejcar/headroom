@@ -39,7 +39,7 @@ spec = do
       toText sample `shouldBe` expected
 
 
-  describe "firstMatchingLine" $ do
+  describe "firstMatching" $ do
     it "finds very first line matching the given predicate" $ do
       let sample = SourceCode
             [ (Comment, "/*")
@@ -57,10 +57,10 @@ spec = do
             ]
           expected  = Just (9, (Code, "this is some code"))
           predicate = \(lt, l) -> lt == Code && "this" `T.isPrefixOf` l
-      firstMatchingLine predicate sample `shouldBe` expected
+      firstMatching predicate sample `shouldBe` expected
 
 
-  describe "lastMatchingLine" $ do
+  describe "lastMatching" $ do
     it "finds very last line matching the given predicate" $ do
       let sample = SourceCode
             [ (Comment, "/*")
@@ -78,4 +78,4 @@ spec = do
             ]
           expected  = Just (10, (Code, "this is code with // comment"))
           predicate = \(lt, l) -> lt == Code && "this" `T.isPrefixOf` l
-      lastMatchingLine predicate sample `shouldBe` expected
+      lastMatching predicate sample `shouldBe` expected

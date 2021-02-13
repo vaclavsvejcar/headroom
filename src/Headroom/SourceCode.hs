@@ -23,8 +23,8 @@ module Headroom.SourceCode
   , SourceCode(..)
   , fromText
   , toText
-  , firstMatchingLine
-  , lastMatchingLine
+  , firstMatching
+  , lastMatching
   )
 where
 
@@ -59,15 +59,15 @@ toText :: SourceCode -> Text
 toText (SourceCode sc) = fromLines . fmap snd $ sc
 
 
-firstMatchingLine :: (CodeLine -> Bool) -> SourceCode -> Maybe (Int, CodeLine)
-firstMatchingLine f (SourceCode ls) = go ls 0
+firstMatching :: (CodeLine -> Bool) -> SourceCode -> Maybe (Int, CodeLine)
+firstMatching f (SourceCode ls) = go ls 0
  where
   go [] _ = Nothing
   go (x : xs) i | f x       = Just (i, x)
                 | otherwise = go xs (i + 1)
 
 
-lastMatchingLine :: (CodeLine -> Bool) -> SourceCode -> Maybe (Int, CodeLine)
-lastMatchingLine f (SourceCode ls) =
-  let matching = firstMatchingLine f . SourceCode . reverse $ ls
+lastMatching :: (CodeLine -> Bool) -> SourceCode -> Maybe (Int, CodeLine)
+lastMatching f (SourceCode ls) =
+  let matching = firstMatching f . SourceCode . reverse $ ls
   in  fmap (first ((length ls - 1) -)) matching

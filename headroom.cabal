@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a72ebb47f793e58d96223d94ffd23924e8380fabf2a00ec55abb33ca4efb393f
+-- hash: 12e41532ea17e269ece89633ce5ad30a0ddf5067ff8a4a780c82dbf34fe32db2
 
 name:           headroom
 version:        0.4.0.0
@@ -166,6 +166,7 @@ library
       Headroom.Header
       Headroom.Header.Sanitize
       Headroom.Header.Types
+      Headroom.Header2
       Headroom.HeaderFn
       Headroom.HeaderFn.Types
       Headroom.HeaderFn.UpdateCopyright
@@ -265,6 +266,7 @@ test-suite spec
       Headroom.FileSystemSpec
       Headroom.FileTypeSpec
       Headroom.Header.SanitizeSpec
+      Headroom.Header2Spec
       Headroom.HeaderFn.TypesSpec
       Headroom.HeaderFn.UpdateCopyrightSpec
       Headroom.HeaderFnSpec
