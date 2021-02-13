@@ -21,6 +21,44 @@ import           Test.Hspec                   hiding ( after
 spec :: Spec
 spec = do
 
+  describe "findBlockHeader" $ do
+    let s = [re|^{-\||]
+        e = [re|(?<!#)-}$|]
+
+    it "finds single line header" $ do
+      let sample =
+            SourceCode
+              [ (Code   , "")
+              , (Comment, "{-| single line -}")
+              , (Code   , "")
+              , (Code   , "")
+              ]
+      findBlockHeader s e sample 0 `shouldBe` Just (1, 1)
+
+    it "finds multi line header" $ do
+      let sample = SourceCode
+            [ (Code   , "")
+            , (Comment, "{-| multi")
+            , (Comment, "line -}")
+            , (Code   , "")
+            , (Code   , "")
+            ]
+      findBlockHeader s e sample 0 `shouldBe` Just (1, 2)
+
+    it "finds only the first occurence of header" $ do
+      let sample = SourceCode
+            [ (Comment, "{-| this")
+            , (Comment, "and this -}")
+            , (Code   , "")
+            , (Comment, "{-| no this -}")
+            ]
+      findBlockHeader s e sample 0 `shouldBe` Just (0, 1)
+
+    it "finds nothing if no header is present" $ do
+      let sample = SourceCode [(Code, "foo"), (Code, "bar")]
+      findBlockHeader s e sample 0 `shouldBe` Nothing
+
+
   describe "findLineHeader" $ do
     it "finds single line header" $ do
       let sample = SourceCode [(Comment, "-- foo"), (Code, "other")]
