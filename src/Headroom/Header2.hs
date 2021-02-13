@@ -2,7 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Headroom.Header2
-  ( splitSource
+  ( findLineHeader
+  , splitSource
   )
 where
 
@@ -10,14 +11,41 @@ import           Data.Coerce                         ( coerce )
 import           Headroom.Data.Regex                 ( Regex
                                                      , isMatch
                                                      )
-import           Headroom.SourceCode                 ( CodeLine
-                                                     , LineType(..)
+import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
                                                      , firstMatching
                                                      , lastMatching
                                                      )
 import           RIO
 import qualified RIO.List                           as L
+
+
+-- | Finds header in the form of /single-line comment/ syntax, which is
+-- delimited with the prefix pattern.
+--
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> let sc = SourceCode [(Code, ""), (Code, "a"), (Comment, "-- first"), (Comment, "-- second"), (Code, "foo")] 
+-- >>> findLineHeader [re|^--|] sc 0
+-- Just (2,3)
+findLineHeader :: Regex
+               -- ^ prefix pattern (e.g. @--@ or @//@)
+               -> SourceCode
+               -- ^ source code in which to detect the header
+               -> Int
+               -- ^ line number offset (adds to resulting position)
+               -> Maybe (Int, Int)
+               -- ^ header position @(startLine + offset, endLine + offset)@
+findLineHeader prefix sc offset = mapT2 (+ offset) <$> position
+ where
+  ls       = zip [0 ..] $ coerce sc
+  position = (,) <$> (header >>= L.headMaybe) <*> (header >>= L.lastMaybe)
+  header =
+    (fmap . fmap) fst
+      . L.find (all (\(_, (lt, t)) -> lt == Comment && isMatch prefix t))
+      . L.groupBy (\(_, (lt1, _)) (_, (lt2, _)) -> lt1 == lt2)
+      $ ls
+  mapT2 = join (***)
 
 
 -- | Splits input source code into three parts:
@@ -51,7 +79,7 @@ splitSource :: [Regex]
 splitSource []    []    sc = (mempty, sc, mempty)
 splitSource fstPs sndPs sc = (before, middle, after)
  where
-  allLines          = coerce sc :: [CodeLine]
+  allLines          = coerce sc
   (middle', after ) = mapT2 SourceCode $ L.splitAt sndSplit allLines
   (before , middle) = mapT2 SourceCode $ L.splitAt fstSplitAt (coerce middle')
   cond              = \ps (lt, t) -> lt == Code && any (`isMatch` t) ps
