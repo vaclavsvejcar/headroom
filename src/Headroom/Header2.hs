@@ -2,7 +2,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Headroom.Header2
-  ( findLineHeader
+  ( -- * Copyright Header Detection
+    findBlockHeader
+  , findLineHeader
   , splitSource
   )
 where
@@ -20,12 +22,44 @@ import           RIO
 import qualified RIO.List                           as L
 
 
+-- | Finds header in the form of /multi-line comment/ syntax, which is delimited
+-- with starting and ending pattern.
+--
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> let sc = SourceCode [(Code, ""), (Comment, "{- HEADER -}"), (Code, ""), (Code,"")]
+-- >>> findBlockHeader [re|^{-|] [re|(?<!#)-}$|] sc 0
+-- Just (1,1)
+findBlockHeader :: Regex
+                -- ^ starting pattern (e.g. @{-@ or @/*@)
+                -> Regex
+                -- ^ ending pattern (e.g. @-}@ or @*/@)
+                -> SourceCode
+                -- ^ source code in which to detect the header
+                -> Int
+                -- ^ line number offset (adds to resulting position)
+                -> Maybe (Int, Int)
+                -- ^ header position @(startLine + offset, endLine + offset)@
+findBlockHeader start end sc offset = mapT2 (+ offset) <$> position
+ where
+  ls          = zip [0 ..] $ coerce sc
+  allComments = all (\(_, (lt, _)) -> lt == Comment)
+  hasStart    = maybe False (\(_, (_, t)) -> isMatch start t) . L.headMaybe
+  hasEnd      = maybe False (\(_, (_, t)) -> isMatch end t) . L.lastMaybe
+  position    = (,) <$> (header >>= L.headMaybe) <*> (header >>= L.lastMaybe)
+  header =
+    (fmap . fmap) fst
+      . L.find (\g -> allComments g && hasStart g && hasEnd g)
+      . L.groupBy (\(_, (lt1, _)) (_, (lt2, _)) -> lt1 == lt2)
+      $ ls
+
+
 -- | Finds header in the form of /single-line comment/ syntax, which is
 -- delimited with the prefix pattern.
 --
 -- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
--- >>> let sc = SourceCode [(Code, ""), (Code, "a"), (Comment, "-- first"), (Comment, "-- second"), (Code, "foo")] 
+-- >>> let sc = SourceCode [(Code, ""), (Code, "a"), (Comment, "-- first"), (Comment, "-- second"), (Code, "foo")]
 -- >>> findLineHeader [re|^--|] sc 0
 -- Just (2,3)
 findLineHeader :: Regex
@@ -45,7 +79,6 @@ findLineHeader prefix sc offset = mapT2 (+ offset) <$> position
       . L.find (all (\(_, (lt, t)) -> lt == Comment && isMatch prefix t))
       . L.groupBy (\(_, (lt1, _)) (_, (lt2, _)) -> lt1 == lt2)
       $ ls
-  mapT2 = join (***)
 
 
 -- | Splits input source code into three parts:
@@ -86,5 +119,7 @@ splitSource fstPs sndPs sc = (before, middle, after)
   fstSplitAt        = maybe 0 ((+ 1) . fst) $ lastMatching (cond fstPs) middle'
   sndSplit          = maybe len fst $ firstMatching (cond sndPs) sc
   len               = length allLines
-  mapT2             = join (***)
 
+
+mapT2 :: (a -> b) -> (a, a) -> (b, b)
+mapT2 = join (***)
