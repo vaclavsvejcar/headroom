@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 module Headroom.Header2Spec
   ( spec
@@ -12,7 +14,10 @@ import           Headroom.Configuration              ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
 import           Headroom.Configuration.Types        ( Configuration(..)
+                                                     , HeaderConfig(..)
+                                                     , HeaderSyntax(..)
                                                      , HeadersConfig(..)
+                                                     , LicenseType(..)
                                                      )
 import           Headroom.Data.Regex                 ( re )
 import           Headroom.Embedded                   ( defaultConfig )
@@ -35,11 +40,109 @@ import           Test.Hspec                   hiding ( after
 spec :: Spec
 spec = do
 
+  let samplesDir = "test-data" </> "code-samples"
+      lHeaderConfig pb pa =
+        HeaderConfig ["hs"] 0 0 0 0 pb pa (LineComment [re|^--|] Nothing)
+      bHeaderConfig = bHeaderConfigM 0 0 0 0
+      bHeaderConfigM mtc mtf mbc mbf pb pa = HeaderConfig
+        ["hs"]
+        mtc
+        mtf
+        mbc
+        mbf
+        pb
+        pa
+        (BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing)
+
+
   describe "findHeader" $ do
+    it "finds block header (one line long)" $ do
+      let sample =
+            SourceCode
+              [ (Code   , "")
+              , (Comment, "{-| single line -}")
+              , (Code   , "")
+              , (Code   , "")
+              ]
+          config = bHeaderConfig [] []
+      findHeader config sample `shouldBe` Just (1, 1)
+
+    it "finds line header (one line long)" $ do
+      let sample = SourceCode
+            [(Code, ""), (Comment, "-- single line"), (Code, ""), (Code, "")]
+          config = lHeaderConfig [] []
+      findHeader config sample `shouldBe` Just (1, 1)
+
+    it "finds block comment header put after 'putAfter' constraint" $ do
+      let sample = SourceCode
+            [ (Comment, "{-| 1 -}")
+            , (Code   , "foo")
+            , (Comment, "{-| 2")
+            , (Comment, "2 -}")
+            , (Code   , "bar")
+            , (Comment, "{-| 3")
+            , (Comment, "3 -}")
+            ]
+          config = bHeaderConfig [[re|^foo|]] []
+      findHeader config sample `shouldBe` Just (2, 3)
+
+    it "finds line comment header put after 'putAfter' constraint" $ do
+      let sample = SourceCode
+            [ (Comment, "-- 1")
+            , (Code   , "foo")
+            , (Comment, "-- 2")
+            , (Comment, "-- 2")
+            , (Code   , "bar")
+            , (Comment, "-- 3")
+            , (Comment, "-- 3")
+            ]
+          config = lHeaderConfig [[re|^foo|]] []
+      findHeader config sample `shouldBe` Just (2, 3)
+
+    it "finds block comment header put after composed constraint" $ do
+      let sample = SourceCode
+            [ (Comment, "{-| 1 -}")
+            , (Code   , "foo")
+            , (Comment, "{-| 2")
+            , (Comment, "2 -}")
+            , (Code   , "bar")
+            , (Comment, "{-| 3")
+            , (Comment, "3 -}")
+            ]
+          config = bHeaderConfig [[re|^bar|^foo|]] []
+      findHeader config sample `shouldBe` Just (5, 6)
+
+    it "finds line comment header put after composed constraint" $ do
+      let sample = SourceCode
+            [ (Comment, "-- 1")
+            , (Code   , "foo")
+            , (Comment, "-- 2")
+            , (Comment, "-- 2")
+            , (Code   , "bar")
+            , (Comment, "-- 3")
+            , (Comment, "-- 3")
+            ]
+          config = lHeaderConfig [[re|^bar|^foo|]] []
+      findHeader config sample `shouldBe` Just (5, 6)
+
+    it "finds nothing if no header present" $ do
+      let sample = SourceCode [(Code, "some"), (Code, "code without header")]
+          config = bHeaderConfig [] []
+      findHeader config sample `shouldBe` Nothing
+
+    it "finds nothing if header is present before 'putAfter' constraint" $ do
+      let sample = SourceCode
+            [ (Code   , "foo")
+            , (Comment, "{-| 1 -}")
+            , (Code   , "bar")
+            , (Code   , "some text")
+            ]
+          config = bHeaderConfig [[re|^bar|]] []
+      findHeader config sample `shouldBe` Nothing
+
     it "correctly detects headers using default YAML configuration" $ do
-      let path       = "test-data" </> "code-samples"
-          loadSample = \ft p ->
-            analyzeSourceCode (fileSupport ft) <$> loadFile (path </> p)
+      let loadSample = \ft p ->
+            analyzeSourceCode (fileSupport ft) <$> loadFile (samplesDir </> p)
       defaultConfig'     <- parseConfiguration defaultConfig
       HeadersConfig {..} <- makeHeadersConfig (cLicenseHeaders defaultConfig')
       sampleC1           <- loadSample C $ "c" </> "sample1.c"
