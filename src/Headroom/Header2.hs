@@ -1,33 +1,111 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module Headroom.Header2
-  ( -- * Copyright Header Detection
-    findHeader
+  ( -- * License header manipulation
+    addHeader
+  , dropHeader
+  , replaceHeader
+    -- * Copyright Header Detection
+  , findHeader
   , findBlockHeader
   , findLineHeader
   , splitSource
   )
 where
 
-import           Data.Coerce                         ( coerce )
 import           Headroom.Configuration.Types        ( CtHeaderConfig
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      )
+import           Headroom.Data.Coerce                ( coerce
+                                                     , inner
+                                                     )
+import           Headroom.Data.Lens                  ( suffixLensesFor )
 import           Headroom.Data.Regex                 ( Regex
                                                      , isMatch
                                                      )
+import           Headroom.Header.Types               ( FileInfo(..) )
 import           Headroom.SourceCode                 ( CodeLine
                                                      , LineType(..)
                                                      , SourceCode(..)
                                                      , firstMatching
+                                                     , fromText
                                                      , lastMatching
+                                                     , stripEnd
+                                                     , stripStart
                                                      )
 import           RIO
 import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
+
+
+suffixLensesFor ["fiHeaderPos"] ''FileInfo
+
+
+-- | Adds given header at position specified by the 'FileInfo'. Does nothing if
+-- any header is already present, use 'replaceHeader' if you need to
+-- override it.
+addHeader :: FileInfo
+          -- ^ info about file where header is added
+          -> Text
+          -- ^ text of the new header
+          -> SourceCode
+          -- ^ source code where to add the header
+          -> SourceCode
+          -- ^ resulting source code with added header
+addHeader FileInfo {..} _ source | isJust fiHeaderPos = source
+addHeader FileInfo {..} header source                 = mconcat chunks
+ where
+  HeaderConfig {..}       = fiHeaderConfig
+  (before, middle, after) = splitSource hcPutAfter hcPutBefore source
+  header'                 = fromText [] (const $ pure Comment) header
+  before'                 = stripEnd before
+  middle'                 = stripStart middle
+  margin (SourceCode ls) mInner mOuter
+    | L.null ls = coerce $ replicate mOuter (Code, T.empty)
+    | otherwise = coerce $ replicate mInner (Code, T.empty)
+  marginT = margin before' hcMarginTopCode hcMarginTopFile
+  marginB = margin (middle' <> after) hcMarginBottomCode hcMarginBottomFile
+  chunks  = [before', marginT, header', marginB, middle', after]
+
+
+-- | Drops header at position specified by the 'FileInfo' from the given source
+-- code. Does nothing if no header is present.
+dropHeader :: FileInfo
+           -- ^ info about the file from which the header will be dropped
+           -> SourceCode
+           -- ^ text of the file from which to drop the header
+           -> SourceCode
+           -- ^ resulting text with dropped header
+dropHeader (FileInfo _ _ Nothing             _) source = source
+dropHeader (FileInfo _ _ (Just (start, end)) _) source = result
+ where
+  before = inner @_ @[CodeLine] (take start) source
+  after  = inner @_ @[CodeLine] (drop $ end + 1) source
+  result = stripEnd before <> stripStart after
+
+
+-- | Replaces existing header at position specified by the 'FileInfo' in the
+-- given text. Basically combines 'addHeader' with 'dropHeader'. If no header
+-- is present, then the given one is added to the text.
+replaceHeader :: FileInfo
+              -- ^ info about the file in which to replace the header
+              -> Text
+              -- ^ text of the new header
+              -> SourceCode
+              -- ^ text of the file where to replace the header
+              -> SourceCode
+              -- ^ resulting text with replaced header
+replaceHeader fileInfo header = addHeader' . dropHeader'
+ where
+  addHeader'     = addHeader infoWithoutPos header
+  dropHeader'    = dropHeader fileInfo
+  infoWithoutPos = fileInfo & fiHeaderPosL .~ Nothing
 
 
 -- | Finds header position in given text, where position is represented by

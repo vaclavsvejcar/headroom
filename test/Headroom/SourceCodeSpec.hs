@@ -79,3 +79,17 @@ spec = do
           expected  = Just (10, (Code, "this is code with // comment"))
           predicate = \(lt, l) -> lt == Code && "this" `T.isPrefixOf` l
       lastMatching predicate sample `shouldBe` expected
+
+
+  describe "stripStart" $ do
+    it "strips empty lines from the start of the source code" $ do
+      let sample = SourceCode [(Code, ""), (Code, ""), (Code, "h"), (Code, "")]
+          expected = SourceCode [(Code, "h"), (Code, "")]
+      stripStart sample `shouldBe` expected
+
+
+  describe "stripEnd" $ do
+    it "strips empty lines from the start of the source code" $ do
+      let sample = SourceCode [(Code, ""), (Code, "h"), (Code, ""), (Code, "")]
+          expected = SourceCode [(Code, ""), (Code, "h")]
+      stripEnd sample `shouldBe` expected

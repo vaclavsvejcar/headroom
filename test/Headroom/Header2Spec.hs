@@ -26,6 +26,7 @@ import           Headroom.FileSupport                ( analyzeSourceCode
                                                      )
 import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Header.Types               ( FileInfo(..) )
 import           Headroom.Header2
 import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
@@ -35,6 +36,7 @@ import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec                   hiding ( after
                                                      , before
                                                      )
+
 
 
 spec :: Spec
@@ -53,6 +55,247 @@ spec = do
         pb
         pa
         (BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing)
+
+
+  describe "addHeader" $ do
+    let fileInfo config = FileInfo Haskell config Nothing mempty
+
+    it "adds header at the beginning of text (with no margin)" $ do
+      let
+        info   = fileInfo $ bHeaderConfig [] []
+        header = "HEADER"
+        sample = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+        expected = SourceCode
+          [ (Comment, "HEADER")
+          , (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Code   , "after")
+          , (Code   , "4")
+          ]
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at the beginning of text (with margin-top-file)" $ do
+      let
+        info   = fileInfo $ bHeaderConfigM 0 1 0 0 [] []
+        header = "HEADER"
+        sample = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+        expected = SourceCode
+          [ (Code   , "")
+          , (Comment, "HEADER")
+          , (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Code   , "after")
+          , (Code   , "4")
+          ]
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at the beginning of text (with both margins)" $ do
+      let
+        info   = fileInfo $ bHeaderConfigM 2 1 2 1 [] []
+        header = "HEADER"
+        sample = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+        expected = SourceCode
+          [ (Code   , "")
+          , (Comment, "HEADER")
+          , (Code   , "")
+          , (Code   , "")
+          , (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Code   , "after")
+          , (Code   , "4")
+          ]
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at correct position" $ do
+      let
+        info   = fileInfo $ bHeaderConfig [[re|^before|]] [[re|^after|]]
+        header = "{-| HEADER -}"
+        sample = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+        expected = SourceCode
+          [ (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Comment, "{-| HEADER -}")
+          , (Code   , "after")
+          , (Code   , "4")
+          ]
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at correct position (with both margins)" $ do
+      let
+        info = fileInfo $ bHeaderConfigM 2 1 2 1 [[re|^before|]] [[re|^after|]]
+        header = "{-| HEADER -}"
+        sample = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+        expected = SourceCode
+          [ (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Code   , "")
+          , (Code   , "")
+          , (Comment, "{-| HEADER -}")
+          , (Code   , "")
+          , (Code   , "")
+          , (Code   , "after")
+          , (Code   , "4")
+          ]
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at the end of text (with no margin)" $ do
+      let
+        info     = fileInfo $ bHeaderConfig [[re|^before|]] []
+        header   = "{-| HEADER -}"
+        sample   = SourceCode [(Code, "1"), (Code, "2"), (Code, "before")]
+        expected = SourceCode
+          [ (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Comment, "{-| HEADER -}")
+          ]
+      addHeader info header sample `shouldBe` expected
+
+    it "adds header at the end of text (with both margins)" $ do
+      let info     = fileInfo $ bHeaderConfigM 2 1 2 1 [[re|^before|]] []
+          header   = "{-| HEADER -}"
+          sample   = SourceCode [(Code, "1"), (Code, "2"), (Code, "before")]
+          expected = SourceCode
+            [ (Code   , "1")
+            , (Code   , "2")
+            , (Code   , "before")
+            , (Code   , "")
+            , (Code   , "")
+            , (Comment, "{-| HEADER -}")
+            , (Code   , "")
+            ]
+      addHeader info header sample `shouldBe` expected
+
+    it "does nothing if header is already present" $ do
+      let info   = FileInfo Haskell config (Just (3, 3)) mempty
+          config = bHeaderConfig [[re|^before|]] []
+          header = "{-| HEADER -}"
+          sample = SourceCode
+            [ (Code   , "1")
+            , (Code   , "2")
+            , (Code   , "before")
+            , (Comment, "{-| OLDHEADER -}")
+            , (Code   , "after")
+            , (Code   , "4")
+            ]
+      addHeader info header sample `shouldBe` sample
+
+
+  describe "dropHeader" $ do
+    it "does nothing if no header is present" $ do
+      let
+        config = bHeaderConfig [] []
+        info   = FileInfo Haskell config Nothing mempty
+        sample = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+      dropHeader info sample `shouldBe` sample
+
+    it "drops existing single line header" $ do
+      let
+        config = bHeaderConfig [] []
+        info   = FileInfo Haskell config (Just (3, 3)) mempty
+        sample = SourceCode
+          [ (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Comment, "{-| HEADER -}")
+          , (Code   , "after")
+          , (Code   , "4")
+          ]
+        expected = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+      dropHeader info sample `shouldBe` expected
+
+    it "drops existing multi line header" $ do
+      let
+        config = bHeaderConfig [] []
+        info   = FileInfo Haskell config (Just (3, 4)) mempty
+        sample = SourceCode
+          [ (Code   , "1")
+          , (Code   , "2")
+          , (Code   , "before")
+          , (Comment, "{-| HEADER")
+          , (Comment, "HERE -}")
+          , (Code   , "after")
+          , (Code   , "4")
+          ]
+        expected = SourceCode
+          [ (Code, "1")
+          , (Code, "2")
+          , (Code, "before")
+          , (Code, "after")
+          , (Code, "4")
+          ]
+      dropHeader info sample `shouldBe` expected
+
+
+  describe "replaceHeader" $ do
+    it "replaces existing header" $ do
+      let info   = FileInfo Haskell config (Just (3, 3)) mempty
+          config = bHeaderConfig [[re|^before|]] []
+          header = "{-| HEADER -}"
+          sample = SourceCode
+            [ (Code   , "1")
+            , (Code   , "2")
+            , (Code   , "before")
+            , (Comment, "{-| OLDHEADER -}")
+            , (Code   , "after")
+            , (Code   , "4")
+            ]
+          expected = SourceCode
+            [ (Code   , "1")
+            , (Code   , "2")
+            , (Code   , "before")
+            , (Comment, "{-| HEADER -}")
+            , (Code   , "after")
+            , (Code   , "4")
+            ]
+      replaceHeader info header sample `shouldBe` expected
 
 
   describe "findHeader" $ do
