@@ -2,6 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE NoImplicitPrelude          #-}
 {-# LANGUAGE StrictData                 #-}
+{-# LANGUAGE TypeApplications           #-}
 {-# LANGUAGE ViewPatterns               #-}
 
 {-|
@@ -25,17 +26,23 @@ module Headroom.SourceCode
   , toText
   , firstMatching
   , lastMatching
+  , stripStart
+  , stripEnd
   )
 where
 
 import           Control.Monad.State                 ( State
                                                      , evalState
                                                      )
-import           Data.Coerce                         ( coerce )
+import           Headroom.Data.Coerce                ( coerce
+                                                     , inner
+                                                     )
 import           Headroom.Data.Text                  ( fromLines
                                                      , toLines
                                                      )
 import           RIO
+import qualified RIO.List                           as L
+import qualified RIO.Text                           as T
 
 
 data LineType
@@ -71,3 +78,11 @@ lastMatching :: (CodeLine -> Bool) -> SourceCode -> Maybe (Int, CodeLine)
 lastMatching f (SourceCode ls) =
   let matching = firstMatching f . SourceCode . reverse $ ls
   in  fmap (first ((length ls - 1) -)) matching
+
+
+stripStart :: SourceCode -> SourceCode
+stripStart = inner @_ @[CodeLine] (L.dropWhile (T.null . T.strip . snd))
+
+
+stripEnd :: SourceCode -> SourceCode
+stripEnd = inner @_ @[CodeLine] (L.dropWhileEnd (T.null . T.strip . snd))
