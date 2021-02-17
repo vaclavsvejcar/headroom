@@ -10,6 +10,9 @@ where
 import           Headroom.Configuration.Types        ( LicenseType(..) )
 import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.Embedded                   ( licenseTemplate )
+import           Headroom.FileSupport                ( analyzeSourceCode
+                                                     , fileSupport
+                                                     )
 import           Headroom.FileSupport.Haskell.Haddock
 import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
                                                      , TemplateData(..)
@@ -36,6 +39,7 @@ spec = do
 
   describe "extractModuleHeader" $ do
     it "extracts fields from Haddock module header" $ do
+      raw <- loadFile $ codeSamples </> "haskell" </> "header.hs"
       let
         expected = HaddockModuleHeader
           { hmhCopyright   = Just
@@ -50,7 +54,7 @@ spec = do
               "Here is a longer description of this module, containing some\n\
               \commentary with @some markup@."
           }
-      sample <- loadFile $ codeSamples </> "haskell" </> "header.hs"
+        sample = analyzeSourceCode (fileSupport Haskell) raw
       extractModuleHeader sample NoTemplateData `shouldBe` expected
 
 

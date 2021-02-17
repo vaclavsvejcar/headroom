@@ -4,6 +4,7 @@
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TupleSections     #-}
+{-# LANGUAGE TypeApplications  #-}
 
 {-|
 Module      : Headroom.FileSupport.PureScript
@@ -31,17 +32,20 @@ module Headroom.FileSupport.PureScript
   )
 where
 
+import           Headroom.Data.Coerce                ( coerce )
 import           Headroom.Data.Regex                 ( isMatch
                                                      , match
                                                      , re
                                                      )
-import           Headroom.Data.Text                  ( toLines )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate )
+import           Headroom.SourceCode                 ( CodeLine
+                                                     , SourceCode(..)
+                                                     )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
@@ -68,14 +72,18 @@ syntaxAnalysis = SyntaxAnalysis
   }
 
 
-extractVariables :: HeaderTemplate -> Maybe (Int, Int) -> Text -> Variables
-extractVariables _ _ text = (mkVariables . catMaybes)
-  [("_purescript_module_name", ) <$> extractModuleName text]
+extractVariables :: HeaderTemplate
+                 -> Maybe (Int, Int)
+                 -> SourceCode
+                 -> Variables
+extractVariables _ _ source = (mkVariables . catMaybes)
+  [("_purescript_module_name", ) <$> extractModuleName source]
 
 
-extractModuleName :: Text -> Maybe Text
-extractModuleName = go . toLines
+extractModuleName :: SourceCode -> Maybe Text
+extractModuleName = go . fmap snd . coerce @_ @[CodeLine]
  where
   go []       = Nothing
   go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^module\s+(\S+)|] x)
+
 
