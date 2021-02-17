@@ -28,6 +28,7 @@ module Headroom.SourceCode
   , lastMatching
   , stripStart
   , stripEnd
+  , cut
   )
 where
 
@@ -86,3 +87,7 @@ stripStart = inner @_ @[CodeLine] (L.dropWhile (T.null . T.strip . snd))
 
 stripEnd :: SourceCode -> SourceCode
 stripEnd = inner @_ @[CodeLine] (L.dropWhileEnd (T.null . T.strip . snd))
+
+
+cut :: Int -> Int -> SourceCode -> SourceCode
+cut s e = inner @_ @[CodeLine] (L.take (e - s) . L.drop s)

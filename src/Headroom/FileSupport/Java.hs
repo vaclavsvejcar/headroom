@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TupleSections     #-}
+{-# LANGUAGE TypeApplications  #-}
 
 {-|
 Module      : Headroom.FileSupport.Java
@@ -29,17 +30,20 @@ module Headroom.FileSupport.Java
   )
 where
 
+import           Headroom.Data.Coerce                ( coerce )
 import           Headroom.Data.Regex                 ( isMatch
                                                      , match
                                                      , re
                                                      )
-import           Headroom.Data.Text                  ( toLines )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate )
+import           Headroom.SourceCode                 ( CodeLine
+                                                     , SourceCode(..)
+                                                     )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
@@ -65,13 +69,16 @@ syntaxAnalysis = SyntaxAnalysis { saIsCommentStart = isMatch [re|^\/\*|^\/\/|]
                                 }
 
 
-extractPackageName :: Text -> Maybe Text
-extractPackageName = go . toLines
+extractVariables :: HeaderTemplate
+                 -> Maybe (Int, Int)
+                 -> SourceCode
+                 -> Variables
+extractVariables _ _ source = (mkVariables . catMaybes)
+  [("_java_package_name", ) <$> extractPackageName source]
+
+
+extractPackageName :: SourceCode -> Maybe Text
+extractPackageName = go . fmap snd . coerce @_ @[CodeLine]
  where
   go []       = Nothing
   go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^package (.*);$|] x)
-
-
-extractVariables :: HeaderTemplate -> Maybe (Int, Int) -> Text -> Variables
-extractVariables _ _ text = (mkVariables . catMaybes)
-  [("_java_package_name", ) <$> extractPackageName text]

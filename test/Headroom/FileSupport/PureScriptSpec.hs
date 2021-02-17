@@ -13,7 +13,9 @@ import           Headroom.Configuration              ( makeHeadersConfig
                                                      )
 import           Headroom.Configuration.Types        ( Configuration(..) )
 import           Headroom.Embedded                   ( defaultConfig )
-import           Headroom.FileSupport.PureScript
+import           Headroom.FileSupport                ( analyzeSourceCode
+                                                     , fileSupport
+                                                     )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
@@ -50,7 +52,7 @@ spec = do
   describe "fsExtractTemplateData" $ do
     it "doesn't provide any custom data for PureScript" $ do
       template <- emptyTemplate @_ @Mustache
-      fsExtractTemplateData fileSupport template `shouldBe` NoTemplateData
+      fsExtractTemplateData fileSupport' template `shouldBe` NoTemplateData
 
 
   describe "fsExtractVariables" $ do
@@ -58,18 +60,20 @@ spec = do
       template       <- emptyTemplate @_ @Mustache
       defaultConfig' <- parseConfiguration defaultConfig
       config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
-      sample         <- loadFile $ codeSamples </> "full.purs"
+      raw            <- loadFile $ codeSamples </> "full.purs"
       let ht        = extractHeaderTemplate config PureScript template
           headerPos = Just (1, 13)
           expected  = mkVariables [("_purescript_module_name", "Test")]
-      fsExtractVariables fileSupport ht headerPos sample `shouldBe` expected
+          sample    = analyzeSourceCode fileSupport' raw
+      fsExtractVariables fileSupport' ht headerPos sample `shouldBe` expected
 
 
   describe "fsFileType" $ do
     it "matches correct type for PureScript" $ do
-      fsFileType fileSupport `shouldBe` PureScript
+      fsFileType fileSupport' `shouldBe` PureScript
 
  where
+  fileSupport' = fileSupport PureScript
   checkSyntaxAnalysis (l, (s, e)) =
-    let SyntaxAnalysis {..} = fsSyntaxAnalysis fileSupport
+    let SyntaxAnalysis {..} = fsSyntaxAnalysis fileSupport'
     in  saIsCommentStart l == s && saIsCommentEnd l == e

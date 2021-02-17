@@ -15,7 +15,7 @@ This module contains data types for "Headroom.Header" module.
 
 module Headroom.Header.Types
   ( -- * Data Types
-    FileInfo(..)
+    HeaderInfo(..)
   , HeaderTemplate(..)
   )
 where
@@ -28,15 +28,15 @@ import           Headroom.Variables.Types            ( Variables )
 import           RIO
 
 
--- | Info extracted about the concrete source code file.
-data FileInfo = FileInfo
-  { fiFileType     :: FileType
+-- | Info extracted about the source code file header.
+data HeaderInfo = HeaderInfo
+  { hiFileType     :: FileType
   -- ^ type of the file
-  , fiHeaderConfig :: CtHeaderConfig
+  , hiHeaderConfig :: CtHeaderConfig
   -- ^ configuration for license header
-  , fiHeaderPos    :: Maybe (Int, Int)
+  , hiHeaderPos    :: Maybe (Int, Int)
   -- ^ position of existing license header
-  , fiVariables    :: Variables
+  , hiVariables    :: Variables
   -- ^ additional extracted variables
   }
   deriving (Eq, Show)

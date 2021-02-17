@@ -1,70 +1,86 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeFamilies      #-}
 
-{-|
-Module      : Headroom.Header
-Description : License header manipulation
-Copyright   : (c) 2019-2021 Vaclav Svejcar
-License     : BSD-3-Clause
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
-
-This module is the heart of /Headroom/ as it contains functions for working with
-the /license headers/ and the /source code files/.
--}
-
 module Headroom.Header
-  ( -- * Header template extraction
-    extractHeaderTemplate
-    -- * File info extraction
-  , extractFileInfo
+  ( -- * Header Info Extraction
+    extractHeaderInfo
+  , extractHeaderTemplate
     -- * License header manipulation
   , addHeader
   , dropHeader
   , replaceHeader
-    -- * License header detection
+    -- * Copyright Header Detection
   , findHeader
   , findBlockHeader
   , findLineHeader
-  , firstMatching
-  , lastMatching
-  , splitInput
+  , splitSource
   )
 where
 
 import           Headroom.Configuration.Types        ( CtHeaderConfig
+                                                     , CtHeaderConfig
                                                      , CtHeadersConfig
                                                      , HeaderConfig(..)
+                                                     , HeaderConfig(..)
                                                      , HeaderSyntax(..)
+                                                     , HeaderSyntax(..)
+                                                     )
+import           Headroom.Data.Coerce                ( coerce
+                                                     , inner
                                                      )
 import           Headroom.Data.Lens                  ( suffixLensesFor )
 import           Headroom.Data.Regex                 ( Regex
                                                      , isMatch
-                                                     )
-import           Headroom.Data.Text                  ( fromLines
-                                                     , toLines
                                                      )
 import           Headroom.FileSupport                ( fileSupport )
 import           Headroom.FileSupport.Types          ( FileSupport(..) )
 import           Headroom.FileType                   ( configByFileType )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Header.Sanitize            ( findPrefix )
-import           Headroom.Header.Types               ( FileInfo(..)
+import           Headroom.Header.Types               ( HeaderInfo(..)
                                                      , HeaderTemplate(..)
                                                      )
 import           Headroom.Meta                       ( TemplateType )
+import           Headroom.SourceCode                 ( CodeLine
+                                                     , LineType(..)
+                                                     , SourceCode(..)
+                                                     , firstMatching
+                                                     , fromText
+                                                     , lastMatching
+                                                     , stripEnd
+                                                     , stripStart
+                                                     )
 import           Headroom.Template                   ( Template(..) )
 import           RIO
 import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
 
 
-suffixLensesFor ["fiHeaderPos"] ''FileInfo
+
 suffixLensesFor ["hcHeaderSyntax"] ''HeaderConfig
+suffixLensesFor ["hiHeaderPos"]    ''HeaderInfo
+
+
+-- | Extracts info about the processed file to be later used by the header
+-- detection/manipulation functions.
+extractHeaderInfo :: HeaderTemplate
+                  -- ^ template info
+                  -> SourceCode
+                  -- ^ text used for detection
+                  -> HeaderInfo
+                  -- ^ resulting file info
+extractHeaderInfo ht@HeaderTemplate {..} source =
+  let hiFileType     = htFileType
+      hiHeaderConfig = htConfig
+      hiHeaderPos    = findHeader hiHeaderConfig source
+      hiVariables    = fsExtractVariables ht hiHeaderPos source
+  in  HeaderInfo { .. }
+  where FileSupport {..} = fileSupport htFileType
 
 
 -- | Constructs new 'HeaderTemplate' from provided data.
@@ -83,87 +99,70 @@ extractHeaderTemplate configs fileType template =
       htTemplate     = template
   in  HeaderTemplate { .. }
  where
-  withP config = config & (hcHeaderSyntaxL %~ headerSyntax)
-  headerSyntax hs = findPrefix hs (rawTemplate template)
   FileSupport {..} = fileSupport fileType
-
-
--- | Extracts info about the processed file to be later used by the header
--- detection/manipulation functions.
-extractFileInfo :: HeaderTemplate
-                -- ^ template info
-                -> Text
-                -- ^ text used for detection
-                -> FileInfo
-                -- ^ resulting file info
-extractFileInfo ht@HeaderTemplate {..} text =
-  let fiFileType     = htFileType
-      fiHeaderConfig = htConfig
-      fiHeaderPos    = findHeader fiHeaderConfig text
-      fiVariables    = fsExtractVariables ht fiHeaderPos text
-  in  FileInfo { .. }
-  where FileSupport {..} = fileSupport htFileType
+  withP            = \config -> config & hcHeaderSyntaxL %~ headerSyntax
+  headerSyntax     = \hs -> findPrefix hs (rawTemplate template)
 
 
 -- | Adds given header at position specified by the 'FileInfo'. Does nothing if
 -- any header is already present, use 'replaceHeader' if you need to
 -- override it.
-addHeader :: FileInfo
-          -- ^ info about file where header is added
+addHeader :: HeaderInfo
+          -- ^ additional info about the header
           -> Text
           -- ^ text of the new header
-          -> Text
-          -- ^ text of the file where to add the header
-          -> Text
-          -- ^ resulting text with added header
-addHeader FileInfo {..} _ text | isJust fiHeaderPos = text
-addHeader FileInfo {..} header text                 = result
+          -> SourceCode
+          -- ^ source code where to add the header
+          -> SourceCode
+          -- ^ resulting source code with added header
+addHeader HeaderInfo {..} _ source | isJust hiHeaderPos = source
+addHeader HeaderInfo {..} header source                 = mconcat chunks
  where
-  (before, middle, after) = splitInput hcPutAfter hcPutBefore text
-  HeaderConfig {..}       = fiHeaderConfig
-  before'                 = stripLinesEnd before
-  middle'                 = stripLinesStart middle
-  margin [] _      mOuter = replicate mOuter T.empty
-  margin _  mInner _      = replicate mInner T.empty
-  marginBefore = margin before' hcMarginTopCode hcMarginTopFile
-  marginAfter  = margin (middle' <> after) hcMarginBottomCode hcMarginBottomFile
-  result       = fromLines $ concat joined
-  joined       = [before', marginBefore, [header], marginAfter, middle', after]
+  HeaderConfig {..}       = hiHeaderConfig
+  (before, middle, after) = splitSource hcPutAfter hcPutBefore source
+  header'                 = fromText [] (const $ pure Comment) header
+  before'                 = stripEnd before
+  middle'                 = stripStart middle
+  margin (SourceCode ls) mInner mOuter
+    | L.null ls = coerce $ replicate mOuter (Code, T.empty)
+    | otherwise = coerce $ replicate mInner (Code, T.empty)
+  marginT = margin before' hcMarginTopCode hcMarginTopFile
+  marginB = margin (middle' <> after) hcMarginBottomCode hcMarginBottomFile
+  chunks  = [before', marginT, header', marginB, middle', after]
 
 
--- | Drops header at position specified by the 'FileInfo' from the given text.
--- Does nothing if no header is present.
-dropHeader :: FileInfo
-           -- ^ info about the file from which the header will be dropped
-           -> Text
+-- | Drops header at position specified by the 'FileInfo' from the given source
+-- code. Does nothing if no header is present.
+dropHeader :: HeaderInfo
+           -- ^ additional info about the header
+           -> SourceCode
            -- ^ text of the file from which to drop the header
-           -> Text
+           -> SourceCode
            -- ^ resulting text with dropped header
-dropHeader (FileInfo _ _ Nothing             _) text = text
-dropHeader (FileInfo _ _ (Just (start, end)) _) text = result
+dropHeader (HeaderInfo _ _ Nothing             _) source = source
+dropHeader (HeaderInfo _ _ (Just (start, end)) _) source = result
  where
-  before     = take start inputLines
-  after      = drop (end + 1) inputLines
-  inputLines = toLines text
-  result     = fromLines (stripLinesEnd before <> stripLinesStart after)
+  before = inner @_ @[CodeLine] (take start) source
+  after  = inner @_ @[CodeLine] (drop $ end + 1) source
+  result = stripEnd before <> stripStart after
 
 
 -- | Replaces existing header at position specified by the 'FileInfo' in the
 -- given text. Basically combines 'addHeader' with 'dropHeader'. If no header
 -- is present, then the given one is added to the text.
-replaceHeader :: FileInfo
-              -- ^ info about the file in which to replace the header
+replaceHeader :: HeaderInfo
+              -- ^ additional info about the header
               -> Text
               -- ^ text of the new header
-              -> Text
+              -> SourceCode
               -- ^ text of the file where to replace the header
-              -> Text
+              -> SourceCode
               -- ^ resulting text with replaced header
 replaceHeader fileInfo header = addHeader' . dropHeader'
  where
   addHeader'     = addHeader infoWithoutPos header
   dropHeader'    = dropHeader fileInfo
-  infoWithoutPos = set fiHeaderPosL Nothing fileInfo
+  infoWithoutPos = fileInfo & hiHeaderPosL .~ Nothing
 
 
 -- | Finds header position in given text, where position is represented by
@@ -174,21 +173,20 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- >>> :set -XFlexibleContexts -XTypeFamilies -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment [re|^{-|] [re|(?<!#)-}$|] Nothing)
--- >>> findHeader hc "foo\nbar\n{- HEADER -}\nbaz"
+-- >>> findHeader hc $ SourceCode [(Code, "foo"), (Code, "bar"), (Comment, "{- HEADER -}")]
 -- Just (2,2)
 findHeader :: CtHeaderConfig
            -- ^ appropriate header configuration
-           -> Text
+           -> SourceCode
            -- ^ text in which to detect the header
            -> Maybe (Int, Int)
            -- ^ header position @(startLine, endLine)@
 findHeader HeaderConfig {..} input = case hcHeaderSyntax of
-  BlockComment start end _ -> findBlockHeader start end inLines splitAt
-  LineComment prefix _     -> findLineHeader prefix inLines splitAt
+  BlockComment start end _ -> findBlockHeader start end headerArea splitAt
+  LineComment prefix _     -> findLineHeader prefix headerArea splitAt
  where
-  (before, headerArea, _) = splitInput hcPutAfter hcPutBefore input
-  splitAt                 = L.length before
-  inLines                 = T.strip <$> headerArea
+  (before, headerArea, _) = splitSource hcPutAfter hcPutBefore input
+  splitAt                 = length (coerce before :: [CodeLine])
 
 
 -- | Finds header in the form of /multi-line comment/ syntax, which is delimited
@@ -196,31 +194,32 @@ findHeader HeaderConfig {..} input = case hcHeaderSyntax of
 --
 -- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
--- >>> findBlockHeader [re|^{-|] [re|(?<!#)-}$|] ["", "{- HEADER -}", "", ""] 0
+-- >>> let sc = SourceCode [(Code, ""), (Comment, "{- HEADER -}"), (Code, ""), (Code,"")]
+-- >>> findBlockHeader [re|^{-|] [re|(?<!#)-}$|] sc 0
 -- Just (1,1)
 findBlockHeader :: Regex
                 -- ^ starting pattern (e.g. @{-@ or @/*@)
                 -> Regex
                 -- ^ ending pattern (e.g. @-}@ or @*/@)
-                -> [Text]
-                -- ^ lines of text in which to detect the header
+                -> SourceCode
+                -- ^ source code in which to detect the header
                 -> Int
                 -- ^ line number offset (adds to resulting position)
                 -> Maybe (Int, Int)
                 -- ^ header position @(startLine + offset, endLine + offset)@
-findBlockHeader startsWith endsWith = go Nothing Nothing 0
+findBlockHeader start end sc offset = mapT2 (+ offset) <$> position
  where
-  isStart = isMatch startsWith
-  isEnd   = isMatch endsWith
-  oneLiner line = isStart line && isEnd line
-  ind curr line | isStart line = curr + (1 :: Integer)
-  ind curr line | isEnd line   = curr - (1 :: Integer)
-  ind curr _                   = curr
-  go Nothing _ 0 (x : _) i | oneLiner x    = Just (i, i)
-  go Nothing _ 0 (x : xs) i | ind 0 x == 1 = go (Just i) Nothing 1 xs (i + 1)
-  go (Just s) _ 1 (x : _) i | ind 1 x == 0 = Just (s, i)
-  go s e l (x : xs) i                      = go s e (ind l x) xs (i + 1)
-  go _ _ _ []       _                      = Nothing
+  ls          = zip [0 ..] $ coerce sc
+  isMatch'    = \p t -> isMatch p . T.strip $ t
+  allComments = all (\(_, (lt, _)) -> lt == Comment)
+  hasStart    = maybe False (\(_, (_, t)) -> isMatch' start t) . L.headMaybe
+  hasEnd      = maybe False (\(_, (_, t)) -> isMatch' end t) . L.lastMaybe
+  position    = (,) <$> (header >>= L.headMaybe) <*> (header >>= L.lastMaybe)
+  header =
+    (fmap . fmap) fst
+      . L.find (\g -> allComments g && hasStart g && hasEnd g)
+      . L.groupBy (\(_, (lt1, _)) (_, (lt2, _)) -> lt1 == lt2)
+      $ ls
 
 
 -- | Finds header in the form of /single-line comment/ syntax, which is
@@ -228,112 +227,68 @@ findBlockHeader startsWith endsWith = go Nothing Nothing 0
 --
 -- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
--- >>> findLineHeader [re|^--|] ["", "a", "-- first", "-- second", "foo"] 0
+-- >>> let sc = SourceCode [(Code, ""), (Code, "a"), (Comment, "-- first"), (Comment, "-- second"), (Code, "foo")]
+-- >>> findLineHeader [re|^--|] sc 0
 -- Just (2,3)
 findLineHeader :: Regex
                -- ^ prefix pattern (e.g. @--@ or @//@)
-               -> [Text]
-               -- ^ lines of text in which to detect the header
+               -> SourceCode
+               -- ^ source code in which to detect the header
                -> Int
                -- ^ line number offset (adds to resulting position)
                -> Maybe (Int, Int)
                -- ^ header position @(startLine + offset, endLine + offset)@
-findLineHeader prefix = go Nothing
+findLineHeader prefix sc offset = mapT2 (+ offset) <$> position
  where
-  isPrefix = isMatch prefix
-  go Nothing (x : xs) i | isPrefix x      = go (Just i) xs (i + 1)
-  go Nothing (_ : xs) i                   = go Nothing xs (i + 1)
-  go (Just start) (x : xs) i | isPrefix x = go (Just start) xs (i + 1)
-  go (Just start) _  i                    = Just (start, i - 1)
-  go _            [] _                    = Nothing
+  ls       = zip [0 ..] $ coerce sc
+  isMatch' = \p t -> isMatch p . T.strip $ t
+  position = (,) <$> (header >>= L.headMaybe) <*> (header >>= L.lastMaybe)
+  header =
+    (fmap . fmap) fst
+      . L.find (all (\(_, (lt, t)) -> lt == Comment && isMatch' prefix t))
+      . L.groupBy (\(_, (lt1, _)) (_, (lt2, _)) -> lt1 == lt2)
+      $ ls
 
 
--- | Finds very first line that matches the given /regex/ (numbered from zero).
+-- | Splits input source code into three parts:
 --
--- >>> :set -XQuasiQuotes
--- >>> import Headroom.Data.Regex (re)
--- >>> firstMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
--- Just 1
-firstMatching :: [Regex]
-              -- ^ /regex/ used for matching
-              -> [Text]
-              -- ^ input lines
-              -> Maybe Int
-              -- ^ matching line number
-firstMatching patterns input = go input 0
- where
-  cond x = any (`isMatch` x) patterns
-  go (x : _) i | cond x = Just i
-  go (_ : xs) i         = go xs (i + 1)
-  go []       _         = Nothing
-
-
--- | Finds very last line that matches the given /regex/ (numbered from zero).
---
--- >>> :set -XQuasiQuotes
--- >>> import Headroom.Data.Regex (re)
--- >>> lastMatching [[re|^foo|]] ["some text", "foo bar", "foo baz", "last"]
--- Just 2
-lastMatching :: [Regex]
-             -- ^ /regex/ used for matching
-             -> [Text]
-             -- ^ input lines
-             -> Maybe Int
-             -- ^ matching line number
-lastMatching patterns input = go input 0 Nothing
- where
-  cond x = any (`isMatch` x) patterns
-  go (x : xs) i _ | cond x = go xs (i + 1) (Just i)
-  go (_ : xs) i pos        = go xs (i + 1) pos
-  go []       _ pos        = pos
-
-
--- | Splits input lines into three parts:
---
---     1. list of all lines located before the very last occurence of one of
---        the conditions from the first condition list
---     2. list of all lines between the first and last lists
---     3. list of all lines located after the very first occurence of one of
---        the conditions from the second condition list
+--     1. all lines located before the very last occurence of one of the
+--        conditions from the first condition list
+--     2. all lines between the first and last lists
+--     3. all lines located after the very first occurence of one of the
+--        conditions from the second condition list
 --
 -- If both first and second patterns are empty, then all lines are returned in
--- the middle list.
+-- the middle part.
 --
 -- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 --
--- >>> splitInput [[re|->|]] [[re|<-|]] "text\n->\nRESULT\n<-\nfoo"
--- (["text","->"],["RESULT"],["<-","foo"])
+-- >>> let ls = [(Code, "text"), (Code, "->"), (Code, "RESULT"), (Code, "<-"), (Code, "foo")]
+-- >>> splitSource [[re|->|]] [[re|<-|]] $ SourceCode ls
+-- (SourceCode [(Code,"text"),(Code,"->")],SourceCode [(Code,"RESULT")],SourceCode [(Code,"<-"),(Code,"foo")])
 --
--- >>> splitInput [] [[re|<-|]] "text\n->\nRESULT\n<-\nfoo"
--- ([],["text","->","RESULT"],["<-","foo"])
+-- >>> let ls = [(Code, "text"), (Code, "->"), (Code, "RESULT"), (Code, "<-"), (Code, "foo")]
+-- >>> splitSource [] [[re|<-|]] $ SourceCode ls
+-- (SourceCode [],SourceCode [(Code,"text"),(Code,"->"),(Code,"RESULT")],SourceCode [(Code,"<-"),(Code,"foo")])
 --
--- >>> splitInput [] [] "one\ntwo"
--- ([],["one","two"],[])
-splitInput :: [Regex]
-           -- ^ patterns for first split
-           -> [Regex]
-           -- ^ patterns for second split
-           -> Text
-           -- ^ text to split
-           -> ([Text], [Text], [Text])
-           -- ^ result lines as @([before1stSplit], [middle], [after2ndSplit])@
-splitInput []       []       input = ([], toLines input, [])
-splitInput fstSplit sndSplit input = (before, middle, after)
+-- >>> splitSource [] [] $ SourceCode [(Code,"foo"), (Code,"bar")]
+-- (SourceCode [],SourceCode [(Code,"foo"),(Code,"bar")],SourceCode [])
+splitSource :: [Regex]
+            -> [Regex]
+            -> SourceCode
+            -> (SourceCode, SourceCode, SourceCode)
+splitSource []    []    sc = (mempty, sc, mempty)
+splitSource fstPs sndPs sc = (before, middle, after)
  where
-  (middle', after ) = L.splitAt sndSplitAt inLines
-  (before , middle) = L.splitAt fstSplitAt middle'
-  fstSplitAt        = maybe 0 (+ 1) (lastMatching fstSplit middle')
-  sndSplitAt        = fromMaybe len (firstMatching sndSplit inLines)
-  inLines           = toLines input
-  len               = L.length inLines
+  allLines          = coerce sc
+  (middle', after ) = mapT2 SourceCode $ L.splitAt sndSplit allLines
+  (before , middle) = mapT2 SourceCode $ L.splitAt fstSplitAt (coerce middle')
+  cond              = \ps (lt, t) -> lt == Code && any (`isMatch` t) ps
+  fstSplitAt        = maybe 0 ((+ 1) . fst) $ lastMatching (cond fstPs) middle'
+  sndSplit          = maybe len fst $ firstMatching (cond sndPs) sc
+  len               = length allLines
 
 
-------------------------------  PRIVATE FUNCTIONS  -----------------------------
-
-stripLinesEnd :: [Text] -> [Text]
-stripLinesEnd = toLines . T.stripEnd . fromLines
-
-
-stripLinesStart :: [Text] -> [Text]
-stripLinesStart = toLines . T.stripStart . fromLines
+mapT2 :: (a -> b) -> (a, a) -> (b, b)
+mapT2 = join (***)

@@ -4,6 +4,7 @@
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TupleSections     #-}
+{-# LANGUAGE TypeApplications  #-}
 
 {-|
 Module      : Headroom.FileSupport.Haskell
@@ -44,9 +45,6 @@ import           Headroom.Data.Regex                 ( isMatch
                                                      , match
                                                      , re
                                                      )
-import           Headroom.Data.Text                  ( fromLines
-                                                     , toLines
-                                                     )
 import           Headroom.FileSupport.Haskell.Haddock
                                                      ( HaddockModuleHeader(..)
                                                      , extractModuleHeader
@@ -59,15 +57,18 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      )
 
+import           Headroom.Data.Coerce                ( coerce )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate(..) )
+import           Headroom.SourceCode                 ( CodeLine
+                                                     , SourceCode(..)
+                                                     , cut
+                                                     )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 import           RIO.Lens                            ( ix )
-import qualified RIO.List                           as L
-import qualified RIO.Text                           as T
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
@@ -97,25 +98,29 @@ extractTemplateData template =
   in  HaskellTemplateData templateData
 
 
-extractVariables :: HeaderTemplate -> Maybe (Int, Int) -> Text -> Variables
-extractVariables HeaderTemplate {..} headerPos text = (mkVariables . catMaybes)
-  [ ("_haskell_module_copyright", ) <$> hmhCopyright
-  , ("_haskell_module_license", ) <$> hmhLicense
-  , ("_haskell_module_maintainer", ) <$> hmhMaintainer
-  , ("_haskell_module_name", ) <$> extractModuleName text
-  , ("_haskell_module_portability", ) <$> hmhPortability
-  , ("_haskell_module_stability", ) <$> hmhStability
-  , ("_haskell_module_longdesc", ) <$> hmhLongDesc
-  , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
-  ]
+extractVariables :: HeaderTemplate
+                 -> Maybe (Int, Int)
+                 -> SourceCode
+                 -> Variables
+extractVariables HeaderTemplate {..} headerPos source =
+  (mkVariables . catMaybes)
+    [ ("_haskell_module_copyright", ) <$> hmhCopyright
+    , ("_haskell_module_license", ) <$> hmhLicense
+    , ("_haskell_module_maintainer", ) <$> hmhMaintainer
+    , ("_haskell_module_name", ) <$> extractModuleName source
+    , ("_haskell_module_portability", ) <$> hmhPortability
+    , ("_haskell_module_stability", ) <$> hmhStability
+    , ("_haskell_module_longdesc", ) <$> hmhLongDesc
+    , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
+    ]
  where
-  HaddockModuleHeader {..} = extractModuleHeader headerText htTemplateData
-  headerText               = maybe T.empty (\(s, e) -> cut s e text) headerPos
-  cut s e = fromLines . L.take (e - s) . L.drop s . toLines
+  HaddockModuleHeader {..} = extractModuleHeader header htTemplateData
+  header                   = maybe mempty (\(s, e) -> cut s e source) headerPos
 
 
-extractModuleName :: Text -> Maybe Text
-extractModuleName = go . toLines
+extractModuleName :: SourceCode -> Maybe Text
+extractModuleName = go . fmap snd . coerce @_ @[CodeLine]
  where
   go []       = Nothing
   go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^module\s+(\S+)|] x)
+

@@ -17,7 +17,9 @@ import           Headroom.Configuration.Types        ( Configuration(..)
 import           Headroom.Embedded                   ( defaultConfig
                                                      , licenseTemplate
                                                      )
-import           Headroom.FileSupport.Haskell
+import           Headroom.FileSupport                ( analyzeSourceCode
+                                                     , fileSupport
+                                                     )
 import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
                                                      , HaskellTemplateData'(..)
                                                      , TemplateData(..)
@@ -38,11 +40,9 @@ import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
 
 
-
 spec :: Spec
 spec = do
   let codeSamples = "test-data" </> "code-samples" </> "haskell"
-
 
   describe "fsSyntaxAnalysis" $ do
     it "correctly detects comment starts/ends" $ do
@@ -63,7 +63,7 @@ spec = do
       let o        = Just 14
           td       = HaskellTemplateData' HaddockOffsets { hoCopyright = o }
           expected = HaskellTemplateData td
-      fsExtractTemplateData fileSupport template `shouldBe` expected
+      fsExtractTemplateData fileSupport' template `shouldBe` expected
 
 
   describe "fsExtractVariables" $ do
@@ -71,7 +71,7 @@ spec = do
       template       <- emptyTemplate @_ @Mustache
       defaultConfig' <- parseConfiguration defaultConfig
       config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
-      sample         <- loadFile $ codeSamples </> "full.hs"
+      raw            <- loadFile $ codeSamples </> "full.hs"
       let ht        = extractHeaderTemplate config Haskell template
           headerPos = Just (1, 13)
           expected  = mkVariables
@@ -86,14 +86,16 @@ spec = do
             , ("_haskell_module_longdesc"   , "long\ndescription")
             , ("_haskell_module_shortdesc"  , "Short description")
             ]
-      fsExtractVariables fileSupport ht headerPos sample `shouldBe` expected
+          sample = analyzeSourceCode fileSupport' raw
+      fsExtractVariables fileSupport' ht headerPos sample `shouldBe` expected
 
 
   describe "fsFileType" $ do
     it "matches correct type for Haskell" $ do
-      fsFileType fileSupport `shouldBe` Haskell
+      fsFileType fileSupport' `shouldBe` Haskell
 
  where
+  fileSupport' = fileSupport Haskell
   checkSyntaxAnalysis (l, (s, e)) =
-    let SyntaxAnalysis {..} = fsSyntaxAnalysis fileSupport
+    let SyntaxAnalysis {..} = fsSyntaxAnalysis fileSupport'
     in  saIsCommentStart l == s && saIsCommentEnd l == e

@@ -41,10 +41,14 @@ import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
                                                      , HaskellTemplateData'(..)
                                                      , TemplateData(..)
                                                      )
+import           Headroom.SourceCode                 ( SourceCode(..)
+                                                     , toText
+                                                     )
 import           Headroom.Template                   ( Template(..) )
 import           RIO
 import qualified RIO.Char                           as C
 import qualified RIO.Text                           as T
+
 
 -- | Extracted fields from the /Haddock module header/.
 data HaddockModuleHeader = HaddockModuleHeader
@@ -88,13 +92,13 @@ extractCopyrightOffset text = case scan [re|\h*Copyright\h*:\h*|] text of
 
 
 -- | Extracts metadata from given /Haddock/ module header.
-extractModuleHeader :: Text
-                    -- ^ text containing /Haddock/ module header
+extractModuleHeader :: SourceCode
+                    -- ^ source code containing /Haddock/ module header
                     -> TemplateData
                     -- ^ extracted metadata from corresponding /template/
                     -> HaddockModuleHeader
                     -- ^ extracted metadata
-extractModuleHeader text extData =
+extractModuleHeader source templateData =
   let hmhCopyright   = indent hoCopyright <$> extractField "Copyright"
       hmhLicense     = extractField "License"
       hmhMaintainer  = extractField "Maintainer"
@@ -105,11 +109,11 @@ extractModuleHeader text extData =
   in  HaddockModuleHeader { .. }
  where
   (fields', rest') = fromMaybe ([], input) $ runP fields input
-  input            = T.unpack . stripCommentSyntax $ text
+  input            = T.unpack . stripCommentSyntax . toText $ source
   extractField name = fmap (T.strip . T.pack) (lookup name fields')
   process = Just . T.strip . T.pack
   indent c t = T.strip $ indentField c t
-  HaddockOffsets {..} = case extData of
+  HaddockOffsets {..} = case templateData of
     HaskellTemplateData (HaskellTemplateData' offsets') -> offsets'
     _ -> HaddockOffsets Nothing
 

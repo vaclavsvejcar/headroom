@@ -63,6 +63,9 @@ import           Headroom.Data.Lens                  ( suffixLenses
 import           Headroom.Embedded                   ( defaultConfig
                                                      , licenseTemplate
                                                      )
+import           Headroom.FileSupport                ( analyzeSourceCode
+                                                     , fileSupport
+                                                     )
 import           Headroom.FileSystem                 ( FileSystem(..)
                                                      , excludePaths
                                                      , fileExtension
@@ -72,12 +75,12 @@ import           Headroom.FileType                   ( fileTypeByExt )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header                     ( addHeader
                                                      , dropHeader
-                                                     , extractFileInfo
+                                                     , extractHeaderInfo
                                                      , extractHeaderTemplate
                                                      , replaceHeader
                                                      )
 import           Headroom.Header.Sanitize            ( sanitizeSyntax )
-import           Headroom.Header.Types               ( FileInfo(..)
+import           Headroom.Header.Types               ( HeaderInfo(..)
                                                      , HeaderTemplate(..)
                                                      )
 import           Headroom.HeaderFn                   ( mkConfiguredEnv
@@ -86,6 +89,9 @@ import           Headroom.HeaderFn                   ( mkConfiguredEnv
 import           Headroom.Meta                       ( TemplateType
                                                      , configFileName
                                                      , productInfo
+                                                     )
+import           Headroom.SourceCode                 ( SourceCode
+                                                     , toText
                                                      )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( CurrentYear(..) )
@@ -111,7 +117,7 @@ suffixLensesFor ["cHeaderFnConfigs"] ''Configuration
 data RunAction = RunAction
   { raProcessed    :: Bool
   -- ^ whether the given file was processed
-  , raFunc         :: Text -> Text
+  , raFunc         :: SourceCode -> SourceCode
   -- ^ function to process the file
   , raProcessedMsg :: Text
   -- ^ message to show when file was processed
@@ -263,7 +269,7 @@ processSourceFiles templates paths = do
  where
   fileType c p = fileExtension p >>= fileTypeByExt c
   template c p = (, p) <$> (fileType c p >>= \ft -> M.lookup ft templates)
-  process cVars dVars (pr, (ti, p)) = processSourceFile cVars dVars pr ti p
+  process cVars dVars (pr, (ht, p)) = processSourceFile cVars dVars pr ht p
 
 
 processSourceFile :: ( Has CommandRunOptions env
@@ -282,29 +288,32 @@ processSourceFile cVars dVars progress ht@HeaderTemplate {..} path = do
   Configuration {..}     <- viewL @CtConfiguration
   CommandRunOptions {..} <- viewL
   fileContent            <- readFileUtf8 path
-  let fileInfo@FileInfo {..} = extractFileInfo ht fileContent
-      variables              = dVars <> cVars <> fiVariables
-      syntax                 = hcHeaderSyntax fiHeaderConfig
+  let fs                         = fileSupport htFileType
+      source                     = analyzeSourceCode fs fileContent
+      headerInfo@HeaderInfo {..} = extractHeaderInfo ht source
+      variables                  = dVars <> cVars <> hiVariables
+      syntax                     = hcHeaderSyntax hiHeaderConfig
   header'        <- renderTemplate variables htTemplate
   header         <- postProcessHeader' syntax variables header'
-  RunAction {..} <- chooseAction fileInfo header
-  let result  = raFunc fileContent
-      changed = raProcessed && (fileContent /= result)
+  RunAction {..} <- chooseAction headerInfo header
+  let result  = raFunc source
+      changed = raProcessed && (source /= result)
       message = if changed then raProcessedMsg else raSkippedMsg
       isCheck = cRunMode == Check
-  logDebug $ "File info: " <> displayShow fileInfo
+  logDebug $ "Header info: " <> displayShow headerInfo
   logInfo $ mconcat [display progress, " ", display message, fromString path]
-  when (not croDryRun && not isCheck && changed) (writeFileUtf8 path result)
+  when (not croDryRun && not isCheck && changed)
+       (writeFileUtf8 path $ toText result)
   pure changed
 
 
 chooseAction :: (Has CtConfiguration env)
-             => FileInfo
+             => HeaderInfo
              -> Text
              -> RIO env RunAction
 chooseAction info header = do
   Configuration {..} <- viewL @CtConfiguration
-  let hasHeader = isJust $ fiHeaderPos info
+  let hasHeader = isJust $ hiHeaderPos info
   pure $ go cRunMode hasHeader
  where
   go runMode hasHeader = case runMode of
