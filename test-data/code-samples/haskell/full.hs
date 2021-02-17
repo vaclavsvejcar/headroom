@@ -11,6 +11,20 @@ Portability : POSIX
 
 long
 description
+
+== Code sample
+@
+{-# LANGUAGE TypeApplications #-}
+
+module Data.VCS.Test where
+
+import Data.VCS.Ignore ( Git, Repo(..), listRepo )
+
+example :: IO [FilePath]
+example = do
+  repo <- scanRepo @Git "path/to/repo"
+  listRepo repo
+@
 -}
 
 {-# LANGUAGE OverloadedStrings #-}

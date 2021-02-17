@@ -57,12 +57,12 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      )
 
-import           Headroom.Data.Coerce                ( coerce )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate(..) )
-import           Headroom.SourceCode                 ( CodeLine
+import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
                                                      , cut
+                                                     , firstMatching
                                                      )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Variables                  ( mkVariables )
@@ -119,8 +119,8 @@ extractVariables HeaderTemplate {..} headerPos source =
 
 
 extractModuleName :: SourceCode -> Maybe Text
-extractModuleName = go . fmap snd . coerce @_ @[CodeLine]
+extractModuleName = fmap snd . firstMatching f
  where
-  go []       = Nothing
-  go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^module\s+(\S+)|] x)
+  f (lt, l) | lt == Code = match [re|^module\s+(\S+)|] l >>= (^? ix 1)
+            | otherwise  = Nothing
 

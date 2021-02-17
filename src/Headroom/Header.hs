@@ -297,10 +297,12 @@ splitSource fstPs sndPs sc = (before, middle, after)
   allLines          = coerce sc
   (middle', after ) = mapT2 SourceCode $ L.splitAt sndSplit allLines
   (before , middle) = mapT2 SourceCode $ L.splitAt fstSplitAt (coerce middle')
-  cond              = \ps (lt, t) -> lt == Code && any (`isMatch` t) ps
   fstSplitAt        = maybe 0 ((+ 1) . fst) $ lastMatching (cond fstPs) middle'
   sndSplit          = maybe len fst $ firstMatching (cond sndPs) sc
   len               = length allLines
+  cond              = \ps cl@(lt, t) ->
+    if lt == Code && any (`isMatch` t) ps then Just cl else Nothing
+
 
 
 mapT2 :: (a -> b) -> (a, a) -> (b, b)

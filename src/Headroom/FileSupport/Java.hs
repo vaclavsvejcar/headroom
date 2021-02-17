@@ -30,7 +30,6 @@ module Headroom.FileSupport.Java
   )
 where
 
-import           Headroom.Data.Coerce                ( coerce )
 import           Headroom.Data.Regex                 ( isMatch
                                                      , match
                                                      , re
@@ -41,8 +40,9 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate )
-import           Headroom.SourceCode                 ( CodeLine
+import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
+                                                     , firstMatching
                                                      )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
@@ -78,7 +78,7 @@ extractVariables _ _ source = (mkVariables . catMaybes)
 
 
 extractPackageName :: SourceCode -> Maybe Text
-extractPackageName = go . fmap snd . coerce @_ @[CodeLine]
+extractPackageName = fmap snd . firstMatching f
  where
-  go []       = Nothing
-  go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^package (.*);$|] x)
+  f (lt, l) | lt == Code = match [re|^package (.*);$|] l >>= (^? ix 1)
+            | otherwise  = Nothing

@@ -32,7 +32,6 @@ module Headroom.FileSupport.PureScript
   )
 where
 
-import           Headroom.Data.Coerce                ( coerce )
 import           Headroom.Data.Regex                 ( isMatch
                                                      , match
                                                      , re
@@ -43,8 +42,9 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate )
-import           Headroom.SourceCode                 ( CodeLine
+import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
+                                                     , firstMatching
                                                      )
 import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
@@ -81,9 +81,7 @@ extractVariables _ _ source = (mkVariables . catMaybes)
 
 
 extractModuleName :: SourceCode -> Maybe Text
-extractModuleName = go . fmap snd . coerce @_ @[CodeLine]
+extractModuleName = fmap snd . firstMatching f
  where
-  go []       = Nothing
-  go (x : xs) = maybe (go xs) (^? ix 1) (match [re|^module\s+(\S+)|] x)
-
-
+  f (lt, l) | lt == Code = match [re|^module\s+(\S+)|] l >>= (^? ix 1)
+            | otherwise  = Nothing

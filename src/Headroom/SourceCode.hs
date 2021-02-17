@@ -91,30 +91,33 @@ toText :: SourceCode
 toText (SourceCode sc) = fromLines . fmap snd $ sc
 
 
--- | Finds very first line that matches the given predicate.
-firstMatching :: (CodeLine -> Bool)
-              -- ^ predicate function
+-- | Finds very first line matching given predicate and optionally performs some
+-- operation over it.
+firstMatching :: (CodeLine -> Maybe a)
+              -- ^ predicate (and transform) function
               -> SourceCode
               -- ^ source code to search in
-              -> Maybe (Int, CodeLine)
+              -> Maybe (Int, a)
               -- ^ first matching line (if found)
-firstMatching f (SourceCode ls) = go ls 0
+firstMatching f sc = go (coerce sc) 0
  where
   go [] _ = Nothing
-  go (x : xs) i | f x       = Just (i, x)
-                | otherwise = go xs (i + 1)
+  go (x : xs) i | Just res <- f x = Just (i, res)
+                | otherwise       = go xs (i + 1)
 
 
--- | Finds very last line that matches the given predicate.
-lastMatching :: (CodeLine -> Bool)
-             -- ^ predicate function
+-- | Finds very last line matching given predicate and optionally performs some
+-- operation over it.
+lastMatching :: (CodeLine -> Maybe a)
+             -- ^ predicate (and transform) function
              -> SourceCode
              -- ^ source code to search in
-             -> Maybe (Int, CodeLine)
+             -> Maybe (Int, a)
              -- ^ last matching line (if found)
-lastMatching f (SourceCode ls) =
-  let matching = firstMatching f . SourceCode . reverse $ ls
-  in  fmap (first ((length ls - 1) -)) matching
+lastMatching f sc =
+  let matching = firstMatching f . inner @_ @[CodeLine] reverse $ sc
+      lastIdx  = length (coerce sc :: [CodeLine]) - 1
+  in  fmap (first (lastIdx -)) matching
 
 
 -- | Strips empty lines at the beginning of source code.
