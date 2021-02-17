@@ -67,7 +67,13 @@ fileSupport Scala      = Scala.fileSupport
 fileSupport Shell      = Shell.fileSupport
 
 
-analyzeSourceCode :: FileSupport -> Text -> SourceCode
+-- | Analyzes the raw source code of given type using provided 'FileSupport'.
+analyzeSourceCode :: FileSupport
+                  -- ^ 'FileSupport' implementation used for analysis
+                  -> Text
+                  -- ^ raw source code to analyze
+                  -> SourceCode
+                  -- ^ analyzed source code
 analyzeSourceCode fs = fromText state0 process
  where
   SyntaxAnalysis {..} = fsSyntaxAnalysis fs
