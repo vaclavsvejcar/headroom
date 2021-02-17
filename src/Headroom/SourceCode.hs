@@ -19,9 +19,11 @@ representation of source code files.
 -}
 
 module Headroom.SourceCode
-  ( LineType(..)
+  ( -- * Data Types
+    LineType(..)
   , CodeLine
   , SourceCode(..)
+    -- * Functions
   , fromText
   , toText
   , firstMatching
@@ -46,28 +48,56 @@ import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
 
 
+---------------------------------  DATA TYPES  ---------------------------------
+
+-- | Represents type of the line in source code.
 data LineType
-  = Code
-  | Comment
+  = Code    -- ^ Line of code
+  | Comment -- ^ Line of comment
   deriving (Eq, Show)
 
+-- | Type alias for analyzed line of code.
 type CodeLine = (LineType, Text)
 
+-- | Represents analyzed source code.
 newtype SourceCode
   = SourceCode [CodeLine]
   deriving stock (Eq, Show)
   deriving newtype (Semigroup, Monoid)
 
 
-fromText :: a -> (Text -> State a LineType) -> Text -> SourceCode
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
+
+-- | Converts 'Text' into 'SourceCode' using the given function to analyze
+-- each line's 'LineType'. The analyzing function can hold any state that is
+-- accumulated as the text is processed, for example to hold some info about
+-- already processed lines.
+fromText :: a
+         -- ^ initial state of analyzing function
+         -> (Text -> State a LineType)
+         -- ^ function that analyzes currently processed line
+         -> Text
+         -- ^ raw source code to analyze
+         -> SourceCode
+         -- ^ analyzed 'SourceCode'
 fromText s0 f (toLines -> ls) = coerce $ zip (evalState (mapM f ls) s0) ls
 
 
-toText :: SourceCode -> Text
+-- | Converts analyzed 'SourceCode' back into 'Text'.
+toText :: SourceCode
+       -- ^ source code to convert back to plain text
+       -> Text
+       -- ^ resulting plain text
 toText (SourceCode sc) = fromLines . fmap snd $ sc
 
 
-firstMatching :: (CodeLine -> Bool) -> SourceCode -> Maybe (Int, CodeLine)
+-- | Finds very first line that matches the given predicate.
+firstMatching :: (CodeLine -> Bool)
+              -- ^ predicate function
+              -> SourceCode
+              -- ^ source code to search in
+              -> Maybe (Int, CodeLine)
+              -- ^ first matching line (if found)
 firstMatching f (SourceCode ls) = go ls 0
  where
   go [] _ = Nothing
@@ -75,19 +105,50 @@ firstMatching f (SourceCode ls) = go ls 0
                 | otherwise = go xs (i + 1)
 
 
-lastMatching :: (CodeLine -> Bool) -> SourceCode -> Maybe (Int, CodeLine)
+-- | Finds very last line that matches the given predicate.
+lastMatching :: (CodeLine -> Bool)
+             -- ^ predicate function
+             -> SourceCode
+             -- ^ source code to search in
+             -> Maybe (Int, CodeLine)
+             -- ^ last matching line (if found)
 lastMatching f (SourceCode ls) =
   let matching = firstMatching f . SourceCode . reverse $ ls
   in  fmap (first ((length ls - 1) -)) matching
 
 
-stripStart :: SourceCode -> SourceCode
+-- | Strips empty lines at the beginning of source code.
+--
+-- >>> stripStart $ SourceCode [(Code, ""), (Code, "foo"), (Code, "")]
+-- SourceCode [(Code,"foo"),(Code,"")]
+stripStart :: SourceCode
+           -- ^ source code to strip
+           -> SourceCode
+           -- ^ stripped source code
 stripStart = inner @_ @[CodeLine] (L.dropWhile (T.null . T.strip . snd))
 
 
-stripEnd :: SourceCode -> SourceCode
+-- | Strips empty lines at the end of source code.
+--
+-- >>> stripEnd $ SourceCode [(Code, ""), (Code, "foo"), (Code, "")]
+-- SourceCode [(Code,""),(Code,"foo")]
+stripEnd :: SourceCode
+         -- ^ source code to strip
+         -> SourceCode
+         -- ^ stripped source code
 stripEnd = inner @_ @[CodeLine] (L.dropWhileEnd (T.null . T.strip . snd))
 
 
-cut :: Int -> Int -> SourceCode -> SourceCode
+-- | Cuts snippet from the source code using the given start and end position.
+--
+-- >>> cut 1 3 $ SourceCode [(Code, "1"), (Code, "2"),(Code, "3"),(Code, "4")]
+-- SourceCode [(Code,"2"),(Code,"3")]
+cut :: Int
+    -- ^ index of first line to be included into the snippet
+    -> Int
+    -- ^ index of the first line after the snippet
+    -> SourceCode
+    -- ^ source code to cut
+    -> SourceCode
+    -- ^ cut snippet
 cut s e = inner @_ @[CodeLine] (L.take (e - s) . L.drop s)

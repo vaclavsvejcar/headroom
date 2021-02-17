@@ -6,6 +6,19 @@
 {-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeFamilies      #-}
 
+{-|
+Module      : Headroom.Header
+Description : Operations with copyright/license headers
+Copyright   : (c) 2019-2021 Vaclav Svejcar
+License     : BSD-3-Clause
+Maintainer  : vaclav.svejcar@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+This module is the heart of /Headroom/ as it contains functions for working with
+the /license headers/ and the /source code files/.
+-}
+
 module Headroom.Header
   ( -- * Header Info Extraction
     extractHeaderInfo
@@ -104,8 +117,8 @@ extractHeaderTemplate configs fileType template =
   headerSyntax     = \hs -> findPrefix hs (rawTemplate template)
 
 
--- | Adds given header at position specified by the 'FileInfo'. Does nothing if
--- any header is already present, use 'replaceHeader' if you need to
+-- | Adds given header at position specified by the 'HeaderInfo'. Does nothing
+-- if any header is already present, use 'replaceHeader' if you need to
 -- override it.
 addHeader :: HeaderInfo
           -- ^ additional info about the header
@@ -131,8 +144,8 @@ addHeader HeaderInfo {..} header source                 = mconcat chunks
   chunks  = [before', marginT, header', marginB, middle', after]
 
 
--- | Drops header at position specified by the 'FileInfo' from the given source
--- code. Does nothing if no header is present.
+-- | Drops header at position specified by the 'HeaderInfo' from the given
+-- source code. Does nothing if no header is present.
 dropHeader :: HeaderInfo
            -- ^ additional info about the header
            -> SourceCode
@@ -147,7 +160,7 @@ dropHeader (HeaderInfo _ _ (Just (start, end)) _) source = result
   result = stripEnd before <> stripStart after
 
 
--- | Replaces existing header at position specified by the 'FileInfo' in the
+-- | Replaces existing header at position specified by the 'HeaderInfo' in the
 -- given text. Basically combines 'addHeader' with 'dropHeader'. If no header
 -- is present, then the given one is added to the text.
 replaceHeader :: HeaderInfo

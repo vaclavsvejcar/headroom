@@ -93,3 +93,10 @@ spec = do
       let sample = SourceCode [(Code, ""), (Code, "h"), (Code, ""), (Code, "")]
           expected = SourceCode [(Code, ""), (Code, "h")]
       stripEnd sample `shouldBe` expected
+
+  describe "cut" $ do
+    it "cuts source code using the given start and end positions" $ do
+      let sample =
+            SourceCode [(Code, "1"), (Code, "2"), (Code, "3"), (Code, "4")]
+          expected = SourceCode [(Code, "2"), (Code, "3")]
+      cut 1 3 sample `shouldBe` expected
