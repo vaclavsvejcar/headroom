@@ -40,7 +40,7 @@ spec = do
 
 
   describe "firstMatching" $ do
-    it "finds very first line matching the given predicate" $ do
+    it "finds and transforms very first line matching the given predicate" $ do
       let sample = SourceCode
             [ (Comment, "/*")
             , (Comment, "this is block comment")
@@ -55,13 +55,15 @@ spec = do
             , (Code   , "this is code with // comment")
             , (Comment, "// single line comment")
             ]
-          expected  = Just (9, (Code, "this is some code"))
-          predicate = \(lt, l) -> lt == Code && "this" `T.isPrefixOf` l
-      firstMatching predicate sample `shouldBe` expected
+          expected = Just (9, "THIS IS SOME CODE")
+          f        = \(lt, l) -> if lt == Code && "this" `T.isPrefixOf` l
+            then Just $ T.toUpper l
+            else Nothing
+      firstMatching f sample `shouldBe` expected
 
 
   describe "lastMatching" $ do
-    it "finds very last line matching the given predicate" $ do
+    it "finds and transforms very last line matching the given predicate" $ do
       let sample = SourceCode
             [ (Comment, "/*")
             , (Comment, "this is block comment")
@@ -76,9 +78,11 @@ spec = do
             , (Code   , "this is code with // comment")
             , (Comment, "// single line comment")
             ]
-          expected  = Just (10, (Code, "this is code with // comment"))
-          predicate = \(lt, l) -> lt == Code && "this" `T.isPrefixOf` l
-      lastMatching predicate sample `shouldBe` expected
+          expected = Just (10, "THIS IS CODE WITH // COMMENT")
+          f        = \(lt, l) -> if lt == Code && "this" `T.isPrefixOf` l
+            then Just $ T.toUpper l
+            else Nothing
+      lastMatching f sample `shouldBe` expected
 
 
   describe "stripStart" $ do

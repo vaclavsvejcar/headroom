@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cf6f4564ba4d6d85c84e213487172547869c5285a2a81a365fbde41c97ee5b79
+-- hash: 4c5eb45fc45946807c2cbd5814cbf57038cb7e09f142e29767fede026dbdd86f
 
 name:           headroom
 version:        0.4.0.0
@@ -294,5 +294,6 @@ test-suite spec
     , optparse-applicative
     , pcre-light
     , rio
+    , string-interpolate
     , time
   default-language: Haskell2010

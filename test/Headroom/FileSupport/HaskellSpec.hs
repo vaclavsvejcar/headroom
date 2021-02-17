@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}
 
@@ -8,6 +9,7 @@ module Headroom.FileSupport.HaskellSpec
   )
 where
 
+import           Data.String.Interpolate             ( __i )
 import           Headroom.Configuration              ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
@@ -72,9 +74,27 @@ spec = do
       defaultConfig' <- parseConfiguration defaultConfig
       config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
       raw            <- loadFile $ codeSamples </> "full.hs"
-      let ht        = extractHeaderTemplate config Haskell template
-          headerPos = Just (1, 13)
-          expected  = mkVariables
+      let ht = extractHeaderTemplate config Haskell template
+          headerPos = Just (1, 29)
+          longDesc = [__i|
+              long
+              description
+
+              == Code sample
+              @
+              \# LANGUAGE TypeApplications \#
+
+              module Data.VCS.Test where
+
+              import Data.VCS.Ignore ( Git, Repo(..), listRepo )
+
+              example :: IO [FilePath]
+              example = do
+                repo <- scanRepo @Git "path/to/repo"
+                listRepo repo
+              @
+            |]
+          expected = mkVariables
             [ ( "_haskell_module_copyright"
               , "(c) Some Guy, 2013\n                  Someone Else, 2014"
               )
@@ -83,7 +103,7 @@ spec = do
             , ("_haskell_module_name"       , "Test")
             , ("_haskell_module_stability"  , "experimental")
             , ("_haskell_module_portability", "POSIX")
-            , ("_haskell_module_longdesc"   , "long\ndescription")
+            , ("_haskell_module_longdesc"   , longDesc)
             , ("_haskell_module_shortdesc"  , "Short description")
             ]
           sample = analyzeSourceCode fileSupport' raw
