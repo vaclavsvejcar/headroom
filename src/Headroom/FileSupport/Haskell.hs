@@ -57,6 +57,9 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      )
 
+import           Headroom.Configuration.Types        ( HeaderConfig(..)
+                                                     , HeaderSyntax
+                                                     )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header.Types               ( HeaderTemplate(..) )
 import           Headroom.SourceCode                 ( LineType(..)
@@ -69,6 +72,7 @@ import           Headroom.Variables                  ( mkVariables )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 import           RIO.Lens                            ( ix )
+
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
@@ -91,9 +95,9 @@ syntaxAnalysis = SyntaxAnalysis
   }
 
 
-extractTemplateData :: Template a => a -> TemplateData
-extractTemplateData template =
-  let htdHaddockOffsets = extractOffsets template
+extractTemplateData :: Template a => a -> HeaderSyntax -> TemplateData
+extractTemplateData template syntax =
+  let htdHaddockOffsets = extractOffsets template syntax
       templateData      = HaskellTemplateData' { .. }
   in  HaskellTemplateData templateData
 
@@ -114,8 +118,9 @@ extractVariables HeaderTemplate {..} headerPos source =
     , ("_haskell_module_shortdesc", ) <$> hmhShortDesc
     ]
  where
-  HaddockModuleHeader {..} = extractModuleHeader header htTemplateData
+  HaddockModuleHeader {..} = extractModuleHeader header htTemplateData syntax
   header                   = maybe mempty (\(s, e) -> cut s e source) headerPos
+  syntax                   = hcHeaderSyntax htConfig
 
 
 extractModuleName :: SourceCode -> Maybe Text

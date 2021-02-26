@@ -52,7 +52,9 @@ spec = do
   describe "fsExtractTemplateData" $ do
     it "doesn't provide any custom data for PureScript" $ do
       template <- emptyTemplate @_ @Mustache
-      fsExtractTemplateData fileSupport' template `shouldBe` NoTemplateData
+      let syntax   = undefined
+          expected = NoTemplateData
+      fsExtractTemplateData fileSupport' template syntax `shouldBe` expected
 
 
   describe "fsExtractVariables" $ do

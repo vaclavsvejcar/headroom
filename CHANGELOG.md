@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.4.0.0 (in development)
-- [#57] FIXED: Comment in code block breaks header detection for Haskell/Haddock
+- [#57] FIXED: put-before/put-after in commented code breaks header detection
 - [#58] BREAKING CHANGE: Extend configuration for defining header margins
 - [#59] Check compatibility of loaded YAML configuration
 - [#61] BREAKING CHANGE: Use regular expressions to specify headers start/end

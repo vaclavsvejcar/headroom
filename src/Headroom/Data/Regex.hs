@@ -29,6 +29,7 @@ module Headroom.Data.Regex
   , isMatch
   , re
   , replace
+  , replaceFirst
   , scan
     -- * Unsafe Functions
   , compileUnsafe
@@ -121,16 +122,26 @@ re = QuasiQuoter { quoteExp  = quoteExpRegex
 
 -- | Replaces all occurences of given /regex/.
 replace :: Regex
-        -- ^ /regex/ to match what to replace
+        -- ^ pattern to replace
         -> (Text -> [Text] -> Text)
         -- ^ replacement function (as @fullMatch -> [groups] -> result@)
         -> Text
         -- ^ text to replace in
         -> Text
         -- ^ resulting text
---replace (Regex regex) = PH.gsub regex
 replace = PH.gsub . coerce
 
+
+-- | Replaces only first occurence of given /regex/.
+replaceFirst :: Regex
+             -- ^ pattern to replace
+             -> (Text -> [Text] -> Text)
+             -- ^ replacement function (as @fullMatch -> [groups] -> result@)
+             -> Text
+             -- ^ text to replace in
+             -> Text
+             -- ^ resulting text
+replaceFirst = PH.sub . coerce
 
 -- | Searches the text for all occurences of given /regex/.
 scan :: Regex

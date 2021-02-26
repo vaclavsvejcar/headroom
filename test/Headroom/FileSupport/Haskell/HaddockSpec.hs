@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TypeApplications  #-}
 
 module Headroom.FileSupport.Haskell.HaddockSpec
@@ -7,7 +8,10 @@ module Headroom.FileSupport.Haskell.HaddockSpec
   )
 where
 
-import           Headroom.Configuration.Types        ( LicenseType(..) )
+import           Headroom.Configuration.Types        ( HeaderSyntax(..)
+                                                     , LicenseType(..)
+                                                     )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.Embedded                   ( licenseTemplate )
 import           Headroom.FileSupport                ( analyzeSourceCode
@@ -33,8 +37,9 @@ spec = do
   describe "extractOffsets" $ do
     it "extract offsets for selected fields of module header" $ do
       template <- parseTemplate @Mustache Nothing $ licenseTemplate BSD3 Haskell
-      let expected = HaddockOffsets { hoCopyright = Just 14 }
-      extractOffsets template `shouldBe` expected
+      let syntax   = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
+          expected = HaddockOffsets { hoCopyright = Just 14 }
+      extractOffsets template syntax `shouldBe` expected
 
 
   describe "extractModuleHeader" $ do
@@ -55,17 +60,8 @@ spec = do
               \commentary with @some markup@."
           }
         sample = analyzeSourceCode (fileSupport Haskell) raw
-      extractModuleHeader sample NoTemplateData `shouldBe` expected
-
-
-  describe "stripCommentSyntax" $ do
-    it "strips single-line or block comment syntax from input" $ do
-      let sample1 = fromLines ["{-|", "Hello1", "foo", "-}"]
-          sample2 = fromLines ["{- |", "Hello2", "foo", "-}"]
-          sample3 = fromLines ["-- | Hello3", "-- foo"]
-      stripCommentSyntax sample1 `shouldBe` fromLines ["", "Hello1", "foo", ""]
-      stripCommentSyntax sample2 `shouldBe` fromLines ["", "Hello2", "foo", ""]
-      stripCommentSyntax sample3 `shouldBe` fromLines [" Hello3", " foo"]
+        syntax = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
+      extractModuleHeader sample NoTemplateData syntax `shouldBe` expected
 
 
   describe "indentField" $ do
