@@ -14,8 +14,10 @@ import           Headroom.Configuration              ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
 import           Headroom.Configuration.Types        ( Configuration(..)
+                                                     , HeaderSyntax(..)
                                                      , LicenseType(..)
                                                      )
+import           Headroom.Data.Regex                 ( re )
 import           Headroom.Embedded                   ( defaultConfig
                                                      , licenseTemplate
                                                      )
@@ -65,7 +67,8 @@ spec = do
       let o        = Just 14
           td       = HaskellTemplateData' HaddockOffsets { hoCopyright = o }
           expected = HaskellTemplateData td
-      fsExtractTemplateData fileSupport' template `shouldBe` expected
+          syntax   = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
+      fsExtractTemplateData fileSupport' template syntax `shouldBe` expected
 
 
   describe "fsExtractVariables" $ do
@@ -82,7 +85,7 @@ spec = do
 
               == Code sample
               @
-              \# LANGUAGE TypeApplications \#
+              {-\# LANGUAGE TypeApplications \#-}
 
               module Data.VCS.Test where
 

@@ -107,7 +107,7 @@ extractHeaderTemplate :: CtHeadersConfig
                       -- ^ resulting template info
 extractHeaderTemplate configs fileType template =
   let htConfig       = withP (configByFileType configs fileType)
-      htTemplateData = fsExtractTemplateData template
+      htTemplateData = fsExtractTemplateData template (hcHeaderSyntax htConfig)
       htFileType     = fileType
       htTemplate     = template
   in  HeaderTemplate { .. }

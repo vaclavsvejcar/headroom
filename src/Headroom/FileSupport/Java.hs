@@ -54,11 +54,12 @@ import           RIO.Lens                            ( ix )
 
 -- | Implementation of 'FileSupport' for /Java/.
 fileSupport :: FileSupport
-fileSupport = FileSupport { fsSyntaxAnalysis      = syntaxAnalysis
-                          , fsExtractTemplateData = const NoTemplateData
-                          , fsExtractVariables    = extractVariables
-                          , fsFileType            = Java
-                          }
+fileSupport = FileSupport
+  { fsSyntaxAnalysis      = syntaxAnalysis
+  , fsExtractTemplateData = const . const $ NoTemplateData
+  , fsExtractVariables    = extractVariables
+  , fsFileType            = Java
+  }
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------

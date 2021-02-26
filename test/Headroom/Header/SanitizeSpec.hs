@@ -57,3 +57,73 @@ spec = do
       let syntax = LineComment [re|^--|] Nothing
           sample = fromLines ["-- first", "second", "-- third"]
       sanitizeSyntax syntax sample `shouldBe` sample
+
+
+  describe "stripCommentSyntax" $ do
+    it "strips comment syntax from single line block comment (no prefix)" $ do
+      let syntax   = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
+          sample   = "{-| outer {- and inner -} comment -}"
+          expected = "outer {- and inner -} comment"
+      stripCommentSyntax syntax sample `shouldBe` expected
+
+    it "strips comment syntax from single line line comment (no prefix)" $ do
+      let syntax   = LineComment [re|^--|] Nothing
+          sample   = "-- single line comment"
+          expected = "single line comment"
+      stripCommentSyntax syntax sample `shouldBe` expected
+
+    it "strips comment syntax from multi line block comment (no prefix)" $ do
+      let syntax = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
+          sample = fromLines
+            [ "{-|"
+            , "Some block comment"
+            , "another line"
+            , "@"
+            , "  {- code example comment -}"
+            , "@"
+            , "-}"
+            ]
+          expected = fromLines
+            [ "Some block comment"
+            , "another line"
+            , "@"
+            , "  {- code example comment -}"
+            , "@"
+            ]
+      stripCommentSyntax syntax sample `shouldBe` expected
+
+    it "strips comment syntax from multi line block comment (with prefix)" $ do
+      let
+        syntax = BlockComment [re|^\/\*|] [re|\*\/$|] (Just " * ")
+        sample = fromLines
+          [ "/*"
+          , " * Some block comment"
+          , " * another line"
+          , " * @"
+          , " *  /* code example comment */"
+          , " */"
+          ]
+        expected = fromLines
+          [ "Some block comment"
+          , "another line"
+          , "@"
+          , " /* code example comment */"
+          ]
+      stripCommentSyntax syntax sample `shouldBe` expected
+
+    it "strips comment syntax from multi line line comment" $ do
+      let
+        syntax = LineComment [re|^--|] (Just "-- ")
+        sample = fromLines
+          [ "-- Some block comment"
+          , "-- another line"
+          , "-- @"
+          , "--  /* code example comment */"
+          ]
+        expected = fromLines
+          [ "Some block comment"
+          , "another line"
+          , "@"
+          , " /* code example comment */"
+          ]
+      stripCommentSyntax syntax sample `shouldBe` expected

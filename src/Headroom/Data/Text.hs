@@ -16,6 +16,7 @@ Module containing bunch of useful functions for working with text.
 module Headroom.Data.Text
   ( read
   , commonLinesPrefix
+  , replaceFirst
     -- * Working with text lines
   , mapLines
   , mapLinesF
@@ -26,6 +27,7 @@ where
 
 import           RIO
 import qualified RIO.Text                           as T
+import qualified RIO.Text.Partial                   as TP
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
@@ -46,6 +48,19 @@ commonLinesPrefix text = go (toLines text) Nothing
   go (x : xs) (Just acc) = case T.commonPrefixes x acc of
     Just (n, _, _) -> go xs (Just n)
     _              -> Nothing
+
+
+-- | Similar to 'T.replace', but replaces only very first occurence of pattern.
+--
+-- >>> replaceFirst ":" "/" "a : b : c"
+-- "a / b : c"
+replaceFirst :: Text -> Text -> Text -> Text
+replaceFirst ptrn substitution text | T.null ptrn || T.null back = text
+                                    | otherwise                  = processed
+ where
+  (front, back) = TP.breakOn ptrn text
+  processed     = mconcat [front, substitution, T.drop (T.length ptrn) back]
+
 
 
 -- | Maps given function over individual lines of the given text.

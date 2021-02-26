@@ -32,6 +32,14 @@ spec = do
       commonLinesPrefix T.empty `shouldBe` Nothing
 
 
+  describe "replaceFirst" $ do
+    it "does nothing on empty pattern" $ do
+      replaceFirst "" "/" "a :: b :: c" `shouldBe` "a :: b :: c"
+
+    it "replaces only first pattern with substitute" $ do
+      replaceFirst "::" "/" "a :: b :: c" `shouldBe` "a / b :: c"
+
+
   describe "mapLines" $ do
     it "returns same output for identity function" $ do
       let sample = fromLines ["foo zz", "bar", "xx"]

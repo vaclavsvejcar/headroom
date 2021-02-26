@@ -24,14 +24,13 @@ module Headroom.FileSupport.Haskell.Haddock
   , extractOffsets
   , extractModuleHeader
   , indentField
-  , stripCommentSyntax
   )
 where
 
 import           Control.Applicative                 ( Alternative(..) )
 import           Control.Monad                       ( ap )
+import           Headroom.Configuration.Types        ( HeaderSyntax )
 import           Headroom.Data.Regex                 ( re
-                                                     , replace
                                                      , scan
                                                      )
 import           Headroom.Data.Text                  ( fromLines
@@ -41,6 +40,7 @@ import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
                                                      , HaskellTemplateData'(..)
                                                      , TemplateData(..)
                                                      )
+import           Headroom.Header.Sanitize            ( stripCommentSyntax )
 import           Headroom.SourceCode                 ( SourceCode(..)
                                                      , toText
                                                      )
@@ -77,12 +77,14 @@ data HaddockModuleHeader = HaddockModuleHeader
 extractOffsets :: Template a
                => a
                -- ^ parsed /template/
+               -> HeaderSyntax
+               -- ^ copyright header syntax
                -> HaddockOffsets
                -- ^ extracted offsets
-extractOffsets template =
+extractOffsets template syntax =
   let hoCopyright = extractCopyrightOffset templateText
   in  HaddockOffsets { .. }
-  where templateText = stripCommentSyntax . rawTemplate $ template
+  where templateText = stripCommentSyntax syntax . rawTemplate $ template
 
 
 extractCopyrightOffset :: Text -> Maybe Int
@@ -96,9 +98,11 @@ extractModuleHeader :: SourceCode
                     -- ^ source code containing /Haddock/ module header
                     -> TemplateData
                     -- ^ extracted metadata from corresponding /template/
+                    -> HeaderSyntax
+                    -- ^ copyright header syntax
                     -> HaddockModuleHeader
                     -- ^ extracted metadata
-extractModuleHeader source templateData =
+extractModuleHeader source templateData syntax =
   let hmhCopyright   = indent hoCopyright <$> extractField "Copyright"
       hmhLicense     = extractField "License"
       hmhMaintainer  = extractField "Maintainer"
@@ -109,7 +113,7 @@ extractModuleHeader source templateData =
   in  HaddockModuleHeader { .. }
  where
   (fields', rest') = fromMaybe ([], input) $ runP fields input
-  input            = T.unpack . stripCommentSyntax . toText $ source
+  input            = T.unpack . stripCommentSyntax syntax . toText $ source
   extractField name = fmap (T.strip . T.pack) (lookup name fields')
   process = Just . T.strip . T.pack
   indent c t = T.strip $ indentField c t
@@ -145,22 +149,6 @@ indentField (Just offset) text = fromLines . go . toLines $ text
   go [x     ] = [x]
   go (x : xs) = x : fmap ((prefix <>) . T.stripStart) xs
   prefix = T.replicate offset " "
-
-
--- | Strips /Haskell/ comment syntax tokens (e.g. @{-@, @-}@) from input text.
---
--- >>> stripCommentSyntax "{- foo -}\nbar\n"
--- "foo \nbar\n"
-stripCommentSyntax :: Text
-                   -- ^ input text to strip
-                   -> Text
-                   -- ^ resulting text without comment syntax tokens
-stripCommentSyntax text = fromLines $ go (toLines text) []
- where
-  regex = [re|^(-- \||-{2,})|^\h*({-\h?\|?)|(-})\h*$|]
-  strip = replace regex (const . const $ "")
-  go []       acc = reverse acc
-  go (x : xs) acc = go xs (strip x : acc)
 
 
 --------------------------------------------------------------------------------

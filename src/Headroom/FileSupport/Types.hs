@@ -27,6 +27,7 @@ module Headroom.FileSupport.Types
   )
 where
 
+import           Headroom.Configuration.Types        ( HeaderSyntax )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Header.Types               ( HeaderTemplate )
@@ -58,6 +59,8 @@ type ExtractTemplateDataFn
    . Template a
   => a
   -- ^ template to use for extraction
+  -> HeaderSyntax
+  -- ^ copyright header syntax
   -> TemplateData
   -- ^ extracted template data
 
@@ -84,7 +87,7 @@ defaultFileSupport :: FileType
                    -- ^ resulting 'FileSupport'
 defaultFileSupport fileType syntaxAnalysis = FileSupport
   { fsSyntaxAnalysis      = syntaxAnalysis
-  , fsExtractTemplateData = const NoTemplateData
+  , fsExtractTemplateData = const . const $ NoTemplateData
   , fsExtractVariables    = const . const . const $ mempty
   , fsFileType            = fileType
   }

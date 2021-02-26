@@ -22,16 +22,13 @@ sure that license header syntax is not broken.
 module Headroom.Header.Sanitize
   ( findPrefix
   , sanitizeSyntax
+  , stripCommentSyntax
   )
 where
 
 import           Headroom.Configuration.Types        ( HeaderSyntax(..) )
-import           Headroom.Data.Regex                 ( isMatch )
-import           Headroom.Data.Text                  ( commonLinesPrefix
-                                                     , fromLines
-                                                     , mapLinesF
-                                                     , toLines
-                                                     )
+import qualified Headroom.Data.Regex                as R
+import qualified Headroom.Data.Text                 as T
 import           RIO
 import qualified RIO.Text                           as T
 
@@ -58,9 +55,9 @@ findPrefix syntax text = case syntax of
   BlockComment s e _ -> BlockComment s e prefix
   LineComment s _    -> LineComment s prefix
  where
-  filtered = filter cond . toLines $ text
+  filtered = filter cond . T.toLines $ text
   cond     = \t -> (not . T.null . T.strip $ t) && isCommentBody syntax t
-  prefix   = fmap T.stripEnd (commonLinesPrefix . fromLines $ filtered)
+  prefix   = fmap T.stripEnd (T.commonLinesPrefix . T.fromLines $ filtered)
 
 
 -- | Sanitizes given header text to make sure that each comment line starts with
@@ -88,6 +85,32 @@ sanitizeSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
     LineComment _ p    -> p
 
 
+-- | Strips comment syntax from given text.
+--
+-- >>> :set -XQuasiQuotes
+-- >>> import Headroom.Data.Regex (re)
+-- >>> stripCommentSyntax (LineComment [re|^--|] (Just "--")) "-- a\n-- b"
+-- "a\n b"
+stripCommentSyntax :: HeaderSyntax
+                   -- ^ copyright header syntax
+                   -> Text
+                   -- ^ input text from which to strip the syntax
+                   -> Text
+                   -- ^ processed text
+stripCommentSyntax syntax = T.strip . T.fromLines . go [] . T.toLines . T.strip
+ where
+  (s, e, p) = case syntax of
+    BlockComment s' e' p' -> (Just s', Just e', p')
+    LineComment s' p'     -> (Just s', Nothing, p')
+  nil = const . const $ ""
+  rep = \pt l -> maybe l (\pt' -> R.replaceFirst pt' nil l) pt
+  dp  = \pt l -> maybe l (\pt' -> T.replaceFirst pt' "" l) pt
+  go agg []       = reverse agg
+  go []  (x : xs) = go [rep s . rep e . dp p $ x] xs
+  go agg [x     ] = go ((rep e . dp p $ x) : agg) []
+  go agg (x : xs) = go (dp p x : agg) xs
+
+
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
 mapCommentLines :: Foldable t
@@ -95,11 +118,11 @@ mapCommentLines :: Foldable t
                 -> (Text -> t Text)
                 -> Text
                 -> Text
-mapCommentLines syntax f = mapLinesF $ \case
+mapCommentLines syntax f = T.mapLinesF $ \case
   line | isCommentBody syntax line -> toList . f $ line
        | otherwise                 -> [line]
 
 
 isCommentBody :: HeaderSyntax -> Text -> Bool
 isCommentBody (LineComment _ _   ) _ = True
-isCommentBody (BlockComment s e _) l = not $ isMatch s l || isMatch e l
+isCommentBody (BlockComment s e _) l = not $ R.isMatch s l || R.isMatch e l

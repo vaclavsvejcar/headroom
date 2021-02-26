@@ -56,11 +56,12 @@ import           RIO.Lens                            ( ix )
 
 -- | Implementation of 'FileSupport' for /PureScript/.
 fileSupport :: FileSupport
-fileSupport = FileSupport { fsSyntaxAnalysis      = syntaxAnalysis
-                          , fsExtractTemplateData = const NoTemplateData
-                          , fsExtractVariables    = extractVariables
-                          , fsFileType            = PureScript
-                          }
+fileSupport = FileSupport
+  { fsSyntaxAnalysis      = syntaxAnalysis
+  , fsExtractTemplateData = const . const $ NoTemplateData
+  , fsExtractVariables    = extractVariables
+  , fsFileType            = PureScript
+  }
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
