@@ -39,7 +39,7 @@ where
 import           Data.Aeson                          ( FromJSON(..)
                                                      , Value(String)
                                                      )
-import           Data.Coerce                         ( coerce )
+import           Headroom.Data.Coerce                ( coerce )
 import           Data.String.Interpolate             ( iii )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
@@ -165,7 +165,7 @@ compileUnsafe raw = case compile raw of
   Right res -> res
 
 
----------------------------------  Error Types  --------------------------------
+---------------------------------  ERROR TYPES  --------------------------------
 
 -- | Exception specific to the "Headroom.Data.Regex" module.
 data RegexError = CompilationFailed Text Text

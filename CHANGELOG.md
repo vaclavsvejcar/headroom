@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#59] Check compatibility of loaded YAML configuration
 - [#61] BREAKING CHANGE: Use regular expressions to specify headers start/end
 - [#62] Sanitize block comment headers with line prefixes
+- [#64] Add command line option for displaying version
 - Bump _LTS Haskell_ to `17.4`
 
 ## 0.3.2.0 (released 2020-11-26)
