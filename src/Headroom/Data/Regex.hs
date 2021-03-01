@@ -39,8 +39,8 @@ where
 import           Data.Aeson                          ( FromJSON(..)
                                                      , Value(String)
                                                      )
-import           Headroom.Data.Coerce                ( coerce )
 import           Data.String.Interpolate             ( iii )
+import           Headroom.Data.Coerce                ( coerce )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -142,6 +142,7 @@ replaceFirst :: Regex
              -> Text
              -- ^ resulting text
 replaceFirst = PH.sub . coerce
+
 
 -- | Searches the text for all occurences of given /regex/.
 scan :: Regex

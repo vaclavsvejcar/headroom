@@ -62,7 +62,6 @@ replaceFirst ptrn substitution text | T.null ptrn || T.null back = text
   processed     = mconcat [front, substitution, T.drop (T.length ptrn) back]
 
 
-
 -- | Maps given function over individual lines of the given text.
 --
 -- >>> mapLines ("T: " <>) "foo zz\nbar"

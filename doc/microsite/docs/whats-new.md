@@ -1,3 +1,5 @@
+Version `0.4.0.0` is major release of _Headroom_ and introduces both new cool features, but also some breaking changes in cofiguration format. Please pay attention to below text and don't forget to check [Migration Guide][doc:migration-guide] if you're migrating from version `0.3.x.y`.
+
 ## New & Noteworthy
 
 ### Extended margin options for license headers
@@ -20,3 +22,32 @@ In order to make this more flexible, current two configuration options are dropp
 someFunc :: String
 someFunc = undefined
 ```
+
+### Version command line option
+Two new command line options were added to check version of current _Headroom_ installation, where `--version` returns version and some additional info and `--numeric-version` returns only version number (for example for some programmatic checks):
+
+```
+$ headroom --version
+headroom, v0.4.0.0 :: https://github.com/vaclavsvejcar/headroom
+
+$ headroom --numeric-version
+0.4.0.0
+```
+
+### Regular expressions used to specify header start/end
+_Headroom_ now provides more flexibility to define copyright/license header start/end by using regular expressions in `starts-with`/`ends-with` (under `block-comment` key) and `prefixed-by` (under `line-comment`) values. This is a breaking change, so don't forget to check [Migration Guide][doc:migration-guide] for more details if you're using these fields in configuration.
+
+
+### Compatibility check for `.headroom.yaml`
+_Headroom's_ configuration file `.headroom.yaml` now requires `version` field, which helps _Headroom_ to check whether your configuration is compatible with its current version and if not, _Headroom_ is able to guide you through correct migration steps based on this value. You usually only need to bump this version when breaking changes in configuration are introduced and changes in your configuration files are required. You will be always informed about such need. See [Migration Guide][doc:migration-guide] for more details.
+
+## Other bugfixes and improvements
+- [#57][github/issue/57] fixes the issue where _Headroom_ sometimes incorrectly detect copyright/license header position within other comment in source code.
+- [#60][github/issue/60] tries to make error messages more helpful for end user by providing links to this documentation microsite
+- [#62][github/issue/62] makes sure that produced header should have correct comment syntax (thus not breaking surrounding source code)
+
+
+[doc:migration-guide]: migration-guide.md
+[github/issue/57]: https://github.com/vaclavsvejcar/headroom/issues/57
+[github/issue/60]: https://github.com/vaclavsvejcar/headroom/issues/60
+[github/issue/62]: https://github.com/vaclavsvejcar/headroom/issues/62
