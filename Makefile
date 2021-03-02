@@ -17,6 +17,10 @@ hlint:
 	hlint ./src
 	hlint ./test
 
+.PHONY: microsite
+microsite:
+	cd doc/microsite; mkdocs build; cd site; tar -zcvf ../site.tgz . ; cd ../..
+
 .PHONY: pretty
 pretty: 
 	find ./app -name '*.hs' | xargs stylish-haskell -i -v
