@@ -2,19 +2,19 @@
 {-# LANGUAGE QuasiQuotes       #-}
 
 {-|
-Module      : Headroom.FileSupport.JS
-Description : Support for /Javascript/ source code files
+Module      : Headroom.FileSupport.Go
+Description : Support for /Go/ source code files
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Basic support for /Javascript/ source code files. This implementation doesn't
+Basic support for /Go language/ source code files. This implementation doesn't
 extract any variables or template data.
 -}
 
-module Headroom.FileSupport.JS
+module Headroom.FileSupport.Go
   ( fileSupport
   )
 where
@@ -26,14 +26,14 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      , defaultFileSupport
                                                      )
-import           Headroom.FileType.Types             ( FileType(JS) )
+import           Headroom.FileType.Types             ( FileType(Go) )
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
--- | Implementation of 'FileSupport' for /Javascript/.
+-- | Implementation of 'FileSupport' for /C/.
 fileSupport :: FileSupport
-fileSupport = defaultFileSupport JS syntaxAnalysis
+fileSupport = defaultFileSupport Go syntaxAnalysis
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------

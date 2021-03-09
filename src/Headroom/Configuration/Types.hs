@@ -431,6 +431,8 @@ data HeadersConfig (p :: Phase) = HeadersConfig
   -- ^ configuration for /C++/ programming language
   , hscCss        :: HeaderConfig p
   -- ^ configuration for /CSS/
+  , hscGo         :: HeaderConfig p
+  -- ^ configuration for /Go/
   , hscHaskell    :: HeaderConfig p
   -- ^ configuration for /Haskell/ programming language
   , hscHtml       :: HeaderConfig p
@@ -471,6 +473,7 @@ instance FromJSON PtHeadersConfig where
     hscC          <- obj .:? "c" .!= mempty
     hscCpp        <- obj .:? "cpp" .!= mempty
     hscCss        <- obj .:? "css" .!= mempty
+    hscGo         <- obj .:? "go" .!= mempty
     hscHaskell    <- obj .:? "haskell" .!= mempty
     hscHtml       <- obj .:? "html" .!= mempty
     hscJava       <- obj .:? "java" .!= mempty

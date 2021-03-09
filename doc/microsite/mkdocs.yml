@@ -1,11 +1,11 @@
-site_name: Headroom v0.4.0.0
+site_name: Headroom v0.4.1.0
 copyright: Copyright (c) 2019-2021 norcane
 
 nav:
   - Home:
     - Overview: index.md
-    - What's new in v0.4.0.0?: whats-new.md
-    - Migration Guide from v0.3.2.0: migration-guide.md
+    - What's new in v0.4.1.0?: whats-new.md
+    - Migration Guide from v0.4.0.0: migration-guide.md
   - Documentation:
       - Installation: documentation/installation.md
       - Basic Concepts: documentation/basic-concepts.md

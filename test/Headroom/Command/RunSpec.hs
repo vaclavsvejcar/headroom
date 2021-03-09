@@ -73,7 +73,7 @@ spec :: Spec
 spec = do
   describe "loadBuiltInTemplates" $ do
     it "should load correct number of built-in templates" $ do
-      M.size <$> runRIO env (loadBuiltInTemplates BSD3) `shouldReturn` 11
+      M.size <$> runRIO env (loadBuiltInTemplates BSD3) `shouldReturn` 12
 
 
   describe "loadTemplateFiles" $ do

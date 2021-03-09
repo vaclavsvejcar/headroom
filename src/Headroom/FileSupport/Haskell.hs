@@ -60,7 +60,7 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
 import           Headroom.Configuration.Types        ( HeaderConfig(..)
                                                      , HeaderSyntax
                                                      )
-import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.FileType.Types             ( FileType(Haskell) )
 import           Headroom.Header.Types               ( HeaderTemplate(..) )
 import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)

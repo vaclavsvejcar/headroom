@@ -26,7 +26,7 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      , defaultFileSupport
                                                      )
-import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.FileType.Types             ( FileType(C) )
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------

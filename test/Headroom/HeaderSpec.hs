@@ -393,6 +393,7 @@ spec = do
       sampleCpp2         <- loadSample CPP $ "cpp" </> "sample2.cpp"
       sampleCss1         <- loadSample CSS $ "css" </> "sample1.css"
       sampleCss2         <- loadSample CSS $ "css" </> "sample2.css"
+      sampleGo           <- loadSample Go $ "go" </> "sample1.go"
       sampleHs1          <- loadSample Haskell $ "haskell" </> "sample1.hs"
       sampleHs2          <- loadSample Haskell $ "haskell" </> "sample2.hs"
       sampleHtml1        <- loadSample HTML $ "html" </> "sample1.html"
@@ -410,6 +411,7 @@ spec = do
       findHeader hscCpp sampleCpp2 `shouldBe` Nothing
       findHeader hscCss sampleCss1 `shouldBe` Just (1, 4)
       findHeader hscCss sampleCss2 `shouldBe` Nothing
+      findHeader hscGo sampleGo `shouldBe` Just (1, 2)
       findHeader hscHaskell sampleHs1 `shouldBe` Just (1, 3)
       findHeader hscHaskell sampleHs2 `shouldBe` Nothing
       findHeader hscHtml sampleHtml1 `shouldBe` Just (1, 4)

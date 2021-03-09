@@ -26,6 +26,8 @@ data FileType
   -- ^ support for /C++/ programming language
   | CSS
   -- ^ support for /CSS/
+  | Go
+  -- ^ support for /Go/ programming language
   | Haskell
   -- ^ support for /Haskell/ programming language
   | HTML

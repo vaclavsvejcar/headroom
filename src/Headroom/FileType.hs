@@ -70,6 +70,7 @@ configByFileType HeadersConfig {..} fileType = case fileType of
   C          -> hscC
   CPP        -> hscCpp
   CSS        -> hscCss
+  Go         -> hscGo
   Haskell    -> hscHaskell
   HTML       -> hscHtml
   Java       -> hscJava

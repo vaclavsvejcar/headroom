@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d9b12670f45db8d7e7c21764e841abbfda08a1417a8a9ea0dff5cf5a79a1906a
+-- hash: bc01e405c33597c1c0babea2ec25e31272b14935d2f13583270a27fd70c62400
 
 name:           headroom
 version:        0.4.1.0
@@ -28,6 +28,7 @@ extra-source-files:
     embedded/license/apache2/c.mustache
     embedded/license/apache2/cpp.mustache
     embedded/license/apache2/css.mustache
+    embedded/license/apache2/go.mustache
     embedded/license/apache2/haskell.mustache
     embedded/license/apache2/html.mustache
     embedded/license/apache2/java.mustache
@@ -39,6 +40,7 @@ extra-source-files:
     embedded/license/bsd3/c.mustache
     embedded/license/bsd3/cpp.mustache
     embedded/license/bsd3/css.mustache
+    embedded/license/bsd3/go.mustache
     embedded/license/bsd3/haskell.mustache
     embedded/license/bsd3/html.mustache
     embedded/license/bsd3/java.mustache
@@ -50,6 +52,7 @@ extra-source-files:
     embedded/license/gpl2/c.mustache
     embedded/license/gpl2/cpp.mustache
     embedded/license/gpl2/css.mustache
+    embedded/license/gpl2/go.mustache
     embedded/license/gpl2/haskell.mustache
     embedded/license/gpl2/html.mustache
     embedded/license/gpl2/java.mustache
@@ -61,6 +64,7 @@ extra-source-files:
     embedded/license/gpl3/c.mustache
     embedded/license/gpl3/cpp.mustache
     embedded/license/gpl3/css.mustache
+    embedded/license/gpl3/go.mustache
     embedded/license/gpl3/haskell.mustache
     embedded/license/gpl3/html.mustache
     embedded/license/gpl3/java.mustache
@@ -72,6 +76,7 @@ extra-source-files:
     embedded/license/mit/c.mustache
     embedded/license/mit/cpp.mustache
     embedded/license/mit/css.mustache
+    embedded/license/mit/go.mustache
     embedded/license/mit/haskell.mustache
     embedded/license/mit/html.mustache
     embedded/license/mit/java.mustache
@@ -83,6 +88,7 @@ extra-source-files:
     embedded/license/mpl2/c.mustache
     embedded/license/mpl2/cpp.mustache
     embedded/license/mpl2/css.mustache
+    embedded/license/mpl2/go.mustache
     embedded/license/mpl2/haskell.mustache
     embedded/license/mpl2/html.mustache
     embedded/license/mpl2/java.mustache
@@ -98,6 +104,7 @@ extra-source-files:
     test-data/code-samples/cpp/sample2.cpp
     test-data/code-samples/css/sample1.css
     test-data/code-samples/css/sample2.css
+    test-data/code-samples/go/sample1.go
     test-data/code-samples/haskell/full.hs
     test-data/code-samples/haskell/header.hs
     test-data/code-samples/haskell/sample1.hs
@@ -150,6 +157,7 @@ library
       Headroom.FileSupport.C
       Headroom.FileSupport.CPP
       Headroom.FileSupport.CSS
+      Headroom.FileSupport.Go
       Headroom.FileSupport.Haskell
       Headroom.FileSupport.Haskell.Haddock
       Headroom.FileSupport.HTML
@@ -254,6 +262,7 @@ test-suite spec
       Headroom.FileSupport.CPPSpec
       Headroom.FileSupport.CSpec
       Headroom.FileSupport.CSSSpec
+      Headroom.FileSupport.GoSpec
       Headroom.FileSupport.Haskell.HaddockSpec
       Headroom.FileSupport.HaskellSpec
       Headroom.FileSupport.HTMLSpec

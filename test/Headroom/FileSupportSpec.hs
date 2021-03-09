@@ -90,6 +90,28 @@ spec = do
             ]
       analyzeSourceCode (fileSupport CSS) sample `shouldBe` expected
 
+    it "analyzes Go source code" $ do
+      sample <- loadFile $ codeSamples </> "go" </> "sample1.go"
+      let expected = SourceCode
+            [ (Code   , "")
+            , (Comment, "// This is the")
+            , (Comment, "// header")
+            , (Code   , "")
+            , (Code   , "package main")
+            , (Code   , "")
+            , (Comment, "// this is not the header")
+            , (Code   , "import \"fmt\"")
+            , (Code   , "func main() {")
+            , (Comment, "    /* another comment */")
+            , (Code, "    fmt.Println(\"hello world\")")
+            , (Code   , "")
+            , (Comment, "    /*")
+            , (Comment, "     * block comment")
+            , (Comment, "     */")
+            , (Code   , "}")
+            ]
+      analyzeSourceCode (fileSupport Go) sample `shouldBe` expected
+
     it "analyzes Haskell source code" $ do
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"
       let expected = SourceCode
