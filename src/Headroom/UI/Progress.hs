@@ -20,7 +20,6 @@ module Headroom.UI.Progress
 where
 
 import           RIO
-import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
 import           Text.Printf                         ( printf )
 
@@ -35,7 +34,7 @@ instance Display Progress where
   textDisplay (Progress current total) = T.pack
     $ mconcat ["[", currentS, " of ", totalS, "]"]
    where
-    format   = "%" <> (show . L.length $ totalS) <> "d"
+    format   = "%" <> (show . length $ totalS) <> "d"
     currentS = printf format current
     totalS   = show total
 
@@ -50,5 +49,5 @@ zipWithProgress :: [a]
                 -- ^ zipped result
 zipWithProgress list = zip progresses list
  where
-  listLength = L.length list
+  listLength = length list
   progresses = fmap (`Progress` listLength) [1 .. listLength]

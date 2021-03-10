@@ -105,7 +105,6 @@ import           Headroom.Variables                  ( compileVariables
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 import           RIO.FilePath                        ( takeBaseName )
-import qualified RIO.List                           as L
 import qualified RIO.Map                            as M
 import qualified RIO.Text                           as T
 
@@ -203,18 +202,19 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   startTS            <- liftIO getPOSIXTime
   templates          <- loadTemplates
   sourceFiles        <- findSourceFiles (M.keys templates)
+  _                  <- logInfo "-----"
   (total, processed) <- processSourceFiles templates sourceFiles
   endTS              <- liftIO getPOSIXTime
-  logInfo "-----"
-  logInfo $ mconcat
+  when (processed > 0) $ logStickyDone "-----"
+  logStickyDone $ mconcat
     [ "Done: "
     , if isCheck then "outdated " else "modified "
     , display processed
     , if isCheck then ", up-to-date " else ", skipped "
     , display (total - processed)
-    , " file(s) in "
+    , " files in "
     , displayShow (endTS - startTS)
-    , " second(s)."
+    , " seconds."
     ]
   warnOnDryRun
   when (not croDryRun && isCheck && processed > 0) (exitWith $ ExitFailure 1)
@@ -239,12 +239,13 @@ findSourceFiles fileTypes = do
   files <-
     mconcat <$> mapM (fsFindFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
   let files' = excludePaths cExcludedPaths files
+  -- Found
   logInfo $ mconcat
     [ "Found "
-    , display $ L.length files'
-    , " source file(s) (excluded "
-    , display $ L.length files - L.length files'
-    , " file(s))"
+    , display $ length files'
+    , " files to process (excluded "
+    , display $ length files - length files'
+    , ")"
     ]
   pure files'
 
@@ -265,7 +266,7 @@ processSourceFiles templates paths = do
       withTemplate = mapMaybe (template cLicenseHeaders) paths
   cVars     <- compileVariables (dVars <> cVariables)
   processed <- mapM (process cVars dVars) (zipWithProgress withTemplate)
-  pure (L.length withTemplate, L.length . filter (== True) $ processed)
+  pure (length withTemplate, length . filter (== True) $ processed)
  where
   fileType c p = fileExtension p >>= fileTypeByExt c
   template c p = (, p) <$> (fileType c p >>= \ft -> M.lookup ft templates)
@@ -299,9 +300,10 @@ processSourceFile cVars dVars progress ht@HeaderTemplate {..} path = do
   let result  = raFunc source
       changed = raProcessed && (source /= result)
       message = if changed then raProcessedMsg else raSkippedMsg
+      logFn   = if changed then logInfo else logSticky
       isCheck = cRunMode == Check
   logDebug $ "Header info: " <> displayShow headerInfo
-  logInfo $ mconcat [display progress, " ", display message, fromString path]
+  logFn $ mconcat [display progress, " ", display message, fromString path]
   when (not croDryRun && not isCheck && changed)
        (writeFileUtf8 path $ toText result)
   pure changed
@@ -357,8 +359,7 @@ loadTemplateFiles paths' = do
       (t, ) <$> (fsLoadFile p >>= parseTemplate (Just $ T.pack p) . T.strip)
     )
     withTypes
-  logInfo
-    $ mconcat ["Found ", display $ L.length parsed, " license template(s)"]
+  logInfo $ mconcat ["Found ", display $ length parsed, " license templates"]
   pure $ M.fromList parsed
   where extensions = toList $ templateExtensions @TemplateType
 
