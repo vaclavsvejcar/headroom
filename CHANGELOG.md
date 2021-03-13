@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.4.1.0 (upcoming release)
 - [#71] Add support for _Go_ language
+- [#72] Headroom doctest not passing with hashable-1.3.1.0
 
 ## 0.4.0.0 (released 2021-03-04)
 - [#57] FIXED: put-before/put-after in commented code breaks header detection

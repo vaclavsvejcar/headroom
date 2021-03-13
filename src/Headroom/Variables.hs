@@ -84,8 +84,10 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
 -- Note that recursive variable reference and/or cyclic references are not
 -- supported.
 --
--- >>> compileVariables $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
--- Variables (fromList [("msg","Hello, John"),("name","John")])
+-- >>> let compiled = compileVariables $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
+-- >>> let expected = mkVariables [("name", "John"), ("msg", "Hello, John")]
+-- >>> compiled == Just expected
+-- True
 compileVariables :: (MonadThrow m)
                  => Variables
                  -- ^ input variables to compile
