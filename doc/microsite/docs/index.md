@@ -4,7 +4,7 @@ Would you like to have nice, up-to-date license/copyright headers in your source
 
 __Headroom__ also offers much more than just adding, replacing or dropping license headers. It can also update years in copyrights for you, provides specialized support for some source code file types, and much more!
 
-[![asciicast](https://asciinema.org/a/4Pfxdss0V4msFjjt2z6mgCZCp.svg)](https://asciinema.org/a/4Pfxdss0V4msFjjt2z6mgCZCp)
+[![asciicast](https://asciinema.org/a/DkSBMZPHMJvJ4jyDtvT9ehfs8.svg)](https://asciinema.org/a/DkSBMZPHMJvJ4jyDtvT9ehfs8)
 
 
 # Main Features
