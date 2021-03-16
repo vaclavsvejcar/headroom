@@ -1,6 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE NoImplicitPrelude         #-}
-{-# LANGUAGE OverloadedStrings         #-}
 {-# LANGUAGE StrictData                #-}
 
 {-|

@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.4.2.0 (in development)
+- Bump _LTS Haskell_ to `17.6`
+
 ## 0.4.1.0 (released 2021-03-14)
 - [#69] Improve console output
 - [#71] Add support for _Go_ language
