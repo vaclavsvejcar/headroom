@@ -2,7 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 {-|
-Module      : Headroom.Serialization
+Module      : Headroom.Data.Serialization
 Description : Various functions for data (de)serialization
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -14,7 +14,7 @@ Module providing support for data (de)serialization, mainly from/to /JSON/
 and /YAML/.
 -}
 
-module Headroom.Serialization
+module Headroom.Data.Serialization
   ( -- * JSON/YAML Serialization
     aesonOptions
   , dropFieldPrefix

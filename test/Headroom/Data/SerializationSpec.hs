@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.SerializationSpec
+module Headroom.Data.SerializationSpec
   ( spec
   )
 where
 
-import           Headroom.Serialization
+import           Headroom.Data.Serialization
 import           RIO
 import qualified RIO.Map                            as M
 import           Test.Hspec

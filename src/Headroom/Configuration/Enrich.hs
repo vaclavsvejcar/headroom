@@ -30,7 +30,7 @@ module Headroom.Configuration.Enrich
 where
 
 import           Data.Aeson                          ( ToJSON(..) )
-import           Headroom.Serialization              ( prettyPrintYAML )
+import           Headroom.Data.Serialization         ( prettyPrintYAML )
 import           RIO
 import qualified RIO.Map                            as M
 import qualified RIO.Text                           as T

@@ -86,9 +86,9 @@ import           Data.String.Interpolate             ( i
 import           Generic.Data                        ( Generically(..) )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.Data.Regex                 ( Regex(..) )
+import           Headroom.Data.Serialization         ( aesonOptions )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Meta                       ( webDocConfigCurr )
-import           Headroom.Serialization              ( aesonOptions )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -356,7 +356,7 @@ instance FromJSON PtConfiguration where
     cSourcePaths     <- Last <$> obj .:? "source-paths"
     cExcludedPaths   <- Last <$> obj .:? "excluded-paths"
     cTemplateSource  <- Last <$> get TemplateFiles (obj .:? "template-paths")
-    cVariables       <- fmap Variables (obj .:? "variables" .!= mempty)
+    cVariables       <- Variables <$> obj .:? "variables" .!= mempty
     cLicenseHeaders  <- obj .:? "license-headers" .!= mempty
     cHeaderFnConfigs <- obj .:? "post-process" .!= mempty
     pure Configuration { .. }
