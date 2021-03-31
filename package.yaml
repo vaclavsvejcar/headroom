@@ -68,10 +68,12 @@ library:
     - generic-data
     - microlens
     - microlens-th
+    - modern-uri
     - mtl
     - mustache
     - pcre-light
     - pcre-heavy
+    - req
     - string-interpolate
     - template-haskell
     - time
@@ -85,6 +87,7 @@ tests:
       - aeson
       - headroom
       - hspec
+      - modern-uri
       - mtl
       - pcre-light
       - QuickCheck
