@@ -7,8 +7,8 @@ module Headroom.FileSupportSpec
 where
 
 import           Headroom.FileSupport
-import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.IO.FileSystem              ( loadFile )
 import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
                                                      )
