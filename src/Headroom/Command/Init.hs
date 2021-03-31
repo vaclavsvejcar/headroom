@@ -54,13 +54,13 @@ import           Headroom.Embedded                   ( configFileStub
                                                      , defaultConfig
                                                      , licenseTemplate
                                                      )
-import           Headroom.FileSystem                 ( FileSystem(..)
+import           Headroom.FileType                   ( fileTypeByExt )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.IO.FileSystem              ( FileSystem(..)
                                                      , fileExtension
                                                      , findFiles
                                                      , mkFileSystem
                                                      )
-import           Headroom.FileType                   ( fileTypeByExt )
-import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Meta                       ( TemplateType
                                                      , buildVersion
                                                      , configFileName

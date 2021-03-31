@@ -21,8 +21,8 @@ import           Headroom.FileSupport.Haskell.Haddock
 import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
                                                      , TemplateData(..)
                                                      )
-import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.IO.FileSystem              ( loadFile )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Template.Mustache          ( Mustache(..) )
 import           RIO

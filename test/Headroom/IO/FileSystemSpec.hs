@@ -2,13 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 
-module Headroom.FileSystemSpec
+module Headroom.IO.FileSystemSpec
   ( spec
   )
 where
 
 import           Headroom.Data.Regex                 ( re )
-import           Headroom.FileSystem
+import           Headroom.IO.FileSystem
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import           RIO.List                            ( sort )

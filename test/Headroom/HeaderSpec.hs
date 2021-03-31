@@ -23,10 +23,10 @@ import           Headroom.Embedded                   ( defaultConfig )
 import           Headroom.FileSupport                ( analyzeSourceCode
                                                      , fileSupport
                                                      )
-import           Headroom.FileSystem                 ( loadFile )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Header
 import           Headroom.Header.Types               ( HeaderInfo(..) )
+import           Headroom.IO.FileSystem              ( loadFile )
 import           Headroom.SourceCode                 ( LineType(..)
                                                      , SourceCode(..)
                                                      )

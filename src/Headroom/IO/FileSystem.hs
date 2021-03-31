@@ -2,7 +2,7 @@
 {-# LANGUAGE ViewPatterns      #-}
 
 {-|
-Module      : Headroom.FileSystem
+Module      : Headroom.IO.FileSystem
 Description : Operations related to files and file system
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -14,7 +14,7 @@ Module providing functions for working with the local file system, its file and
 directories.
 -}
 
-module Headroom.FileSystem
+module Headroom.IO.FileSystem
   ( -- * Type Aliases
     CreateDirectoryFn
   , DoesFileExistFn

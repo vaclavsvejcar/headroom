@@ -17,8 +17,8 @@ import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
-import           Headroom.FileSystem                 ( FileSystem(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.IO.FileSystem              ( FileSystem(..) )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import qualified RIO.List                           as L
