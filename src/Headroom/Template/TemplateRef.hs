@@ -71,6 +71,12 @@ data TemplateRef = TemplateRef
 -- | Creates a 'TemplateRef' from given text. If the raw text appears to be
 -- valid URL with either @http@ or @https@ as protocol, it considers it as
 -- 'UriTemplateSource', otherwise it creates 'LocalTemplateSource'.
+--
+-- >>> mkTemplateRef "/path/to/haskell.mustache" :: Maybe TemplateRef
+-- Just (TemplateRef {trFileType = Haskell, trSource = LocalTemplateSource "/path/to/haskell.mustache"})
+--
+-- >>> mkTemplateRef "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
+-- Just (TemplateRef {trFileType = Haskell, trSource = UriTemplateSource (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing})})
 mkTemplateRef :: MonadThrow m
               => Text          -- ^ input text
               -> m TemplateRef -- ^ created 'TemplateRef' (or error)
