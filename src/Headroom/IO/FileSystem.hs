@@ -3,7 +3,7 @@
 
 {-|
 Module      : Headroom.IO.FileSystem
-Description : Operations related to files and file system
+Description : File system related IO operations
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
