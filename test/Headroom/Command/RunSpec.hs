@@ -34,6 +34,7 @@ import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.IO.FileSystem              ( FileSystem(..) )
 import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template                   ( Template(..) )
+import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO                          hiding ( assert )
@@ -86,7 +87,7 @@ spec = do
           fsFindFilesByExts' _          _ = throwString "INVALID CONDITION"
           fsLoadFile' "haskell.mustache" = pure "template content"
           fsLoadFile' _                  = throwString "INVALID CONDITION"
-      templates <- runRIO env' $ loadTemplateFiles ["test-dir"]
+      templates <- runRIO env' $ loadTemplateFiles @Mustache ["test-dir"]
       M.size templates `shouldBe` 1
       M.member Haskell templates `shouldBe` True
 
@@ -115,7 +116,8 @@ spec = do
             ]
           vars   = mkVariables [("sndAuthor", "2nd Author")]
           syntax = LineComment [re|^--|] (Just "--")
-      runRIO env (postProcessHeader' syntax vars sample) `shouldReturn` expected
+      runRIO env (postProcessHeader' @Mustache syntax vars sample)
+        `shouldReturn` expected
 
 
 env :: TestEnv

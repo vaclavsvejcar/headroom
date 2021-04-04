@@ -2,7 +2,9 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
+
 module Headroom.HeaderFnSpec
   ( spec
   )
@@ -17,6 +19,7 @@ import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.HeaderFn
 import           Headroom.HeaderFn.Types
 import           Headroom.HeaderFn.UpdateCopyright
+import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO
@@ -71,8 +74,8 @@ spec = do
   describe "mkConfiguredEnv" $ do
     it "makes ConfiguredEnv from input parameters" $ do
       let configsIn = configs "{{ sndAuthor }}"
-          envOut    = configuredEnv "2nd Author"
-      mkConfiguredEnv currentYear vars configsIn `shouldBe` Just envOut
+          out       = configuredEnv "2nd Author"
+      mkConfiguredEnv @Mustache currentYear vars configsIn `shouldBe` Just out
 
 -------------------------------  Test Data Types  ------------------------------
 

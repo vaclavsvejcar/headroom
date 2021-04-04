@@ -1,10 +1,13 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
+
 module Headroom.VariablesSpec
   ( spec
   )
 where
 
+import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables
 import           Headroom.Variables.Types            ( Variables(..) )
@@ -36,12 +39,12 @@ spec = do
             [("name", "John Smith"), ("greeting", "Hello, {{ name }}")]
           expected = mkVariables
             [("name", "John Smith"), ("greeting", "Hello, John Smith")]
-      compileVariables sample1 `shouldReturn` expected
+      compileVariables @Mustache sample1 `shouldReturn` expected
 
     it "doesn't get stuck in infinite loop on invalid recursive variable" $ do
       let sample1  = mkVariables [("greeting", "Hello, {{ greeting }}")]
           expected = mkVariables [("greeting", "Hello, Hello, {{ greeting }}")]
-      compileVariables sample1 `shouldReturn` expected
+      compileVariables @Mustache sample1 `shouldReturn` expected
 
 
   describe "dynamicVariables" $ do
