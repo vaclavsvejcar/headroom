@@ -1,9 +1,11 @@
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE StrictData        #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE QuasiQuotes         #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StrictData          #-}
+{-# LANGUAGE TypeApplications    #-}
 
 {-|
 Module      : Headroom.Variables
@@ -29,7 +31,6 @@ module Headroom.Variables
 where
 
 import           Data.String.Interpolate             ( iii )
-import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( CurrentYear(..)
                                                      , fromHeadroomError
@@ -84,11 +85,14 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
 -- Note that recursive variable reference and/or cyclic references are not
 -- supported.
 --
--- >>> let compiled = compileVariables $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
+-- >>> :set -XTypeApplications
+-- >>> import Headroom.Template.Mustache (Mustache)
+-- >>> let compiled = compileVariables @Mustache $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
 -- >>> let expected = mkVariables [("name", "John"), ("msg", "Hello, John")]
 -- >>> compiled == Just expected
 -- True
-compileVariables :: (MonadThrow m)
+compileVariables :: forall a m
+                  . (Template a, MonadThrow m)
                  => Variables
                  -- ^ input variables to compile
                  -> m Variables
@@ -98,7 +102,7 @@ compileVariables variables@(Variables kvs) = do
   pure $ mkVariables compiled
  where
   compileVariable (key, value) = do
-    parsed   <- parseTemplate @TemplateType (Just $ "variable " <> key) value
+    parsed   <- parseTemplate @a (Just $ "variable " <> key) value
     rendered <- renderTemplate variables parsed
     pure (key, rendered)
 

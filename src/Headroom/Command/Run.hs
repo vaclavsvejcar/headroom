@@ -1,9 +1,11 @@
+{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TupleSections         #-}
@@ -200,10 +202,10 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   let isCheck = cRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
-  templates          <- loadTemplates
+  templates          <- loadTemplates @TemplateType
   sourceFiles        <- findSourceFiles (M.keys templates)
   _                  <- logInfo "-----"
-  (total, processed) <- processSourceFiles templates sourceFiles
+  (total, processed) <- processSourceFiles @TemplateType templates sourceFiles
   endTS              <- liftIO getPOSIXTime
   when (processed > 0) $ logStickyDone "-----"
   logStickyDone $ mconcat
@@ -239,7 +241,6 @@ findSourceFiles fileTypes = do
   files <-
     mconcat <$> mapM (fsFindFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
   let files' = excludePaths cExcludedPaths files
-  -- Found
   logInfo $ mconcat
     [ "Found "
     , display $ length files'
@@ -250,7 +251,9 @@ findSourceFiles fileTypes = do
   pure files'
 
 
-processSourceFiles :: ( Has CtConfiguration env
+processSourceFiles :: forall a env
+                    . ( Template a
+                      , Has CtConfiguration env
                       , Has CtHeaderFnConfigs env
                       , Has CommandRunOptions env
                       , Has CurrentYear env
@@ -264,16 +267,18 @@ processSourceFiles templates paths = do
   year               <- viewL
   let dVars        = dynamicVariables year
       withTemplate = mapMaybe (template cLicenseHeaders) paths
-  cVars     <- compileVariables (dVars <> cVariables)
+  cVars     <- compileVariables @a (dVars <> cVariables)
   processed <- mapM (process cVars dVars) (zipWithProgress withTemplate)
   pure (length withTemplate, length . filter (== True) $ processed)
  where
   fileType c p = fileExtension p >>= fileTypeByExt c
   template c p = (, p) <$> (fileType c p >>= \ft -> M.lookup ft templates)
-  process cVars dVars (pr, (ht, p)) = processSourceFile cVars dVars pr ht p
+  process cVars dVars (pr, (ht, p)) = processSourceFile @a cVars dVars pr ht p
 
 
-processSourceFile :: ( Has CommandRunOptions env
+processSourceFile :: forall a env
+                   . ( Template a
+                     , Has CommandRunOptions env
                      , Has CtConfiguration env
                      , Has CtHeaderFnConfigs env
                      , Has CurrentYear env
@@ -295,7 +300,7 @@ processSourceFile cVars dVars progress ht@HeaderTemplate {..} path = do
       variables                  = dVars <> cVars <> hiVariables
       syntax                     = hcHeaderSyntax hiHeaderConfig
   header'        <- renderTemplate variables htTemplate
-  header         <- postProcessHeader' syntax variables header'
+  header         <- postProcessHeader' @a syntax variables header'
   RunAction {..} <- chooseAction headerInfo header
   let result  = raFunc source
       changed = raProcessed && (source /= result)
@@ -344,7 +349,11 @@ chooseAction info header = do
 
 
 -- | Loads templates from the given paths.
-loadTemplateFiles :: (Has (FileSystem (RIO env)) env, HasLogFunc env)
+loadTemplateFiles :: forall a env
+                   . ( Template a
+                     , Has (FileSystem (RIO env)) env
+                     , HasLogFunc env
+                     )
                   => [FilePath]
                   -- ^ paths to template files
                   -> RIO env (Map FileType TemplateType)
@@ -361,7 +370,7 @@ loadTemplateFiles paths' = do
     withTypes
   logInfo $ mconcat ["Found ", display $ length parsed, " license templates"]
   pure $ M.fromList parsed
-  where extensions = toList $ templateExtensions @TemplateType
+  where extensions = toList $ templateExtensions @a
 
 
 -- | Loads built-in templates, stored in "Headroom.Embedded", for the given
@@ -380,7 +389,9 @@ loadBuiltInTemplates licenseType = do
   template     = licenseTemplate licenseType
 
 
-loadTemplates :: ( Has CtConfiguration env
+loadTemplates :: forall a env
+               . ( Template a
+                 , Has CtConfiguration env
                  , Has (FileSystem (RIO env)) env
                  , HasLogFunc env
                  )
@@ -388,7 +399,7 @@ loadTemplates :: ( Has CtConfiguration env
 loadTemplates = do
   Configuration {..} <- viewL @CtConfiguration
   templates          <- case cTemplateSource of
-    TemplateFiles    paths       -> loadTemplateFiles paths
+    TemplateFiles    paths       -> loadTemplateFiles @a paths
     BuiltInTemplates licenseType -> loadBuiltInTemplates licenseType
   pure $ M.mapWithKey (extractHeaderTemplate cLicenseHeaders) templates
 
@@ -473,7 +484,11 @@ currentYear = do
 --
 --  1. sanitize possibly corrupted comment syntax ('sanitizeSyntax')
 --  2. apply /license header functions/ ('postProcessHeader')
-postProcessHeader' :: (Has CtHeaderFnConfigs env, Has CurrentYear env)
+postProcessHeader' :: forall a env
+                    . ( Template a
+                      , Has CtHeaderFnConfigs env
+                      , Has CurrentYear env
+                      )
                    => HeaderSyntax
                    -- ^ syntax of the license header comments
                    -> Variables
@@ -485,5 +500,5 @@ postProcessHeader' :: (Has CtHeaderFnConfigs env, Has CurrentYear env)
 postProcessHeader' syntax vars rawHeader = do
   configs <- viewL @CtHeaderFnConfigs
   year    <- viewL
-  cEnv    <- mkConfiguredEnv year vars configs
+  cEnv    <- mkConfiguredEnv @a year vars configs
   pure . sanitizeSyntax syntax . postProcessHeader cEnv $ rawHeader

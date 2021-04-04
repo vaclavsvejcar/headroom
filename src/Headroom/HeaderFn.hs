@@ -1,3 +1,4 @@
+{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -5,6 +6,7 @@
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
@@ -48,7 +50,6 @@ import           Headroom.HeaderFn.UpdateCopyright   ( SelectedAuthors(..)
                                                      , UpdateCopyrightMode(..)
                                                      , updateCopyright
                                                      )
-import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables.Types            ( Variables(..) )
@@ -125,7 +126,8 @@ instance Has UpdateCopyrightMode ConfiguredEnv where
 -- | Constructor function for 'ConfiguredEnv' data type. This function takes
 -- 'Variables' as argument, because it performs template compilation on
 -- selected fields of 'CtHeaderFnConfigs'.
-mkConfiguredEnv :: (MonadThrow m)
+mkConfiguredEnv :: forall a m
+                 . (Template a, MonadThrow m)
                 => CurrentYear
                 -- ^ current year
                 -> Variables
@@ -135,7 +137,7 @@ mkConfiguredEnv :: (MonadThrow m)
                 -> m ConfiguredEnv
                 -- ^ environment data type
 mkConfiguredEnv ceCurrentYear vars configs = do
-  ceHeaderFnConfigs <- compileTemplates vars configs
+  ceHeaderFnConfigs <- compileTemplates @a vars configs
   let ceUpdateCopyrightMode = mode ceHeaderFnConfigs
   pure ConfiguredEnv { .. }
  where
@@ -147,7 +149,8 @@ mkConfiguredEnv ceCurrentYear vars configs = do
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-compileTemplates :: (MonadThrow m)
+compileTemplates :: forall a m
+                  . (Template a, MonadThrow m)
                  => Variables
                  -> CtHeaderFnConfigs
                  -> m CtHeaderFnConfigs
@@ -156,7 +159,7 @@ compileTemplates vars configs = configs & traverseOf authorsL compileAuthors'
   authorsL        = hfcsUpdateCopyrightL . hfcConfigL . uccSelectedAuthorsL
   compileAuthors' = mapM . mapM $ compileAuthor
   compileAuthor author = do
-    parsed <- parseTemplate @TemplateType (Just $ "author " <> author) author
+    parsed <- parseTemplate @a (Just $ "author " <> author) author
     renderTemplate vars parsed
 
 

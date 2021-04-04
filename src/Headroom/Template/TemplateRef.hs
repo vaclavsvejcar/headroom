@@ -1,10 +1,12 @@
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE StrictData        #-}
-{-# LANGUAGE TypeApplications  #-}
-{-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE QuasiQuotes         #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StrictData          #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE ViewPatterns        #-}
 
 {-|
 Module      : Headroom.Template.TemplateRef
@@ -36,7 +38,6 @@ import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
 import           Headroom.FileType.Types             ( FileType )
-import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
@@ -72,12 +73,17 @@ data TemplateRef = TemplateRef
 -- valid URL with either @http@ or @https@ as protocol, it considers it as
 -- 'UriTemplateSource', otherwise it creates 'LocalTemplateSource'.
 --
--- >>> mkTemplateRef "/path/to/haskell.mustache" :: Maybe TemplateRef
+-- >>> :set -XTypeApplications
+-- >>> import Headroom.Template.Mustache (Mustache)
+-- >>> mkTemplateRef @Mustache "/path/to/haskell.mustache" :: Maybe TemplateRef
 -- Just (TemplateRef {trFileType = Haskell, trSource = LocalTemplateSource "/path/to/haskell.mustache"})
 --
--- >>> mkTemplateRef "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
+-- >>> :set -XTypeApplications
+-- >>> import Headroom.Template.Mustache (Mustache)
+-- >>> mkTemplateRef @Mustache "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
 -- Just (TemplateRef {trFileType = Haskell, trSource = UriTemplateSource (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing})})
-mkTemplateRef :: MonadThrow m
+mkTemplateRef :: forall a m
+               . (Template a, MonadThrow m)
               => Text          -- ^ input text
               -> m TemplateRef -- ^ created 'TemplateRef' (or error)
 mkTemplateRef raw = do
@@ -85,7 +91,7 @@ mkTemplateRef raw = do
   source   <- detectSource
   pure TemplateRef { trFileType = fileType, trSource = source }
  where
-  exts         = templateExtensions @TemplateType
+  exts         = templateExtensions @a
   detectSource = case match [re|(^\w+):\/\/|] raw of
     Just (_ : p : _)
       | p `elem` ["http", "https"] -> UriTemplateSource <$> mkURI raw
