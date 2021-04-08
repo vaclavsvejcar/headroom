@@ -1,12 +1,14 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE LambdaCase          #-}
-{-# LANGUAGE NoImplicitPrelude   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE QuasiQuotes         #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StrictData          #-}
-{-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE LambdaCase            #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE StrictData            #-}
+{-# LANGUAGE TypeApplications      #-}
 
 {-|
 Module      : Headroom.Template.TemplateRef
@@ -23,8 +25,7 @@ remote, which can be later opened/downloaded and parsed into template.
 
 module Headroom.Template.TemplateRef
   ( -- * Data Types
-    TemplateSource(..)
-  , TemplateRef(..)
+    TemplateRef(..)
     -- * Constructor Functions
   , mkTemplateRef
     -- * Error Types
@@ -33,12 +34,9 @@ module Headroom.Template.TemplateRef
 where
 
 import           Data.String.Interpolate             ( iii )
-import           Headroom.Data.EnumExtra             ( textToEnum )
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
-import           Headroom.FileType.Types             ( FileType )
-import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -51,55 +49,31 @@ import           Text.URI                            ( URI(..)
 
 ---------------------------------  DATA TYPES  ---------------------------------
 
--- | Source of the template (e.g. local file, URI address).
-data TemplateSource
-  = LocalTemplateSource FilePath -- ^ template path on local file system
-  | UriTemplateSource URI        -- ^ remote template URI adress
-  deriving (Eq, Show)
-
-
--- | Reference to the template. Later this reference is used to get and parse
--- the content of the actual template.
-data TemplateRef = TemplateRef
-  { trFileType :: FileType       -- ^ type of files which this template is for
-  , trSource   :: TemplateSource -- ^ source of the template
-  }
-  deriving (Eq, Show)
+-- | Reference to the template (e.g. local file, URI address).
+data TemplateRef
+  = LocalTemplateRef FilePath -- ^ template path on local file system
+  | UriTemplateRef URI        -- ^ remote template URI adress
+  deriving (Eq, Ord, Show)
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Creates a 'TemplateRef' from given text. If the raw text appears to be
 -- valid URL with either @http@ or @https@ as protocol, it considers it as
--- 'UriTemplateSource', otherwise it creates 'LocalTemplateSource'.
+-- 'UriTemplateRef', otherwise it creates 'LocalTemplateRef'.
 --
--- >>> :set -XTypeApplications
--- >>> import Headroom.Template.Mustache (Mustache)
--- >>> mkTemplateRef @Mustache "/path/to/haskell.mustache" :: Maybe TemplateRef
--- Just (TemplateRef {trFileType = Haskell, trSource = LocalTemplateSource "/path/to/haskell.mustache"})
+-- >>> mkTemplateRef "/path/to/haskell.mustache" :: Maybe TemplateRef
+-- Just (LocalTemplateRef "/path/to/haskell.mustache")
 --
--- >>> :set -XTypeApplications
--- >>> import Headroom.Template.Mustache (Mustache)
--- >>> mkTemplateRef @Mustache "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
--- Just (TemplateRef {trFileType = Haskell, trSource = UriTemplateSource (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing})})
-mkTemplateRef :: forall a m
-               . (Template a, MonadThrow m)
+-- >>> mkTemplateRef "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
+-- Just (UriTemplateRef (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing}))
+mkTemplateRef :: MonadThrow m
               => Text          -- ^ input text
               -> m TemplateRef -- ^ created 'TemplateRef' (or error)
-mkTemplateRef raw = do
-  fileType <- extractFileType
-  source   <- detectSource
-  pure TemplateRef { trFileType = fileType, trSource = source }
- where
-  exts         = templateExtensions @a
-  detectSource = case match [re|(^\w+):\/\/|] raw of
-    Just (_ : p : _)
-      | p `elem` ["http", "https"] -> UriTemplateSource <$> mkURI raw
-      | otherwise                  -> throwM $ UnsupportedUriProtocol p raw
-    _ -> pure . LocalTemplateSource . T.unpack $ raw
-  extractFileType = case match [re|(\w+)\.(\w+)$|] raw of
-    Just (_ : (textToEnum -> (Just ft )) : e : _) | e `elem` exts -> pure ft
-    _ -> throwM $ UnrecognizedTemplateName raw
+mkTemplateRef raw = case match [re|(^\w+):\/\/|] raw of
+  Just (_ : p : _) | p `elem` ["http", "https"] -> UriTemplateRef <$> mkURI raw
+                   | otherwise -> throwM $ UnsupportedUriProtocol p raw
+  _ -> pure . LocalTemplateRef . T.unpack $ raw
 
 
 ---------------------------------  ERROR TYPES  --------------------------------
