@@ -9,6 +9,7 @@
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE ViewPatterns          #-}
 
 {-|
 Module      : Headroom.Template.TemplateRef
@@ -28,15 +29,20 @@ module Headroom.Template.TemplateRef
     TemplateRef(..)
     -- * Constructor Functions
   , mkTemplateRef
+    -- * Public Functions
+  , renderRef
     -- * Error Types
   , TemplateRefError(..)
   )
 where
 
 import           Data.String.Interpolate             ( iii )
+import           Headroom.Data.EnumExtra             ( textToEnum )
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
+import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -45,6 +51,7 @@ import qualified RIO.Text                           as T
 import           Text.URI                            ( URI(..)
                                                      , mkURI
                                                      )
+import qualified Text.URI                           as URI
 
 
 ---------------------------------  DATA TYPES  ---------------------------------
@@ -62,18 +69,39 @@ data TemplateRef
 -- valid URL with either @http@ or @https@ as protocol, it considers it as
 -- 'UriTemplateRef', otherwise it creates 'LocalTemplateRef'.
 --
--- >>> mkTemplateRef "/path/to/haskell.mustache" :: Maybe TemplateRef
+-- >>> :set -XTypeApplications
+-- >>> import Headroom.Template.Mustache (Mustache)
+-- >>> mkTemplateRef @Mustache "/path/to/haskell.mustache" :: Maybe TemplateRef
 -- Just (LocalTemplateRef "/path/to/haskell.mustache")
 --
--- >>> mkTemplateRef "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
+-- >>> :set -XTypeApplications
+-- >>> import Headroom.Template.Mustache (Mustache)
+-- >>> mkTemplateRef @Mustache "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
 -- Just (UriTemplateRef (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing}))
-mkTemplateRef :: MonadThrow m
+mkTemplateRef :: forall a m
+               . (Template a, MonadThrow m)
               => Text          -- ^ input text
               -> m TemplateRef -- ^ created 'TemplateRef' (or error)
 mkTemplateRef raw = case match [re|(^\w+):\/\/|] raw of
-  Just (_ : p : _) | p `elem` ["http", "https"] -> UriTemplateRef <$> mkURI raw
+  Just (_ : p : _) | p `elem` ["http", "https"] -> uriTemplateRef
                    | otherwise -> throwM $ UnsupportedUriProtocol p raw
   _ -> pure . LocalTemplateRef . T.unpack $ raw
+ where
+  uriTemplateRef  = extractFileType >> UriTemplateRef <$> mkURI raw
+  exts            = templateExtensions @a
+  extractFileType = case match [re|(\w+)\.(\w+)$|] raw of
+    Just (_ : (textToEnum @FileType -> (Just ft )) : e : _) | e `elem` exts ->
+      pure ft
+    _ -> throwM $ UnrecognizedTemplateName raw
+
+
+------------------------------  PUBLIC FUNCTIONS  ------------------------------
+
+-- | Renders given 'TemplateRef' into human-friendly text.
+renderRef :: TemplateRef -- ^ 'TemplateRef' to render
+          -> Text        -- ^ rendered text
+renderRef (LocalTemplateRef path) = T.pack path
+renderRef (UriTemplateRef   uri ) = URI.render uri
 
 
 ---------------------------------  ERROR TYPES  --------------------------------

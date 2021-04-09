@@ -1,6 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
@@ -28,6 +29,7 @@ module Headroom.Command.Run
   ( commandRun
   , loadBuiltInTemplates
   , loadTemplateFiles
+  , loadTemplateRefs
   , typeOfTemplate
     -- * License Header Post-processing
   , postProcessHeader'
@@ -88,6 +90,9 @@ import           Headroom.IO.FileSystem              ( FileSystem(..)
                                                      , fileExtension
                                                      , mkFileSystem
                                                      )
+import           Headroom.IO.Network                 ( Network(..)
+                                                     , mkNetwork
+                                                     )
 import           Headroom.Meta                       ( TemplateType
                                                      , configFileName
                                                      , productInfo
@@ -96,6 +101,9 @@ import           Headroom.SourceCode                 ( SourceCode
                                                      , toText
                                                      )
 import           Headroom.Template                   ( Template(..) )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..)
+                                                     , renderRef
+                                                     )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.UI                         ( Progress(..)
                                                      , zipWithProgress
@@ -107,6 +115,7 @@ import           Headroom.Variables                  ( compileVariables
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 import           RIO.FilePath                        ( takeBaseName )
+import qualified RIO.List                           as L
 import qualified RIO.Map                            as M
 import qualified RIO.Text                           as T
 
@@ -116,37 +125,28 @@ suffixLensesFor ["cHeaderFnConfigs"] ''Configuration
 
 -- | Action to be performed based on the selected 'RunMode'.
 data RunAction = RunAction
-  { raProcessed    :: Bool
-  -- ^ whether the given file was processed
-  , raFunc         :: SourceCode -> SourceCode
-  -- ^ function to process the file
-  , raProcessedMsg :: Text
-  -- ^ message to show when file was processed
-  , raSkippedMsg   :: Text
-  -- ^ message to show when file was skipped
+  { raProcessed    :: Bool -- ^ whether the given file was processed
+  , raFunc         :: SourceCode -> SourceCode -- ^ function to process the file
+  , raProcessedMsg :: Text -- ^ message to show when file was processed
+  , raSkippedMsg   :: Text -- ^ message to show when file was skipped
   }
 
 
 -- | Initial /RIO/ startup environment for the /Run/ command.
 data StartupEnv = StartupEnv
-  { envLogFunc    :: LogFunc
-  -- ^ logging function
-  , envRunOptions :: CommandRunOptions
-  -- ^ options
+  { envLogFunc    :: LogFunc           -- ^ logging function
+  , envRunOptions :: CommandRunOptions -- ^ options
   }
 
 suffixLenses ''StartupEnv
 
 -- | Full /RIO/ environment for the /Run/ command.
 data Env = Env
-  { envEnv           :: StartupEnv
-  -- ^ startup /RIO/ environment
-  , envConfiguration :: CtConfiguration
-  -- ^ application configuration
-  , envCurrentYear   :: CurrentYear
-  -- ^ current year
-  , envFileSystem    :: FileSystem (RIO Env)
-  -- ^ file system operations
+  { envEnv           :: StartupEnv           -- ^ startup /RIO/ environment
+  , envConfiguration :: CtConfiguration      -- ^ application configuration
+  , envCurrentYear   :: CurrentYear          -- ^ current year
+  , envNetwork       :: Network (RIO Env)    -- ^ network operations
+  , envFileSystem    :: FileSystem (RIO Env) -- ^ file system operations
   }
 
 suffixLenses ''Env
@@ -178,6 +178,9 @@ instance Has CommandRunOptions Env where
 instance Has CurrentYear Env where
   hasLens = envCurrentYearL
 
+instance Has (Network (RIO Env)) Env where
+  hasLens = envNetworkL
+
 instance Has (FileSystem (RIO Env)) Env where
   hasLens = envFileSystemL
 
@@ -185,6 +188,7 @@ instance Has (FileSystem (RIO Env)) Env where
 env' :: CommandRunOptions -> LogFunc -> IO Env
 env' opts logFunc = do
   let envEnv        = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
+      envNetwork    = mkNetwork
       envFileSystem = mkFileSystem
   envConfiguration <- runRIO envEnv finalConfiguration
   envCurrentYear   <- currentYear
@@ -192,10 +196,8 @@ env' opts logFunc = do
 
 
 -- | Handler for /Run/ command.
-commandRun :: CommandRunOptions
-           -- ^ /Run/ command options
-           -> IO ()
-           -- ^ execution result
+commandRun :: CommandRunOptions -- ^ /Run/ command options
+           -> IO ()             -- ^ execution result
 commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   CommandRunOptions {..} <- viewL
   Configuration {..}     <- viewL @CtConfiguration
@@ -346,6 +348,38 @@ chooseAction info header = do
                        (justify "Replacing header in:")
                        (justify "Header up-to-date in:")
   justify = T.justifyLeft 30 ' '
+
+
+-- | Loads templates using given template references.
+loadTemplateRefs :: forall a env
+                  . ( Template a
+                    , Has (Network (RIO env)) env
+                    , Has (FileSystem (RIO env)) env
+                    , HasLogFunc env
+                    )
+                 => [TemplateRef]            -- ^ template references
+                 -> RIO env (Map FileType a) -- ^ map of templates
+loadTemplateRefs refs = do
+  fs       <- viewL
+  n        <- viewL
+  allRefs  <- concat <$> mapM (getAllRefs fs) refs
+  refsWTp  <- (\rs -> [ (ft, ref) | (Just ft, ref) <- rs ]) <$> zipRs allRefs
+  refsWCtn <- mapM (loadContent fs n) (filterPreferred refsWTp)
+  M.fromList <$> mapM loadTemplate refsWCtn
+ where
+  zipRs      = \rs -> fmap (`zip` rs) . mapM getFileType $ rs
+  exts       = toList $ templateExtensions @a
+  getAllRefs = \fs ref -> case ref of
+    LocalTemplateRef p -> fmap LocalTemplateRef <$> fsFindFilesByExts fs p exts
+    UriTemplateRef   _ -> pure [ref]
+  loadContent = \fs n (ft, ref) -> (ft, ref, ) <$> case ref of
+    LocalTemplateRef path -> fsLoadFile fs path
+    UriTemplateRef   uri  -> nDownloadContent n uri
+  loadTemplate =
+    \(ft, ref, c) -> (ft, ) <$> parseTemplate @a (Just . renderRef $ ref) c
+  getFileType = typeOfTemplate . T.unpack . renderRef
+  filterPreferred rs =
+    mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y) $ rs
 
 
 -- | Loads templates from the given paths.

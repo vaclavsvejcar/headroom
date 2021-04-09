@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
@@ -9,6 +10,7 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE ViewPatterns          #-}
 
 module Headroom.Command.RunSpec
   ( spec
@@ -32,9 +34,11 @@ import           Headroom.Data.Regex                 ( re )
 import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.IO.FileSystem              ( FileSystem(..) )
+import           Headroom.IO.Network                 ( Network(..) )
 import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Template.Mustache          ( Mustache )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..) )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO                          hiding ( assert )
@@ -45,17 +49,20 @@ import           Test.Hspec
 import           Test.Hspec.QuickCheck               ( prop )
 import           Test.QuickCheck              hiding ( sample )
 import           Test.QuickCheck.Monadic
+import           Text.URI.QQ                         ( uri )
 
 
 data TestEnv = TestEnv
   { envLogFunc         :: LogFunc
   , envCurrentYear     :: CurrentYear
   , envFileSystem      :: FileSystem (RIO TestEnv)
+  , envNetwork         :: Network (RIO TestEnv)
   , envHeaderFnConfigs :: CtHeaderFnConfigs
   }
 
 suffixLenses ''TestEnv
 suffixLensesFor ["fsFindFilesByExts", "fsLoadFile"] ''FileSystem
+suffixLensesFor ["nDownloadContent"] ''Network
 
 instance HasLogFunc TestEnv where
   logFuncL = envLogFuncL
@@ -68,6 +75,9 @@ instance Has CurrentYear TestEnv where
 
 instance Has (FileSystem (RIO TestEnv)) TestEnv where
   hasLens = envFileSystemL
+
+instance Has (Network (RIO TestEnv)) TestEnv where
+  hasLens = envNetworkL
 
 
 spec :: Spec
@@ -90,6 +100,35 @@ spec = do
       templates <- runRIO env' $ loadTemplateFiles @Mustache ["test-dir"]
       M.size templates `shouldBe` 1
       M.member Haskell templates `shouldBe` True
+
+
+  describe "loadTemplateRefs" $ do
+    it "should load templates from given references" $ do
+      let env' =
+            env
+              & (envFileSystemL . fsFindFilesByExtsL .~ fsFindFilesByExts')
+              & (envFileSystemL . fsLoadFileL .~ fsLoadFile')
+              & (envNetworkL . nDownloadContentL .~ nDownloadContent')
+          fsFindFilesByExts' = \path _ -> case path of
+            "test-dir" -> pure ["haskell.mustache", "rust.mustache"]
+            _          -> throwString "INVALID"
+          fsLoadFile' = \case
+            "haskell.mustache" -> pure "haskell local"
+            "rust.mustache"    -> pure "rust local"
+            _                  -> throwString "INVALID"
+          nDownloadContent' = \case
+            [uri|http://test.com/haskell.mustache|] -> pure "haskell URI"
+            _ -> throwString "INVALID"
+          refs =
+            [ UriTemplateRef [uri|http://test.com/haskell.mustache|]
+            , LocalTemplateRef "test-dir"
+            ]
+      templates <- runRIO env' $ loadTemplateRefs @Mustache refs
+      M.size templates `shouldBe` 2
+      M.member Haskell templates `shouldBe` True
+      M.member Rust templates `shouldBe` True
+      rawTemplate <$> M.lookup Haskell templates `shouldBe` Just "haskell local"
+      rawTemplate <$> M.lookup Rust templates `shouldBe` Just "rust local"
 
 
   describe "typeOfTemplate" $ do
@@ -134,6 +173,7 @@ env = TestEnv { .. }
                               , fsListFiles           = undefined
                               , fsLoadFile            = undefined
                               }
+  envNetwork         = Network { nDownloadContent = undefined }
   envHeaderFnConfigs = HeaderFnConfigs
     { hfcsUpdateCopyright = HeaderFnConfig
                               { hfcEnabled = True
