@@ -350,7 +350,9 @@ chooseAction info header = do
   justify = T.justifyLeft 30 ' '
 
 
--- | Loads templates using given template references.
+-- | Loads templates using given template references. If multiple sources define
+-- template for the same 'FileType', then the preferred one (based on ordering
+-- of 'TemplateRef' is selected).
 loadTemplateRefs :: forall a env
                   . ( Template a
                     , Has (Network (RIO env)) env

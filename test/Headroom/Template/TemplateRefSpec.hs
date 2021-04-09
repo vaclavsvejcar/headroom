@@ -10,6 +10,7 @@ module Headroom.Template.TemplateRefSpec
 where
 
 
+import qualified Data.Aeson                         as Aeson
 import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Template.TemplateRef
 import           RIO
@@ -55,6 +56,13 @@ spec = do
       let sample   = UriTemplateRef [uri|http://foo/haskell.mustache|]
           expected = "http://foo/haskell.mustache"
       renderRef sample `shouldBe` expected
+
+
+  describe "FromJSON instance for TemplateRef" $ do
+    it "deserializes TemplateRef from JSON value" $ do
+      let sample   = "\"http://foo/haskell.mustache\""
+          expected = UriTemplateRef [uri|http://foo/haskell.mustache|]
+      Aeson.decode sample `shouldBe` Just expected
 
 
   describe "Ord instance for TemplateRef" $ do
