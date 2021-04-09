@@ -36,12 +36,16 @@ module Headroom.Template.TemplateRef
   )
 where
 
+import           Data.Aeson                          ( FromJSON(..)
+                                                     , Value(String)
+                                                     )
 import           Data.String.Interpolate             ( iii )
 import           Headroom.Data.EnumExtra             ( textToEnum )
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
@@ -61,6 +65,12 @@ data TemplateRef
   = LocalTemplateRef FilePath -- ^ template path on local file system
   | UriTemplateRef URI        -- ^ remote template URI adress
   deriving (Eq, Ord, Show)
+
+
+instance FromJSON TemplateRef where
+  parseJSON = \case
+    String s -> maybe (error $ T.unpack s) pure (mkTemplateRef @TemplateType s)
+    other    -> error $ "Invalid value for template reference: " <> show other
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------

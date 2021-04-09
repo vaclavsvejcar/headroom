@@ -19,6 +19,7 @@ module Headroom.Command.Readers
   ( licenseReader
   , licenseTypeReader
   , regexReader
+  , templateRefReader
   , parseLicense
   )
 where
@@ -30,6 +31,10 @@ import           Headroom.Data.Regex                 ( Regex(..)
                                                      , compile
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
+import           Headroom.Meta                       ( TemplateType )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..)
+                                                     , mkTemplateRef
+                                                     )
 import           Options.Applicative
 import           RIO
 import qualified RIO.Text                           as T
@@ -66,6 +71,14 @@ licenseTypeReader = eitherReader parseLicenseType
 regexReader :: ReadM Regex
 regexReader =
   let parse input = mapLeft displayException (compile . T.pack $ input)
+  in  eitherReader parse
+
+
+-- | Reader for 'TemplateRef'.
+templateRefReader :: ReadM TemplateRef
+templateRefReader =
+  let parse input = mapLeft displayException
+                            (mkTemplateRef @TemplateType . T.pack $ input)
   in  eitherReader parse
 
 
