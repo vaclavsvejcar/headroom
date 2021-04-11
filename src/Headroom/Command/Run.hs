@@ -28,7 +28,6 @@ responsible for license header management.
 module Headroom.Command.Run
   ( commandRun
   , loadBuiltInTemplates
-  , loadTemplateFiles
   , loadTemplateRefs
   , typeOfTemplate
     -- * License Header Post-processing
@@ -57,7 +56,6 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , LicenseType(..)
                                                      , PtConfiguration
                                                      , RunMode(..)
-                                                     , TemplateSource(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.Data.Has                   ( Has(..) )
@@ -204,7 +202,7 @@ commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
   let isCheck = cRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
-  templates          <- loadTemplates @TemplateType
+  templates          <- loadTemplates
   sourceFiles        <- findSourceFiles (M.keys templates)
   _                  <- logInfo "-----"
   (total, processed) <- processSourceFiles @TemplateType templates sourceFiles
@@ -384,38 +382,11 @@ loadTemplateRefs refs = do
     mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y) $ rs
 
 
--- | Loads templates from the given paths.
-loadTemplateFiles :: forall a env
-                   . ( Template a
-                     , Has (FileSystem (RIO env)) env
-                     , HasLogFunc env
-                     )
-                  => [FilePath]
-                  -- ^ paths to template files
-                  -> RIO env (Map FileType TemplateType)
-                  -- ^ map of file types and templates
-loadTemplateFiles paths' = do
-  FileSystem {..} <- viewL
-  paths           <- mconcat <$> mapM (`fsFindFilesByExts` extensions) paths'
-  logDebug $ "Using template paths: " <> displayShow paths
-  withTypes <- catMaybes <$> mapM (\p -> fmap (, p) <$> typeOfTemplate p) paths
-  parsed    <- mapM
-    (\(t, p) ->
-      (t, ) <$> (fsLoadFile p >>= parseTemplate (Just $ T.pack p) . T.strip)
-    )
-    withTypes
-  logInfo $ mconcat ["Found ", display $ length parsed, " license templates"]
-  pure $ M.fromList parsed
-  where extensions = toList $ templateExtensions @a
-
-
 -- | Loads built-in templates, stored in "Headroom.Embedded", for the given
 -- 'LicenseType'.
 loadBuiltInTemplates :: (HasLogFunc env)
-                     => LicenseType
-                     -- ^ license type for which to selected templates
-                     -> RIO env (Map FileType TemplateType)
-                     -- ^ map of file types and templates
+                     => LicenseType                         -- ^ selected license type
+                     -> RIO env (Map FileType TemplateType) -- ^ map of file types and templates
 loadBuiltInTemplates licenseType = do
   logInfo $ "Using built-in templates for license: " <> displayShow licenseType
   parsed <- mapM (\(t, r) -> (t, ) <$> parseTemplate Nothing r) rawTemplates
@@ -425,27 +396,26 @@ loadBuiltInTemplates licenseType = do
   template     = licenseTemplate licenseType
 
 
-loadTemplates :: forall a env
-               . ( Template a
-                 , Has CtConfiguration env
+loadTemplates :: ( Has CtConfiguration env
                  , Has (FileSystem (RIO env)) env
+                 , Has (Network (RIO env)) env
                  , HasLogFunc env
                  )
               => RIO env (Map FileType HeaderTemplate)
 loadTemplates = do
   Configuration {..} <- viewL @CtConfiguration
-  templates          <- case cTemplateSource of
-    TemplateFiles    paths       -> loadTemplateFiles @a paths
-    BuiltInTemplates licenseType -> loadBuiltInTemplates licenseType
-  pure $ M.mapWithKey (extractHeaderTemplate cLicenseHeaders) templates
+  fromRefs           <- loadTemplateRefs @TemplateType cTemplateRefs
+  builtIn            <- case cBuiltInTemplates of
+    Just licenseType -> loadBuiltInTemplates licenseType
+    _                -> pure M.empty
+  pure $ M.mapWithKey (extractHeaderTemplate cLicenseHeaders)
+                      (builtIn <> fromRefs)
 
 
 -- | Takes path to the template file and returns detected type of the template.
 typeOfTemplate :: HasLogFunc env
-               => FilePath
-               -- ^ path to the template file
-               -> RIO env (Maybe FileType)
-               -- ^ detected template type
+               => FilePath                 -- ^ path to the template file
+               -> RIO env (Maybe FileType) -- ^ detected template type
 typeOfTemplate path = do
   let fileType = textToEnum . T.pack . takeBaseName $ path
   when (isNothing fileType)
@@ -495,13 +465,14 @@ optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtConfiguration
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
-  pure Configuration { cRunMode         = maybe mempty pure croRunMode
-                     , cSourcePaths     = ifNot null croSourcePaths
-                     , cExcludedPaths   = ifNot null croExcludedPaths
-                     , cTemplateSource  = maybe mempty pure croTemplateSource
-                     , cVariables       = variables
-                     , cLicenseHeaders  = mempty
-                     , cHeaderFnConfigs = mempty
+  pure Configuration { cRunMode          = maybe mempty pure croRunMode
+                     , cSourcePaths      = ifNot null croSourcePaths
+                     , cExcludedPaths    = ifNot null croExcludedPaths
+                     , cBuiltInTemplates = pure croBuiltInTemplates
+                     , cTemplateRefs     = croTemplateRefs
+                     , cVariables        = variables
+                     , cLicenseHeaders   = mempty
+                     , cHeaderFnConfigs  = mempty
                      }
   where ifNot cond value = if cond value then mempty else pure value
 
@@ -525,14 +496,10 @@ postProcessHeader' :: forall a env
                       , Has CtHeaderFnConfigs env
                       , Has CurrentYear env
                       )
-                   => HeaderSyntax
-                   -- ^ syntax of the license header comments
-                   -> Variables
-                   -- ^ template variables
-                   -> Text
-                   -- ^ rendered /license header/ to post-process
-                   -> RIO env Text
-                   -- ^ post-processed /license header/
+                   => HeaderSyntax -- ^ syntax of the license header comments
+                   -> Variables    -- ^ template variables
+                   -> Text         -- ^ /license header/ to post-process
+                   -> RIO env Text -- ^ post-processed /license header/
 postProcessHeader' syntax vars rawHeader = do
   configs <- viewL @CtHeaderFnConfigs
   year    <- viewL

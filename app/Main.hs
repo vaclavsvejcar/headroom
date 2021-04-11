@@ -51,5 +51,5 @@ bootstrap = \case
     cgoGenMode <- parseGenMode c
     commandGen CommandGenOptions { .. }
   Init cioLicenseType cioSourcePaths -> commandInit CommandInitOptions { .. }
-  Run croSourcePaths croExcludedPaths croTemplateSource croVariables croRunMode croDebug croDryRun
+  Run croSourcePaths croExcludedPaths croBuiltInTemplates croTemplateRefs croVariables croRunMode croDebug croDryRun
     -> commandRun CommandRunOptions { .. }

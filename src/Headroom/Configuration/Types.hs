@@ -67,7 +67,6 @@ module Headroom.Configuration.Types
   , GenMode(..)
   , LicenseType(..)
   , RunMode(..)
-  , TemplateSource(..)
   )
 where
 
@@ -89,6 +88,7 @@ import           Headroom.Data.Regex                 ( Regex(..) )
 import           Headroom.Data.Serialization         ( aesonOptions )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Meta                       ( webDocConfigCurr )
+import           Headroom.Template.TemplateRef       ( TemplateRef )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -166,6 +166,13 @@ data LicenseType
   -- ^ support for /MPL2/ license
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
 
+instance FromJSON LicenseType where
+  parseJSON = \case
+    String s -> case textToEnum s of
+      Just licenseType -> pure licenseType
+      _                -> error $ "Unknown license type: " <> T.unpack s
+    other -> error $ "Invalid value for run mode: " <> show other
+
 -----------------------------------  RunMode  ----------------------------------
 
 -- | Represents what action should the @run@ command perform.
@@ -199,17 +206,6 @@ data GenMode
   -- ^ generate /YAML/ config file stub
   | GenLicense (LicenseType, FileType)
   -- ^ generate license header template
-  deriving (Eq, Show)
-
-
--------------------------------  TemplateSource  -------------------------------
-
--- | Source of license templates
-data TemplateSource
-  = TemplateFiles [FilePath]
-  -- ^ templates are stored as local files
-  | BuiltInTemplates LicenseType
-  -- ^ use built-in templates for selected license
   deriving (Eq, Show)
 
 
@@ -316,19 +312,19 @@ instance FromJSON PtHeaderFnConfigs where
 
 -- | Application configuration.
 data Configuration (p :: Phase) = Configuration
-  { cRunMode         :: p ::: RunMode
+  { cRunMode          :: p ::: RunMode
   -- ^ mode of the @run@ command
-  , cSourcePaths     :: p ::: [FilePath]
+  , cSourcePaths      :: p ::: [FilePath]
   -- ^ paths to source code files
-  , cExcludedPaths   :: p ::: [Regex]
+  , cExcludedPaths    :: p ::: [Regex]
   -- ^ excluded source paths
-  , cTemplateSource  :: p ::: TemplateSource
-  -- ^ source of license templates
-  , cVariables       :: Variables
+  , cBuiltInTemplates :: p ::: Maybe LicenseType
+  , cTemplateRefs     :: [TemplateRef]
+  , cVariables        :: Variables
   -- ^ variable values for templates
-  , cLicenseHeaders  :: HeadersConfig p
+  , cLicenseHeaders   :: HeadersConfig p
   -- ^ configuration of license headers
-  , cHeaderFnConfigs :: HeaderFnConfigs p
+  , cHeaderFnConfigs  :: HeaderFnConfigs p
   -- ^ configuration of license header functions
   }
 
@@ -352,15 +348,15 @@ deriving via (Generically PtConfiguration)
 
 instance FromJSON PtConfiguration where
   parseJSON = withObject "PtConfiguration" $ \obj -> do
-    cRunMode         <- Last <$> obj .:? "run-mode"
-    cSourcePaths     <- Last <$> obj .:? "source-paths"
-    cExcludedPaths   <- Last <$> obj .:? "excluded-paths"
-    cTemplateSource  <- Last <$> get TemplateFiles (obj .:? "template-paths")
-    cVariables       <- Variables <$> obj .:? "variables" .!= mempty
-    cLicenseHeaders  <- obj .:? "license-headers" .!= mempty
-    cHeaderFnConfigs <- obj .:? "post-process" .!= mempty
+    cRunMode          <- Last <$> obj .:? "run-mode"
+    cSourcePaths      <- Last <$> obj .:? "source-paths"
+    cExcludedPaths    <- Last <$> obj .:? "excluded-paths"
+    cBuiltInTemplates <- Last <$> obj .:? "builtin-templates"
+    cTemplateRefs     <- obj .:? "template-paths" .!= mempty
+    cVariables        <- Variables <$> obj .:? "variables" .!= mempty
+    cLicenseHeaders   <- obj .:? "license-headers" .!= mempty
+    cHeaderFnConfigs  <- obj .:? "post-process" .!= mempty
     pure Configuration { .. }
-    where get = fmap . fmap
 
 
 --------------------------------  HeaderConfig  --------------------------------
@@ -511,8 +507,8 @@ data ConfigurationKey
   -- ^ no configuration for @source-paths@
   | CkExcludedPaths
   -- ^ no configuration for @excluded-paths@
-  | CkTemplateSource
-  -- ^ no configuration for template source
+  | CkBuiltInTemplates
+  -- ^ no configuration for built in templates
   | CkVariables
   -- ^ no configuration for @variables@
   | CkEnabled
@@ -577,9 +573,9 @@ displayException' = T.unpack . \case
     CkExcludedPaths -> missingConfig "excluded paths"
                                      (Just "excluded-paths")
                                      (Just "-e|--excluded-path")
-    CkTemplateSource -> missingConfig
-      "template files source"
-      (Just "template-paths")
+    CkBuiltInTemplates -> missingConfig
+      "use of built-in templates"
+      (Just "builtin-templates")
       (Just "(-t|--template-path)|--builtin-templates")
     CkVariables -> missingConfig "template variables"
                                  (Just "variables")
