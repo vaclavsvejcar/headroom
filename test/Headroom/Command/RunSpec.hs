@@ -87,21 +87,6 @@ spec = do
       M.size <$> runRIO env (loadBuiltInTemplates BSD3) `shouldReturn` 12
 
 
-  describe "loadTemplateFiles" $ do
-    it "should load templates from given paths" $ do
-      let env' =
-            env
-              & (envFileSystemL . fsFindFilesByExtsL .~ fsFindFilesByExts')
-              & (envFileSystemL . fsLoadFileL .~ fsLoadFile')
-          fsFindFilesByExts' "test-dir" _ = pure ["haskell.mustache"]
-          fsFindFilesByExts' _          _ = throwString "INVALID CONDITION"
-          fsLoadFile' "haskell.mustache" = pure "template content"
-          fsLoadFile' _                  = throwString "INVALID CONDITION"
-      templates <- runRIO env' $ loadTemplateFiles @Mustache ["test-dir"]
-      M.size templates `shouldBe` 1
-      M.member Haskell templates `shouldBe` True
-
-
   describe "loadTemplateRefs" $ do
     it "should load templates from given references" $ do
       let env' =
