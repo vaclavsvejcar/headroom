@@ -25,6 +25,7 @@ import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.IO.FileSystem              ( loadFile )
 import           Headroom.Template                   ( Template(..) )
 import           Headroom.Template.Mustache          ( Mustache(..) )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..) )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
@@ -36,7 +37,9 @@ spec = do
 
   describe "extractOffsets" $ do
     it "extract offsets for selected fields of module header" $ do
-      template <- parseTemplate @Mustache Nothing $ licenseTemplate BSD3 Haskell
+      template <-
+        parseTemplate @Mustache (BuiltInRef BSD3 Haskell)
+          $ licenseTemplate BSD3 Haskell
       let syntax   = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
           expected = HaddockOffsets { hoCopyright = Just 14 }
       extractOffsets template syntax `shouldBe` expected

@@ -1,4 +1,6 @@
+{-# LANGUAGE DeriveAnyClass            #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE LambdaCase                #-}
 {-# LANGUAGE NoImplicitPrelude         #-}
 {-# LANGUAGE StrictData                #-}
 
@@ -22,11 +24,17 @@ module Headroom.Types
   , toHeadroomError
     -- * Other Data Types
   , CurrentYear(..)
+  , LicenseType(..)
   )
 where
 
+import           Data.Aeson                          ( FromJSON(..)
+                                                     , Value(String)
+                                                     )
 import           Data.Typeable                       ( cast )
+import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           RIO
+import qualified RIO.Text                           as T
 
 
 -- | Top-level of the /Headroom/ exception hierarchy.
@@ -41,19 +49,15 @@ instance Exception HeadroomError where
 
 -- | Wraps given exception into 'HeadroomError'.
 toHeadroomError :: Exception e
-                => e
-                -- ^ exception to wrap
-                -> SomeException
-                -- ^ wrapped exception
+                => e             -- ^ exception to wrap
+                -> SomeException -- ^ wrapped exception
 toHeadroomError = toException . HeadroomError
 
 
 -- | Unwraps given exception from 'HeadroomError'.
 fromHeadroomError :: Exception e
-                  => SomeException
-                  -- ^ exception to unwrap
-                  -> Maybe e
-                  -- ^ unwrapped exception
+                  => SomeException -- ^ exception to unwrap
+                  -> Maybe e       -- ^ unwrapped exception
 fromHeadroomError e = do
   HeadroomError he <- fromException e
   cast he
@@ -61,7 +65,24 @@ fromHeadroomError e = do
 
 -- | Wraps the value of current year.
 newtype CurrentYear = CurrentYear
-  { unCurrentYear :: Integer
-  -- ^ value of current year
+  { unCurrentYear :: Integer -- ^ value of current year
   }
   deriving (Eq, Show)
+
+
+-- | Supported type of open source license.
+data LicenseType
+  = Apache2 -- ^ support for /Apache-2.0/ license
+  | BSD3    -- ^ support for /BSD-3-Clause/ license
+  | GPL2    -- ^ support for /GNU GPL2/ license
+  | GPL3    -- ^ support for /GNU GPL3/ license
+  | MIT     -- ^ support for /MIT/ license
+  | MPL2    -- ^ support for /MPL2/ license
+  deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
+
+instance FromJSON LicenseType where
+  parseJSON = \case
+    String s -> case textToEnum s of
+      Just licenseType -> pure licenseType
+      _                -> error $ "Unknown license type: " <> T.unpack s
+    other -> error $ "Invalid value for run mode: " <> show other

@@ -31,7 +31,6 @@ import           Headroom.Data.Regex                 ( Regex(..)
                                                      , compile
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.Meta                       ( TemplateType )
 import           Headroom.Template.TemplateRef       ( TemplateRef(..)
                                                      , mkTemplateRef
                                                      )
@@ -77,8 +76,7 @@ regexReader =
 -- | Reader for 'TemplateRef'.
 templateRefReader :: ReadM TemplateRef
 templateRefReader =
-  let parse input = mapLeft displayException
-                            (mkTemplateRef @TemplateType . T.pack $ input)
+  let parse input = mapLeft displayException (mkTemplateRef . T.pack $ input)
   in  eitherReader parse
 
 

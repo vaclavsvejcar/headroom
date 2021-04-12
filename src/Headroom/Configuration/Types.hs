@@ -83,13 +83,13 @@ import           Data.String.Interpolate             ( i
                                                      , iii
                                                      )
 import           Generic.Data                        ( Generically(..) )
-import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.Data.Regex                 ( Regex(..) )
 import           Headroom.Data.Serialization         ( aesonOptions )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Meta                       ( webDocConfigCurr )
 import           Headroom.Template.TemplateRef       ( TemplateRef )
-import           Headroom.Types                      ( fromHeadroomError
+import           Headroom.Types                      ( LicenseType(..)
+                                                     , fromHeadroomError
                                                      , toHeadroomError
                                                      )
 import           Headroom.Variables.Types            ( Variables(..) )
@@ -147,31 +147,6 @@ newtype LineComment' = LineComment'
 instance FromJSON LineComment' where
   parseJSON = genericParseJSON aesonOptions
 
-
----------------------------------  LicenseType  --------------------------------
-
--- | Supported type of open source license.
-data LicenseType
-  = Apache2
-  -- ^ support for /Apache-2.0/ license
-  | BSD3
-  -- ^ support for /BSD-3-Clause/ license
-  | GPL2
-  -- ^ support for /GNU GPL2/ license
-  | GPL3
-  -- ^ support for /GNU GPL3/ license
-  | MIT
-  -- ^ support for /MIT/ license
-  | MPL2
-  -- ^ support for /MPL2/ license
-  deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
-
-instance FromJSON LicenseType where
-  parseJSON = \case
-    String s -> case textToEnum s of
-      Just licenseType -> pure licenseType
-      _                -> error $ "Unknown license type: " <> T.unpack s
-    other -> error $ "Invalid value for run mode: " <> show other
 
 -----------------------------------  RunMode  ----------------------------------
 

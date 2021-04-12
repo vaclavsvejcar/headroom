@@ -51,6 +51,7 @@ import           Headroom.HeaderFn.UpdateCopyright   ( SelectedAuthors(..)
                                                      , updateCopyright
                                                      )
 import           Headroom.Template                   ( Template(..) )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..) )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           Lens.Micro                          ( traverseOf )
@@ -159,7 +160,7 @@ compileTemplates vars configs = configs & traverseOf authorsL compileAuthors'
   authorsL        = hfcsUpdateCopyrightL . hfcConfigL . uccSelectedAuthorsL
   compileAuthors' = mapM . mapM $ compileAuthor
   compileAuthor author = do
-    parsed <- parseTemplate @a (Just $ "author " <> author) author
+    parsed <- parseTemplate @a (InlineRef author) author
     renderTemplate vars parsed
 
 

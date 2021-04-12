@@ -32,6 +32,7 @@ where
 
 import           Data.String.Interpolate             ( iii )
 import           Headroom.Template                   ( Template(..) )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..) )
 import           Headroom.Types                      ( CurrentYear(..)
                                                      , fromHeadroomError
                                                      , toHeadroomError
@@ -102,7 +103,7 @@ compileVariables variables@(Variables kvs) = do
   pure $ mkVariables compiled
  where
   compileVariable (key, value) = do
-    parsed   <- parseTemplate @a (Just $ "variable " <> key) value
+    parsed   <- parseTemplate @a (InlineRef value) value
     rendered <- renderTemplate variables parsed
     pure (key, rendered)
 
