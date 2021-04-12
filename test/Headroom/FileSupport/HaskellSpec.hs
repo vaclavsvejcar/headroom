@@ -38,6 +38,7 @@ import           Headroom.Template                   ( Template(..)
                                                      , emptyTemplate
                                                      )
 import           Headroom.Template.Mustache          ( Mustache )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..) )
 import           Headroom.Variables                  ( mkVariables )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
@@ -63,7 +64,8 @@ spec = do
 
   describe "fsExtractTemplateData" $ do
     it "provides correct custom data for Haskell" $ do
-      template <- parseTemplate @Mustache Nothing (licenseTemplate BSD3 Haskell)
+      template <- parseTemplate @Mustache (BuiltInRef BSD3 Haskell)
+                                          (licenseTemplate BSD3 Haskell)
       let o        = Just 14
           td       = HaskellTemplateData' HaddockOffsets { hoCopyright = o }
           expected = HaskellTemplateData td

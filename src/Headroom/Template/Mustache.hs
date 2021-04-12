@@ -24,6 +24,9 @@ where
 import           Headroom.Template                   ( Template(..)
                                                      , TemplateError(..)
                                                      )
+import           Headroom.Template.TemplateRef       ( TemplateRef
+                                                     , renderRef
+                                                     )
 import           Headroom.Variables.Types            ( Variables(..) )
 import           RIO
 import qualified RIO.Text                           as T
@@ -35,6 +38,7 @@ import           Text.Mustache.Render                ( SubstitutionError(..) )
 data Mustache = Mustache
   { mCompiledTemplate :: MU.Template
   , mRawTemplate      :: Text
+  , mTemplateRef      :: TemplateRef
   }
   deriving Show
 
@@ -48,17 +52,18 @@ instance Template Mustache where
   parseTemplate      = parseTemplate'
   renderTemplate     = renderTemplate'
   rawTemplate        = mRawTemplate
+  templateRef        = mTemplateRef
 
 
-parseTemplate' :: MonadThrow m => Maybe Text -> Text -> m Mustache
-parseTemplate' name raw = case MU.compileTemplate templateName raw of
-  Left  err -> throwM . ParseError $ tshow err
-  Right res -> pure $ Mustache res raw
-  where templateName = T.unpack . fromMaybe T.empty $ name
+parseTemplate' :: MonadThrow m => TemplateRef -> Text -> m Mustache
+parseTemplate' ref raw =
+  case MU.compileTemplate (T.unpack $ renderRef ref) raw of
+    Left  err -> throwM . ParseError $ tshow err
+    Right res -> pure $ Mustache res raw ref
 
 
 renderTemplate' :: MonadThrow m => Variables -> Mustache -> m Text
-renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _) _) =
+renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _) _ _) =
   case MU.checkedSubstitute t variables of
     ([], rendered) -> pure rendered
     (errs, rendered) ->

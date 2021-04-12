@@ -5,6 +5,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE StrictData            #-}
@@ -35,6 +36,7 @@ module Headroom.Command.Run
   )
 where
 
+import           Data.String.Interpolate             ( i )
 import           Data.Time.Calendar                  ( toGregorian )
 import           Data.Time.Clock                     ( getCurrentTime )
 import           Data.Time.Clock.POSIX               ( getPOSIXTime )
@@ -360,24 +362,28 @@ loadTemplateRefs :: forall a env
                  => [TemplateRef]            -- ^ template references
                  -> RIO env (Map FileType a) -- ^ map of templates
 loadTemplateRefs refs = do
-  fs       <- viewL
-  n        <- viewL
-  allRefs  <- concat <$> mapM (getAllRefs fs) refs
-  refsWTp  <- (\rs -> [ (ft, ref) | (Just ft, ref) <- rs ]) <$> zipRs allRefs
-  refsWCtn <- mapM (loadContent fs n) (filterPreferred refsWTp)
+  fileSystem <- viewL
+  network    <- viewL
+  allRefs    <- concat <$> mapM (getAllRefs fileSystem) refs
+  refsWTp    <- (\rs -> [ (ft, ref) | (Just ft, ref) <- rs ]) <$> zipRs allRefs
+  refsWCtn   <- mapM (loadContent fileSystem network) (filterPreferred refsWTp)
   M.fromList <$> mapM loadTemplate refsWCtn
  where
   zipRs      = \rs -> fmap (`zip` rs) . mapM getFileType $ rs
   exts       = toList $ templateExtensions @a
   getAllRefs = \fs ref -> case ref of
     LocalTemplateRef p -> fmap LocalTemplateRef <$> fsFindFilesByExts fs p exts
-    UriTemplateRef   _ -> pure [ref]
+    _                  -> pure [ref]
   loadContent = \fs n (ft, ref) -> (ft, ref, ) <$> case ref of
-    LocalTemplateRef path -> fsLoadFile fs path
-    UriTemplateRef   uri  -> nDownloadContent n uri
-  loadTemplate =
-    \(ft, ref, c) -> (ft, ) <$> parseTemplate @a (Just . renderRef $ ref) c
-  getFileType = typeOfTemplate . T.unpack . renderRef
+    InlineRef        content -> pure content
+    LocalTemplateRef path    -> fsLoadFile fs path
+    UriTemplateRef   uri     -> nDownloadContent n uri
+    BuiltInRef lt ft'        -> pure $ licenseTemplate lt ft'
+  loadTemplate = \(ft, ref, c) -> (ft, ) <$> parseTemplate @a ref c
+  getFileType  = \case
+    InlineRef _     -> pure Nothing
+    BuiltInRef _ ft -> pure . Just $ ft
+    other           -> typeOfTemplate . T.unpack . renderRef $ other
   filterPreferred rs =
     mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y) $ rs
 
@@ -389,7 +395,9 @@ loadBuiltInTemplates :: (HasLogFunc env)
                      -> RIO env (Map FileType TemplateType) -- ^ map of file types and templates
 loadBuiltInTemplates licenseType = do
   logInfo $ "Using built-in templates for license: " <> displayShow licenseType
-  parsed <- mapM (\(t, r) -> (t, ) <$> parseTemplate Nothing r) rawTemplates
+  parsed <- mapM
+    (\(t, r) -> (t, ) <$> parseTemplate (BuiltInRef licenseType t) r)
+    rawTemplates
   pure $ M.fromList parsed
  where
   rawTemplates = fmap (\ft -> (ft, template ft)) (allValues @FileType)
@@ -404,12 +412,16 @@ loadTemplates :: ( Has CtConfiguration env
               => RIO env (Map FileType HeaderTemplate)
 loadTemplates = do
   Configuration {..} <- viewL @CtConfiguration
-  fromRefs           <- loadTemplateRefs @TemplateType cTemplateRefs
-  builtIn            <- case cBuiltInTemplates of
-    Just licenseType -> loadBuiltInTemplates licenseType
-    _                -> pure M.empty
-  pure $ M.mapWithKey (extractHeaderTemplate cLicenseHeaders)
-                      (builtIn <> fromRefs)
+  let allRefs = builtInRefs cBuiltInTemplates <> cTemplateRefs
+  templates <- loadTemplateRefs @TemplateType allRefs
+  logInfo . display . T.intercalate "\n" . stats . M.toList $ templates
+  pure $ M.mapWithKey (extractHeaderTemplate cLicenseHeaders) templates
+ where
+  stats =
+    fmap (\(ft, t) -> [i|Using #{ft} template: #{renderRef . templateRef $ t}|])
+  builtInRefs = \case
+    Just lt -> fmap (BuiltInRef lt) $ allValues @FileType
+    _       -> []
 
 
 -- | Takes path to the template file and returns detected type of the template.

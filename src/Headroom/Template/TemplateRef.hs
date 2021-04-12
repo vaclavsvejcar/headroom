@@ -6,7 +6,6 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE QuasiQuotes           #-}
 {-# LANGUAGE RecordWildCards       #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE ViewPatterns          #-}
@@ -39,15 +38,16 @@ where
 import           Data.Aeson                          ( FromJSON(..)
                                                      , Value(String)
                                                      )
-import           Data.String.Interpolate             ( iii )
+import           Data.String.Interpolate             ( i
+                                                     , iii
+                                                     )
 import           Headroom.Data.EnumExtra             ( textToEnum )
 import           Headroom.Data.Regex                 ( match
                                                      , re
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
-import           Headroom.Meta                       ( TemplateType )
-import           Headroom.Template                   ( Template(..) )
-import           Headroom.Types                      ( fromHeadroomError
+import           Headroom.Types                      ( LicenseType
+                                                     , fromHeadroomError
                                                      , toHeadroomError
                                                      )
 import           RIO
@@ -62,14 +62,16 @@ import qualified Text.URI                           as URI
 
 -- | Reference to the template (e.g. local file, URI address).
 data TemplateRef
-  = LocalTemplateRef FilePath -- ^ template path on local file system
+  = InlineRef Text
+  | LocalTemplateRef FilePath -- ^ template path on local file system
   | UriTemplateRef URI        -- ^ remote template URI adress
+  | BuiltInRef LicenseType FileType
   deriving (Eq, Ord, Show)
 
 
 instance FromJSON TemplateRef where
   parseJSON = \case
-    String s -> maybe (error $ T.unpack s) pure (mkTemplateRef @TemplateType s)
+    String s -> maybe (error $ T.unpack s) pure (mkTemplateRef s)
     other    -> error $ "Invalid value for template reference: " <> show other
 
 
@@ -79,17 +81,12 @@ instance FromJSON TemplateRef where
 -- valid URL with either @http@ or @https@ as protocol, it considers it as
 -- 'UriTemplateRef', otherwise it creates 'LocalTemplateRef'.
 --
--- >>> :set -XTypeApplications
--- >>> import Headroom.Template.Mustache (Mustache)
--- >>> mkTemplateRef @Mustache "/path/to/haskell.mustache" :: Maybe TemplateRef
+-- >>> mkTemplateRef "/path/to/haskell.mustache" :: Maybe TemplateRef
 -- Just (LocalTemplateRef "/path/to/haskell.mustache")
 --
--- >>> :set -XTypeApplications
--- >>> import Headroom.Template.Mustache (Mustache)
--- >>> mkTemplateRef @Mustache "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
+-- >>> mkTemplateRef "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
 -- Just (UriTemplateRef (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing}))
-mkTemplateRef :: forall a m
-               . (Template a, MonadThrow m)
+mkTemplateRef :: MonadThrow m
               => Text          -- ^ input text
               -> m TemplateRef -- ^ created 'TemplateRef' (or error)
 mkTemplateRef raw = case match [re|(^\w+):\/\/|] raw of
@@ -98,10 +95,8 @@ mkTemplateRef raw = case match [re|(^\w+):\/\/|] raw of
   _ -> pure . LocalTemplateRef . T.unpack $ raw
  where
   uriTemplateRef  = extractFileType >> UriTemplateRef <$> mkURI raw
-  exts            = templateExtensions @a
   extractFileType = case match [re|(\w+)\.(\w+)$|] raw of
-    Just (_ : (textToEnum @FileType -> (Just ft )) : e : _) | e `elem` exts ->
-      pure ft
+    Just (_ : (textToEnum @FileType -> (Just ft )) : _ : _) -> pure ft
     _ -> throwM $ UnrecognizedTemplateName raw
 
 
@@ -110,8 +105,10 @@ mkTemplateRef raw = case match [re|(^\w+):\/\/|] raw of
 -- | Renders given 'TemplateRef' into human-friendly text.
 renderRef :: TemplateRef -- ^ 'TemplateRef' to render
           -> Text        -- ^ rendered text
-renderRef (LocalTemplateRef path) = T.pack path
-renderRef (UriTemplateRef   uri ) = URI.render uri
+renderRef (InlineRef        content) = [i|<inline template '#{content}'>|]
+renderRef (LocalTemplateRef path   ) = T.pack path
+renderRef (UriTemplateRef   uri    ) = URI.render uri
+renderRef (BuiltInRef lt ft        ) = [i|<built-in template #{lt}/#{ft}>|]
 
 
 ---------------------------------  ERROR TYPES  --------------------------------

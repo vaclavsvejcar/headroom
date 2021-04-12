@@ -29,6 +29,7 @@ module Headroom.Template
 where
 
 import           Data.String.Interpolate             ( iii )
+import           Headroom.Template.TemplateRef       ( TemplateRef(..) )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -41,53 +42,45 @@ import qualified RIO.Text                           as T
 class Template a where
 
   -- | Returns list of supported file extensions for this template type.
-  templateExtensions :: NonEmpty Text
-                     -- ^ list of supported file extensions
+  templateExtensions :: NonEmpty Text -- ^ list of supported file extensions
 
 
   -- | Parses template from given raw text.
   parseTemplate :: MonadThrow m
-                => Maybe Text
-                -- ^ name of the template (optional)
-                -> Text
-                -- ^ raw template text
-                -> m a
-                -- ^ parsed template
+                => TemplateRef -- ^ reference to template source
+                -> Text        -- ^ raw template text
+                -> m a         -- ^ parsed template
 
 
   -- | Renders parsed template and replaces all variables with actual values.
   renderTemplate :: MonadThrow m
-                 => Variables
-                 -- ^ values of variables to replace
-                 -> a
-                 -- ^ parsed template to render
-                 -> m Text
-                 -- ^ rendered template text
+                 => Variables -- ^ values of variables to replace
+                 -> a         -- ^ parsed template to render
+                 -> m Text    -- ^ rendered template text
 
 
   -- | Returns the raw text of the template, same that has been parsed by
   -- 'parseTemplate' method.
-  rawTemplate :: a
-              -- ^ template for which to return raw template text
-              -> Text
-              -- ^ raw template text
+  rawTemplate :: a    -- ^ template for which to return raw template text
+              -> Text -- ^ raw template text
+
+
+  templateRef :: a -> TemplateRef
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Returns empty template of selected type.
 emptyTemplate :: (MonadThrow m, Template a) => m a
-emptyTemplate = parseTemplate Nothing T.empty
+emptyTemplate = parseTemplate (InlineRef T.empty) T.empty
 
 
 ---------------------------------  ERROR TYPES  --------------------------------
 
 -- | Error during processing template.
 data TemplateError
-  = MissingVariables Text [Text]
-  -- ^ missing variable values
-  | ParseError Text
-  -- ^ error parsing raw template text
+  = MissingVariables Text [Text] -- ^ missing variable values
+  | ParseError Text              -- ^ error parsing raw template text
   deriving (Eq, Show, Typeable)
 
 
