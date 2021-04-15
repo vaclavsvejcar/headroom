@@ -107,14 +107,14 @@ runOptions =
     <*> many
           (option
             templateRefReader
-            (long "source-path" <> short 'e' <> metavar "REGEX" <> help
-              "path to exclude from source code file paths"
+            (long "template-path" <> short 't' <> metavar "PATH" <> help
+              "path to template"
             )
           )
     <*> many
           (strOption
-            (long "template-path" <> short 't' <> metavar "PATH" <> help
-              "path to template"
+            (long "variable" <> short 'v' <> metavar "KEY=VALUE" <> help
+              "value for template variable"
             )
           )
     <*> optional
