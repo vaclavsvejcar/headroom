@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 72415323085ba06bc3915586a518274dfacd0cc40094ff2cb15a4fda96cce90b
+-- hash: a9bea7045ba169a6f1bad3697b65b51a89ac7a127bce9e1c9eecdf339605f583
 
 name:           headroom
 version:        0.4.2.0
@@ -205,6 +205,8 @@ library
     , either
     , file-embed
     , generic-data
+    , http-client
+    , http-types
     , microlens
     , microlens-th
     , modern-uri

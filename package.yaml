@@ -66,6 +66,8 @@ library:
     - either
     - file-embed
     - generic-data
+    - http-client
+    - http-types
     - microlens
     - microlens-th
     - modern-uri
