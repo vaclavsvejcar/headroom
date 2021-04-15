@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+
 module Headroom.UI.ProgressSpec
   ( spec
   )
@@ -11,13 +12,15 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
+
   describe "zipWithProgress" $ do
     it "zips progress for given collection" $ do
       let col      = ["a", "b"] :: [Text]
           expected = [(Progress 1 2, "a"), (Progress 2 2, "b")]
       zipWithProgress col `shouldBe` expected
 
-  describe "show" $ do
+
+  describe "Display instance" $ do
     it "displays correct output for Progress data type" $ do
       textDisplay (Progress 1 1) `shouldBe` "[1 of 1]"
       textDisplay (Progress 10 250) `shouldBe` "[ 10 of 250]"

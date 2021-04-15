@@ -28,7 +28,6 @@ responsible for license header management.
 
 module Headroom.Command.Run
   ( commandRun
-  , loadBuiltInTemplates
   , loadTemplateRefs
   , typeOfTemplate
     -- * License Header Post-processing
@@ -55,7 +54,6 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , CtHeaderFnConfigs
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
-                                                     , LicenseType(..)
                                                      , PtConfiguration
                                                      , RunMode(..)
                                                      )
@@ -108,6 +106,7 @@ import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.UI                         ( Progress(..)
                                                      , zipWithProgress
                                                      )
+import           Headroom.UI.Table                   ( Table2(..) )
 import           Headroom.Variables                  ( compileVariables
                                                      , dynamicVariables
                                                      , parseVariables
@@ -388,22 +387,6 @@ loadTemplateRefs refs = do
     mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y) $ rs
 
 
--- | Loads built-in templates, stored in "Headroom.Embedded", for the given
--- 'LicenseType'.
-loadBuiltInTemplates :: (HasLogFunc env)
-                     => LicenseType                         -- ^ selected license type
-                     -> RIO env (Map FileType TemplateType) -- ^ map of file types and templates
-loadBuiltInTemplates licenseType = do
-  logInfo $ "Using built-in templates for license: " <> displayShow licenseType
-  parsed <- mapM
-    (\(t, r) -> (t, ) <$> parseTemplate (BuiltInRef licenseType t) r)
-    rawTemplates
-  pure $ M.fromList parsed
- where
-  rawTemplates = fmap (\ft -> (ft, template ft)) (allValues @FileType)
-  template     = licenseTemplate licenseType
-
-
 loadTemplates :: ( Has CtConfiguration env
                  , Has (FileSystem (RIO env)) env
                  , Has (Network (RIO env)) env
@@ -414,11 +397,11 @@ loadTemplates = do
   Configuration {..} <- viewL @CtConfiguration
   let allRefs = builtInRefs cBuiltInTemplates <> cTemplateRefs
   templates <- loadTemplateRefs @TemplateType allRefs
-  logInfo . display . T.intercalate "\n" . stats . M.toList $ templates
+  logInfo . display . stats . M.toList $ templates
   pure $ M.mapWithKey (extractHeaderTemplate cLicenseHeaders) templates
  where
-  stats =
-    fmap (\(ft, t) -> [i|Using #{ft} template: #{renderRef . templateRef $ t}|])
+  stats = Table2 . fmap
+    (\(ft, t) -> ([i|Using #{ft} template:|], renderRef . templateRef $ t))
   builtInRefs = \case
     Just lt -> fmap (BuiltInRef lt) $ allValues @FileType
     _       -> []

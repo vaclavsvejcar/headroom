@@ -22,7 +22,6 @@ import           Headroom.Configuration.Types        ( CtHeaderFnConfigs
                                                      , HeaderFnConfig(..)
                                                      , HeaderFnConfigs(..)
                                                      , HeaderSyntax(..)
-                                                     , LicenseType(..)
                                                      , UpdateCopyrightConfig(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
@@ -82,10 +81,6 @@ instance Has (Network (RIO TestEnv)) TestEnv where
 
 spec :: Spec
 spec = do
-  describe "loadBuiltInTemplates" $ do
-    it "should load correct number of built-in templates" $ do
-      M.size <$> runRIO env (loadBuiltInTemplates BSD3) `shouldReturn` 12
-
 
   describe "loadTemplateRefs" $ do
     it "should load templates from given references" $ do
