@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## 0.4.2.0 (in development)
-- Bump _LTS Haskell_ to `17.7`
+- Bump _LTS Haskell_ to `17.9`
 
 ## 0.4.1.0 (released 2021-03-14)
 - [#69] Improve console output
