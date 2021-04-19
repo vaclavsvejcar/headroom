@@ -55,7 +55,7 @@ excluded-paths:
 Defines list of paths to source code files to process. Note that given path, if directory, is __recursively__ traversed for all types of source code files knowh to _Headroom_.
 
 ### `template-paths` key
-Defined list of paths to _template files_, which defines how your _license headers_ will look like.
+Defines list of _template_ paths. Path can be either relative or absolute path of template stored on local file system, or _URL_ pointing to template stored on Internet (note that only `HTTP` or `HTTPS` protocols are supported).
 
 ### `variables` key
 This is the main point where you define values for variables present in template files. Variables in _Headroom_ can be split into two main categories:

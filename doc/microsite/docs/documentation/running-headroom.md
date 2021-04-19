@@ -21,7 +21,7 @@ Below is the overview of command line interface of `run` command:
 ```
 $ headroom run --help
 Usage: headroom run [-s|--source-path PATH] [-e|--excluded-path REGEX] 
-                    [--builtin-templates TYPE | (-t|--template-path PATH)] 
+                    [--builtin-templates licenseType] [-t|--template-path PATH] 
                     [-v|--variable KEY=VALUE] 
                     [(-a|--add-headers) | (-c|--check-headers) | 
                       (-r|--replace-headers) | (-d|--drop-headers)] [--debug] 
@@ -31,9 +31,10 @@ Usage: headroom run [-s|--source-path PATH] [-e|--excluded-path REGEX]
 Available options:
   -s,--source-path PATH    path to source code file/directory
   -e,--excluded-path REGEX path to exclude from source code file paths
-  --builtin-templates TYPE use built-in templates for license type, available
-                           options: apache2, bsd3, gpl2, gpl3, mit, mpl2
-  -t,--template-path PATH  path to license template file/directory
+  --builtin-templates licenseType
+                           use built-in templates of selected license type
+  -t,--template-path PATH  path to template, can be either local file or
+                           directory or URL
   -v,--variable KEY=VALUE  value for template variable
   -a,--add-headers         only adds missing license headers
   -c,--check-headers       check whether existing headers are up-to-date
@@ -47,6 +48,7 @@ Available options:
 This command requires you to specify three key parameters, either using command line option, or in `.headroom.yaml` file:
 
 1. __paths to source code files__ - this needs to be specified either by using the `-s|--source-path PATH` option (can be repeated) or using the `source-paths` option in `.headroom.yaml`.
+1. __paths to templates__ - you can freely combine all three supported sources of templates: First are built-in templates for one of supported _OSS_ licenses, which can be enabled by `--builtin-templates TYPE`. Second option is to use either templates stored on local file system or URI-based template. For local stored template, if path to directory is provided, _Headroom_ will recursively search for all suitable templates in all subdirectories.
 1. __paths to template files__ - you have two options here. Either specify path(s) to template files using `-t|--template-path PATH` (can be repeated) or `template-paths` option in `.headroom.yaml`, __or__ use the built-in templates using the `--builtin-templates TYPE`, where `TYPE` is one of the supported _OSS_ license types.
 1. __variables__ - if your templates use any variables, you need to specify their values using the `-v|--variable "KEY=VALUE"` option (can be repeated) or using the `variable` option in `.headroom.yaml`.
 1. __run mode__ _(optional)_ - if you don't specify this, the _add mode_ will be used as default, but you can set the run mode using one of the `-a,--add-headers`, `-c,--check-headers`, `-r,--replace-headers` or `-d,--drop-headers` options, or using the `run-mode` option in `.headroom.yaml`.

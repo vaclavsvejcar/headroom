@@ -12,7 +12,7 @@ Before continuing to next chapters, here's the overview of key parts of _Headroo
 
 - __Source Code Files__ - Those are the files in which the license headers should be managed by _Headroom_. You can specify multiple different locations and also paths that should be excluded.
 
-- __License Templates__ - _Headroom_ uses [Mustache][web:mustache] templates to define the license headers. These templates are then compiled, variables are filled with actual and such rendered license headers are put into source code files.
+- __Header Templates__ - _Headroom_ uses [Mustache][web:mustache] templates to define the license headers. These templates are then compiled, variables are filled with actual and such rendered license headers are put into source code files. At this moment _Headroom_ allows to define 3 different template sources: built-in templates (for popular _OSS_ licenses), templates stored on local file system and URL-based templates.
 
 - __Variables__ - Changing parts of license headers (such as year, author, e-mail, etc.) can be represented by variables and the actual values are then loaded from either `.headroom.yaml` or command line arguments and filled in during template rendering.
 

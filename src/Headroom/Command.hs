@@ -108,7 +108,7 @@ runOptions =
           (option
             templateRefReader
             (long "template-path" <> short 't' <> metavar "PATH" <> help
-              "path to template"
+              "path to template, can be either local file or directory or URL"
             )
           )
     <*> many
