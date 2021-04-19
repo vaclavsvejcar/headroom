@@ -38,20 +38,20 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , ConfigurationKey(..)
                                                      , CtConfiguration
                                                      , CtHeaderConfig
-                                                     , CtHeaderFnConfig
-                                                     , CtHeaderFnConfigs
                                                      , CtHeadersConfig
+                                                     , CtPostProcessConfig
+                                                     , CtPostProcessConfigs
                                                      , CtUpdateCopyrightConfig
                                                      , HeaderConfig(..)
-                                                     , HeaderFnConfig(..)
-                                                     , HeaderFnConfigs(..)
                                                      , HeadersConfig(..)
                                                      , Phase(..)
+                                                     , PostProcessConfig(..)
+                                                     , PostProcessConfigs(..)
                                                      , PtConfiguration
                                                      , PtHeaderConfig
-                                                     , PtHeaderFnConfig
-                                                     , PtHeaderFnConfigs
                                                      , PtHeadersConfig
+                                                     , PtPostProcessConfig
+                                                     , PtPostProcessConfigs
                                                      , PtUpdateCopyrightConfig
                                                      , UpdateCopyrightConfig(..)
                                                      )
@@ -64,8 +64,8 @@ import           RIO
 import qualified RIO.ByteString                     as B
 
 
-suffixLenses ''HeaderFnConfig
-suffixLenses ''HeaderFnConfigs
+suffixLenses ''PostProcessConfig
+suffixLenses ''PostProcessConfigs
 suffixLenses ''UpdateCopyrightConfig
 
 
@@ -95,14 +95,14 @@ makeConfiguration :: MonadThrow m
                   -> m CtConfiguration
                   -- ^ full 'CtConfiguration'
 makeConfiguration pt = do
-  cRunMode          <- lastOrError CkRunMode (cRunMode pt)
-  cSourcePaths      <- lastOrError CkSourcePaths (cSourcePaths pt)
-  cExcludedPaths    <- lastOrError CkExcludedPaths (cExcludedPaths pt)
-  cBuiltInTemplates <- lastOrError CkBuiltInTemplates (cBuiltInTemplates pt)
-  cTemplateRefs     <- pure $ cTemplateRefs pt
-  cLicenseHeaders   <- makeHeadersConfig (cLicenseHeaders pt)
-  cHeaderFnConfigs  <- makeHeaderFnConfigs (cHeaderFnConfigs pt)
-  cVariables        <- pure $ cVariables pt
+  cRunMode            <- lastOrError CkRunMode (cRunMode pt)
+  cSourcePaths        <- lastOrError CkSourcePaths (cSourcePaths pt)
+  cExcludedPaths      <- lastOrError CkExcludedPaths (cExcludedPaths pt)
+  cBuiltInTemplates   <- lastOrError CkBuiltInTemplates (cBuiltInTemplates pt)
+  cTemplateRefs       <- pure $ cTemplateRefs pt
+  cLicenseHeaders     <- makeHeadersConfig (cLicenseHeaders pt)
+  cPostProcessConfigs <- makePostProcessConfigs (cPostProcessConfigs pt)
+  cVariables          <- pure $ cVariables pt
   pure Configuration { .. }
 
 
@@ -153,21 +153,23 @@ makeHeaderConfig fileType pt = do
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-makeHeaderFnConfigs :: MonadThrow m => PtHeaderFnConfigs -> m CtHeaderFnConfigs
-makeHeaderFnConfigs pt = do
-  hfcsUpdateCopyright <- makeHeaderFnConfig (pt ^. hfcsUpdateCopyrightL)
-                                            makeUpdateCopyrightConfig
-  pure HeaderFnConfigs { .. }
+makePostProcessConfigs :: MonadThrow m
+                       => PtPostProcessConfigs
+                       -> m CtPostProcessConfigs
+makePostProcessConfigs pt = do
+  ppcsUpdateCopyright <- makePostProcessConfig (pt ^. ppcsUpdateCopyrightL)
+                                               makeUpdateCopyrightConfig
+  pure PostProcessConfigs { .. }
 
 
-makeHeaderFnConfig :: MonadThrow m
-                   => PtHeaderFnConfig c
-                   -> (c 'Partial -> m (c 'Complete))
-                   -> m (CtHeaderFnConfig c)
-makeHeaderFnConfig pt fn = do
-  hfcEnabled <- lastOrError CkEnabled (pt ^. hfcEnabledL)
-  hfcConfig  <- fn $ pt ^. hfcConfigL
-  pure HeaderFnConfig { .. }
+makePostProcessConfig :: MonadThrow m
+                      => PtPostProcessConfig c
+                      -> (c 'Partial -> m (c 'Complete))
+                      -> m (CtPostProcessConfig c)
+makePostProcessConfig pt fn = do
+  ppcEnabled <- lastOrError CkEnabled (pt ^. ppcEnabledL)
+  ppcConfig  <- fn $ pt ^. ppcConfigL
+  pure PostProcessConfig { .. }
 
 
 makeUpdateCopyrightConfig :: MonadThrow m

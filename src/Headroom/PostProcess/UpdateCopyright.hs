@@ -6,8 +6,8 @@
 {-# LANGUAGE TypeApplications  #-}
 
 {-|
-Module      : Headroom.HeaderFn.UpdateCopyright
-Description : /License Header function/ for updating years in copyrights
+Module      : Headroom.PostProcess.UpdateCopyright
+Description : /Post-processor/ for updating years in copyrights
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
@@ -18,7 +18,7 @@ This module provides functionality for updating years in copyright statements
 in already rendered /license headers/.
 -}
 
-module Headroom.HeaderFn.UpdateCopyright
+module Headroom.PostProcess.UpdateCopyright
   ( -- * Data Types
     SelectedAuthors(..)
   , UpdateCopyrightMode(..)
@@ -36,7 +36,7 @@ import           Headroom.Data.Regex                 ( re
 import           Headroom.Data.Text                  ( mapLines
                                                      , read
                                                      )
-import           Headroom.HeaderFn.Types             ( HeaderFn(..) )
+import           Headroom.PostProcess.Types          ( PostProcess(..) )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           RIO
 import qualified RIO.NonEmpty                       as NE
@@ -52,25 +52,23 @@ newtype SelectedAuthors = SelectedAuthors (NonEmpty Text) deriving (Eq, Show)
 
 -- | Mode that changes behaviour of the 'updateCopyright' function.
 data UpdateCopyrightMode
-  = UpdateAllAuthors
-  -- ^ updates years in copyrights for all authors
-  | UpdateSelectedAuthors SelectedAuthors
-  -- ^ updates years in copyrights only for selected authors
+  = UpdateAllAuthors                      -- ^ updates years in copyrights for all authors
+  | UpdateSelectedAuthors SelectedAuthors -- ^ updates years in copyrights only for selected authors
   deriving (Eq, Show)
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 
--- | /License header function/ that updates years and year ranges in any
+-- | /Post-processor/ that updates years and year ranges in any
 -- present copyright statements.
 --
 -- = Reader Environment Parameters
 --   ['CurrentYear'] value of the current year
 --   ['UpdateCopyrightMode'] mode specifying the behaviour of the updater
 updateCopyright :: (Has CurrentYear env, Has UpdateCopyrightMode env)
-                => HeaderFn env
-updateCopyright = HeaderFn $ \input -> do
+                => PostProcess env
+updateCopyright = PostProcess $ \input -> do
   currentYear <- viewL
   mode        <- viewL
   pure $ mapLines (update mode currentYear) input
@@ -95,12 +93,9 @@ updateCopyright = HeaderFn $ \input -> do
 --
 -- >>> updateYears (CurrentYear 2020) "Copyright (c) 2018-2019"
 -- "Copyright (c) 2018-2020"
-updateYears :: CurrentYear
-            -- ^ current year
-            -> Text
-            -- ^ text to update
-            -> Text
-            -- ^ text with updated years
+updateYears :: CurrentYear -- ^ current year
+            -> Text        -- ^ text to update
+            -> Text        -- ^ text with updated years
 updateYears (CurrentYear year) = processYear . processRange
  where
   processYear  = replace [re|(?!\d{4}-)(?<!-)(\d{4})|] processYear'

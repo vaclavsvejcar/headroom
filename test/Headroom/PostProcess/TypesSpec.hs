@@ -4,14 +4,14 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE StrictData            #-}
-module Headroom.HeaderFn.TypesSpec
+module Headroom.PostProcess.TypesSpec
   ( spec
   )
 where
 
 import           Headroom.Data.Has                   ( Has(..) )
-import           Headroom.HeaderFn                   ( runHeaderFn )
-import           Headroom.HeaderFn.Types
+import           Headroom.PostProcess                ( postProcess )
+import           Headroom.PostProcess.Types
 import           RIO
 import           Test.Hspec
 
@@ -27,7 +27,7 @@ spec = do
           input       = "input"
           combinedFn  = fooFn <> barFn
           expected    = "input_FOO_ENV_BAR_ENV"
-      runHeaderFn combinedFn combinedEnv input `shouldBe` expected
+      postProcess combinedFn combinedEnv input `shouldBe` expected
 
 
   describe "Monoid HeaderFn" $ do
@@ -35,7 +35,7 @@ spec = do
       let input   = "input"
           testEnv = undefined
           testFn  = mempty
-      runHeaderFn testFn testEnv input `shouldBe` input
+      postProcess testFn testEnv input `shouldBe` input
 
 
 -------------------------------  Test Data Types  ------------------------------
@@ -65,12 +65,12 @@ instance Has BarEnv CombinedEnv where
   hasLens = lens ceBarEnv (\x y -> x { ceBarEnv = y })
 
 
-fooFn :: (Has FooEnv env) => HeaderFn env
-fooFn = HeaderFn $ \input -> do
+fooFn :: (Has FooEnv env) => PostProcess env
+fooFn = PostProcess $ \input -> do
   FooEnv {..} <- viewL
   pure $ input <> feValue
 
-barFn :: (Has BarEnv env) => HeaderFn env
-barFn = HeaderFn $ \input -> do
+barFn :: (Has BarEnv env) => PostProcess env
+barFn = PostProcess $ \input -> do
   BarEnv {..} <- viewL
   pure $ input <> beValue

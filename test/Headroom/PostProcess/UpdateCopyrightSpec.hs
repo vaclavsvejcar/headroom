@@ -3,15 +3,15 @@
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE StrictData            #-}
-module Headroom.HeaderFn.UpdateCopyrightSpec
+module Headroom.PostProcess.UpdateCopyrightSpec
   ( spec
   )
 where
 
 import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Text                  ( fromLines )
-import           Headroom.HeaderFn                   ( runHeaderFn )
-import           Headroom.HeaderFn.UpdateCopyright
+import           Headroom.PostProcess                ( postProcess )
+import           Headroom.PostProcess.UpdateCopyright
 import           Headroom.Types                      ( CurrentYear(..) )
 import           RIO
 import           Test.Hspec
@@ -34,7 +34,7 @@ spec = do
           , "Copyright (c) 2017-2020 2nd Author"
           ]
         testEnv = TestEnv currYear UpdateAllAuthors
-      runHeaderFn updateCopyright testEnv sample `shouldBe` expected
+      postProcess updateCopyright testEnv sample `shouldBe` expected
 
     it "updates only selected authors in such mode" $ do
       let sample = fromLines
@@ -47,7 +47,7 @@ spec = do
             ]
           mode    = UpdateSelectedAuthors . SelectedAuthors $ "2nd Author" :| []
           testEnv = TestEnv currYear mode
-      runHeaderFn updateCopyright testEnv sample `shouldBe` expected
+      postProcess updateCopyright testEnv sample `shouldBe` expected
 
 
   describe "updateYears" $ do

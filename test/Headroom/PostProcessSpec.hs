@@ -5,20 +5,20 @@
 {-# LANGUAGE TypeApplications      #-}
 {-# LANGUAGE TypeFamilies          #-}
 
-module Headroom.HeaderFnSpec
+module Headroom.PostProcessSpec
   ( spec
   )
 where
 
-import           Headroom.Configuration.Types        ( HeaderFnConfig(..)
-                                                     , HeaderFnConfigs(..)
+import           Headroom.Configuration.Types        ( PostProcessConfig(..)
+                                                     , PostProcessConfigs(..)
                                                      , UpdateCopyrightConfig(..)
                                                      )
 import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Text                  ( fromLines )
-import           Headroom.HeaderFn
-import           Headroom.HeaderFn.Types
-import           Headroom.HeaderFn.UpdateCopyright
+import           Headroom.PostProcess
+import           Headroom.PostProcess.Types
+import           Headroom.PostProcess.UpdateCopyright
 import           Headroom.Template.Mustache          ( Mustache )
 import           Headroom.Types                      ( CurrentYear(..) )
 import           Headroom.Variables                  ( mkVariables )
@@ -31,10 +31,10 @@ spec = do
   let currentYear = CurrentYear 2020
       mode        = UpdateSelectedAuthors . SelectedAuthors $ "2nd Author" :| []
       vars        = mkVariables [("sndAuthor", "2nd Author")]
-      configs a = HeaderFnConfigs
-        { hfcsUpdateCopyright = HeaderFnConfig
-                                  { hfcEnabled = True
-                                  , hfcConfig  = UpdateCopyrightConfig
+      configs a = PostProcessConfigs
+        { ppcsUpdateCopyright = PostProcessConfig
+                                  { ppcEnabled = True
+                                  , ppcConfig  = UpdateCopyrightConfig
                                                    { uccSelectedAuthors = Just
                                                                           $  a
                                                                           :| []
@@ -42,21 +42,21 @@ spec = do
                                   }
         }
       configuredEnv a = ConfiguredEnv { ceCurrentYear         = currentYear
-                                      , ceHeaderFnConfigs     = configs a
+                                      , cePostProcessConfigs  = configs a
                                       , ceUpdateCopyrightMode = mode
                                       }
 
 
-  describe "runHeaderFn" $ do
+  describe "postProcess" $ do
     it "executes the function for given environment" $ do
       let testEnv  = TestEnv "ENV"
           input    = "input"
           expected = "input_ENV"
-      runHeaderFn testFn testEnv input `shouldBe` expected
+      postProcess testFn testEnv input `shouldBe` expected
 
 
   describe "postProcessHeader" $ do
-    it "post-processes given license header using given configuration" $ do
+    it "post-processes license header using given configuration" $ do
       let header = fromLines
             [ "License header"
             , "Copyright (c) 2019 1st Author"
@@ -84,7 +84,7 @@ newtype TestEnv = TestEnv Text
 instance Has TestEnv TestEnv where
   hasLens = id
 
-testFn :: (Has TestEnv env) => HeaderFn env
-testFn = HeaderFn $ \input -> do
+testFn :: (Has TestEnv env) => PostProcess env
+testFn = PostProcess $ \input -> do
   TestEnv text <- viewL
   pure $ input <> "_" <> text

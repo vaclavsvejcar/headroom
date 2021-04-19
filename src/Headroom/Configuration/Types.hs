@@ -56,12 +56,12 @@ module Headroom.Configuration.Types
   , CtUpdateCopyrightConfig
   , PtUpdateCopyrightConfig
   , UpdateCopyrightConfig(..)
-  , CtHeaderFnConfig
-  , PtHeaderFnConfig
-  , HeaderFnConfig(..)
-  , CtHeaderFnConfigs
-  , PtHeaderFnConfigs
-  , HeaderFnConfigs(..)
+  , CtPostProcessConfig
+  , PtPostProcessConfig
+  , PostProcessConfig(..)
+  , CtPostProcessConfigs
+  , PtPostProcessConfigs
+  , PostProcessConfigs(..)
     -- ** Additional Data Types
   , HeaderSyntax(..)
   , GenMode(..)
@@ -187,7 +187,7 @@ data GenMode
 ----------------------------  UpdateCopyrightConfig  ---------------------------
 
 -- | Main configuration for the "Headroom.HeaderFn.UpdateCopyright"
--- /license header function/.
+-- /post-processor/.
 data UpdateCopyrightConfig (p :: Phase) = UpdateCopyrightConfig
   { uccSelectedAuthors :: p ::: Maybe (NonEmpty Text)
   -- ^ if specified, years will be updated only in copyright statements of
@@ -216,91 +216,88 @@ instance FromJSON PtUpdateCopyrightConfig where
     uccSelectedAuthors <- Last <$> obj .:? "selected-authors-only"
     pure UpdateCopyrightConfig { .. }
 
--------------------------------  HeaderFnConfig  -------------------------------
+-------------------------------  PostProcessConfig  -------------------------------
 
--- | Configuration for selected /license header function/.
-data HeaderFnConfig (p :: Phase) c = HeaderFnConfig
-  { hfcEnabled :: p ::: Bool
-  -- ^ whether this function is enabled or not
-  , hfcConfig  :: c p
-  -- ^ custom configuration of the /license header function/
+-- | Configuration for selected /post-processor/.
+data PostProcessConfig (p :: Phase) c = PostProcessConfig
+  { ppcEnabled :: p ::: Bool -- ^ whether this function is enabled or not
+  , ppcConfig  :: c p        -- ^ custom configuration of the /post-processor/
   }
 
--- | Alias for complete variant of 'HeaderFnConfig'.
-type CtHeaderFnConfig c = HeaderFnConfig 'Complete c
+-- | Alias for complete variant of 'PostProcessConfig'.
+type CtPostProcessConfig c = PostProcessConfig 'Complete c
 
--- | Alias for partial variant of 'HeaderFnConfig'.
-type PtHeaderFnConfig c = HeaderFnConfig 'Partial c
-
-
-deriving instance (Eq (c 'Complete)) => Eq (CtHeaderFnConfig c)
-deriving instance (Eq (c 'Partial)) => Eq (PtHeaderFnConfig c)
-deriving instance (Show (c 'Complete)) => Show (CtHeaderFnConfig c)
-deriving instance (Show (c 'Partial)) => Show (PtHeaderFnConfig c)
-deriving instance Generic (PtHeaderFnConfig c)
-
-deriving via (Generically (PtHeaderFnConfig c))
-         instance Semigroup (c 'Partial) => Semigroup (PtHeaderFnConfig c)
-deriving via (Generically (PtHeaderFnConfig c))
-         instance Monoid (c 'Partial) => Monoid (PtHeaderFnConfig c)
-
-instance (FromJSON (c 'Partial), Monoid (c 'Partial)) => FromJSON (PtHeaderFnConfig c) where
-  parseJSON = withObject "PtHeaderFnConfig" $ \obj -> do
-    hfcEnabled <- Last <$> obj .:? "enabled"
-    hfcConfig  <- obj .:? "config" .!= mempty
-    pure HeaderFnConfig { .. }
+-- | Alias for partial variant of 'PostProcessConfig'.
+type PtPostProcessConfig c = PostProcessConfig 'Partial c
 
 
--------------------------------  HeaderFnConfigs  ------------------------------
+deriving instance (Eq (c 'Complete)) => Eq (CtPostProcessConfig c)
+deriving instance (Eq (c 'Partial)) => Eq (PtPostProcessConfig c)
+deriving instance (Show (c 'Complete)) => Show (CtPostProcessConfig c)
+deriving instance (Show (c 'Partial)) => Show (PtPostProcessConfig c)
+deriving instance Generic (PtPostProcessConfig c)
 
--- | Configuration of all known /license header functions/.
-data HeaderFnConfigs (p :: Phase) = HeaderFnConfigs
-  { hfcsUpdateCopyright :: HeaderFnConfig p UpdateCopyrightConfig
-  -- ^ configuration for the "Headroom.HeaderFn.UpdateCopyright"
-  -- /license header function/
+deriving via (Generically (PtPostProcessConfig c))
+         instance Semigroup (c 'Partial) => Semigroup (PtPostProcessConfig c)
+deriving via (Generically (PtPostProcessConfig c))
+         instance Monoid (c 'Partial) => Monoid (PtPostProcessConfig c)
+
+instance (FromJSON (c 'Partial), Monoid (c 'Partial)) => FromJSON (PtPostProcessConfig c) where
+  parseJSON = withObject "PtPostProcessConfig" $ \obj -> do
+    ppcEnabled <- Last <$> obj .:? "enabled"
+    ppcConfig  <- obj .:? "config" .!= mempty
+    pure PostProcessConfig { .. }
+
+
+-------------------------------  PostProcessConfigs  ------------------------------
+
+-- | Configuration of all known /post-processors/.
+data PostProcessConfigs (p :: Phase) = PostProcessConfigs
+  { ppcsUpdateCopyright :: PostProcessConfig p UpdateCopyrightConfig
+  -- ^ configuration for the "Headroom.PostProcess.UpdateCopyright"
   }
 
--- | Alias for complete variant of 'HeaderFnConfigs'.
-type CtHeaderFnConfigs = HeaderFnConfigs 'Complete
+-- | Alias for complete variant of 'PostProcessConfigs'.
+type CtPostProcessConfigs = PostProcessConfigs 'Complete
 
--- | Alias for partial variant of 'HeaderFnConfigs'.
-type PtHeaderFnConfigs = HeaderFnConfigs 'Partial
+-- | Alias for partial variant of 'PostProcessConfigs'.
+type PtPostProcessConfigs = PostProcessConfigs 'Partial
 
-deriving instance Eq CtHeaderFnConfigs
-deriving instance Eq PtHeaderFnConfigs
-deriving instance Show CtHeaderFnConfigs
-deriving instance Show PtHeaderFnConfigs
-deriving instance Generic PtHeaderFnConfigs
+deriving instance Eq CtPostProcessConfigs
+deriving instance Eq PtPostProcessConfigs
+deriving instance Show CtPostProcessConfigs
+deriving instance Show PtPostProcessConfigs
+deriving instance Generic PtPostProcessConfigs
 
-deriving via (Generically PtHeaderFnConfigs)
-         instance Semigroup PtHeaderFnConfigs
-deriving via (Generically PtHeaderFnConfigs)
-         instance Monoid PtHeaderFnConfigs
+deriving via (Generically PtPostProcessConfigs)
+         instance Semigroup PtPostProcessConfigs
+deriving via (Generically PtPostProcessConfigs)
+         instance Monoid PtPostProcessConfigs
 
-instance FromJSON PtHeaderFnConfigs where
-  parseJSON = withObject "PtHeaderFnConfigs" $ \obj -> do
-    hfcsUpdateCopyright <- obj .:? "update-copyright" .!= mempty
-    pure HeaderFnConfigs { .. }
+instance FromJSON PtPostProcessConfigs where
+  parseJSON = withObject "PtPostProcessConfigs" $ \obj -> do
+    ppcsUpdateCopyright <- obj .:? "update-copyright" .!= mempty
+    pure PostProcessConfigs { .. }
 
 
 --------------------------------  Configuration  -------------------------------
 
 -- | Application configuration.
 data Configuration (p :: Phase) = Configuration
-  { cRunMode          :: p ::: RunMode
+  { cRunMode            :: p ::: RunMode
   -- ^ mode of the @run@ command
-  , cSourcePaths      :: p ::: [FilePath]
+  , cSourcePaths        :: p ::: [FilePath]
   -- ^ paths to source code files
-  , cExcludedPaths    :: p ::: [Regex]
+  , cExcludedPaths      :: p ::: [Regex]
   -- ^ excluded source paths
-  , cBuiltInTemplates :: p ::: Maybe LicenseType
-  , cTemplateRefs     :: [TemplateRef]
-  , cVariables        :: Variables
+  , cBuiltInTemplates   :: p ::: Maybe LicenseType
+  , cTemplateRefs       :: [TemplateRef]
+  , cVariables          :: Variables
   -- ^ variable values for templates
-  , cLicenseHeaders   :: HeadersConfig p
+  , cLicenseHeaders     :: HeadersConfig p
   -- ^ configuration of license headers
-  , cHeaderFnConfigs  :: HeaderFnConfigs p
-  -- ^ configuration of license header functions
+  , cPostProcessConfigs :: PostProcessConfigs p
+  -- ^ configuration of post-processors
   }
 
 -- | Alias for complete variant of 'Configuration'.
@@ -323,14 +320,14 @@ deriving via (Generically PtConfiguration)
 
 instance FromJSON PtConfiguration where
   parseJSON = withObject "PtConfiguration" $ \obj -> do
-    cRunMode          <- Last <$> obj .:? "run-mode"
-    cSourcePaths      <- Last <$> obj .:? "source-paths"
-    cExcludedPaths    <- Last <$> obj .:? "excluded-paths"
-    cBuiltInTemplates <- Last <$> obj .:? "builtin-templates"
-    cTemplateRefs     <- obj .:? "template-paths" .!= mempty
-    cVariables        <- Variables <$> obj .:? "variables" .!= mempty
-    cLicenseHeaders   <- obj .:? "license-headers" .!= mempty
-    cHeaderFnConfigs  <- obj .:? "post-process" .!= mempty
+    cRunMode            <- Last <$> obj .:? "run-mode"
+    cSourcePaths        <- Last <$> obj .:? "source-paths"
+    cExcludedPaths      <- Last <$> obj .:? "excluded-paths"
+    cBuiltInTemplates   <- Last <$> obj .:? "builtin-templates"
+    cTemplateRefs       <- obj .:? "template-paths" .!= mempty
+    cVariables          <- Variables <$> obj .:? "variables" .!= mempty
+    cLicenseHeaders     <- obj .:? "license-headers" .!= mempty
+    cPostProcessConfigs <- obj .:? "post-process" .!= mempty
     pure Configuration { .. }
 
 

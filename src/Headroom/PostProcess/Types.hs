@@ -1,8 +1,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 {-|
-Module      : Headroom.HeaderFn.Types
-Description : Data types for /license header functions/
+Module      : Headroom.PostProcess.Types
+Description : Data types for /post-processing/
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
@@ -10,26 +10,26 @@ Stability   : experimental
 Portability : POSIX
 
 This module contains data types and /type class/ instances for the
-/license header functions/.
+/post-processing/ functions.
 -}
 
-module Headroom.HeaderFn.Types
-  ( HeaderFn(..)
+module Headroom.PostProcess.Types
+  ( PostProcess(..)
   )
 where
 
 import           RIO
 
 
--- | Definition of /license header function/, i.e. function, that is applied to
+-- | Definition of /post-processor/, i.e. function, that is applied to
 -- already rendered /license header/, performs some logic and returns modified
 -- text of /license header/. Given that the /reader monad/ and 'ReaderT'
 -- transformer is used, any configuration is provided using the @env@
 -- environment. When combined with the "Headroom.Data.Has" monad, it provides
--- powerful way how to combine different /license header function/ and
+-- powerful way how to combine different /post-processors/ and
 -- environments.
 --
--- = Structure of License Header Function Type
+-- = Structure of post-processor
 --
 -- @
 -- __Text -> Reader env Text__
@@ -40,10 +40,10 @@ import           RIO
 --                      │
 --                      └─ modified license header text
 -- @
-newtype HeaderFn env = HeaderFn (Text -> Reader env Text)
+newtype PostProcess env = PostProcess (Text -> Reader env Text)
 
-instance Semigroup (HeaderFn env) where
-  HeaderFn fnX <> HeaderFn fnY = HeaderFn $ fnX >=> fnY
+instance Semigroup (PostProcess env) where
+  PostProcess fnX <> PostProcess fnY = PostProcess $ fnX >=> fnY
 
-instance Monoid (HeaderFn env) where
-  mempty = HeaderFn $ \input -> pure input
+instance Monoid (PostProcess env) where
+  mempty = PostProcess $ \input -> pure input

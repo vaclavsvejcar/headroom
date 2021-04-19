@@ -18,10 +18,10 @@ module Headroom.Command.RunSpec
 where
 
 import           Headroom.Command.Run
-import           Headroom.Configuration.Types        ( CtHeaderFnConfigs
-                                                     , HeaderFnConfig(..)
-                                                     , HeaderFnConfigs(..)
+import           Headroom.Configuration.Types        ( CtPostProcessConfigs
                                                      , HeaderSyntax(..)
+                                                     , PostProcessConfig(..)
+                                                     , PostProcessConfigs(..)
                                                      , UpdateCopyrightConfig(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
@@ -52,11 +52,11 @@ import           Text.URI.QQ                         ( uri )
 
 
 data TestEnv = TestEnv
-  { envLogFunc         :: LogFunc
-  , envCurrentYear     :: CurrentYear
-  , envFileSystem      :: FileSystem (RIO TestEnv)
-  , envNetwork         :: Network (RIO TestEnv)
-  , envHeaderFnConfigs :: CtHeaderFnConfigs
+  { envLogFunc            :: LogFunc
+  , envCurrentYear        :: CurrentYear
+  , envFileSystem         :: FileSystem (RIO TestEnv)
+  , envNetwork            :: Network (RIO TestEnv)
+  , envPostProcessConfigs :: CtPostProcessConfigs
   }
 
 suffixLenses ''TestEnv
@@ -66,8 +66,8 @@ suffixLensesFor ["nDownloadContent"] ''Network
 instance HasLogFunc TestEnv where
   logFuncL = envLogFuncL
 
-instance Has CtHeaderFnConfigs TestEnv where
-  hasLens = envHeaderFnConfigsL
+instance Has CtPostProcessConfigs TestEnv where
+  hasLens = envPostProcessConfigsL
 
 instance Has CurrentYear TestEnv where
   hasLens = envCurrentYearL
@@ -153,11 +153,11 @@ env = TestEnv { .. }
                               , fsListFiles           = undefined
                               , fsLoadFile            = undefined
                               }
-  envNetwork         = Network { nDownloadContent = undefined }
-  envHeaderFnConfigs = HeaderFnConfigs
-    { hfcsUpdateCopyright = HeaderFnConfig
-                              { hfcEnabled = True
-                              , hfcConfig  = UpdateCopyrightConfig
+  envNetwork            = Network { nDownloadContent = undefined }
+  envPostProcessConfigs = PostProcessConfigs
+    { ppcsUpdateCopyright = PostProcessConfig
+                              { ppcEnabled = True
+                              , ppcConfig  = UpdateCopyrightConfig
                                                { uccSelectedAuthors =
                                                  Just $ "{{ sndAuthor }}" :| []
                                                }

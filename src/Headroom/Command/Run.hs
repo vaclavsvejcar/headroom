@@ -51,7 +51,7 @@ import           Headroom.Configuration              ( loadConfiguration
                                                      )
 import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , CtConfiguration
-                                                     , CtHeaderFnConfigs
+                                                     , CtPostProcessConfigs
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      , PtConfiguration
@@ -80,9 +80,6 @@ import           Headroom.Header.Sanitize            ( sanitizeSyntax )
 import           Headroom.Header.Types               ( HeaderInfo(..)
                                                      , HeaderTemplate(..)
                                                      )
-import           Headroom.HeaderFn                   ( mkConfiguredEnv
-                                                     , postProcessHeader
-                                                     )
 import           Headroom.IO.FileSystem              ( FileSystem(..)
                                                      , excludePaths
                                                      , fileExtension
@@ -94,6 +91,9 @@ import           Headroom.IO.Network                 ( Network(..)
 import           Headroom.Meta                       ( TemplateType
                                                      , configFileName
                                                      , productInfo
+                                                     )
+import           Headroom.PostProcess                ( mkConfiguredEnv
+                                                     , postProcessHeader
                                                      )
 import           Headroom.SourceCode                 ( SourceCode
                                                      , toText
@@ -119,7 +119,7 @@ import qualified RIO.Map                            as M
 import qualified RIO.Text                           as T
 
 
-suffixLensesFor ["cHeaderFnConfigs"] ''Configuration
+suffixLensesFor ["cPostProcessConfigs"] ''Configuration
 
 
 -- | Action to be performed based on the selected 'RunMode'.
@@ -153,8 +153,8 @@ suffixLenses ''Env
 instance Has CtConfiguration Env where
   hasLens = envConfigurationL
 
-instance Has CtHeaderFnConfigs Env where
-  hasLens = envConfigurationL . cHeaderFnConfigsL
+instance Has CtPostProcessConfigs Env where
+  hasLens = envConfigurationL . cPostProcessConfigsL
 
 instance Has StartupEnv StartupEnv where
   hasLens = id
@@ -255,7 +255,7 @@ findSourceFiles fileTypes = do
 processSourceFiles :: forall a env
                     . ( Template a
                       , Has CtConfiguration env
-                      , Has CtHeaderFnConfigs env
+                      , Has CtPostProcessConfigs env
                       , Has CommandRunOptions env
                       , Has CurrentYear env
                       , HasLogFunc env
@@ -281,7 +281,7 @@ processSourceFile :: forall a env
                    . ( Template a
                      , Has CommandRunOptions env
                      , Has CtConfiguration env
-                     , Has CtHeaderFnConfigs env
+                     , Has CtPostProcessConfigs env
                      , Has CurrentYear env
                      , HasLogFunc env
                      )
@@ -460,14 +460,14 @@ optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtConfiguration
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
-  pure Configuration { cRunMode          = maybe mempty pure croRunMode
-                     , cSourcePaths      = ifNot null croSourcePaths
-                     , cExcludedPaths    = ifNot null croExcludedPaths
-                     , cBuiltInTemplates = pure croBuiltInTemplates
-                     , cTemplateRefs     = croTemplateRefs
-                     , cVariables        = variables
-                     , cLicenseHeaders   = mempty
-                     , cHeaderFnConfigs  = mempty
+  pure Configuration { cRunMode            = maybe mempty pure croRunMode
+                     , cSourcePaths        = ifNot null croSourcePaths
+                     , cExcludedPaths      = ifNot null croExcludedPaths
+                     , cBuiltInTemplates   = pure croBuiltInTemplates
+                     , cTemplateRefs       = croTemplateRefs
+                     , cVariables          = variables
+                     , cLicenseHeaders     = mempty
+                     , cPostProcessConfigs = mempty
                      }
   where ifNot cond value = if cond value then mempty else pure value
 
@@ -485,10 +485,10 @@ currentYear = do
 -- configuration. Currently the main points are to:
 --
 --  1. sanitize possibly corrupted comment syntax ('sanitizeSyntax')
---  2. apply /license header functions/ ('postProcessHeader')
+--  2. apply /post-processors/ ('postProcessHeader')
 postProcessHeader' :: forall a env
                     . ( Template a
-                      , Has CtHeaderFnConfigs env
+                      , Has CtPostProcessConfigs env
                       , Has CurrentYear env
                       )
                    => HeaderSyntax -- ^ syntax of the license header comments
@@ -496,7 +496,7 @@ postProcessHeader' :: forall a env
                    -> Text         -- ^ /license header/ to post-process
                    -> RIO env Text -- ^ post-processed /license header/
 postProcessHeader' syntax vars rawHeader = do
-  configs <- viewL @CtHeaderFnConfigs
+  configs <- viewL @CtPostProcessConfigs
   year    <- viewL
   cEnv    <- mkConfiguredEnv @a year vars configs
   pure . sanitizeSyntax syntax . postProcessHeader cEnv $ rawHeader

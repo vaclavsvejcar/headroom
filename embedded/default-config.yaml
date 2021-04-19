@@ -247,12 +247,12 @@ license-headers:
     line-comment:
       prefixed-by: ^#
 
-## Configuration for post-processing license header functions. These functions
+## Configuration for post-processing functions. These functions
 ## allows to modify/enhance already rendered license headers, e.g. update years
 ## in copyright statements, etc. Each function can be enabled/disabled using the
 ## 'enabled' key and eventually customized using the 'config' key.
 post-process:
-  ## License header function that updates years in copyright statements in
+  ## Post-processing function that updates years in copyright statements in
   ## rendered license header. If you need to update copyright year only for
   ## selected author(s), define them in 'selected-authors-only' key, otherwise
   ## ommit/comment out this key completely and all copyright statements will be
