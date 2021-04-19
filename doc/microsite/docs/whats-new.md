@@ -13,8 +13,8 @@ For command line or
 
 ```yaml
 template-paths:
-  /some/local/haskell.mustache
-  https://example.com/path/rust.mustache
+  - /some/local/haskell.mustache
+  - https://example.com/path/rust.mustache
 ```
 
 for _YAML_ configuration.
