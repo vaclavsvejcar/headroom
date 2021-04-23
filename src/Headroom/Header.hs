@@ -74,7 +74,6 @@ import qualified RIO.List                           as L
 import qualified RIO.Text                           as T
 
 
-
 suffixLensesFor ["hcHeaderSyntax"] ''HeaderConfig
 suffixLensesFor ["hiHeaderPos"]    ''HeaderInfo
 

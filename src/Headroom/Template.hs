@@ -42,30 +42,44 @@ import qualified RIO.Text                           as T
 class Template a where
 
   -- | Returns list of supported file extensions for this template type.
-  templateExtensions :: NonEmpty Text -- ^ list of supported file extensions
+  templateExtensions :: NonEmpty Text
+                     -- ^ list of supported file extensions
 
 
   -- | Parses template from given raw text.
   parseTemplate :: MonadThrow m
-                => TemplateRef -- ^ reference to template source
-                -> Text        -- ^ raw template text
-                -> m a         -- ^ parsed template
+                => TemplateRef
+                -- ^ reference to template source
+                -> Text
+                -- ^ raw template text
+                -> m a
+                -- ^ parsed template
 
 
   -- | Renders parsed template and replaces all variables with actual values.
   renderTemplate :: MonadThrow m
-                 => Variables -- ^ values of variables to replace
-                 -> a         -- ^ parsed template to render
-                 -> m Text    -- ^ rendered template text
+                 => Variables
+                 -- ^ values of variables to replace
+                 -> a
+                 -- ^ parsed template to render
+                 -> m Text
+                 -- ^ rendered template text
 
 
   -- | Returns the raw text of the template, same that has been parsed by
   -- 'parseTemplate' method.
-  rawTemplate :: a    -- ^ template for which to return raw template text
-              -> Text -- ^ raw template text
+  rawTemplate :: a
+              -- ^ template for which to return raw template text
+              -> Text
+              -- ^ raw template text
 
 
-  templateRef :: a -> TemplateRef
+  -- | Returns a reference to template source, from which this template was
+  -- loaded.
+  templateRef :: a
+              -- ^ template for which to return reference
+              -> TemplateRef
+              -- ^ template reference
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------

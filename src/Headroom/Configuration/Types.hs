@@ -186,7 +186,7 @@ data GenMode
 
 ----------------------------  UpdateCopyrightConfig  ---------------------------
 
--- | Main configuration for the "Headroom.HeaderFn.UpdateCopyright"
+-- | Main configuration for the "Headroom.PostProcess.UpdateCopyright"
 -- /post-processor/.
 data UpdateCopyrightConfig (p :: Phase) = UpdateCopyrightConfig
   { uccSelectedAuthors :: p ::: Maybe (NonEmpty Text)
@@ -291,7 +291,9 @@ data Configuration (p :: Phase) = Configuration
   , cExcludedPaths      :: p ::: [Regex]
   -- ^ excluded source paths
   , cBuiltInTemplates   :: p ::: Maybe LicenseType
+  -- ^ used built-in templates
   , cTemplateRefs       :: [TemplateRef]
+  -- ^ template references
   , cVariables          :: Variables
   -- ^ variable values for templates
   , cLicenseHeaders     :: HeadersConfig p

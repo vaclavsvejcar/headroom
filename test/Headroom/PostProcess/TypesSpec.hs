@@ -4,6 +4,7 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE StrictData            #-}
+
 module Headroom.PostProcess.TypesSpec
   ( spec
   )
@@ -19,7 +20,7 @@ import           Test.Hspec
 spec :: Spec
 spec = do
 
-  describe "Semigroup HeaderFn" $ do
+  describe "Semigroup PostProcess" $ do
     it "combines two values together" $ do
       let fooEnv      = FooEnv "_FOO_ENV"
           barEnv      = BarEnv "_BAR_ENV"
@@ -30,7 +31,7 @@ spec = do
       postProcess combinedFn combinedEnv input `shouldBe` expected
 
 
-  describe "Monoid HeaderFn" $ do
+  describe "Monoid PostProcess" $ do
     it "does nothing with the input" $ do
       let input   = "input"
           testEnv = undefined
