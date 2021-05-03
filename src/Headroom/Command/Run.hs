@@ -460,14 +460,15 @@ optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtConfiguration
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
-  pure Configuration { cRunMode            = maybe mempty pure croRunMode
-                     , cSourcePaths        = ifNot null croSourcePaths
-                     , cExcludedPaths      = ifNot null croExcludedPaths
-                     , cBuiltInTemplates   = pure croBuiltInTemplates
-                     , cTemplateRefs       = croTemplateRefs
-                     , cVariables          = variables
-                     , cLicenseHeaders     = mempty
-                     , cPostProcessConfigs = mempty
+  pure Configuration { cRunMode             = maybe mempty pure croRunMode
+                     , cSourcePaths         = ifNot null croSourcePaths
+                     , cExcludedPaths       = ifNot null croExcludedPaths
+                     , cExcludeIgnoredPaths = pure croExcludeIgnoredPaths
+                     , cBuiltInTemplates    = pure croBuiltInTemplates
+                     , cTemplateRefs        = croTemplateRefs
+                     , cVariables           = variables
+                     , cLicenseHeaders      = mempty
+                     , cPostProcessConfigs  = mempty
                      }
   where ifNot cond value = if cond value then mempty else pure value
 

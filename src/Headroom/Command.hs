@@ -97,6 +97,10 @@ runOptions =
               "path to exclude from source code file paths"
             )
           )
+    <*> switch
+          (  long "exclude-ignored-paths"
+          <> help "exclude paths ignored by used VCS"
+          )
     <*> optional
           (option
             licenseTypeReader

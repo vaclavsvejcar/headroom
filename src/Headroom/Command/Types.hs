@@ -33,7 +33,7 @@ import           RIO
 
 -- | Application command.
 data Command
-  = Run [FilePath] [Regex] (Maybe LicenseType) [TemplateRef] [Text] (Maybe RunMode) Bool Bool -- ^ @run@ command
+  = Run [FilePath] [Regex] Bool (Maybe LicenseType) [TemplateRef] [Text] (Maybe RunMode) Bool Bool -- ^ @run@ command
   | Gen Bool (Maybe (LicenseType, FileType)) -- ^ @gen@ command
   | Init LicenseType [FilePath] -- ^ @init@ command
   deriving (Show)
@@ -54,13 +54,14 @@ data CommandInitOptions = CommandInitOptions
 
 -- | Options for the @run@ command.
 data CommandRunOptions = CommandRunOptions
-  { croRunMode          :: Maybe RunMode      -- ^ used /Run/ command mode
-  , croSourcePaths      :: [FilePath]         -- ^ source code file paths
-  , croExcludedPaths    :: [Regex]            -- ^ source paths to exclude
-  , croBuiltInTemplates :: Maybe LicenseType  -- ^ whether to use built-in templates
-  , croTemplateRefs     :: [TemplateRef]      -- ^ template references
-  , croVariables        :: [Text]             -- ^ raw variables
-  , croDebug            :: Bool               -- ^ whether to run in debug mode
-  , croDryRun           :: Bool               -- ^ whether to perform dry run
+  { croRunMode             :: Maybe RunMode     -- ^ used /Run/ command mode
+  , croSourcePaths         :: [FilePath]        -- ^ source code file paths
+  , croExcludedPaths       :: [Regex]           -- ^ source paths to exclude
+  , croExcludeIgnoredPaths :: Bool              -- ^ whether to exclude ignored paths
+  , croBuiltInTemplates    :: Maybe LicenseType -- ^ whether to use built-in templates
+  , croTemplateRefs        :: [TemplateRef]     -- ^ template references
+  , croVariables           :: [Text]            -- ^ raw variables
+  , croDebug               :: Bool              -- ^ whether to run in debug mode
+  , croDryRun              :: Bool              -- ^ whether to perform dry run
   }
   deriving (Eq, Show)

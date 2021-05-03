@@ -284,21 +284,23 @@ instance FromJSON PtPostProcessConfigs where
 
 -- | Application configuration.
 data Configuration (p :: Phase) = Configuration
-  { cRunMode            :: p ::: RunMode
+  { cRunMode             :: p ::: RunMode
   -- ^ mode of the @run@ command
-  , cSourcePaths        :: p ::: [FilePath]
+  , cSourcePaths         :: p ::: [FilePath]
   -- ^ paths to source code files
-  , cExcludedPaths      :: p ::: [Regex]
+  , cExcludedPaths       :: p ::: [Regex]
   -- ^ excluded source paths
-  , cBuiltInTemplates   :: p ::: Maybe LicenseType
+  , cExcludeIgnoredPaths :: p ::: Bool
+  -- ^ whether to exclude paths ignored by VCS
+  , cBuiltInTemplates    :: p ::: Maybe LicenseType
   -- ^ used built-in templates
-  , cTemplateRefs       :: [TemplateRef]
+  , cTemplateRefs        :: [TemplateRef]
   -- ^ template references
-  , cVariables          :: Variables
+  , cVariables           :: Variables
   -- ^ variable values for templates
-  , cLicenseHeaders     :: HeadersConfig p
+  , cLicenseHeaders      :: HeadersConfig p
   -- ^ configuration of license headers
-  , cPostProcessConfigs :: PostProcessConfigs p
+  , cPostProcessConfigs  :: PostProcessConfigs p
   -- ^ configuration of post-processors
   }
 
@@ -322,14 +324,15 @@ deriving via (Generically PtConfiguration)
 
 instance FromJSON PtConfiguration where
   parseJSON = withObject "PtConfiguration" $ \obj -> do
-    cRunMode            <- Last <$> obj .:? "run-mode"
-    cSourcePaths        <- Last <$> obj .:? "source-paths"
-    cExcludedPaths      <- Last <$> obj .:? "excluded-paths"
-    cBuiltInTemplates   <- Last <$> obj .:? "builtin-templates"
-    cTemplateRefs       <- obj .:? "template-paths" .!= mempty
-    cVariables          <- Variables <$> obj .:? "variables" .!= mempty
-    cLicenseHeaders     <- obj .:? "license-headers" .!= mempty
-    cPostProcessConfigs <- obj .:? "post-process" .!= mempty
+    cRunMode             <- Last <$> obj .:? "run-mode"
+    cSourcePaths         <- Last <$> obj .:? "source-paths"
+    cExcludedPaths       <- Last <$> obj .:? "excluded-paths"
+    cExcludeIgnoredPaths <- Last <$> obj .:? "exclude-ignored-paths"
+    cBuiltInTemplates    <- Last <$> obj .:? "builtin-templates"
+    cTemplateRefs        <- obj .:? "template-paths" .!= mempty
+    cVariables           <- Variables <$> obj .:? "variables" .!= mempty
+    cLicenseHeaders      <- obj .:? "license-headers" .!= mempty
+    cPostProcessConfigs  <- obj .:? "post-process" .!= mempty
     pure Configuration { .. }
 
 
@@ -481,6 +484,8 @@ data ConfigurationKey
   -- ^ no configuration for @source-paths@
   | CkExcludedPaths
   -- ^ no configuration for @excluded-paths@
+  | CkExcludeIgnoredPaths
+  -- ^ no configuration for @exclude-ignored-paths@
   | CkBuiltInTemplates
   -- ^ no configuration for built in templates
   | CkVariables
@@ -547,6 +552,9 @@ displayException' = T.unpack . \case
     CkExcludedPaths -> missingConfig "excluded paths"
                                      (Just "excluded-paths")
                                      (Just "-e|--excluded-path")
+    CkExcludeIgnoredPaths -> missingConfig "whether to exclude ignored paths"
+                                           (Just "exclude-ignored-paths")
+                                           (Just "--exclude-ignored-paths")
     CkBuiltInTemplates -> missingConfig
       "use of built-in templates"
       (Just "builtin-templates")
