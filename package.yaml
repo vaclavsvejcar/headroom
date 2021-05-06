@@ -64,6 +64,7 @@ library:
   dependencies:
     - aeson
     - either
+    - extra
     - file-embed
     - generic-data
     - http-client
@@ -79,6 +80,7 @@ library:
     - string-interpolate
     - template-haskell
     - time
+    - vcs-ignore
     - yaml
 
 tests:

@@ -1,3 +1,7 @@
 resolver: lts-17.10
 packages:
   - .
+
+extra-deps:
+  - git: https://github.com/vaclavsvejcar/vcs-ignore.git
+    commit: fcbfc92d0d02820f15425784118aa3fcba65fd85
