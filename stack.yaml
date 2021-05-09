@@ -4,4 +4,4 @@ packages:
 
 extra-deps:
   - git: https://github.com/vaclavsvejcar/vcs-ignore.git
-    commit: fcbfc92d0d02820f15425784118aa3fcba65fd85
+    commit: 0718a65e9afb422c9567d095ba0560124703cf3b
