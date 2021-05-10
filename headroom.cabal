@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1a3904f9aab4a3b7b42e24e103a2df1e4ca49fe1418ebdab9560cd4341cf5ca4
+-- hash: 65abf7f836c076afc90aa5cf7190e8d0cabee4309c39c66ebd00b9da3a773b92
 
 name:           headroom
 version:        0.4.2.0
@@ -203,6 +203,7 @@ library
       aeson
     , base >=4.7 && <5
     , either
+    , extra
     , file-embed
     , generic-data
     , http-client
@@ -220,6 +221,7 @@ library
     , string-interpolate
     , template-haskell
     , time
+    , vcs-ignore
     , yaml
   default-language: Haskell2010
 

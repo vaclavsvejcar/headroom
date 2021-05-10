@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE MultiWayIf            #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE QuasiQuotes           #-}
@@ -35,13 +36,20 @@ module Headroom.Command.Run
   )
 where
 
-import           Data.String.Interpolate             ( i )
+import           Control.Monad.Extra                 ( ifM )
+import           Data.String.Interpolate             ( i
+                                                     , iii
+                                                     )
 import           Data.Time.Calendar                  ( toGregorian )
 import           Data.Time.Clock                     ( getCurrentTime )
 import           Data.Time.Clock.POSIX               ( getPOSIXTime )
 import           Data.Time.LocalTime                 ( getCurrentTimeZone
                                                      , localDay
                                                      , utcToLocalTime
+                                                     )
+import           Data.VCS.Ignore                     ( Git
+                                                     , Repo(..)
+                                                     , findRepo
                                                      )
 import           Headroom.Command.Types              ( CommandRunOptions(..) )
 import           Headroom.Command.Utils              ( bootstrap )
@@ -241,15 +249,38 @@ findSourceFiles fileTypes = do
   logDebug $ "Using source paths: " <> displayShow cSourcePaths
   files <-
     mconcat <$> mapM (fsFindFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
-  let files' = excludePaths cExcludedPaths files
-  logInfo $ mconcat
-    [ "Found "
-    , display $ length files'
-    , " files to process (excluded "
-    , display $ length files - length files'
-    , ")"
-    ]
-  pure files'
+  notIgnored <- excludePaths cExcludedPaths <$> excludeIgnored files
+  logInfo [iii|
+      Found #{length notIgnored} files to process
+      (excluded #{length files - length notIgnored})
+    |]
+  pure notIgnored
+
+
+excludeIgnored :: ( Has CtConfiguration env
+                  , Has (FileSystem (RIO env)) env
+                  , HasLogFunc env
+                  )
+               => [FilePath]
+               -> RIO env [FilePath]
+excludeIgnored paths = do
+  Configuration {..} <- viewL @CtConfiguration
+  FileSystem {..}    <- viewL
+  currentDir         <- fsGetCurrentDirectory
+  maybeRepo          <- ifM (pure cExcludeIgnoredPaths)
+                            (findRepo' currentDir)
+                            (pure Nothing)
+  case maybeRepo of
+    Just repo -> filterM (fmap not . isIgnored repo) paths
+    Nothing   -> pure paths
+ where
+  findRepo' = \dir -> do
+    logInfo "Searching for VCS repository to extract exclude patterns from..."
+    maybeRepo <- findRepo @_ @Git dir
+    case maybeRepo of
+      Just r -> logInfo [i|Found #{repoName r} repository in: #{dir}|]
+      _      -> logInfo [i|No VCS repository found in: #{dir}|]
+    pure maybeRepo
 
 
 processSourceFiles :: forall a env
@@ -460,14 +491,15 @@ optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtConfiguration
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
-  pure Configuration { cRunMode            = maybe mempty pure croRunMode
-                     , cSourcePaths        = ifNot null croSourcePaths
-                     , cExcludedPaths      = ifNot null croExcludedPaths
-                     , cBuiltInTemplates   = pure croBuiltInTemplates
-                     , cTemplateRefs       = croTemplateRefs
-                     , cVariables          = variables
-                     , cLicenseHeaders     = mempty
-                     , cPostProcessConfigs = mempty
+  pure Configuration { cRunMode             = maybe mempty pure croRunMode
+                     , cSourcePaths         = ifNot null croSourcePaths
+                     , cExcludedPaths       = ifNot null croExcludedPaths
+                     , cExcludeIgnoredPaths = pure croExcludeIgnoredPaths
+                     , cBuiltInTemplates    = pure croBuiltInTemplates
+                     , cTemplateRefs        = croTemplateRefs
+                     , cVariables           = variables
+                     , cLicenseHeaders      = mempty
+                     , cPostProcessConfigs  = mempty
                      }
   where ifNot cond value = if cond value then mempty else pure value
 

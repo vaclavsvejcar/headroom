@@ -95,9 +95,11 @@ makeConfiguration :: MonadThrow m
                   -> m CtConfiguration
                   -- ^ full 'CtConfiguration'
 makeConfiguration pt = do
-  cRunMode            <- lastOrError CkRunMode (cRunMode pt)
-  cSourcePaths        <- lastOrError CkSourcePaths (cSourcePaths pt)
-  cExcludedPaths      <- lastOrError CkExcludedPaths (cExcludedPaths pt)
+  cRunMode             <- lastOrError CkRunMode (cRunMode pt)
+  cSourcePaths         <- lastOrError CkSourcePaths (cSourcePaths pt)
+  cExcludedPaths       <- lastOrError CkExcludedPaths (cExcludedPaths pt)
+  cExcludeIgnoredPaths <- lastOrError CkExcludeIgnoredPaths
+                                      (cExcludeIgnoredPaths pt)
   cBuiltInTemplates   <- lastOrError CkBuiltInTemplates (cBuiltInTemplates pt)
   cTemplateRefs       <- pure $ cTemplateRefs pt
   cLicenseHeaders     <- makeHeadersConfig (cLicenseHeaders pt)
