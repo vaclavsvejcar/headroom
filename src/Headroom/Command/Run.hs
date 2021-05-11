@@ -13,6 +13,7 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE ViewPatterns          #-}
 
 {-|
 Module      : Headroom.Command.Run
@@ -409,7 +410,7 @@ loadTemplateRefs refs = do
     LocalTemplateRef path    -> fsLoadFile fs path
     UriTemplateRef   uri     -> nDownloadContent n uri
     BuiltInRef lt ft'        -> pure $ licenseTemplate lt ft'
-  loadTemplate = \(ft, ref, c) -> (ft, ) <$> parseTemplate @a ref c
+  loadTemplate = \(ft, ref, T.strip -> c) -> (ft, ) <$> parseTemplate @a ref c
   getFileType  = \case
     InlineRef _     -> pure Nothing
     BuiltInRef _ ft -> pure . Just $ ft
@@ -491,16 +492,17 @@ optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtConfiguration
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
-  pure Configuration { cRunMode             = maybe mempty pure croRunMode
-                     , cSourcePaths         = ifNot null croSourcePaths
-                     , cExcludedPaths       = ifNot null croExcludedPaths
-                     , cExcludeIgnoredPaths = pure croExcludeIgnoredPaths
-                     , cBuiltInTemplates    = pure croBuiltInTemplates
-                     , cTemplateRefs        = croTemplateRefs
-                     , cVariables           = variables
-                     , cLicenseHeaders      = mempty
-                     , cPostProcessConfigs  = mempty
-                     }
+  pure Configuration
+    { cRunMode             = maybe mempty pure croRunMode
+    , cSourcePaths         = ifNot null croSourcePaths
+    , cExcludedPaths       = ifNot null croExcludedPaths
+    , cExcludeIgnoredPaths = ifNot (== False) croExcludeIgnoredPaths
+    , cBuiltInTemplates    = pure croBuiltInTemplates
+    , cTemplateRefs        = croTemplateRefs
+    , cVariables           = variables
+    , cLicenseHeaders      = mempty
+    , cPostProcessConfigs  = mempty
+    }
   where ifNot cond value = if cond value then mempty else pure value
 
 

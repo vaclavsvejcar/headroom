@@ -94,7 +94,7 @@ spec = do
             _          -> throwString "INVALID"
           fsLoadFile' = \case
             "haskell.mustache" -> pure "haskell local"
-            "rust.mustache"    -> pure "rust local"
+            "rust.mustache"    -> pure "rust\nlocal\n"
             _                  -> throwString "INVALID"
           nDownloadContent' = \case
             [uri|http://test.com/haskell.mustache|] -> pure "haskell URI"
@@ -108,7 +108,7 @@ spec = do
       M.member Haskell templates `shouldBe` True
       M.member Rust templates `shouldBe` True
       rawTemplate <$> M.lookup Haskell templates `shouldBe` Just "haskell local"
-      rawTemplate <$> M.lookup Rust templates `shouldBe` Just "rust local"
+      rawTemplate <$> M.lookup Rust templates `shouldBe` Just "rust\nlocal"
 
 
   describe "typeOfTemplate" $ do
