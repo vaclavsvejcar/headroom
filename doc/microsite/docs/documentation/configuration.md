@@ -14,42 +14,47 @@ When _Headroom_ is loading your `.headroom.yaml` file, it first checks whether y
 From top-level perspective, the _YAML_ configuration has the following structure:
 
 ```yaml
-version: 1.2.3.4        ## Version of Headroom the configuration is compatible with
-run-mode: ...           ## Default mode of the 'run' command
-excluded-paths: []      ## Path(s) to exclude from 'source-paths'
-source-paths: []        ## Path(s) to source code files to process headers in
-template-paths: []      ## Path(s) to license header templates
-variables: {}           ## Value(s) of variable(s) to replace in template(s)
-license-headers: {}     ## License header detection & positioning
-post-process: {}        ## Post-processing functions
+version: 1.2.3.4            ## Version of Headroom the configuration is compatible with
+run-mode: ...               ## Default mode of the 'run' command
+excluded-paths: []          ## Path(s) to exclude from 'source-paths'
+exclude-ignored-paths: true ## Whether to exclude source paths ignored by GIT
+source-paths: []            ## Path(s) to source code files to process headers in
+template-paths: []          ## Path(s) to license header templates
+variables: {}               ## Value(s) of variable(s) to replace in template(s)
+license-headers: {}         ## License header detection & positioning
+post-process: {}            ## Post-processing functions
 ```
 
 #### Relation between Command-line Arguments and YAML Configuration
 Not all configuration options can be set/overridden using the command line arguments, but below is the list of matching _YAML_ options and command line options:
 
-| YAML option         | Command Line Option            |		
-|---------------------|--------------------------------|		
-| `run-mode: add`     | `-a`, `--add-headers`          |		
-| `run-mode: drop`    | `-d`, `--drop-headers`         |		
-| `run-mode: replace` | `-r`, `--replace-headers`      |	
-| `run-mode: check`   | `-c`, `--check-headers`        |		
-| `source-paths`      | `-s`, `--source-path PATH`     |	
-| `excluded-paths`    | `-e`, `--excluded-path REGEX`  |	
-| `template-paths`    | `-t`, `--template-path PATH`   |
-| `variables`         | `-v`, `--variable "KEY=VALUE"` |
+| YAML option             | Command Line Option            |		
+|-------------------------|--------------------------------|		
+| `run-mode: add`         | `-a`, `--add-headers`          |		
+| `run-mode: drop`        | `-d`, `--drop-headers`         |		
+| `run-mode: replace`     | `-r`, `--replace-headers`      |	
+| `run-mode: check`       | `-c`, `--check-headers`        |		
+| `source-paths`          | `-s`, `--source-path PATH`     |	
+| `excluded-paths`        | `-e`, `--excluded-path REGEX`  |	
+| `exclude-ignored-paths` | `--exclude-ignored-paths`      |	
+| `template-paths`        | `-t`, `--template-path PATH`   |
+| `variables`             | `-v`, `--variable "KEY=VALUE"` |
 
 Where `source-path`, `template-path` and `variable` command line arguments can be used multiple times to set more values.
 
 ### `run-mode` key
 This configuration changes default behaviour of the `run` command. Possible values are `add`, `drop`, `replace` or `check`. For more details, see the [Running Headroom][doc:running-headroom#run-command] chapter.
 
-### excluded-paths` key
+### `excluded-paths` key
 If you need to exclude selected paths from the list of paths defined in `source-paths`, you can use this option. The value of this configuration is list of `regexes`, so be aware of that when you exclude path with dot, as you need to escape it, like:
 
 ```yaml
 excluded-paths:
     - '\.stack-work'
 ```
+
+### `exclude-ignored-paths` key
+If some paths within your source paths list are ignored by _Git_, you can either manually exclude them using the above key, but better way is to use this option. Using this configuration, _Headroom_ will scan Git's ignore rules for current project and will automatically exclude appropriate source paths.
 
 ### `source-paths` key
 Defines list of paths to source code files to process. Note that given path, if directory, is __recursively__ traversed for all types of source code files knowh to _Headroom_.

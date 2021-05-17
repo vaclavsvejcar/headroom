@@ -33,10 +33,17 @@ http(s)://path/to/<FILE_TYPE>.<TEMPLATE_TYPE>
 
 See [configuration chapter][doc:configuration] for more details.
 
+
+### Automatically exclude source paths ignored by GIT
+It may happen that some (otherwise valid) source files inside your source directory are for some reason set to be ignored by _Git_, therefore you also need _Headroom_ to ignore them. Until now, this has to be done manually using the `exclude-source-paths`/`--exclude-source-path=PATH` _YAML_/_CLI_ options. Thanks to the [vcs-ignore][github:vcs-ignore] library, _Headroom_ can not exclude these files for you by scanning _Git's_ ignore rules. All you need to do is use either `exclude-ignored-paths: true` _YAML_ option or `--exclude-ignored-paths` _CLI_ option.
+
+See [configuration chapter][doc:configuration] for more details.
+
 ## Other bugfixes and improvements
 TODO
 
 [doc:configuration]: documentation/configuration.md
 [doc:migration-guide]: migration-guide.md
 [doc:running-headroom]: documentation/running-headroom.md
+[github:vcs-ignore]: https://github.com/vaclavsvejcar/vcs-ignore
 [github/issue/72]: https://github.com/vaclavsvejcar/headroom/issues/72
