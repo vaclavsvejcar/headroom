@@ -19,6 +19,7 @@ where
 
 import           RIO
 
+
 -- | Bootstraps /RIO/ application using provided environment data and flag
 -- whether to run in debug mode.
 bootstrap :: (LogFunc -> IO env)
@@ -29,10 +30,9 @@ bootstrap :: (LogFunc -> IO env)
           -- ^ /RIO/ application to execute
           -> IO a
           -- ^ execution result
-bootstrap getEnv isDebug logic = do
-  logOptions <- logOptionsHandle stderr isDebug
-  let logOptions' = setLogUseLoc False logOptions
-  withLogFunc logOptions' $ \logFunc -> do
-    env <- liftIO $ getEnv logFunc
+bootstrap enfFn isDebug logic = do
+  defLogOptions <- logOptionsHandle stderr isDebug
+  withLogFunc (setLogUseLoc False defLogOptions) $ \logFunc -> do
+    env <- liftIO $ enfFn logFunc
     runRIO env logic
 
