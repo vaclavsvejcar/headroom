@@ -36,7 +36,6 @@ module Headroom.Header
 where
 
 import           Headroom.Configuration.Types        ( CtHeaderConfig
-                                                     , CtHeaderConfig
                                                      , CtHeadersConfig
                                                      , HeaderConfig(..)
                                                      , HeaderConfig(..)
