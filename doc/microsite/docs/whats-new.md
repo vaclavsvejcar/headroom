@@ -40,7 +40,7 @@ It may happen that some (otherwise valid) source files inside your source direct
 See [configuration chapter][doc:configuration] for more details.
 
 ## Other bugfixes and improvements
-TODO
+- minor tweaks and performance improvements
 
 [doc:configuration]: documentation/configuration.md
 [doc:migration-guide]: migration-guide.md
