@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.4.2.0 (in development)
+## 0.4.2.0 (released 2021-07-01)
 - [#42] Add option to exclude source paths ignored by VCS
 - [#66] Allow loading templates from HTTP(S) resource
 - Bump _LTS Haskell_ to `18.0`
