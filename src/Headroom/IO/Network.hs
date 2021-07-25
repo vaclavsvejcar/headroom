@@ -56,8 +56,8 @@ import qualified Text.URI                           as URI
 
 -- | Type of a function that returns content of remote resource.
 type DownloadContentFn m
-  =  URI    -- ^ /URI/ of remote resource
-  -> m Text -- ^ downloaded content
+  =  URI          -- ^ /URI/ of remote resource
+  -> m ByteString -- ^ downloaded content
 
 
 -----------------------------  POLYMORPHIC RECORD  -----------------------------
@@ -75,17 +75,14 @@ mkNetwork = Network { nDownloadContent = downloadContent }
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
--- | Downloads content of remote resource as 'Text'. Note that only @http@ and
--- @https@ is supported at this moment.
+-- | Downloads content of remote resource as 'ByteString'. Note that only
+-- @http@ and @https@ protocols are supported at this moment.
 downloadContent :: MonadIO m
-                => URI    -- ^ /URI/ of remote resource
-                -> m Text -- ^ downloaded content
+                => URI          -- ^ /URI/ of remote resource
+                -> m ByteString -- ^ downloaded content
 downloadContent uri = runReq defaultHttpConfig $ do
   response <- httpGet uri
-  case T.decodeUtf8' $ responseBody response of
-    Left  err  -> throwM $ InvalidResponse uri (T.pack $ displayException err)
-    Right body -> pure body
-
+  pure $ responseBody response
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
@@ -119,9 +116,8 @@ handleHttpException uri ex = case ex of
 -- | Error related to network operations.
 data NetworkError
   = ConnectionFailure URI Text -- ^ connection failure
-  | InvalidResponse URI Text        -- ^ error during obtaining response
-  | InvalidStatus URI Int Text      -- ^ invalid response status
-  | InvalidURL URI                  -- ^ given /URI/ is not valid
+  | InvalidStatus URI Int Text -- ^ invalid response status
+  | InvalidURL URI             -- ^ given /URI/ is not valid
   deriving (Eq, Show)
 
 
@@ -134,8 +130,6 @@ instance Exception NetworkError where
 displayException' :: NetworkError -> String
 displayException' = \case
   ConnectionFailure uri ex -> [i|Error connecting to #{URI.render uri}: #{ex}|]
-  InvalidResponse uri reason ->
-    [i|Cannot decode response for '#{URI.render uri}': #{reason}|]
   InvalidStatus uri status message ->
     [i|Error downloading #{URI.render uri}: #{status} #{message}|]
   InvalidURL uri -> [i|Cannot build URL from input URI: #{URI.render uri}|]

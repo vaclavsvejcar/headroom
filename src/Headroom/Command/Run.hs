@@ -408,7 +408,7 @@ loadTemplateRefs refs = do
   loadContent = \fs n (ft, ref) -> (ft, ref, ) <$> case ref of
     InlineRef        content -> pure content
     LocalTemplateRef path    -> fsLoadFile fs path
-    UriTemplateRef   uri     -> nDownloadContent n uri
+    UriTemplateRef   uri     -> decodeUtf8Lenient <$> nDownloadContent n uri
     BuiltInRef lt ft'        -> pure $ licenseTemplate lt ft'
   loadTemplate = \(ft, ref, T.strip -> c) -> (ft, ) <$> parseTemplate @a ref c
   getFileType  = \case
