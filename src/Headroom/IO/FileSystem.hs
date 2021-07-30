@@ -21,6 +21,7 @@ module Headroom.IO.FileSystem
   , FindFilesFn
   , FindFilesByExtsFn
   , FindFilesByTypesFn
+  , GetCacheDirectoryFn
   , GetCurrentDirectoryFn
   , ListFilesFn
   , LoadFileFn
@@ -31,6 +32,7 @@ module Headroom.IO.FileSystem
   , findFiles
   , findFilesByExts
   , findFilesByTypes
+  , getCacheDirectory
   , listFiles
   , loadFile
     -- * Working with Files Metadata
@@ -47,11 +49,13 @@ import           Headroom.Data.Regex                 ( Regex
 import           Headroom.FileType                   ( listExtensions )
 import           Headroom.FileType.Types             ( FileType )
 import           RIO
-import           RIO.Directory                       ( createDirectory
+import           RIO.Directory                       ( XdgDirectory(..)
+                                                     , createDirectory
                                                      , doesDirectoryExist
                                                      , doesFileExist
                                                      , getCurrentDirectory
                                                      , getDirectoryContents
+                                                     , getXdgDirectory
                                                      )
 import           RIO.FilePath                        ( isExtensionOf
                                                      , takeExtension
@@ -115,6 +119,10 @@ type FindFilesByTypesFn m
   -- ^ list of found files
 
 
+-- | Type of a function that obtains the cache directory as an absolute path.
+type GetCacheDirectoryFn m = m FilePath
+
+
 -- | Type of a function that obtains the current working directory as an
 -- absolute path.
 type GetCurrentDirectoryFn m = m FilePath
@@ -156,6 +164,8 @@ data FileSystem m = FileSystem
   -- ^ Function that recursively finds files on given path by file extensions.
   , fsFindFilesByTypes    :: FindFilesByTypesFn m
   -- ^ Function that recursively find files on given path by their file types.
+  , fsGetCacheDirectory   :: GetCacheDirectoryFn m
+  -- ^ Function that obtains cache directory as an absolute path.
   , fsGetCurrentDirectory :: GetCurrentDirectoryFn m
   -- ^ Function that obtains the current working directory as an absolute path.
   , fsListFiles           :: ListFilesFn m
@@ -173,6 +183,7 @@ mkFileSystem = FileSystem { fsCreateDirectory     = createDirectory
                           , fsFindFiles           = findFiles
                           , fsFindFilesByExts     = findFilesByExts
                           , fsFindFilesByTypes    = findFilesByTypes
+                          , fsGetCacheDirectory   = getCacheDirectory
                           , fsGetCurrentDirectory = getCurrentDirectory
                           , fsListFiles           = listFiles
                           , fsLoadFile            = loadFile
@@ -196,6 +207,11 @@ findFilesByExts path exts = findFiles path predicate
 findFilesByTypes :: MonadIO m => FindFilesByTypesFn m
 findFilesByTypes headersConfig types path =
   findFilesByExts path (types >>= listExtensions headersConfig)
+
+
+-- | Returns absolute path of the system preferred cache directory.
+getCacheDirectory :: MonadIO m => GetCacheDirectoryFn m
+getCacheDirectory = getXdgDirectory XdgCache ""
 
 
 -- | Recursively find all files on given path. If file reference is passed

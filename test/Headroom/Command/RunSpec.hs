@@ -149,6 +149,7 @@ env = TestEnv { .. }
                               , fsFindFiles           = undefined
                               , fsFindFilesByExts     = undefined
                               , fsFindFilesByTypes    = undefined
+                              , fsGetCacheDirectory   = undefined
                               , fsGetCurrentDirectory = undefined
                               , fsListFiles           = undefined
                               , fsLoadFile            = undefined
