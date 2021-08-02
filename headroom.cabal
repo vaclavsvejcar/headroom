@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3845aee60e6509e43b9ea9ad092405846976b023c0e54af2c6587198799158ba
+-- hash: dcc10e87079fd164b265fca5b32d9c72bdd5fac387d925787458af66b0d7208a
 
 name:           headroom
 version:        0.4.3.0
@@ -175,6 +175,8 @@ library
       Headroom.Header
       Headroom.Header.Sanitize
       Headroom.Header.Types
+      Headroom.IO.Cache
+      Headroom.IO.Cache.SQLite
       Headroom.IO.FileSystem
       Headroom.IO.Network
       Headroom.Meta
@@ -216,6 +218,8 @@ library
     , optparse-applicative
     , pcre-heavy
     , pcre-light
+    , persistent
+    , persistent-sqlite
     , req
     , rio
     , string-interpolate
@@ -286,6 +290,7 @@ test-suite spec
       Headroom.FileTypeSpec
       Headroom.Header.SanitizeSpec
       Headroom.HeaderSpec
+      Headroom.IO.Cache.SQLiteSpec
       Headroom.IO.FileSystemSpec
       Headroom.Meta.VersionSpec
       Headroom.PostProcess.TypesSpec

@@ -76,6 +76,8 @@ library:
     - mustache
     - pcre-light
     - pcre-heavy
+    - persistent
+    - persistent-sqlite
     - req
     - string-interpolate
     - template-haskell
