@@ -80,8 +80,8 @@ env = TestEnv { .. }
                              , fsFindFiles           = undefined
                              , fsFindFilesByExts     = undefined
                              , fsFindFilesByTypes    = undefined
-                             , fsGetCacheDirectory   = undefined
                              , fsGetCurrentDirectory = undefined
+                             , fsGetUserDirectory    = undefined
                              , fsListFiles           = undefined
                              , fsLoadFile            = undefined
                              }
