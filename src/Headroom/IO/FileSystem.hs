@@ -25,6 +25,7 @@ module Headroom.IO.FileSystem
   , GetUserDirectoryFn
   , ListFilesFn
   , LoadFileFn
+  , WriteFileFn
     -- * Polymorphic Record
   , FileSystem(..)
   , mkFileSystem
@@ -48,7 +49,7 @@ import           Headroom.Data.Regex                 ( Regex
 import           Headroom.FileType                   ( listExtensions )
 import           Headroom.FileType.Types             ( FileType )
 import           RIO
-import           RIO.Directory                       ( createDirectory
+import           RIO.Directory                       ( createDirectoryIfMissing
                                                      , doesDirectoryExist
                                                      , doesFileExist
                                                      , getCurrentDirectory
@@ -67,54 +68,40 @@ import qualified RIO.Text                           as T
 
 -- | Type of a function that creates new empty directory on the given path.
 type CreateDirectoryFn m
-  =  FilePath
-  -- ^ path of new directory
-  -> m ()
-  -- ^ /IO/ action result
+  =  FilePath -- ^ path of new directory
+  -> m ()     -- ^ /IO/ action result
 
 
 -- | Type of a function that returns 'True' if the argument file exists and is
 -- not a directory, and 'False' otherwise.
 type DoesFileExistFn m
-  =  FilePath
-  -- ^ path to check
-  -> m Bool
-  -- ^ whether the given path is existing file
+  =  FilePath -- ^ path to check
+  -> m Bool   -- ^ whether the given path is existing file
 
 
 -- | Type of a function that recursively finds files on given path whose
 -- filename matches the predicate.
 type FindFilesFn m
-  =  FilePath
-  -- ^ path to search
-  -> (FilePath -> Bool)
-  -- ^ predicate to match filename
-  -> m [FilePath]
-  -- ^ found files
+  =  FilePath           -- ^ path to search
+  -> (FilePath -> Bool) -- ^ predicate to match filename
+  -> m [FilePath]       -- ^ found files
 
 
 -- | Type of a function that recursively finds files on given path by file
 -- extensions.
 type FindFilesByExtsFn m
-  =  FilePath
-  -- ^ path to search
-  -> [Text]
-  -- ^ list of file extensions (without dot)
-  -> m [FilePath]
-  -- ^ list of found files
+  =  FilePath     -- ^ path to search
+  -> [Text]       -- ^ list of file extensions (without dot)
+  -> m [FilePath] -- ^ list of found files
 
 
 -- | Type of a function that recursively find files on given path by their
 -- file types.
 type FindFilesByTypesFn m
-  =  CtHeadersConfig
-  -- ^ configuration of license headers
-  -> [FileType]
-  -- ^ list of file types
-  -> FilePath
-  -- ^ path to search
-  -> m [FilePath]
-  -- ^ list of found files
+  =  CtHeadersConfig -- ^ configuration of license headers
+  -> [FileType]      -- ^ list of file types
+  -> FilePath        -- ^ path to search
+  -> m [FilePath]    -- ^ list of found files
 
 
 -- | Type of a function that obtains the current working directory as an
@@ -130,17 +117,20 @@ type GetUserDirectoryFn m = m FilePath
 -- | Type of a function that recursively find all files on given path. If file
 -- reference is passed instead of directory, such file path is returned.
 type ListFilesFn m
-  =  FilePath
-  -- ^ path to search
-  -> m [FilePath]
-  -- ^ list of found files
+  =  FilePath     -- ^ path to search
+  -> m [FilePath] -- ^ list of found files
 
--- | Type of a function that loads file content in UTF8 encoding.
+-- | Type of a function that loads file content in UTF-8 encoding.
 type LoadFileFn m
-  =  FilePath
-  -- ^ file path
-  -> m Text
-  -- ^ file content
+  =  FilePath -- ^ file path
+  -> m Text   -- ^ file content
+
+
+-- | Type of a function that writes file content in UTF-8 encoding.
+type WriteFileFn m
+  =  FilePath -- ^ file path
+  -> Text    -- ^ file content
+  -> m ()    -- ^ write result
 
 -----------------------------  POLYMORPHIC RECORD  -----------------------------
 
@@ -166,17 +156,20 @@ data FileSystem m = FileSystem
   , fsGetCurrentDirectory :: GetCurrentDirectoryFn m
   -- ^ Function that obtains the current working directory as an absolute path.
   , fsGetUserDirectory    :: GetUserDirectoryFn m
+  -- ^ Function that obtains the user's home directory as an absolute path.
   , fsListFiles           :: ListFilesFn m
   -- ^ Function that recursively find all files on given path. If file reference
   -- is passed instead of directory, such file path is returned.
   , fsLoadFile            :: LoadFileFn m
-  -- ^ Function that loads file content in UTF8 encoding.
+  -- ^ Function that loads file content in UTF-8 encoding.
+  , fsWriteFile           :: WriteFileFn m
+  -- ^ Function that writes file content in UTF-8 encoding.
   }
 
 
 -- | Creates new 'FileSystem' that performs actual disk /IO/ operations.
 mkFileSystem :: MonadIO m => FileSystem m
-mkFileSystem = FileSystem { fsCreateDirectory     = createDirectory
+mkFileSystem = FileSystem { fsCreateDirectory = createDirectoryIfMissing True
                           , fsDoesFileExist       = doesFileExist
                           , fsFindFiles           = findFiles
                           , fsFindFilesByExts     = findFilesByExts
@@ -185,6 +178,7 @@ mkFileSystem = FileSystem { fsCreateDirectory     = createDirectory
                           , fsGetUserDirectory    = getHomeDirectory
                           , fsListFiles           = listFiles
                           , fsLoadFile            = loadFile
+                          , fsWriteFile           = writeFileUtf8
                           }
 
 

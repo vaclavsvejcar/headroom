@@ -153,6 +153,7 @@ env = TestEnv { .. }
                               , fsGetUserDirectory    = undefined
                               , fsListFiles           = undefined
                               , fsLoadFile            = undefined
+                              , fsWriteFile           = undefined
                               }
   envNetwork            = Network { nDownloadContent = undefined }
   envPostProcessConfigs = PostProcessConfigs

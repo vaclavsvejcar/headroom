@@ -20,6 +20,8 @@ module Headroom.Meta
   , buildVersion
   , configBreakingChanges
   , configFileName
+  , globalConfigDirName
+  , globalConfigFileName
   , productDesc
   , productInfo
   , productName
@@ -61,6 +63,16 @@ configBreakingChanges = [[pvp|0.4.0.0|]]
 -- | Name of the YAML configuration file.
 configFileName :: IsString a => a
 configFileName = ".headroom.yaml"
+
+
+-- | Name of the global configuration directory
+globalConfigDirName :: IsString a => a
+globalConfigDirName = ".headroom"
+
+
+-- | Name of the YAML global configuration file.
+globalConfigFileName :: IsString a => a
+globalConfigFileName = "global-config.yaml"
 
 
 -- | Full product description.

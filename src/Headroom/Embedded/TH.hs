@@ -18,6 +18,7 @@ This module contains some /Template Haskell/ powered functions, used by
 module Headroom.Embedded.TH
   ( embedConfigFile
   , embedDefaultConfig
+  , embedDefaultGlobalConfig
   , embedTemplate
   )
 where
@@ -44,6 +45,12 @@ embedConfigFile = embedStringFile "embedded/config-file.yaml"
 -- | Embeds default configuration file to source code.
 embedDefaultConfig :: Q Exp
 embedDefaultConfig = embedStringFile "embedded/default-config.yaml"
+
+
+-- | Embeds default global configuration file to source code.
+embedDefaultGlobalConfig :: Q Exp
+embedDefaultGlobalConfig =
+  embedStringFile "embedded/default-global-config.yaml"
 
 
 -- | Embeds /template file/ to the source code.

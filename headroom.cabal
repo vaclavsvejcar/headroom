@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dcc10e87079fd164b265fca5b32d9c72bdd5fac387d925787458af66b0d7208a
+-- hash: 74f514a99dc0dcf51f69a017ba20e30cde75215a2b16abe4158ef700b55749b3
 
 name:           headroom
 version:        0.4.3.0
@@ -25,6 +25,7 @@ extra-source-files:
     README.md
     embedded/config-file.yaml
     embedded/default-config.yaml
+    embedded/default-global-config.yaml
     embedded/license/apache2/c.mustache
     embedded/license/apache2/cpp.mustache
     embedded/license/apache2/css.mustache
@@ -144,6 +145,7 @@ library
       Headroom.Configuration
       Headroom.Configuration.Compat
       Headroom.Configuration.Enrich
+      Headroom.Configuration.GlobalConfig
       Headroom.Configuration.Types
       Headroom.Data.Coerce
       Headroom.Data.EnumExtra
@@ -267,6 +269,7 @@ test-suite spec
       Headroom.Command.RunSpec
       Headroom.Configuration.CompatSpec
       Headroom.Configuration.EnrichSpec
+      Headroom.Configuration.GlobalConfigSpec
       Headroom.ConfigurationSpec
       Headroom.Data.CoerceSpec
       Headroom.Data.EnumExtraSpec
