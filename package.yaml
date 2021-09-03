@@ -30,6 +30,7 @@ extra-source-files:
   - test-data/test-traverse/*
   - test-data/test-traverse/foo/*
   - test-data/test-traverse/foo/bar/*
+  - test-data/updater/*
 
 dependencies:
   - base >= 4.7 && < 5
@@ -70,6 +71,7 @@ library:
     - http-client
     - http-types
     - microlens
+    - microlens-aeson
     - microlens-th
     - modern-uri
     - mtl
