@@ -25,6 +25,8 @@ module Headroom.IO.Network
   , mkNetwork
     -- * Network IO operations
   , downloadContent
+  , -- * Error Data Types
+    NetworkError(..)
   )
 where
 
