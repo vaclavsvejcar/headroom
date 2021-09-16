@@ -1,10 +1,11 @@
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE QuasiQuotes         #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE TypeApplications    #-}
 
 {-|
 Module      : Headroom.Updater
@@ -55,7 +56,7 @@ fetchLatestVersion = do
   resp         <- catchAny (nDownloadContent apiURI) handleError
   case A.decode (BL.fromStrict resp) of
     Just json -> parseLatestVersion json
-    _         -> throwM $ CannotDetectVersion "cannot parse response"
+    _         -> throwM $ CannotDetectVersion "cannot fetch response"
   where handleError = throwM . CannotDetectVersion . T.pack . displayException
 
 

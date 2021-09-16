@@ -16,21 +16,21 @@
 {-# LANGUAGE UndecidableInstances       #-}
 
 {-|
-Module      : Headroom.IO.Cache.SQLite
-Description : /SQLite/ backend for cache support
+Module      : Headroom.IO.KVStore.SQLiteStore
+Description : /SQLite/ backend for key-value store support
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-Persistent 'Cache' implementation using /SQLite/ as backend store. This
+Persistent 'KVStore' implementation using /SQLite/ as backend store. This
 implementation is quite crude and definitely not great performance-wise, but
 given the intended use it should be good enough for now.
 -}
 
-module Headroom.IO.Cache.SQLite
-  ( SQLiteCache(..)
+module Headroom.IO.KVStore.SQLiteStore
+  ( SQLiteStore(..)
   )
 where
 
@@ -40,17 +40,14 @@ import           Database.Persist.Sqlite             ( runMigrationSilent
                                                      )
 import           Database.Persist.TH
 import qualified Headroom.Data.Text                 as T
-import           Headroom.IO.Cache                   ( Cache(..)
-                                                     , CacheKey(..)
-                                                     , CacheT
+import           Headroom.IO.KVStore                 ( KVStore(..)
+                                                     , StoreKey(..)
                                                      , ValueCodec(..)
                                                      , ValueRepr
                                                      )
 import           RIO
 import qualified RIO.Text                           as T
 
-
-------------------------------  TEMPLATE HASKELL  ------------------------------
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 CacheStore
@@ -59,53 +56,45 @@ CacheStore
   deriving Show
 |]
 
+-- | Persistent implementation of 'KVStore' that uses /SQLite/ as a backend.
+newtype SQLiteStore = SQLiteStore Text deriving (Eq, Show)
 
----------------------------------  DATA TYPES  ---------------------------------
-
--- | Persistent cache implementation using /SQLite/ as backend store.
-newtype SQLiteCache = SQLiteCache Text deriving (Eq, Show)
-
-
-instance Cache SQLiteCache where
+instance KVStore SQLiteStore where
   getValue = getValue'
   setValue = setValue'
 
+type instance ValueRepr SQLiteStore = Text
 
-type instance ValueRepr SQLiteCache = Text
-
-
-instance ValueCodec SQLiteCache Int where
+instance ValueCodec SQLiteStore Int where
   encodeValue = T.pack . show
   decodeValue = T.read
 
 
-instance ValueCodec SQLiteCache Text where
+instance ValueCodec SQLiteStore Text where
   encodeValue = id
   decodeValue = Just
 
 
-------------------------------  PRIVATE FUNCTIONS  -----------------------------
-
-getValue' :: (ValueCodec SQLiteCache a, MonadIO m)
-          => CacheKey a
-          -> CacheT SQLiteCache m (Maybe a)
-getValue' (CacheEntry key) = do
-  SQLiteCache connPath <- ask
-  liftIO . runSqlite connPath $ do
+getValue' :: (ValueCodec SQLiteStore a, MonadIO m)
+          => SQLiteStore
+          -> StoreKey a
+          -> m (Maybe a)
+getValue' (SQLiteStore conn) (CacheEntry key) = do
+  liftIO . runSqlite conn $ do
     _          <- runMigrationSilent migrateAll
     maybeValue <- get $ CacheStoreKey key
     case maybeValue of
-      Just (CacheStore v) -> pure . decodeValue @SQLiteCache $ v
+      Just (CacheStore v) -> pure . decodeValue @SQLiteStore $ v
       Nothing             -> pure Nothing
 
 
-setValue' :: (ValueCodec SQLiteCache a, MonadIO m)
-          => CacheKey a
+setValue' :: (ValueCodec SQLiteStore a, MonadIO m)
+          => SQLiteStore
+          -> StoreKey a
           -> a
-          -> CacheT SQLiteCache m ()
-setValue' (CacheEntry key) value = do
-  SQLiteCache connPath <- ask
-  let newValue = encodeValue @SQLiteCache value
-  liftIO . runSqlite connPath $ do
+          -> m ()
+setValue' (SQLiteStore conn) (CacheEntry key) value = do
+  let newValue = encodeValue @SQLiteStore value
+  liftIO . runSqlite conn $ do
     _ <- runMigrationSilent migrateAll
     repsert (CacheStoreKey key) (CacheStore newValue)
