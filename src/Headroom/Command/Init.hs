@@ -48,7 +48,9 @@ import           Headroom.Configuration.Enrich       ( Enrich(..)
 import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , LicenseType(..)
                                                      )
-import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Has                   ( Has(..)
+                                                     , HasRIO
+                                                     )
 import           Headroom.Data.Lens                  ( suffixLenses )
 import           Headroom.Embedded                   ( configFileStub
                                                      , defaultConfig
@@ -169,10 +171,7 @@ findSupportedFileTypes = do
 
 
 -- | Checks whether application config file already exists.
-doesAppConfigExist :: ( HasLogFunc env
-                      , Has (FileSystem (RIO env)) env
-                      , Has Paths env
-                      )
+doesAppConfigExist :: (HasLogFunc env, HasRIO FileSystem env, Has Paths env)
                    => RIO env Bool
 doesAppConfigExist = do
   FileSystem {..} <- viewL
@@ -223,10 +222,7 @@ createConfigFile = do
     ]
 
 
-makeTemplatesDir :: ( HasLogFunc env
-                    , Has (FileSystem (RIO env)) env
-                    , Has Paths env
-                    )
+makeTemplatesDir :: (HasLogFunc env, HasRIO FileSystem env, Has Paths env)
                  => RIO env ()
 makeTemplatesDir = do
   FileSystem {..} <- viewL

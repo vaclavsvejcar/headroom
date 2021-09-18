@@ -67,7 +67,9 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , RunMode(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
-import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Has                   ( Has(..)
+                                                     , HasRIO
+                                                     )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
@@ -239,7 +241,7 @@ warnOnDryRun = do
 
 
 findSourceFiles :: ( Has CtConfiguration env
-                   , Has (FileSystem (RIO env)) env
+                   , HasRIO FileSystem env
                    , HasLogFunc env
                    )
                 => [FileType]
@@ -259,7 +261,7 @@ findSourceFiles fileTypes = do
 
 
 excludeIgnored :: ( Has CtConfiguration env
-                  , Has (FileSystem (RIO env)) env
+                  , HasRIO FileSystem env
                   , HasLogFunc env
                   )
                => [FilePath]
@@ -386,8 +388,8 @@ chooseAction info header = do
 -- of 'TemplateRef' is selected).
 loadTemplateRefs :: forall a env
                   . ( Template a
-                    , Has (Network (RIO env)) env
-                    , Has (FileSystem (RIO env)) env
+                    , HasRIO Network env
+                    , HasRIO FileSystem env
                     , HasLogFunc env
                     )
                  => [TemplateRef]            -- ^ template references
@@ -420,8 +422,8 @@ loadTemplateRefs refs = do
 
 
 loadTemplates :: ( Has CtConfiguration env
-                 , Has (FileSystem (RIO env)) env
-                 , Has (Network (RIO env)) env
+                 , HasRIO Network env
+                 , HasRIO FileSystem env
                  , HasLogFunc env
                  )
               => RIO env (Map FileType HeaderTemplate)

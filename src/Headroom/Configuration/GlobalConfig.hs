@@ -28,7 +28,9 @@ import           Data.Aeson                          ( FromJSON(..)
                                                      , genericParseJSON
                                                      )
 import qualified Data.Yaml                          as Y
-import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Has                   ( Has(..)
+                                                     , HasRIO
+                                                     )
 import           Headroom.Data.Serialization         ( aesonOptions )
 import           Headroom.Embedded                   ( defaultGlobalConfig )
 import           Headroom.IO.FileSystem              ( FileSystem(..) )
@@ -56,7 +58,7 @@ instance FromJSON GlobalConfig where
 
 -- | Checks if global configuration /YAML/ file is already present and if not,
 -- it creates one with default values.
-initGlobalConfigIfNeeded :: (Has (FileSystem (RIO env)) env) => RIO env ()
+initGlobalConfigIfNeeded :: (HasRIO FileSystem env) => RIO env ()
 initGlobalConfigIfNeeded = do
   FileSystem {..} <- viewL
   userDir         <- fsGetUserDirectory
@@ -66,7 +68,7 @@ initGlobalConfigIfNeeded = do
 
 
 -- | Loads global configuration from /YAML/ file.
-loadGlobalConfig :: (Has (FileSystem (RIO env)) env) => RIO env GlobalConfig
+loadGlobalConfig :: (HasRIO FileSystem env) => RIO env GlobalConfig
 loadGlobalConfig = do
   FileSystem {..} <- viewL
   userDir         <- fsGetUserDirectory

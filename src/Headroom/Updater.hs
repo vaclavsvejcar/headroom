@@ -32,7 +32,9 @@ where
 import           Data.Aeson                          ( Value(String) )
 import qualified Data.Aeson                         as A
 import           Data.String.Interpolate             ( iii )
-import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Has                   ( Has(..)
+                                                     , HasRIO
+                                                     )
 import           Headroom.IO.Network                 ( Network(..) )
 import           Headroom.Meta.Version               ( Version
                                                      , parseVersion
@@ -49,7 +51,7 @@ import qualified Text.URI                           as URI
 
 
 -- | Fetches and parses latest version from update server.
-fetchLatestVersion :: (Has (Network (RIO env)) env) => RIO env Version
+fetchLatestVersion :: (HasRIO Network env) => RIO env Version
 fetchLatestVersion = do
   Network {..} <- viewL
   apiURI       <- latestVersionApiURI
