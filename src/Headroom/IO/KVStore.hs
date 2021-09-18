@@ -1,84 +1,174 @@
-{-# LANGUAGE AllowAmbiguousTypes   #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE NoImplicitPrelude     #-}
-{-# LANGUAGE RankNTypes            #-}
-{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE NoImplicitPrelude          #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE RankNTypes                 #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE StrictData                 #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE UndecidableInstances       #-}
 
 {-|
 Module      : Headroom.IO.KVStore
-Description : Support for key-value store implementations
+Description : Key-value persistent store
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-This module provides abstract key-value store representation that allows to
-implement specific in-memory/persistent backends.
+This is really simple /key-value/ persistent store that uses /SQLite/ as a
+backend. Main goal is to provide /type-safe/ way how to define value keys, that
+can be later used to set/put the actual value into the store.
 -}
 
 module Headroom.IO.KVStore
-  ( -- * Data Types
-    KVStore(..)
+  ( -- * Type Aliases
+    GetValueFn
+  , PutValueFn
+  , KVStore(..)
+    -- * Type Classes
   , ValueCodec(..)
-  , ValueRepr
-  , StoreKey(..)
-    -- * Helper Functions
-  , storeKey
+    -- * Data Types
+  , ValueKey(..)
+  , StorePath(..)
+    -- * Public Functions
+  , mkKVStore
+  , valueKey
+  , getValue
+  , putValue
   )
 where
 
+import           Database.Persist                    ( PersistStoreRead(..)
+                                                     , PersistStoreWrite(..)
+                                                     )
+import           Database.Persist.Sqlite             ( runMigrationSilent
+                                                     , runSqlite
+                                                     )
+import           Database.Persist.TH                 ( mkMigrate
+                                                     , mkPersist
+                                                     , persistLowerCase
+                                                     , share
+                                                     , sqlSettings
+                                                     )
 import           RIO
+import qualified RIO.Text                           as T
+import           RIO.Time                            ( UTCTime
+                                                     , defaultTimeLocale
+                                                     , formatTime
+                                                     , parseTimeM
+                                                     )
 
+
+------------------------------  TEMPLATE HASKELL  ------------------------------
+
+share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+StoreRecord
+  Id Text
+  value Text
+  deriving Show
+|]
+
+
+--------------------------------  TYPE ALIASES  --------------------------------
+
+-- | Gets the value for given 'ValueKey' from the store.
+type GetValueFn m
+  =  forall a
+   . (ValueCodec a)
+  => StorePath   -- ^ path to the store
+  -> ValueKey a  -- ^ key for the value
+  -> m (Maybe a) -- ^ value (if found)
+
+
+-- | Puts the value for given 'ValueKey' into the store.
+type PutValueFn m
+  =  forall a
+   . (ValueCodec a)
+  => StorePath  -- ^ path to the store
+  -> ValueKey a -- ^ key for the value
+  -> a          -- ^ value to put into store
+  -> m ()       -- ^ operation result
+
+
+-----------------------------  POLYMORPHIC RECORD  -----------------------------
+
+-- | /Polymorphic record/ composed of /key-value/ store operations, allowing to
+-- abstract over concrete implementation without (ab)using /type classes/.
+data KVStore m = KVStore
+  { kvGetValue :: GetValueFn m
+  , kvPutValue :: PutValueFn m
+  }
+
+
+-- | Constructs the default 'KVStore' that uses /SQLite/ as a backend.
+mkKVStore :: MonadIO m => KVStore m
+mkKVStore = KVStore { kvGetValue = getValue, kvPutValue = putValue }
+
+--------------------------------  TYPE CLASSES  --------------------------------
+
+-- | Represents way how to encode/decode concrete types into textual
+-- representation used by the store to hold values.
+class ValueCodec a where
+
+  -- | Encodes value into textual representation.
+  encodeValue :: a    -- ^ value to encode
+              -> Text -- ^ textual representation
+
+
+  -- | Decodes value from textual representation.
+  decodeValue :: Text    -- ^ value to decode
+              -> Maybe a -- ^ decoded value (if available)
+
+
+instance ValueCodec Text where
+  encodeValue = id
+  decodeValue = Just
+
+instance ValueCodec UTCTime where
+  encodeValue = T.pack . formatTime defaultTimeLocale "%FT%T%Q"
+  decodeValue = parseTimeM True defaultTimeLocale "%FT%T%Q" . T.unpack
 
 ---------------------------------  DATA TYPES  ---------------------------------
 
--- | Represents key-value store. Whether this store is persistent or not is
--- dependend on the concrete implementation. Operation over keys is done in
--- type-safe manner by declaring them using 'Storekey'. Store can store any
--- value type for which the instance of 'ValueCodec' is defined.
-class KVStore s where
-
-  -- | Gets value for given key from the store (if exists).
-  getValue :: forall a m. (ValueCodec s a, MonadIO m)
-           => s           -- ^ instance of store
-           -> StoreKey a  -- ^ key
-           -> m (Maybe a) -- ^ value (if found)
-
-  setValue :: forall a m. (ValueCodec s a, MonadIO m)
-           => s          -- ^ instance of store
-           -> StoreKey a -- ^ key
-           -> a          -- ^ value to store
-           -> m ()       -- ^ operation result
+-- | /Type-safe/ representation of the key for specific value.
+newtype ValueKey a = ValueKey Text deriving (Eq, Show)
 
 
--- | Type class providing support to decode/encode given value for given
--- 'KVStore' instance.
-class ValueCodec s a where
-
-  -- | Encodes value into type recognized by given 'KVStore' instance.
-  encodeValue :: a           -- ^ value to encode
-              -> ValueRepr s -- ^ encoded representation
-
-  -- | Decodes value from type recognized by given 'KVStore' instance.
-  decodeValue :: ValueRepr s -- ^ encoded representation
-              -> Maybe a     -- ^ decoded value
+-- | Constructor function for 'ValueKey'.
+valueKey :: Text -> ValueKey a
+valueKey = ValueKey
 
 
--- | Representation of encoded store value, specific to the given 'KVStore'
--- instance. Main point is that each 'KVStore' instance might need to
--- encode/decode given type into some internal representation. Using this type
--- family, it's possible to define such representation in type safe manner.
-type family ValueRepr s
-
-
--- | Type safe representation of store key.
-newtype StoreKey a = CacheEntry Text deriving (Eq, Show)
+-- | Path to the store (e.g. path of the /SQLite/ database on filesystem).
+newtype StorePath = StorePath Text deriving (Eq, Show)
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
--- | Constructor function for 'StoreKey'.
-storeKey :: Text       -- ^ name of the key
-         -> StoreKey a -- ^ type safe representation
-storeKey = CacheEntry
+-- | Implementation of 'GetValueFn' that gets value from /SQLite/.
+getValue :: MonadIO m => GetValueFn m
+getValue (StorePath path) (ValueKey key) = do
+  liftIO . runSqlite path $ do
+    _          <- runMigrationSilent migrateAll
+    maybeValue <- get $ StoreRecordKey key
+    case maybeValue of
+      Just (StoreRecord v) -> pure . decodeValue $ v
+      Nothing              -> pure Nothing
+
+
+-- | Implementation of 'PutValueFn' that puts value to /SQLite/.
+putValue :: MonadIO m => PutValueFn m
+putValue (StorePath path) (ValueKey key) value = do
+  liftIO . runSqlite path $ do
+    _ <- runMigrationSilent migrateAll
+    repsert (StoreRecordKey key) (StoreRecord $ encodeValue value)
