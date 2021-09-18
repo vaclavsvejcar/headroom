@@ -65,8 +65,14 @@ class ValueCodec s a where
               -> Maybe a     -- ^ decoded value
 
 
+-- | Representation of encoded store value, specific to the given 'KVStore'
+-- instance. Main point is that each 'KVStore' instance might need to
+-- encode/decode given type into some internal representation. Using this type
+-- family, it's possible to define such representation in type safe manner.
 type family ValueRepr s
 
+
+-- | Type safe representation of store key.
 newtype StoreKey a = CacheEntry Text deriving (Eq, Show)
 
 
