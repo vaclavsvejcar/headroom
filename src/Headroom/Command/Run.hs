@@ -277,7 +277,7 @@ excludeIgnored paths = do
     Just repo -> filterM (fmap not . isIgnored repo) paths
     Nothing   -> pure paths
  where
-  findRepo' = \dir -> do
+  findRepo' dir = do
     logInfo "Searching for VCS repository to extract exclude patterns from..."
     maybeRepo <- findRepo @_ @Git dir
     case maybeRepo of
@@ -402,23 +402,23 @@ loadTemplateRefs refs = do
   refsWCtn   <- mapM (loadContent fileSystem network) (filterPreferred refsWTp)
   M.fromList <$> mapM loadTemplate refsWCtn
  where
-  zipRs      = \rs -> fmap (`zip` rs) . mapM getFileType $ rs
-  exts       = toList $ templateExtensions @a
-  getAllRefs = \fs ref -> case ref of
+  zipRs rs = fmap (`zip` rs) . mapM getFileType $ rs
+  exts = toList $ templateExtensions @a
+  getAllRefs fs ref = case ref of
     LocalTemplateRef p -> fmap LocalTemplateRef <$> fsFindFilesByExts fs p exts
     _                  -> pure [ref]
-  loadContent = \fs n (ft, ref) -> (ft, ref, ) <$> case ref of
+  loadContent fs n (ft, ref) = (ft, ref, ) <$> case ref of
     InlineRef        content -> pure content
     LocalTemplateRef path    -> fsLoadFile fs path
     UriTemplateRef   uri     -> decodeUtf8Lenient <$> nDownloadContent n uri
     BuiltInRef lt ft'        -> pure $ licenseTemplate lt ft'
-  loadTemplate = \(ft, ref, T.strip -> c) -> (ft, ) <$> parseTemplate @a ref c
-  getFileType  = \case
+  loadTemplate (ft, ref, T.strip -> c) = (ft, ) <$> parseTemplate @a ref c
+  getFileType = \case
     InlineRef _     -> pure Nothing
     BuiltInRef _ ft -> pure . Just $ ft
     other           -> typeOfTemplate . T.unpack . renderRef $ other
-  filterPreferred rs =
-    mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y) $ rs
+  filterPreferred =
+    mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y)
 
 
 loadTemplates :: ( Has CtConfiguration env

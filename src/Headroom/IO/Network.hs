@@ -97,8 +97,7 @@ httpGet uri = do
   case eitherRes of
     Left  err -> handleHttpException uri err
     Right res -> pure res
- where
-  doGet = \u -> try @_ @HttpException $ req GET u NoReqBody bsResponse mempty
+  where doGet u = try @_ @HttpException $ req GET u NoReqBody bsResponse mempty
 
 
 handleHttpException :: MonadThrow m => URI -> HttpException -> m BsResponse
