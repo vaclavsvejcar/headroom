@@ -25,11 +25,11 @@ spec = do
         let path         = StorePath . T.pack $ dir </> "test-db.sqlite"
             fstKey       = valueKey @Text "fst-key"
             sndKey       = valueKey @Text "snd-key"
-            KVStore {..} = mkKVStore
-        maybeFst <- kvGetValue path fstKey
-        _        <- kvPutValue path sndKey "foo"
-        _        <- kvPutValue path sndKey "bar"
-        maybeSnd <- kvGetValue path sndKey
+            KVStore {..} = mkKVStore path
+        maybeFst <- kvGetValue fstKey
+        _        <- kvPutValue sndKey "foo"
+        _        <- kvPutValue sndKey "bar"
+        maybeSnd <- kvGetValue sndKey
         maybeFst `shouldBe` Nothing
         maybeSnd `shouldBe` Just "bar"
 

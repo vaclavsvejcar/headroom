@@ -85,8 +85,7 @@ StoreRecord
 type GetValueFn m
   =  forall a
    . (ValueCodec a)
-  => StorePath   -- ^ path to the store
-  -> ValueKey a  -- ^ key for the value
+  => ValueKey a  -- ^ key for the value
   -> m (Maybe a) -- ^ value (if found)
 
 
@@ -94,8 +93,7 @@ type GetValueFn m
 type PutValueFn m
   =  forall a
    . (ValueCodec a)
-  => StorePath  -- ^ path to the store
-  -> ValueKey a -- ^ key for the value
+  => ValueKey a -- ^ key for the value
   -> a          -- ^ value to put into store
   -> m ()       -- ^ operation result
 
@@ -111,8 +109,10 @@ data KVStore m = KVStore
 
 
 -- | Constructs the default 'KVStore' that uses /SQLite/ as a backend.
-mkKVStore :: MonadIO m => KVStore m
-mkKVStore = KVStore { kvGetValue = getValue, kvPutValue = putValue }
+mkKVStore :: MonadIO m
+          => StorePath -- ^ path of the store location
+          -> KVStore m -- ^ store instance
+mkKVStore sp = KVStore { kvGetValue = getValue sp, kvPutValue = putValue sp }
 
 --------------------------------  TYPE CLASSES  --------------------------------
 
@@ -156,7 +156,7 @@ newtype StorePath = StorePath Text deriving (Eq, Show)
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Implementation of 'GetValueFn' that gets value from /SQLite/.
-getValue :: MonadIO m => GetValueFn m
+getValue :: MonadIO m => StorePath -> GetValueFn m
 getValue (StorePath path) (ValueKey key) = do
   liftIO . runSqlite path $ do
     _          <- runMigrationSilent migrateAll
@@ -167,7 +167,7 @@ getValue (StorePath path) (ValueKey key) = do
 
 
 -- | Implementation of 'PutValueFn' that puts value to /SQLite/.
-putValue :: MonadIO m => PutValueFn m
+putValue :: MonadIO m => StorePath -> PutValueFn m
 putValue (StorePath path) (ValueKey key) value = do
   liftIO . runSqlite path $ do
     _ <- runMigrationSilent migrateAll
