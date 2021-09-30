@@ -5,7 +5,6 @@
 {-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
 
-
 module Headroom.Configuration.GlobalConfigSpec
   ( spec
   )
@@ -16,6 +15,7 @@ import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
+import           Headroom.Embedded                   ( defaultGlobalConfig )
 import           Headroom.IO.FileSystem              ( FileSystem(..)
                                                      , mkFileSystem
                                                      )
@@ -26,6 +26,7 @@ import           RIO
 import           RIO.Directory                       ( doesFileExist )
 import           RIO.FilePath                        ( (</>) )
 import           Test.Hspec
+
 
 
 data TestEnv = TestEnv
@@ -78,3 +79,8 @@ spec = do
         _      <- runRIO env' initGlobalConfigIfNeeded
         result <- doesFileExist cfgPath
         result `shouldBe` True
+
+
+  describe "parseGlobalConfig" $ do
+    it "parses embedded default config YAML" $ do
+      parseGlobalConfig defaultGlobalConfig `shouldSatisfy` isRight

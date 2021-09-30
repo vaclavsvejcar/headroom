@@ -1,5 +1,11 @@
 ## This is the global configuration file for Headroom.
 ## See https://github.com/vaclavsvejcar/headroom for more details.
 
-## Whether Headroom should automatically check for available updates. 
-check-for-updates: true
+## Configuration for Headroom Updater.
+updates:
+
+  ## Whether Headroom should automatically check for available updates. 
+  check-for-updates: true
+
+  ## How often (in days) should Headroom check for updates.
+  update-interval-days: 1

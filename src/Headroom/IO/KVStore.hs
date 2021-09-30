@@ -41,7 +41,7 @@ module Headroom.IO.KVStore
   , ValueKey(..)
   , StorePath(..)
     -- * Public Functions
-  , mkKVStore
+  , sqliteKVStore
   , valueKey
   , getValue
   , putValue
@@ -109,10 +109,11 @@ data KVStore m = KVStore
 
 
 -- | Constructs the default 'KVStore' that uses /SQLite/ as a backend.
-mkKVStore :: MonadIO m
-          => StorePath -- ^ path of the store location
-          -> KVStore m -- ^ store instance
-mkKVStore sp = KVStore { kvGetValue = getValue sp, kvPutValue = putValue sp }
+sqliteKVStore :: MonadIO m
+              => StorePath -- ^ path of the store location
+              -> KVStore m -- ^ store instance
+sqliteKVStore sp =
+  KVStore { kvGetValue = getValue sp, kvPutValue = putValue sp }
 
 --------------------------------  TYPE CLASSES  --------------------------------
 

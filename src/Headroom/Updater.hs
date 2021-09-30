@@ -22,7 +22,8 @@ might be capable to update /Headroom/ binaries automatically.
 -}
 
 module Headroom.Updater
-  ( fetchLatestVersion
+  ( checkUpdates
+  , fetchLatestVersion
   , parseLatestVersion
     -- * Error Data Types
   , UpdaterError(..)
@@ -32,10 +33,16 @@ where
 import           Data.Aeson                          ( Value(String) )
 import qualified Data.Aeson                         as A
 import           Data.String.Interpolate             ( iii )
+import           Data.Time                           ( UTCTime(utctDay) )
+import           Headroom.Configuration.GlobalConfig ( UpdaterConfig(..) )
 import           Headroom.Data.Has                   ( Has(..)
                                                      , HasRIO
                                                      )
+import           Headroom.IO.KVStore                 ( KVStore(..)
+                                                     , valueKey
+                                                     )
 import           Headroom.IO.Network                 ( Network(..) )
+import           Headroom.Meta                       ( buildVersion )
 import           Headroom.Meta.Version               ( Version
                                                      , parseVersion
                                                      )
@@ -46,8 +53,30 @@ import           Lens.Micro.Aeson                    ( key )
 import           RIO
 import qualified RIO.ByteString.Lazy                as BL
 import qualified RIO.Text                           as T
-import           Text.URI                            ( URI )
+import           RIO.Time                            ( diffDays
+                                                     , getCurrentTime
+                                                     )
 import qualified Text.URI                           as URI
+
+
+-- | Check whether newer version is available (if enabled by configuration).
+checkUpdates :: (Has UpdaterConfig env, HasRIO KVStore env, HasRIO Network env)
+             => RIO env (Maybe Version)
+checkUpdates = do
+  KVStore {..}       <- viewL
+  UpdaterConfig {..} <- viewL
+  now                <- getCurrentTime
+  maybeLastCheckDate <- kvGetValue lastCheckDateKey
+  let today       = utctDay now
+      shouldCheck = ucCheckForUpdates && case utctDay <$> maybeLastCheckDate of
+        Just lastCheck | diffDays lastCheck today > ucUpdateIntervalDays -> True
+        _ -> False
+  when shouldCheck $ kvPutValue lastCheckDateKey now
+  if shouldCheck then isNewer <$> fetchLatestVersion else pure Nothing
+ where
+  lastCheckDateKey = valueKey @UTCTime "updater/last-check-date"
+  isNewer version | version > buildVersion = Just version
+                  | otherwise              = Nothing
 
 
 -- | Fetches and parses latest version from update server.
@@ -59,7 +88,11 @@ fetchLatestVersion = do
   case A.decode (BL.fromStrict resp) of
     Just json -> parseLatestVersion json
     _         -> throwM $ CannotDetectVersion "cannot fetch response"
-  where handleError = throwM . CannotDetectVersion . T.pack . displayException
+ where
+  handleError         = throwM . CannotDetectVersion . T.pack . displayException
+  latestVersionApiURI = URI.mkURI
+    "https://api.github.com/repos/vaclavsvejcar/headroom/releases/latest"
+
 
 
 -- | Parses latest version number from /GitHub/ API response.
@@ -71,11 +104,6 @@ parseLatestVersion json = case json ^? key "name" of
     Just version -> pure version
     _            -> throwM $ CannotDetectVersion "cannot parse version"
   _ -> throwM $ CannotDetectVersion "cannot parse response"
-
-
-latestVersionApiURI :: MonadThrow m => m URI
-latestVersionApiURI = URI.mkURI
-  "https://api.github.com/repos/vaclavsvejcar/headroom/releases/latest"
 
 
 ---------------------------------  ERROR TYPES  --------------------------------

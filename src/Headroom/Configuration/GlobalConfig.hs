@@ -19,8 +19,10 @@ and it's located in user's home directory.
 
 module Headroom.Configuration.GlobalConfig
   ( GlobalConfig(..)
+  , UpdaterConfig(..)
   , initGlobalConfigIfNeeded
   , loadGlobalConfig
+  , parseGlobalConfig
   )
 where
 
@@ -44,9 +46,19 @@ import           RIO.FilePath                        ( (</>) )
 
 ---------------------------------  DATA TYPES  ---------------------------------
 
+-- | Data type representing updater configuration.
+data UpdaterConfig = UpdaterConfig
+  { ucCheckForUpdates    :: Bool    -- ^ whether to check for updates
+  , ucUpdateIntervalDays :: Integer -- ^ how ofter check for updates
+  }
+  deriving (Eq, Generic, Show)
+
+instance FromJSON UpdaterConfig where
+  parseJSON = genericParseJSON aesonOptions
+
 -- | Data type representing global configuration options.
 data GlobalConfig = GlobalConfig
-  { gcCheckForUpdates :: Bool -- ^ whether to check for updates
+  { gcUpdates :: UpdaterConfig -- ^ config for updater
   }
   deriving (Eq, Generic, Show)
 
@@ -74,6 +86,11 @@ loadGlobalConfig = do
   userDir         <- fsGetUserDirectory
   content         <- liftIO . B.readFile $ (userDir </> configPath)
   Y.decodeThrow content
+
+
+-- | Parses global configuration /YAML/ file.
+parseGlobalConfig :: (MonadThrow m) => ByteString -> m GlobalConfig
+parseGlobalConfig = Y.decodeThrow
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
