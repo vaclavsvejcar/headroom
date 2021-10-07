@@ -16,7 +16,7 @@ where
 import           Data.Aeson                          ( Value )
 import qualified Data.Aeson                         as A
 import           Data.String.Interpolate             ( i )
-import           Data.Time                           ( UTCTime )
+import           Data.Time                           ( UTCTime(..) )
 import           Headroom.Configuration.GlobalConfig ( UpdaterConfig(..) )
 import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
@@ -39,6 +39,9 @@ import qualified RIO.ByteString                     as B
 import qualified RIO.ByteString.Lazy                as BL
 import           RIO.FilePath                        ( (</>) )
 import           RIO.Partial                         ( fromJust )
+import           RIO.Time                            ( addDays
+                                                     , getCurrentTime
+                                                     )
 import           Test.Hspec
 
 
@@ -64,6 +67,7 @@ instance Has UpdaterConfig TestEnv where
 spec :: Spec
 spec = do
   let testFile = "test-data" </> "updater" </> "github-resp.json"
+      storeKey = valueKey @UTCTime "updater/last-check-date"
 
   describe "checkUpdates" $ do
     it "returns Nothing if current version is the latest" $ do
@@ -75,13 +79,61 @@ spec = do
               & (envNetworkL . nDownloadContentL .~ nDownloadContent')
               & (envUpdaterConfigL .~ updaterConfig')
           nDownloadContent' = const . pure $ json
-          updaterConfig'    = UpdaterConfig True 1
+          updaterConfig'    = UpdaterConfig True 2
           kvStore'          = store
-          storeKey          = valueKey @UTCTime "updater/last-check-date"
       actual             <- runRIO env checkUpdates
       maybeLastCheckDate <- runRIO env $ kvGetValue storeKey
       actual `shouldBe` Nothing
       maybeLastCheckDate `shouldSatisfy` isJust
+
+    it "returns newer version if current version is outdated" $ do
+      store@KVStore {..} <- runRIO env0 inMemoryKVStore
+      let json = [i|{"name": "v999.0.0.0"}|]
+          env =
+            env0
+              & (envKVStoreL .~ kvStore')
+              & (envNetworkL . nDownloadContentL .~ nDownloadContent')
+              & (envUpdaterConfigL .~ updaterConfig')
+          nDownloadContent' = const . pure $ json
+          updaterConfig'    = UpdaterConfig True 2
+          kvStore'          = store
+      actual             <- runRIO env checkUpdates
+      maybeLastCheckDate <- runRIO env $ kvGetValue storeKey
+      actual `shouldBe` Just [pvp|999.0.0.0|]
+      maybeLastCheckDate `shouldSatisfy` isJust
+
+    it "doesn't check for updates if still within check interval" $ do
+      store@KVStore {..} <- runRIO env0 inMemoryKVStore
+      oneDayAgo          <- addDays' (-1) <$> getCurrentTime
+      let json = [i|{"name": "v999.0.0.0"}|]
+          env =
+            env0
+              & (envKVStoreL .~ kvStore')
+              & (envNetworkL . nDownloadContentL .~ nDownloadContent')
+              & (envUpdaterConfigL .~ updaterConfig')
+          nDownloadContent' = const . pure $ json
+          updaterConfig'    = UpdaterConfig True 2
+          kvStore'          = store
+      actual <- runRIO env $ do
+        kvPutValue storeKey oneDayAgo
+        checkUpdates
+      actual `shouldBe` Nothing
+
+    it "returns Nothing if checking for updates is disabled" $ do
+      store@KVStore {..} <- runRIO env0 inMemoryKVStore
+      let json = [i|{"name": "v999.0.0.0"}|]
+          env =
+            env0
+              & (envKVStoreL .~ kvStore')
+              & (envNetworkL . nDownloadContentL .~ nDownloadContent')
+              & (envUpdaterConfigL .~ updaterConfig')
+          nDownloadContent' = const . pure $ json
+          updaterConfig'    = UpdaterConfig False 2
+          kvStore'          = store
+      actual             <- runRIO env checkUpdates
+      maybeLastCheckDate <- runRIO env $ kvGetValue storeKey
+      actual `shouldBe` Nothing
+      maybeLastCheckDate `shouldBe` Nothing
 
 
   describe "fetchLatestVersion" $ do
@@ -112,3 +164,8 @@ env0 = TestEnv
   , envNetwork = Network { nDownloadContent = undefined }
   , envUpdaterConfig = undefined
   }
+
+
+addDays' :: Integer -> UTCTime -> UTCTime
+addDays' noOfDays (UTCTime day timeOfDay) =
+  UTCTime (addDays noOfDays day) timeOfDay
