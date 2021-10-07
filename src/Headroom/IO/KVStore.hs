@@ -41,10 +41,9 @@ module Headroom.IO.KVStore
   , ValueKey(..)
   , StorePath(..)
     -- * Public Functions
+  , inMemoryKVStore
   , sqliteKVStore
   , valueKey
-  , getValue
-  , putValue
   )
 where
 
@@ -61,13 +60,13 @@ import           Database.Persist.TH                 ( mkMigrate
                                                      , sqlSettings
                                                      )
 import           RIO
+import qualified RIO.Map                            as M
 import qualified RIO.Text                           as T
 import           RIO.Time                            ( UTCTime
                                                      , defaultTimeLocale
                                                      , formatTime
                                                      , parseTimeM
                                                      )
-
 
 ------------------------------  TEMPLATE HASKELL  ------------------------------
 
@@ -108,12 +107,21 @@ data KVStore m = KVStore
   }
 
 
--- | Constructs the default 'KVStore' that uses /SQLite/ as a backend.
+-- | Constructs persistent instance of 'KVStore' that uses /SQLite/ as a backend.
 sqliteKVStore :: MonadIO m
               => StorePath -- ^ path of the store location
               -> KVStore m -- ^ store instance
 sqliteKVStore sp =
-  KVStore { kvGetValue = getValue sp, kvPutValue = putValue sp }
+  KVStore { kvGetValue = getValueSQLite sp, kvPutValue = putValueSQLite sp }
+
+
+-- | Constructs non-persistent in-memory instance of 'KVStore'.
+inMemoryKVStore :: MonadIO m => m (KVStore m)
+inMemoryKVStore = do
+  ref <- newIORef M.empty
+  pure KVStore { kvGetValue = getValueInMemory ref
+               , kvPutValue = putValueInMemory ref
+               }
 
 --------------------------------  TYPE CLASSES  --------------------------------
 
@@ -154,11 +162,22 @@ valueKey = ValueKey
 newtype StorePath = StorePath Text deriving (Eq, Show)
 
 
-------------------------------  PUBLIC FUNCTIONS  ------------------------------
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
--- | Implementation of 'GetValueFn' that gets value from /SQLite/.
-getValue :: MonadIO m => StorePath -> GetValueFn m
-getValue (StorePath path) (ValueKey key) = do
+getValueInMemory :: MonadIO m => IORef (Map Text Text) -> GetValueFn m
+getValueInMemory ref (ValueKey key) = do
+  storeMap <- readIORef ref
+  pure $ M.lookup key storeMap >>= decodeValue
+
+
+putValueInMemory :: MonadIO m => IORef (Map Text Text) -> PutValueFn m
+putValueInMemory ref (ValueKey key) value = do
+  modifyIORef ref $ M.insert key (encodeValue value)
+  pure ()
+
+
+getValueSQLite :: MonadIO m => StorePath -> GetValueFn m
+getValueSQLite (StorePath path) (ValueKey key) = do
   liftIO . runSqlite path $ do
     _          <- runMigrationSilent migrateAll
     maybeValue <- get $ StoreRecordKey key
@@ -167,9 +186,8 @@ getValue (StorePath path) (ValueKey key) = do
       Nothing              -> pure Nothing
 
 
--- | Implementation of 'PutValueFn' that puts value to /SQLite/.
-putValue :: MonadIO m => StorePath -> PutValueFn m
-putValue (StorePath path) (ValueKey key) value = do
+putValueSQLite :: MonadIO m => StorePath -> PutValueFn m
+putValueSQLite (StorePath path) (ValueKey key) value = do
   liftIO . runSqlite path $ do
     _ <- runMigrationSilent migrateAll
     repsert (StoreRecordKey key) (StoreRecord $ encodeValue value)

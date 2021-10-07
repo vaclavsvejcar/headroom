@@ -19,7 +19,7 @@ import           Test.Hspec
 spec :: Spec
 spec = do
 
-  describe "getValue/putValue" $ do
+  describe "SQLite store" $ do
     it "reads and writes values from/to store" $ do
       withSystemTempDirectory "sqlite-kvstore" $ \dir -> do
         let path         = StorePath . T.pack $ dir </> "test-db.sqlite"
@@ -32,6 +32,19 @@ spec = do
         maybeSnd <- kvGetValue sndKey
         maybeFst `shouldBe` Nothing
         maybeSnd `shouldBe` Just "bar"
+
+
+  describe "In-memory store" $ do
+    it "reads and writes values from/to store" $ do
+      let fstKey = valueKey @Text "fst-key"
+          sndKey = valueKey @Text "snd-key"
+      KVStore {..} <- inMemoryKVStore
+      maybeFst     <- kvGetValue fstKey
+      _            <- kvPutValue sndKey "foo"
+      _            <- kvPutValue sndKey "bar"
+      maybeSnd     <- kvGetValue sndKey
+      maybeFst `shouldBe` Nothing
+      maybeSnd `shouldBe` Just "bar"
 
 
   describe "ValueCodec type class" $ do
