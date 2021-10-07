@@ -70,7 +70,8 @@ checkUpdates = do
   let today       = utctDay now
       shouldCheck = ucCheckForUpdates && case utctDay <$> maybeLastCheckDate of
         Just lastCheck | diffDays lastCheck today > ucUpdateIntervalDays -> True
-        _ -> False
+                       | otherwise -> False
+        Nothing -> True
   when shouldCheck $ kvPutValue lastCheckDateKey now
   if shouldCheck then isNewer <$> fetchLatestVersion else pure Nothing
  where

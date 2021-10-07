@@ -4,6 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeApplications      #-}
 
@@ -15,12 +16,16 @@ where
 import           Data.Aeson                          ( Value )
 import qualified Data.Aeson                         as A
 import           Data.String.Interpolate             ( i )
+import           Data.Time                           ( UTCTime )
 import           Headroom.Configuration.GlobalConfig ( UpdaterConfig(..) )
 import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
-import           Headroom.IO.KVStore                 ( KVStore(..) )
+import           Headroom.IO.KVStore                 ( KVStore(..)
+                                                     , inMemoryKVStore
+                                                     , valueKey
+                                                     )
 import           Headroom.IO.Network                 ( Network(..)
                                                      , NetworkError(..)
                                                      )
@@ -35,7 +40,6 @@ import qualified RIO.ByteString.Lazy                as BL
 import           RIO.FilePath                        ( (</>) )
 import           RIO.Partial                         ( fromJust )
 import           Test.Hspec
-
 
 
 data TestEnv = TestEnv
@@ -63,6 +67,7 @@ spec = do
 
   describe "checkUpdates" $ do
     it "returns Nothing if current version is the latest" $ do
+      store@KVStore {..} <- runRIO env0 inMemoryKVStore
       let json = [i|{"name": "#{printVersionP buildVersion}"}|]
           env =
             env0
@@ -71,11 +76,12 @@ spec = do
               & (envUpdaterConfigL .~ updaterConfig')
           nDownloadContent' = const . pure $ json
           updaterConfig'    = UpdaterConfig True 1
-          kvStore'          = KVStore { kvGetValue = const . pure $ Nothing
-                                      , kvPutValue = const . const . pure $ ()
-                                      }
-      actual <- runRIO env checkUpdates
+          kvStore'          = store
+          storeKey          = valueKey @UTCTime "updater/last-check-date"
+      actual             <- runRIO env checkUpdates
+      maybeLastCheckDate <- runRIO env $ kvGetValue storeKey
       actual `shouldBe` Nothing
+      maybeLastCheckDate `shouldSatisfy` isJust
 
 
   describe "fetchLatestVersion" $ do
