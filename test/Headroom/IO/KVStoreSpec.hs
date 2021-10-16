@@ -3,7 +3,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}
 
-module Headroom.IO.KvStoreSpec
+module Headroom.IO.KVStoreSpec
   ( spec
   )
 where
