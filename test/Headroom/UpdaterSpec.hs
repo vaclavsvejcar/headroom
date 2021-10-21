@@ -46,9 +46,8 @@ import           Test.Hspec
 
 
 data TestEnv = TestEnv
-  { envKVStore       :: KVStore (RIO TestEnv)
-  , envNetwork       :: Network (RIO TestEnv)
-  , envUpdaterConfig :: UpdaterConfig
+  { envKVStore :: KVStore (RIO TestEnv)
+  , envNetwork :: Network (RIO TestEnv)
   }
 
 suffixLenses ''TestEnv
@@ -59,9 +58,6 @@ instance Has (KVStore (RIO TestEnv)) TestEnv where
 
 instance Has (Network (RIO TestEnv)) TestEnv where
   hasLens = envNetworkL
-
-instance Has UpdaterConfig TestEnv where
-  hasLens = envUpdaterConfigL
 
 
 spec :: Spec
@@ -77,11 +73,10 @@ spec = do
             env0
               & (envKVStoreL .~ kvStore')
               & (envNetworkL . nDownloadContentL .~ nDownloadContent')
-              & (envUpdaterConfigL .~ updaterConfig')
           nDownloadContent' = const . pure $ json
           updaterConfig'    = UpdaterConfig True 2
           kvStore'          = store
-      actual             <- runRIO env checkUpdates
+      actual             <- runRIO env (checkUpdates updaterConfig')
       maybeLastCheckDate <- runRIO env $ kvGetValue storeKey
       actual `shouldBe` Nothing
       maybeLastCheckDate `shouldSatisfy` isJust
@@ -93,11 +88,10 @@ spec = do
             env0
               & (envKVStoreL .~ kvStore')
               & (envNetworkL . nDownloadContentL .~ nDownloadContent')
-              & (envUpdaterConfigL .~ updaterConfig')
           nDownloadContent' = const . pure $ json
           updaterConfig'    = UpdaterConfig True 2
           kvStore'          = store
-      actual             <- runRIO env checkUpdates
+      actual             <- runRIO env (checkUpdates updaterConfig')
       maybeLastCheckDate <- runRIO env $ kvGetValue storeKey
       actual `shouldBe` Just [pvp|999.0.0.0|]
       maybeLastCheckDate `shouldSatisfy` isJust
@@ -110,13 +104,12 @@ spec = do
             env0
               & (envKVStoreL .~ kvStore')
               & (envNetworkL . nDownloadContentL .~ nDownloadContent')
-              & (envUpdaterConfigL .~ updaterConfig')
           nDownloadContent' = const . pure $ json
           updaterConfig'    = UpdaterConfig True 2
           kvStore'          = store
       actual <- runRIO env $ do
         kvPutValue storeKey oneDayAgo
-        checkUpdates
+        checkUpdates updaterConfig'
       actual `shouldBe` Nothing
 
     it "returns Nothing if checking for updates is disabled" $ do
@@ -126,11 +119,10 @@ spec = do
             env0
               & (envKVStoreL .~ kvStore')
               & (envNetworkL . nDownloadContentL .~ nDownloadContent')
-              & (envUpdaterConfigL .~ updaterConfig')
           nDownloadContent' = const . pure $ json
           updaterConfig'    = UpdaterConfig False 2
           kvStore'          = store
-      actual             <- runRIO env checkUpdates
+      actual             <- runRIO env (checkUpdates updaterConfig')
       maybeLastCheckDate <- runRIO env $ kvGetValue storeKey
       actual `shouldBe` Nothing
       maybeLastCheckDate `shouldBe` Nothing
@@ -162,7 +154,6 @@ env0 :: TestEnv
 env0 = TestEnv
   { envKVStore = KVStore { kvGetValue = undefined, kvPutValue = undefined }
   , envNetwork = Network { nDownloadContent = undefined }
-  , envUpdaterConfig = undefined
   }
 
 

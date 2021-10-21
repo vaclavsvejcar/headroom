@@ -60,17 +60,18 @@ import qualified Text.URI                           as URI
 
 
 -- | Check whether newer version is available (if enabled by configuration).
-checkUpdates :: (Has UpdaterConfig env, HasRIO KVStore env, HasRIO Network env)
-             => RIO env (Maybe Version)
-checkUpdates = do
+checkUpdates :: (HasRIO KVStore env, HasRIO Network env)
+             => UpdaterConfig
+             -> RIO env (Maybe Version)
+checkUpdates UpdaterConfig {..} = do
   KVStore {..}       <- viewL
-  UpdaterConfig {..} <- viewL
   now                <- getCurrentTime
   maybeLastCheckDate <- kvGetValue lastCheckDateKey
   let today       = utctDay now
       shouldCheck = ucCheckForUpdates && case utctDay <$> maybeLastCheckDate of
-        Just lastCheck | diffDays lastCheck today > ucUpdateIntervalDays -> True
-                       | otherwise -> False
+        Just lastCheck
+          | abs (diffDays lastCheck today) > ucUpdateIntervalDays -> True
+          | otherwise -> False
         Nothing -> True
   when shouldCheck $ kvPutValue lastCheckDateKey now
   if shouldCheck then isNewer <$> fetchLatestVersion else pure Nothing

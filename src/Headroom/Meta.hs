@@ -20,11 +20,13 @@ module Headroom.Meta
   , buildVersion
   , configBreakingChanges
   , configFileName
+  , cacheFileName
   , globalConfigDirName
   , globalConfigFileName
   , productDesc
   , productInfo
   , productName
+  , productVendor
   , webDoc
   , webDocConfigCurr
   , webDocMigration
@@ -75,6 +77,11 @@ globalConfigFileName :: IsString a => a
 globalConfigFileName = "global-config.yaml"
 
 
+-- | Name of the global cache file.
+cacheFileName :: IsString a => a
+cacheFileName = "cache.sqlite"
+
+
 -- | Full product description.
 productDesc :: Text
 productDesc = "manage your source code license headers"
@@ -90,6 +97,9 @@ productInfo =
 productName :: Text
 productName = "headroom"
 
+-- | Product vendor.
+productVendor :: IsString a => a
+productVendor = "norcane"
 
 -- | Product documentation website for given version.
 webDoc :: Version -> Text

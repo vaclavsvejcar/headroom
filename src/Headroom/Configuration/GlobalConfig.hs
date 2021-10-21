@@ -23,6 +23,7 @@ module Headroom.Configuration.GlobalConfig
   , initGlobalConfigIfNeeded
   , loadGlobalConfig
   , parseGlobalConfig
+  , globalConfigPath
   )
 where
 
@@ -74,17 +75,17 @@ initGlobalConfigIfNeeded :: (HasRIO FileSystem env) => RIO env ()
 initGlobalConfigIfNeeded = do
   FileSystem {..} <- viewL
   userDir         <- fsGetUserDirectory
-  whenM (not <$> fsDoesFileExist (userDir </> configPath)) $ do
+  configPath      <- globalConfigPath
+  whenM (not <$> fsDoesFileExist configPath) $ do
     fsCreateDirectory $ userDir </> globalConfigDirName
-    fsWriteFile (userDir </> configPath) defaultGlobalConfig
+    fsWriteFile configPath defaultGlobalConfig
 
 
 -- | Loads global configuration from /YAML/ file.
 loadGlobalConfig :: (HasRIO FileSystem env) => RIO env GlobalConfig
 loadGlobalConfig = do
-  FileSystem {..} <- viewL
-  userDir         <- fsGetUserDirectory
-  content         <- liftIO . B.readFile $ (userDir </> configPath)
+  configPath <- globalConfigPath
+  content    <- liftIO . B.readFile $ configPath
   Y.decodeThrow content
 
 
@@ -93,7 +94,9 @@ parseGlobalConfig :: (MonadThrow m) => ByteString -> m GlobalConfig
 parseGlobalConfig = Y.decodeThrow
 
 
-------------------------------  PRIVATE FUNCTIONS  -----------------------------
-
-configPath :: FilePath
-configPath = globalConfigDirName </> globalConfigFileName
+-- | Path to global configuration /YAML/ file in user's directory.
+globalConfigPath :: HasRIO FileSystem env => RIO env FilePath
+globalConfigPath = do
+  FileSystem {..} <- viewL
+  userDir         <- fsGetUserDirectory
+  pure $ userDir </> globalConfigDirName </> globalConfigFileName

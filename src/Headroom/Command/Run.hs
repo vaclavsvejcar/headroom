@@ -52,8 +52,11 @@ import           Data.VCS.Ignore                     ( Git
                                                      , Repo(..)
                                                      , findRepo
                                                      )
+import           Headroom.Command.Bootstrap          ( bootstrap
+                                                     , globalKVStore
+                                                     , runRIO'
+                                                     )
 import           Headroom.Command.Types              ( CommandRunOptions(..) )
-import           Headroom.Command.Utils              ( bootstrap )
 import           Headroom.Configuration              ( loadConfiguration
                                                      , makeConfiguration
                                                      , parseConfiguration
@@ -96,12 +99,12 @@ import           Headroom.IO.FileSystem              ( FileSystem(..)
                                                      , fileExtension
                                                      , mkFileSystem
                                                      )
+import           Headroom.IO.KVStore                 ( KVStore )
 import           Headroom.IO.Network                 ( Network(..)
                                                      , mkNetwork
                                                      )
 import           Headroom.Meta                       ( TemplateType
                                                      , configFileName
-                                                     , productInfo
                                                      )
 import           Headroom.PostProcess                ( mkConfiguredEnv
                                                      , postProcessHeader
@@ -142,19 +145,13 @@ data RunAction = RunAction
   }
 
 
--- | Initial /RIO/ startup environment for the /Run/ command.
-data StartupEnv = StartupEnv
-  { envLogFunc    :: LogFunc           -- ^ logging function
-  , envRunOptions :: CommandRunOptions -- ^ options
-  }
-
-suffixLenses ''StartupEnv
-
 -- | Full /RIO/ environment for the /Run/ command.
 data Env = Env
-  { envEnv           :: StartupEnv           -- ^ startup /RIO/ environment
-  , envConfiguration :: CtConfiguration      -- ^ application configuration
+  { envLogFunc       :: LogFunc              -- ^ logging function
+  , envRunOptions    :: CommandRunOptions    -- ^ options
+  , envConfiguration :: ~CtConfiguration     -- ^ application configuration
   , envCurrentYear   :: CurrentYear          -- ^ current year
+  , envKVStore       :: ~(KVStore (RIO Env))
   , envNetwork       :: Network (RIO Env)    -- ^ network operations
   , envFileSystem    :: FileSystem (RIO Env) -- ^ file system operations
   }
@@ -167,23 +164,11 @@ instance Has CtConfiguration Env where
 instance Has CtPostProcessConfigs Env where
   hasLens = envConfigurationL . cPostProcessConfigsL
 
-instance Has StartupEnv StartupEnv where
-  hasLens = id
-
-instance Has StartupEnv Env where
-  hasLens = envEnvL
-
-instance HasLogFunc StartupEnv where
+instance HasLogFunc Env where
   logFuncL = envLogFuncL
 
-instance HasLogFunc Env where
-  logFuncL = hasLens @StartupEnv . logFuncL
-
-instance Has CommandRunOptions StartupEnv where
-  hasLens = envRunOptionsL
-
 instance Has CommandRunOptions Env where
-  hasLens = hasLens @StartupEnv . hasLens
+  hasLens = envRunOptionsL
 
 instance Has CurrentYear Env where
   hasLens = envCurrentYearL
@@ -194,21 +179,31 @@ instance Has (Network (RIO Env)) Env where
 instance Has (FileSystem (RIO Env)) Env where
   hasLens = envFileSystemL
 
+instance Has (KVStore (RIO Env)) Env where
+  hasLens = envKVStoreL
 
-env' :: CommandRunOptions -> LogFunc -> IO Env
-env' opts logFunc = do
-  let envEnv        = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
-      envNetwork    = mkNetwork
-      envFileSystem = mkFileSystem
-  envConfiguration <- runRIO envEnv finalConfiguration
-  envCurrentYear   <- currentYear
-  pure Env { .. }
+
+getEnv :: CommandRunOptions -> LogFunc -> IO Env
+getEnv opts logFunc = do
+  currentYear' <- currentYear
+  let env0 = Env { envLogFunc       = logFunc
+                 , envRunOptions    = opts
+                 , envConfiguration = undefined
+                 , envCurrentYear   = currentYear'
+                 , envKVStore       = undefined
+                 , envNetwork       = mkNetwork
+                 , envFileSystem    = mkFileSystem
+                 }
+  config  <- runRIO env0 finalConfiguration
+  kvStore <- runRIO env0 globalKVStore
+  pure env0 { envConfiguration = config, envKVStore = kvStore }
 
 
 -- | Handler for /Run/ command.
 commandRun :: CommandRunOptions -- ^ /Run/ command options
            -> IO ()             -- ^ execution result
-commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
+commandRun opts = runRIO' (getEnv opts) (croDebug opts) $ do
+  _                      <- bootstrap
   CommandRunOptions {..} <- viewL
   Configuration {..}     <- viewL @CtConfiguration
   let isCheck = cRunMode == Check
@@ -475,7 +470,6 @@ loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
 finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
                    => RIO env CtConfiguration
 finalConfiguration = do
-  logInfo $ display productInfo
   defaultConfig' <- Just <$> parseConfiguration defaultConfig
   cmdLineConfig  <- Just <$> optionsToConfiguration
   yamlConfig     <- loadConfigurationSafe configFileName

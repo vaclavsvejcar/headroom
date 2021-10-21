@@ -1,5 +1,6 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TypeApplications  #-}
 {-# LANGUAGE TypeFamilies      #-}
@@ -31,6 +32,11 @@ module Headroom.IO.Network
 where
 
 import           Data.String.Interpolate             ( i )
+import           Headroom.Meta                       ( buildVersion
+                                                     , productName
+                                                     , productVendor
+                                                     )
+import           Headroom.Meta.Version               ( printVersion )
 import           Headroom.Types                      ( fromHeadroomError
                                                      , toHeadroomError
                                                      )
@@ -42,11 +48,13 @@ import           Network.HTTP.Req                    ( BsResponse
                                                      , NoReqBody(NoReqBody)
                                                      , bsResponse
                                                      , defaultHttpConfig
+                                                     , header
                                                      , req
                                                      , responseBody
                                                      , runReq
                                                      , useURI
                                                      )
+import qualified Network.HTTP.Req                   as Req
 import qualified Network.HTTP.Types.Status          as HC
 import           RIO
 import qualified RIO.Text                           as T
@@ -88,6 +96,12 @@ downloadContent uri = runReq defaultHttpConfig $ do
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
+headers :: Req.Option scheme
+headers = header "User-Agent" $ encodeUtf8 ua
+ where
+  ua = productVendor <> "/" <> productName <> "-" <> printVersion buildVersion
+
+
 httpGet :: (MonadHttp m, MonadThrow m, MonadUnliftIO m) => URI -> m BsResponse
 httpGet uri = do
   urlE      <- maybe (throwM $ InvalidURL uri) pure (useURI uri)
@@ -97,7 +111,8 @@ httpGet uri = do
   case eitherRes of
     Left  err -> handleHttpException uri err
     Right res -> pure res
-  where doGet u = try @_ @HttpException $ req GET u NoReqBody bsResponse mempty
+ where
+  doGet u = try @_ @HttpException $ req GET u NoReqBody bsResponse headers
 
 
 handleHttpException :: MonadThrow m => URI -> HttpException -> m BsResponse
