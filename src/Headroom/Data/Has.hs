@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds       #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
 
@@ -16,6 +17,7 @@ application.
 
 module Headroom.Data.Has
   ( Has(..)
+  , HasRIO
   )
 where
 
@@ -42,3 +44,19 @@ class Has a t where
 
   viewL :: MonadReader t m => m a
   viewL = view hasLens
+
+
+-- | Handy type alias that allows to avoid ugly type singatures. Allows to
+-- transform this:
+--
+-- @
+-- foo :: (Has (Network (RIO env)) env) => RIO env ()
+-- @
+--
+-- into
+--
+-- @
+-- foo :: (HasRIO Network env) => RIO env ()
+-- @
+--
+type HasRIO a env = Has (a (RIO env)) env

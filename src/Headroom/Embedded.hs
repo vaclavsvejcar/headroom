@@ -17,6 +17,7 @@ Contains contents of files embedded using the "Data.FileEmbed" module.
 module Headroom.Embedded
   ( configFileStub
   , defaultConfig
+  , defaultGlobalConfig
   , licenseTemplate
   )
 where
@@ -24,6 +25,7 @@ where
 import           Headroom.Configuration.Types        ( LicenseType(..) )
 import           Headroom.Embedded.TH                ( embedConfigFile
                                                      , embedDefaultConfig
+                                                     , embedDefaultGlobalConfig
                                                      , embedTemplate
                                                      )
 import           Headroom.FileType.Types             ( FileType(..) )
@@ -38,6 +40,11 @@ configFileStub = $(embedConfigFile)
 -- | Default /YAML/ configuration.
 defaultConfig :: IsString a => a
 defaultConfig = $(embedDefaultConfig)
+
+
+-- | Default /YAML/ configuration for the global configuration file.
+defaultGlobalConfig :: IsString a => a
+defaultGlobalConfig = $(embedDefaultGlobalConfig)
 
 
 -- | License template for given license.

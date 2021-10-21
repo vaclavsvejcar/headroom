@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3845aee60e6509e43b9ea9ad092405846976b023c0e54af2c6587198799158ba
+-- hash: 7d5147259bf3565fd10f38a3aa865b29df91aa3c463366a623d71bb99f0042c5
 
 name:           headroom
 version:        0.4.3.0
@@ -25,6 +25,7 @@ extra-source-files:
     README.md
     embedded/config-file.yaml
     embedded/default-config.yaml
+    embedded/default-global-config.yaml
     embedded/license/apache2/c.mustache
     embedded/license/apache2/cpp.mustache
     embedded/license/apache2/css.mustache
@@ -127,6 +128,7 @@ extra-source-files:
     test-data/test-traverse/foo/b.html
     test-data/test-traverse/foo/test.xml
     test-data/test-traverse/foo/bar/c.html
+    test-data/updater/github-resp.json
 
 source-repository head
   type: git
@@ -135,6 +137,7 @@ source-repository head
 library
   exposed-modules:
       Headroom.Command
+      Headroom.Command.Bootstrap
       Headroom.Command.Gen
       Headroom.Command.Init
       Headroom.Command.Readers
@@ -144,6 +147,7 @@ library
       Headroom.Configuration
       Headroom.Configuration.Compat
       Headroom.Configuration.Enrich
+      Headroom.Configuration.GlobalConfig
       Headroom.Configuration.Types
       Headroom.Data.Coerce
       Headroom.Data.EnumExtra
@@ -176,6 +180,7 @@ library
       Headroom.Header.Sanitize
       Headroom.Header.Types
       Headroom.IO.FileSystem
+      Headroom.IO.KVStore
       Headroom.IO.Network
       Headroom.Meta
       Headroom.Meta.Version
@@ -188,8 +193,10 @@ library
       Headroom.Template.TemplateRef
       Headroom.Types
       Headroom.UI
+      Headroom.UI.Message
       Headroom.UI.Progress
       Headroom.UI.Table
+      Headroom.Updater
       Headroom.Variables
       Headroom.Variables.Types
   other-modules:
@@ -209,6 +216,7 @@ library
     , http-client
     , http-types
     , microlens
+    , microlens-aeson
     , microlens-th
     , modern-uri
     , mtl
@@ -216,6 +224,8 @@ library
     , optparse-applicative
     , pcre-heavy
     , pcre-light
+    , persistent
+    , persistent-sqlite
     , req
     , rio
     , string-interpolate
@@ -263,6 +273,7 @@ test-suite spec
       Headroom.Command.RunSpec
       Headroom.Configuration.CompatSpec
       Headroom.Configuration.EnrichSpec
+      Headroom.Configuration.GlobalConfigSpec
       Headroom.ConfigurationSpec
       Headroom.Data.CoerceSpec
       Headroom.Data.EnumExtraSpec
@@ -287,6 +298,7 @@ test-suite spec
       Headroom.Header.SanitizeSpec
       Headroom.HeaderSpec
       Headroom.IO.FileSystemSpec
+      Headroom.IO.KVStoreSpec
       Headroom.Meta.VersionSpec
       Headroom.PostProcess.TypesSpec
       Headroom.PostProcess.UpdateCopyrightSpec
@@ -295,8 +307,10 @@ test-suite spec
       Headroom.Template.MustacheSpec
       Headroom.Template.TemplateRefSpec
       Headroom.TypesSpec
+      Headroom.UI.MessageSpec
       Headroom.UI.ProgressSpec
       Headroom.UI.TableSpec
+      Headroom.UpdaterSpec
       Headroom.VariablesSpec
       Paths_headroom
   hs-source-dirs:

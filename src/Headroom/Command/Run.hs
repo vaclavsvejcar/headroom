@@ -52,8 +52,11 @@ import           Data.VCS.Ignore                     ( Git
                                                      , Repo(..)
                                                      , findRepo
                                                      )
+import           Headroom.Command.Bootstrap          ( bootstrap
+                                                     , globalKVStore
+                                                     , runRIO'
+                                                     )
 import           Headroom.Command.Types              ( CommandRunOptions(..) )
-import           Headroom.Command.Utils              ( bootstrap )
 import           Headroom.Configuration              ( loadConfiguration
                                                      , makeConfiguration
                                                      , parseConfiguration
@@ -67,7 +70,9 @@ import           Headroom.Configuration.Types        ( Configuration(..)
                                                      , RunMode(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
-import           Headroom.Data.Has                   ( Has(..) )
+import           Headroom.Data.Has                   ( Has(..)
+                                                     , HasRIO
+                                                     )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
                                                      )
@@ -94,12 +99,12 @@ import           Headroom.IO.FileSystem              ( FileSystem(..)
                                                      , fileExtension
                                                      , mkFileSystem
                                                      )
+import           Headroom.IO.KVStore                 ( KVStore )
 import           Headroom.IO.Network                 ( Network(..)
                                                      , mkNetwork
                                                      )
 import           Headroom.Meta                       ( TemplateType
                                                      , configFileName
-                                                     , productInfo
                                                      )
 import           Headroom.PostProcess                ( mkConfiguredEnv
                                                      , postProcessHeader
@@ -140,19 +145,13 @@ data RunAction = RunAction
   }
 
 
--- | Initial /RIO/ startup environment for the /Run/ command.
-data StartupEnv = StartupEnv
-  { envLogFunc    :: LogFunc           -- ^ logging function
-  , envRunOptions :: CommandRunOptions -- ^ options
-  }
-
-suffixLenses ''StartupEnv
-
 -- | Full /RIO/ environment for the /Run/ command.
 data Env = Env
-  { envEnv           :: StartupEnv           -- ^ startup /RIO/ environment
-  , envConfiguration :: CtConfiguration      -- ^ application configuration
+  { envLogFunc       :: LogFunc              -- ^ logging function
+  , envRunOptions    :: CommandRunOptions    -- ^ options
+  , envConfiguration :: ~CtConfiguration     -- ^ application configuration
   , envCurrentYear   :: CurrentYear          -- ^ current year
+  , envKVStore       :: ~(KVStore (RIO Env))
   , envNetwork       :: Network (RIO Env)    -- ^ network operations
   , envFileSystem    :: FileSystem (RIO Env) -- ^ file system operations
   }
@@ -165,23 +164,11 @@ instance Has CtConfiguration Env where
 instance Has CtPostProcessConfigs Env where
   hasLens = envConfigurationL . cPostProcessConfigsL
 
-instance Has StartupEnv StartupEnv where
-  hasLens = id
-
-instance Has StartupEnv Env where
-  hasLens = envEnvL
-
-instance HasLogFunc StartupEnv where
+instance HasLogFunc Env where
   logFuncL = envLogFuncL
 
-instance HasLogFunc Env where
-  logFuncL = hasLens @StartupEnv . logFuncL
-
-instance Has CommandRunOptions StartupEnv where
-  hasLens = envRunOptionsL
-
 instance Has CommandRunOptions Env where
-  hasLens = hasLens @StartupEnv . hasLens
+  hasLens = envRunOptionsL
 
 instance Has CurrentYear Env where
   hasLens = envCurrentYearL
@@ -192,21 +179,31 @@ instance Has (Network (RIO Env)) Env where
 instance Has (FileSystem (RIO Env)) Env where
   hasLens = envFileSystemL
 
+instance Has (KVStore (RIO Env)) Env where
+  hasLens = envKVStoreL
 
-env' :: CommandRunOptions -> LogFunc -> IO Env
-env' opts logFunc = do
-  let envEnv        = StartupEnv { envLogFunc = logFunc, envRunOptions = opts }
-      envNetwork    = mkNetwork
-      envFileSystem = mkFileSystem
-  envConfiguration <- runRIO envEnv finalConfiguration
-  envCurrentYear   <- currentYear
-  pure Env { .. }
+
+getEnv :: CommandRunOptions -> LogFunc -> IO Env
+getEnv opts logFunc = do
+  currentYear' <- currentYear
+  let env0 = Env { envLogFunc       = logFunc
+                 , envRunOptions    = opts
+                 , envConfiguration = undefined
+                 , envCurrentYear   = currentYear'
+                 , envKVStore       = undefined
+                 , envNetwork       = mkNetwork
+                 , envFileSystem    = mkFileSystem
+                 }
+  config  <- runRIO env0 finalConfiguration
+  kvStore <- runRIO env0 globalKVStore
+  pure env0 { envConfiguration = config, envKVStore = kvStore }
 
 
 -- | Handler for /Run/ command.
 commandRun :: CommandRunOptions -- ^ /Run/ command options
            -> IO ()             -- ^ execution result
-commandRun opts = bootstrap (env' opts) (croDebug opts) $ do
+commandRun opts = runRIO' (getEnv opts) (croDebug opts) $ do
+  _                      <- bootstrap
   CommandRunOptions {..} <- viewL
   Configuration {..}     <- viewL @CtConfiguration
   let isCheck = cRunMode == Check
@@ -239,7 +236,7 @@ warnOnDryRun = do
 
 
 findSourceFiles :: ( Has CtConfiguration env
-                   , Has (FileSystem (RIO env)) env
+                   , HasRIO FileSystem env
                    , HasLogFunc env
                    )
                 => [FileType]
@@ -259,7 +256,7 @@ findSourceFiles fileTypes = do
 
 
 excludeIgnored :: ( Has CtConfiguration env
-                  , Has (FileSystem (RIO env)) env
+                  , HasRIO FileSystem env
                   , HasLogFunc env
                   )
                => [FilePath]
@@ -275,7 +272,7 @@ excludeIgnored paths = do
     Just repo -> filterM (fmap not . isIgnored repo) paths
     Nothing   -> pure paths
  where
-  findRepo' = \dir -> do
+  findRepo' dir = do
     logInfo "Searching for VCS repository to extract exclude patterns from..."
     maybeRepo <- findRepo @_ @Git dir
     case maybeRepo of
@@ -386,8 +383,8 @@ chooseAction info header = do
 -- of 'TemplateRef' is selected).
 loadTemplateRefs :: forall a env
                   . ( Template a
-                    , Has (Network (RIO env)) env
-                    , Has (FileSystem (RIO env)) env
+                    , HasRIO Network env
+                    , HasRIO FileSystem env
                     , HasLogFunc env
                     )
                  => [TemplateRef]            -- ^ template references
@@ -400,28 +397,28 @@ loadTemplateRefs refs = do
   refsWCtn   <- mapM (loadContent fileSystem network) (filterPreferred refsWTp)
   M.fromList <$> mapM loadTemplate refsWCtn
  where
-  zipRs      = \rs -> fmap (`zip` rs) . mapM getFileType $ rs
-  exts       = toList $ templateExtensions @a
-  getAllRefs = \fs ref -> case ref of
+  zipRs rs = fmap (`zip` rs) . mapM getFileType $ rs
+  exts = toList $ templateExtensions @a
+  getAllRefs fs ref = case ref of
     LocalTemplateRef p -> fmap LocalTemplateRef <$> fsFindFilesByExts fs p exts
     _                  -> pure [ref]
-  loadContent = \fs n (ft, ref) -> (ft, ref, ) <$> case ref of
+  loadContent fs n (ft, ref) = (ft, ref, ) <$> case ref of
     InlineRef        content -> pure content
     LocalTemplateRef path    -> fsLoadFile fs path
     UriTemplateRef   uri     -> decodeUtf8Lenient <$> nDownloadContent n uri
     BuiltInRef lt ft'        -> pure $ licenseTemplate lt ft'
-  loadTemplate = \(ft, ref, T.strip -> c) -> (ft, ) <$> parseTemplate @a ref c
-  getFileType  = \case
+  loadTemplate (ft, ref, T.strip -> c) = (ft, ) <$> parseTemplate @a ref c
+  getFileType = \case
     InlineRef _     -> pure Nothing
     BuiltInRef _ ft -> pure . Just $ ft
     other           -> typeOfTemplate . T.unpack . renderRef $ other
-  filterPreferred rs =
-    mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y) $ rs
+  filterPreferred =
+    mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y)
 
 
 loadTemplates :: ( Has CtConfiguration env
-                 , Has (FileSystem (RIO env)) env
-                 , Has (Network (RIO env)) env
+                 , HasRIO Network env
+                 , HasRIO FileSystem env
                  , HasLogFunc env
                  )
               => RIO env (Map FileType HeaderTemplate)
@@ -473,7 +470,6 @@ loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
 finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
                    => RIO env CtConfiguration
 finalConfiguration = do
-  logInfo $ display productInfo
   defaultConfig' <- Just <$> parseConfiguration defaultConfig
   cmdLineConfig  <- Just <$> optionsToConfiguration
   yamlConfig     <- loadConfigurationSafe configFileName
