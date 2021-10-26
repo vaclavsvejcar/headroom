@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.4.3.0 (in development)
 - [#78] Check automatically for Headroom updates
-- Bump _LTS Haskell_ to `18.13`
+- Bump _LTS Haskell_ to `18.14`
 
 ## 0.4.2.0 (released 2021-07-01)
 - [#42] Add option to exclude source paths ignored by VCS
