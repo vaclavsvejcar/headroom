@@ -34,7 +34,7 @@ import           Data.Aeson                          ( Value(String) )
 import qualified Data.Aeson                         as A
 import           Data.String.Interpolate             ( iii )
 import           Data.Time                           ( UTCTime(utctDay) )
-import           Headroom.Config.GlobalConfig        ( UpdaterConfig(..) )
+import           Headroom.Config.Global              ( UpdaterConfig(..) )
 import           Headroom.Data.Has                   ( Has(..)
                                                      , HasRIO
                                                      )

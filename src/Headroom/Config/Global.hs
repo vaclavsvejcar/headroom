@@ -5,7 +5,7 @@
 {-# LANGUAGE StrictData        #-}
 
 {-|
-Module      : Headroom.Config.GlobalConfig
+Module      : Headroom.Config.Global
 Description : Global configutation
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -17,7 +17,7 @@ Portability : POSIX
 and it's located in user's home directory.
 -}
 
-module Headroom.Config.GlobalConfig
+module Headroom.Config.Global
   ( GlobalConfig(..)
   , UpdaterConfig(..)
   , initGlobalConfigIfNeeded

@@ -17,7 +17,7 @@ import           Data.Aeson                          ( Value )
 import qualified Data.Aeson                         as A
 import           Data.String.Interpolate             ( i )
 import           Data.Time                           ( UTCTime(..) )
-import           Headroom.Config.GlobalConfig        ( UpdaterConfig(..) )
+import           Headroom.Config.Global              ( UpdaterConfig(..) )
 import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor
