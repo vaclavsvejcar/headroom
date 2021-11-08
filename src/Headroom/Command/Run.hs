@@ -57,9 +57,9 @@ import           Headroom.Command.Bootstrap          ( bootstrap
                                                      , runRIO'
                                                      )
 import           Headroom.Command.Types              ( CommandRunOptions(..) )
-import           Headroom.Config                     ( loadConfiguration
-                                                     , makeConfiguration
-                                                     , parseConfiguration
+import           Headroom.Config                     ( loadAppConfig
+                                                     , makeAppConfig
+                                                     , parseAppConfig
                                                      )
 import           Headroom.Config.Types               ( AppConfig(..)
                                                      , CtAppConfig
@@ -442,7 +442,7 @@ typeOfTemplate path = do
 loadConfigurationSafe :: (HasLogFunc env)
                       => FilePath
                       -> RIO env (Maybe PtAppConfig)
-loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
+loadConfigurationSafe path = catch (Just <$> loadAppConfig path) onError
  where
   onError err = do
     logDebug $ displayShow (err :: IOException)
@@ -462,12 +462,12 @@ loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
 finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
                    => RIO env CtAppConfig
 finalConfiguration = do
-  defaultConfig' <- Just <$> parseConfiguration defaultConfig
+  defaultConfig' <- Just <$> parseAppConfig defaultConfig
   cmdLineConfig  <- Just <$> optionsToConfiguration
   yamlConfig     <- loadConfigurationSafe configFileName
   let mergedConfig =
         mconcat . catMaybes $ [defaultConfig', yamlConfig, cmdLineConfig]
-  config <- makeConfiguration mergedConfig
+  config <- makeAppConfig mergedConfig
   logDebug $ "Default config: " <> displayShow defaultConfig'
   logDebug $ "YAML config: " <> displayShow yamlConfig
   logDebug $ "CmdLine config: " <> displayShow cmdLineConfig

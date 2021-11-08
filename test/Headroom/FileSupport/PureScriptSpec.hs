@@ -9,7 +9,7 @@ module Headroom.FileSupport.PureScriptSpec
 where
 
 import           Headroom.Config                     ( makeHeadersConfig
-                                                     , parseConfiguration
+                                                     , parseAppConfig
                                                      )
 import           Headroom.Config.Types               ( AppConfig(..) )
 import           Headroom.Embedded                   ( defaultConfig )
@@ -60,7 +60,7 @@ spec = do
   describe "fsExtractVariables" $ do
     it "extract variables from PureScript source code" $ do
       template       <- emptyTemplate @_ @Mustache
-      defaultConfig' <- parseConfiguration defaultConfig
+      defaultConfig' <- parseAppConfig defaultConfig
       config         <- makeHeadersConfig (acLicenseHeaders defaultConfig')
       raw            <- loadFile $ codeSamples </> "full.purs"
       let ht        = extractHeaderTemplate config PureScript template

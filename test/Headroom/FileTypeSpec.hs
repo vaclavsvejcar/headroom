@@ -6,7 +6,7 @@ module Headroom.FileTypeSpec
 where
 
 import           Headroom.Config                     ( makeHeadersConfig
-                                                     , parseConfiguration
+                                                     , parseAppConfig
                                                      )
 import           Headroom.Config.Types               ( AppConfig(..) )
 import           Headroom.Embedded                   ( defaultConfig )
@@ -20,6 +20,6 @@ spec :: Spec
 spec = do
   describe "fileTypeByExt" $ do
     it "parses FileType from file extension" $ do
-      pHeadersConfig <- acLicenseHeaders <$> parseConfiguration defaultConfig
+      pHeadersConfig <- acLicenseHeaders <$> parseAppConfig defaultConfig
       headersConfig  <- makeHeadersConfig pHeadersConfig
       fileTypeByExt headersConfig "hs" `shouldBe` Just Haskell

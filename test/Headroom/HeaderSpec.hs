@@ -11,7 +11,7 @@ module Headroom.HeaderSpec
 where
 
 import           Headroom.Config                     ( makeHeadersConfig
-                                                     , parseConfiguration
+                                                     , parseAppConfig
                                                      )
 import           Headroom.Config.Types               ( AppConfig(..)
                                                      , HeaderConfig(..)
@@ -385,7 +385,7 @@ spec = do
     it "correctly detects headers using default YAML configuration" $ do
       let loadSample = \ft p ->
             analyzeSourceCode (fileSupport ft) <$> loadFile (samplesDir </> p)
-      defaultConfig'     <- parseConfiguration defaultConfig
+      defaultConfig'     <- parseAppConfig defaultConfig
       HeadersConfig {..} <- makeHeadersConfig (acLicenseHeaders defaultConfig')
       sampleC1           <- loadSample C $ "c" </> "sample1.c"
       sampleC2           <- loadSample C $ "c" </> "sample2.c"

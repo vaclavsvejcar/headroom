@@ -21,10 +21,10 @@ pattern for the configuration.
 
 module Headroom.Config
   ( -- * Loading & Parsing Configuration
-    loadConfiguration
-  , parseConfiguration
+    loadAppConfig
+  , parseAppConfig
     -- * Processing Partial Configuration
-  , makeConfiguration
+  , makeAppConfig
   , makeHeadersConfig
   , makeHeaderConfig
   )
@@ -72,25 +72,25 @@ suffixLenses ''UpdateCopyrightConfig
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Loads and parses application configuration from given /YAML/ file.
-loadConfiguration :: (MonadIO m, MonadThrow m) => FilePath -> m PtAppConfig
-loadConfiguration path = do
+loadAppConfig :: (MonadIO m, MonadThrow m) => FilePath -> m PtAppConfig
+loadAppConfig path = do
   content <- liftIO $ B.readFile path
   _       <- checkCompatibility configBreakingChanges buildVersion content
-  parseConfiguration content
+  parseAppConfig content
 
 
 -- | Parses application configuration from given raw input in /YAML/ format.
-parseConfiguration :: MonadThrow m
-                   => ByteString    -- ^ raw input to parse
-                   -> m PtAppConfig -- ^ parsed application configuration
-parseConfiguration = Y.decodeThrow
+parseAppConfig :: MonadThrow m
+               => ByteString    -- ^ raw input to parse
+               -> m PtAppConfig -- ^ parsed application configuration
+parseAppConfig = Y.decodeThrow
 
 
 -- | Makes full 'CtAppConfig' from provided 'PtAppConfig' (if valid).
-makeConfiguration :: MonadThrow m
-                  => PtAppConfig   -- ^ source 'PtAppConfig'
-                  -> m CtAppConfig -- ^ full 'CtAppConfig'
-makeConfiguration pt = do
+makeAppConfig :: MonadThrow m
+              => PtAppConfig   -- ^ source 'PtAppConfig'
+              -> m CtAppConfig -- ^ full 'CtAppConfig'
+makeAppConfig pt = do
   acRunMode             <- lastOrError CkRunMode (acRunMode pt)
   acSourcePaths         <- lastOrError CkSourcePaths (acSourcePaths pt)
   acExcludedPaths       <- lastOrError CkExcludedPaths (acExcludedPaths pt)

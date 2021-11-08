@@ -38,7 +38,7 @@ import           Data.String.Interpolate             ( iii )
 import           Headroom.Command.Types              ( CommandInitOptions(..) )
 import           Headroom.Command.Utils              ( bootstrap )
 import           Headroom.Config                     ( makeHeadersConfig
-                                                     , parseConfiguration
+                                                     , parseAppConfig
                                                      )
 import           Headroom.Config.Enrich              ( Enrich(..)
                                                      , replaceEmptyValue
@@ -153,7 +153,7 @@ findSupportedFileTypes :: (Has CommandInitOptions env, HasLogFunc env)
                        => RIO env [FileType]
 findSupportedFileTypes = do
   opts           <- viewL
-  pHeadersConfig <- acLicenseHeaders <$> parseConfiguration defaultConfig
+  pHeadersConfig <- acLicenseHeaders <$> parseAppConfig defaultConfig
   headersConfig  <- makeHeadersConfig pHeadersConfig
   fileTypes      <- do
     allFiles <- mapM (\path -> findFiles path (const True))

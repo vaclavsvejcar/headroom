@@ -13,6 +13,6 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "parseConfiguration" $ do
+  describe "parseAppConfig" $ do
     it "should parse default bundled configuration" $ do
-      parseConfiguration defaultConfig `shouldSatisfy` isJust
+      parseAppConfig defaultConfig `shouldSatisfy` isJust

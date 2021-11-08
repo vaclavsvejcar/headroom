@@ -9,7 +9,7 @@ module Headroom.FileSupport.JavaSpec
 where
 
 import           Headroom.Config                     ( makeHeadersConfig
-                                                     , parseConfiguration
+                                                     , parseAppConfig
                                                      )
 import           Headroom.Config.Types               ( AppConfig(..) )
 import           Headroom.Embedded                   ( defaultConfig )
@@ -60,7 +60,7 @@ spec = do
   describe "fsExtractVariables" $ do
     it "extract variables from Java source code" $ do
       template       <- emptyTemplate @_ @Mustache
-      defaultConfig' <- parseConfiguration defaultConfig
+      defaultConfig' <- parseAppConfig defaultConfig
       config         <- makeHeadersConfig (acLicenseHeaders defaultConfig')
       raw            <- loadFile $ codeSamples </> "sample1.java"
       let ht        = extractHeaderTemplate config Java template
