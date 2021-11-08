@@ -11,7 +11,7 @@ where
 import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Config.Types               ( Configuration(..) )
+import           Headroom.Config.Types               ( AppConfig(..) )
 import           Headroom.Embedded                   ( defaultConfig )
 import           Headroom.FileSupport                ( analyzeSourceCode
                                                      , fileSupport
@@ -61,7 +61,7 @@ spec = do
     it "extract variables from Java source code" $ do
       template       <- emptyTemplate @_ @Mustache
       defaultConfig' <- parseConfiguration defaultConfig
-      config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
+      config         <- makeHeadersConfig (acLicenseHeaders defaultConfig')
       raw            <- loadFile $ codeSamples </> "sample1.java"
       let ht        = extractHeaderTemplate config Java template
           headerPos = Just (0, 2)

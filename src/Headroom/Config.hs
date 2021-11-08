@@ -33,10 +33,10 @@ where
 import           Data.Monoid                         ( Last(..) )
 import qualified Data.Yaml                          as Y
 import           Headroom.Config.Compat              ( checkCompatibility )
-import           Headroom.Config.Types               ( Configuration(..)
+import           Headroom.Config.Types               ( AppConfig(..)
                                                      , ConfigurationError(..)
                                                      , ConfigurationKey(..)
-                                                     , CtConfiguration
+                                                     , CtAppConfig
                                                      , CtHeaderConfig
                                                      , CtHeadersConfig
                                                      , CtPostProcessConfig
@@ -47,7 +47,7 @@ import           Headroom.Config.Types               ( Configuration(..)
                                                      , Phase(..)
                                                      , PostProcessConfig(..)
                                                      , PostProcessConfigs(..)
-                                                     , PtConfiguration
+                                                     , PtAppConfig
                                                      , PtHeaderConfig
                                                      , PtHeadersConfig
                                                      , PtPostProcessConfig
@@ -72,7 +72,7 @@ suffixLenses ''UpdateCopyrightConfig
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Loads and parses application configuration from given /YAML/ file.
-loadConfiguration :: (MonadIO m, MonadThrow m) => FilePath -> m PtConfiguration
+loadConfiguration :: (MonadIO m, MonadThrow m) => FilePath -> m PtAppConfig
 loadConfiguration path = do
   content <- liftIO $ B.readFile path
   _       <- checkCompatibility configBreakingChanges buildVersion content
@@ -81,39 +81,33 @@ loadConfiguration path = do
 
 -- | Parses application configuration from given raw input in /YAML/ format.
 parseConfiguration :: MonadThrow m
-                   => ByteString
-                   -- ^ raw input to parse
-                   -> m PtConfiguration
-                   -- ^ parsed application configuration
+                   => ByteString    -- ^ raw input to parse
+                   -> m PtAppConfig -- ^ parsed application configuration
 parseConfiguration = Y.decodeThrow
 
 
--- | Makes full 'CtConfiguration' from provided 'PtConfiguration' (if valid).
+-- | Makes full 'CtAppConfig' from provided 'PtAppConfig' (if valid).
 makeConfiguration :: MonadThrow m
-                  => PtConfiguration
-                  -- ^ source 'PtConfiguration'
-                  -> m CtConfiguration
-                  -- ^ full 'CtConfiguration'
+                  => PtAppConfig   -- ^ source 'PtAppConfig'
+                  -> m CtAppConfig -- ^ full 'CtAppConfig'
 makeConfiguration pt = do
-  cRunMode             <- lastOrError CkRunMode (cRunMode pt)
-  cSourcePaths         <- lastOrError CkSourcePaths (cSourcePaths pt)
-  cExcludedPaths       <- lastOrError CkExcludedPaths (cExcludedPaths pt)
-  cExcludeIgnoredPaths <- lastOrError CkExcludeIgnoredPaths
-                                      (cExcludeIgnoredPaths pt)
-  cBuiltInTemplates   <- lastOrError CkBuiltInTemplates (cBuiltInTemplates pt)
-  cTemplateRefs       <- pure $ cTemplateRefs pt
-  cLicenseHeaders     <- makeHeadersConfig (cLicenseHeaders pt)
-  cPostProcessConfigs <- makePostProcessConfigs (cPostProcessConfigs pt)
-  cVariables          <- pure $ cVariables pt
-  pure Configuration { .. }
+  acRunMode             <- lastOrError CkRunMode (acRunMode pt)
+  acSourcePaths         <- lastOrError CkSourcePaths (acSourcePaths pt)
+  acExcludedPaths       <- lastOrError CkExcludedPaths (acExcludedPaths pt)
+  acExcludeIgnoredPaths <- lastOrError CkExcludeIgnoredPaths
+                                       (acExcludeIgnoredPaths pt)
+  acBuiltInTemplates   <- lastOrError CkBuiltInTemplates (acBuiltInTemplates pt)
+  acTemplateRefs       <- pure $ acTemplateRefs pt
+  acLicenseHeaders     <- makeHeadersConfig (acLicenseHeaders pt)
+  acPostProcessConfigs <- makePostProcessConfigs (acPostProcessConfigs pt)
+  acVariables          <- pure $ acVariables pt
+  pure AppConfig { .. }
 
 
 -- | Makes full 'CtHeadersConfig' from provided 'PtHeadersConfig' (if valid).
 makeHeadersConfig :: MonadThrow m
-                  => PtHeadersConfig
-                  -- ^ source 'PtHeadersConfig'
-                  -> m CtHeadersConfig
-                  -- ^ full 'CtHeadersConfig'
+                  => PtHeadersConfig   -- ^ source 'PtHeadersConfig'
+                  -> m CtHeadersConfig -- ^ full 'CtHeadersConfig'
 makeHeadersConfig pt = do
   hscC          <- makeHeaderConfig C (hscC pt)
   hscCpp        <- makeHeaderConfig CPP (hscCpp pt)
@@ -132,12 +126,9 @@ makeHeadersConfig pt = do
 
 -- | Makes full 'CtHeaderConfig' from provided 'PtHeaderConfig' (if valid).
 makeHeaderConfig :: MonadThrow m
-                 => FileType
-                 -- ^ determines for which file type this configuration is
-                 -> PtHeaderConfig
-                 -- ^ source 'PtHeaderConfig'
-                 -> m CtHeaderConfig
-                 -- ^ full 'CtHeaderConfig'
+                 => FileType         -- ^ determines file type of configuration
+                 -> PtHeaderConfig   -- ^ source 'PtHeaderConfig'
+                 -> m CtHeaderConfig -- ^ full 'CtHeaderConfig'
 makeHeaderConfig fileType pt = do
   hcFileExtensions <- lastOrError (CkFileExtensions fileType)
                                   (hcFileExtensions pt)

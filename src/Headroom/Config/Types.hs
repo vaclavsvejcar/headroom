@@ -43,9 +43,9 @@ module Headroom.Config.Types
   , (:::)
     -- * Data Types
     -- ** Top Level Configuration
-  , Configuration(..)
-  , CtConfiguration
-  , PtConfiguration
+  , AppConfig(..)
+  , CtAppConfig
+  , PtAppConfig
   , HeadersConfig(..)
   , CtHeadersConfig
   , PtHeadersConfig
@@ -283,57 +283,57 @@ instance FromJSON PtPostProcessConfigs where
 --------------------------------  Configuration  -------------------------------
 
 -- | Application configuration.
-data Configuration (p :: Phase) = Configuration
-  { cRunMode             :: p ::: RunMode
+data AppConfig (p :: Phase) = AppConfig
+  { acRunMode             :: p ::: RunMode
   -- ^ mode of the @run@ command
-  , cSourcePaths         :: p ::: [FilePath]
+  , acSourcePaths         :: p ::: [FilePath]
   -- ^ paths to source code files
-  , cExcludedPaths       :: p ::: [Regex]
+  , acExcludedPaths       :: p ::: [Regex]
   -- ^ excluded source paths
-  , cExcludeIgnoredPaths :: p ::: Bool
+  , acExcludeIgnoredPaths :: p ::: Bool
   -- ^ whether to exclude paths ignored by VCS
-  , cBuiltInTemplates    :: p ::: Maybe LicenseType
+  , acBuiltInTemplates    :: p ::: Maybe LicenseType
   -- ^ used built-in templates
-  , cTemplateRefs        :: [TemplateRef]
+  , acTemplateRefs        :: [TemplateRef]
   -- ^ template references
-  , cVariables           :: Variables
+  , acVariables           :: Variables
   -- ^ variable values for templates
-  , cLicenseHeaders      :: HeadersConfig p
+  , acLicenseHeaders      :: HeadersConfig p
   -- ^ configuration of license headers
-  , cPostProcessConfigs  :: PostProcessConfigs p
+  , acPostProcessConfigs  :: PostProcessConfigs p
   -- ^ configuration of post-processors
   }
 
--- | Alias for complete variant of 'Configuration'.
-type CtConfiguration = Configuration 'Complete
+-- | Alias for complete variant of 'AppConfig'.
+type CtAppConfig = AppConfig 'Complete
 
--- | Alias for partial variant of 'Configuration'.
-type PtConfiguration = Configuration 'Partial
+-- | Alias for partial variant of 'AppConfig'.
+type PtAppConfig = AppConfig 'Partial
 
-deriving instance Eq CtConfiguration
-deriving instance Eq PtConfiguration
-deriving instance Show CtConfiguration
-deriving instance Show PtConfiguration
-deriving instance Generic PtConfiguration
+deriving instance Eq CtAppConfig
+deriving instance Eq PtAppConfig
+deriving instance Show CtAppConfig
+deriving instance Show PtAppConfig
+deriving instance Generic PtAppConfig
 
-deriving via (Generically PtConfiguration)
-         instance Semigroup PtConfiguration
-deriving via (Generically PtConfiguration)
-         instance Monoid PtConfiguration
+deriving via (Generically PtAppConfig)
+         instance Semigroup PtAppConfig
+deriving via (Generically PtAppConfig)
+         instance Monoid PtAppConfig
 
 
-instance FromJSON PtConfiguration where
-  parseJSON = withObject "PtConfiguration" $ \obj -> do
-    cRunMode             <- Last <$> obj .:? "run-mode"
-    cSourcePaths         <- Last <$> obj .:? "source-paths"
-    cExcludedPaths       <- Last <$> obj .:? "excluded-paths"
-    cExcludeIgnoredPaths <- Last <$> obj .:? "exclude-ignored-paths"
-    cBuiltInTemplates    <- Last <$> obj .:? "builtin-templates"
-    cTemplateRefs        <- obj .:? "template-paths" .!= mempty
-    cVariables           <- Variables <$> obj .:? "variables" .!= mempty
-    cLicenseHeaders      <- obj .:? "license-headers" .!= mempty
-    cPostProcessConfigs  <- obj .:? "post-process" .!= mempty
-    pure Configuration { .. }
+instance FromJSON PtAppConfig where
+  parseJSON = withObject "PtAppConfig" $ \obj -> do
+    acRunMode             <- Last <$> obj .:? "run-mode"
+    acSourcePaths         <- Last <$> obj .:? "source-paths"
+    acExcludedPaths       <- Last <$> obj .:? "excluded-paths"
+    acExcludeIgnoredPaths <- Last <$> obj .:? "exclude-ignored-paths"
+    acBuiltInTemplates    <- Last <$> obj .:? "builtin-templates"
+    acTemplateRefs        <- obj .:? "template-paths" .!= mempty
+    acVariables           <- Variables <$> obj .:? "variables" .!= mempty
+    acLicenseHeaders      <- obj .:? "license-headers" .!= mempty
+    acPostProcessConfigs  <- obj .:? "post-process" .!= mempty
+    pure AppConfig { .. }
 
 
 --------------------------------  HeaderConfig  --------------------------------

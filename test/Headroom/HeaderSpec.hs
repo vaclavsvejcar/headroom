@@ -13,7 +13,7 @@ where
 import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Config.Types               ( Configuration(..)
+import           Headroom.Config.Types               ( AppConfig(..)
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      , HeadersConfig(..)
@@ -386,7 +386,7 @@ spec = do
       let loadSample = \ft p ->
             analyzeSourceCode (fileSupport ft) <$> loadFile (samplesDir </> p)
       defaultConfig'     <- parseConfiguration defaultConfig
-      HeadersConfig {..} <- makeHeadersConfig (cLicenseHeaders defaultConfig')
+      HeadersConfig {..} <- makeHeadersConfig (acLicenseHeaders defaultConfig')
       sampleC1           <- loadSample C $ "c" </> "sample1.c"
       sampleC2           <- loadSample C $ "c" </> "sample2.c"
       sampleCpp1         <- loadSample CPP $ "cpp" </> "sample1.cpp"

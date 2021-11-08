@@ -8,7 +8,7 @@ where
 import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Config.Types               ( Configuration(..) )
+import           Headroom.Config.Types               ( AppConfig(..) )
 import           Headroom.Embedded                   ( defaultConfig )
 import           Headroom.FileType
 import           Headroom.FileType.Types             ( FileType(..) )
@@ -20,6 +20,6 @@ spec :: Spec
 spec = do
   describe "fileTypeByExt" $ do
     it "parses FileType from file extension" $ do
-      pHeadersConfig <- cLicenseHeaders <$> parseConfiguration defaultConfig
+      pHeadersConfig <- acLicenseHeaders <$> parseConfiguration defaultConfig
       headersConfig  <- makeHeadersConfig pHeadersConfig
       fileTypeByExt headersConfig "hs" `shouldBe` Just Haskell

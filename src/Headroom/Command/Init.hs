@@ -45,7 +45,7 @@ import           Headroom.Config.Enrich              ( Enrich(..)
                                                      , withArray
                                                      , withText
                                                      )
-import           Headroom.Config.Types               ( Configuration(..)
+import           Headroom.Config.Types               ( AppConfig(..)
                                                      , LicenseType(..)
                                                      )
 import           Headroom.Data.Has                   ( Has(..)
@@ -134,10 +134,8 @@ env' opts logFunc = do
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Handler for @init@ command.
-commandInit :: CommandInitOptions
-            -- ^ @init@ command options
-            -> IO ()
-            -- ^ execution result
+commandInit :: CommandInitOptions -- ^ @init@ command options
+            -> IO ()              -- ^ execution result
 commandInit opts = bootstrap (env' opts) False $ doesAppConfigExist >>= \case
   False -> do
     fileTypes <- findSupportedFileTypes
@@ -155,7 +153,7 @@ findSupportedFileTypes :: (Has CommandInitOptions env, HasLogFunc env)
                        => RIO env [FileType]
 findSupportedFileTypes = do
   opts           <- viewL
-  pHeadersConfig <- cLicenseHeaders <$> parseConfiguration defaultConfig
+  pHeadersConfig <- acLicenseHeaders <$> parseConfiguration defaultConfig
   headersConfig  <- makeHeadersConfig pHeadersConfig
   fileTypes      <- do
     allFiles <- mapM (\path -> findFiles path (const True))

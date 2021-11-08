@@ -61,12 +61,12 @@ import           Headroom.Config                     ( loadConfiguration
                                                      , makeConfiguration
                                                      , parseConfiguration
                                                      )
-import           Headroom.Config.Types               ( Configuration(..)
-                                                     , CtConfiguration
+import           Headroom.Config.Types               ( AppConfig(..)
+                                                     , CtAppConfig
                                                      , CtPostProcessConfigs
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
-                                                     , PtConfiguration
+                                                     , PtAppConfig
                                                      , RunMode(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
@@ -133,7 +133,7 @@ import qualified RIO.Map                            as M
 import qualified RIO.Text                           as T
 
 
-suffixLensesFor ["cPostProcessConfigs"] ''Configuration
+suffixLensesFor ["acPostProcessConfigs"] ''AppConfig
 
 
 -- | Action to be performed based on the selected 'RunMode'.
@@ -149,20 +149,20 @@ data RunAction = RunAction
 data Env = Env
   { envLogFunc       :: LogFunc              -- ^ logging function
   , envRunOptions    :: CommandRunOptions    -- ^ options
-  , envConfiguration :: ~CtConfiguration     -- ^ application configuration
+  , envConfiguration :: ~CtAppConfig         -- ^ application configuration
   , envCurrentYear   :: CurrentYear          -- ^ current year
-  , envKVStore       :: ~(KVStore (RIO Env))
+  , envKVStore       :: ~(KVStore (RIO Env)) -- ^ key-value store
   , envNetwork       :: Network (RIO Env)    -- ^ network operations
   , envFileSystem    :: FileSystem (RIO Env) -- ^ file system operations
   }
 
 suffixLenses ''Env
 
-instance Has CtConfiguration Env where
+instance Has CtAppConfig Env where
   hasLens = envConfigurationL
 
 instance Has CtPostProcessConfigs Env where
-  hasLens = envConfigurationL . cPostProcessConfigsL
+  hasLens = envConfigurationL . acPostProcessConfigsL
 
 instance HasLogFunc Env where
   logFuncL = envLogFuncL
@@ -205,8 +205,8 @@ commandRun :: CommandRunOptions -- ^ /Run/ command options
 commandRun opts = runRIO' (getEnv opts) (croDebug opts) $ do
   _                      <- bootstrap
   CommandRunOptions {..} <- viewL
-  Configuration {..}     <- viewL @CtConfiguration
-  let isCheck = cRunMode == Check
+  AppConfig {..}         <- viewL @CtAppConfig
+  let isCheck = acRunMode == Check
   warnOnDryRun
   startTS            <- liftIO getPOSIXTime
   templates          <- loadTemplates
@@ -235,19 +235,17 @@ warnOnDryRun = do
   when croDryRun $ logWarn "[!] Running with '--dry-run', no files are changed!"
 
 
-findSourceFiles :: ( Has CtConfiguration env
-                   , HasRIO FileSystem env
-                   , HasLogFunc env
-                   )
+findSourceFiles :: (Has CtAppConfig env, HasRIO FileSystem env, HasLogFunc env)
                 => [FileType]
                 -> RIO env [FilePath]
 findSourceFiles fileTypes = do
-  Configuration {..} <- viewL
-  FileSystem {..}    <- viewL
-  logDebug $ "Using source paths: " <> displayShow cSourcePaths
+  AppConfig {..}  <- viewL
+  FileSystem {..} <- viewL
+  logDebug $ "Using source paths: " <> displayShow acSourcePaths
   files <-
-    mconcat <$> mapM (fsFindFilesByTypes cLicenseHeaders fileTypes) cSourcePaths
-  notIgnored <- excludePaths cExcludedPaths <$> excludeIgnored files
+    mconcat
+      <$> mapM (fsFindFilesByTypes acLicenseHeaders fileTypes) acSourcePaths
+  notIgnored <- excludePaths acExcludedPaths <$> excludeIgnored files
   logInfo [iii|
       Found #{length notIgnored} files to process
       (excluded #{length files - length notIgnored})
@@ -255,19 +253,16 @@ findSourceFiles fileTypes = do
   pure notIgnored
 
 
-excludeIgnored :: ( Has CtConfiguration env
-                  , HasRIO FileSystem env
-                  , HasLogFunc env
-                  )
+excludeIgnored :: (Has CtAppConfig env, HasRIO FileSystem env, HasLogFunc env)
                => [FilePath]
                -> RIO env [FilePath]
 excludeIgnored paths = do
-  Configuration {..} <- viewL @CtConfiguration
-  FileSystem {..}    <- viewL
-  currentDir         <- fsGetCurrentDirectory
-  maybeRepo          <- ifM (pure cExcludeIgnoredPaths)
-                            (findRepo' currentDir)
-                            (pure Nothing)
+  AppConfig {..}  <- viewL @CtAppConfig
+  FileSystem {..} <- viewL
+  currentDir      <- fsGetCurrentDirectory
+  maybeRepo       <- ifM (pure acExcludeIgnoredPaths)
+                         (findRepo' currentDir)
+                         (pure Nothing)
   case maybeRepo of
     Just repo -> filterM (fmap not . isIgnored repo) paths
     Nothing   -> pure paths
@@ -283,7 +278,7 @@ excludeIgnored paths = do
 
 processSourceFiles :: forall a env
                     . ( Template a
-                      , Has CtConfiguration env
+                      , Has CtAppConfig env
                       , Has CtPostProcessConfigs env
                       , Has CommandRunOptions env
                       , Has CurrentYear env
@@ -293,11 +288,11 @@ processSourceFiles :: forall a env
                    -> [FilePath]
                    -> RIO env (Int, Int)
 processSourceFiles templates paths = do
-  Configuration {..} <- viewL
-  year               <- viewL
+  AppConfig {..} <- viewL
+  year           <- viewL
   let dVars        = dynamicVariables year
-      withTemplate = mapMaybe (template cLicenseHeaders) paths
-  cVars     <- compileVariables @a (dVars <> cVariables)
+      withTemplate = mapMaybe (template acLicenseHeaders) paths
+  cVars     <- compileVariables @a (dVars <> acVariables)
   processed <- mapM (process cVars dVars) (zipWithProgress withTemplate)
   pure (length withTemplate, length . filter (== True) $ processed)
  where
@@ -309,7 +304,7 @@ processSourceFiles templates paths = do
 processSourceFile :: forall a env
                    . ( Template a
                      , Has CommandRunOptions env
-                     , Has CtConfiguration env
+                     , Has CtAppConfig env
                      , Has CtPostProcessConfigs env
                      , Has CurrentYear env
                      , HasLogFunc env
@@ -321,7 +316,7 @@ processSourceFile :: forall a env
                   -> FilePath
                   -> RIO env Bool
 processSourceFile cVars dVars progress ht@HeaderTemplate {..} path = do
-  Configuration {..}     <- viewL @CtConfiguration
+  AppConfig {..}         <- viewL @CtAppConfig
   CommandRunOptions {..} <- viewL
   fileContent            <- readFileUtf8 path
   let fs                         = fileSupport htFileType
@@ -336,7 +331,7 @@ processSourceFile cVars dVars progress ht@HeaderTemplate {..} path = do
       changed = raProcessed && (source /= result)
       message = if changed then raProcessedMsg else raSkippedMsg
       logFn   = if changed then logInfo else logSticky
-      isCheck = cRunMode == Check
+      isCheck = acRunMode == Check
   logDebug $ "Header info: " <> displayShow headerInfo
   logFn $ mconcat [display progress, " ", display message, fromString path]
   when (not croDryRun && not isCheck && changed)
@@ -344,14 +339,11 @@ processSourceFile cVars dVars progress ht@HeaderTemplate {..} path = do
   pure changed
 
 
-chooseAction :: (Has CtConfiguration env)
-             => HeaderInfo
-             -> Text
-             -> RIO env RunAction
+chooseAction :: (Has CtAppConfig env) => HeaderInfo -> Text -> RIO env RunAction
 chooseAction info header = do
-  Configuration {..} <- viewL @CtConfiguration
+  AppConfig {..} <- viewL @CtAppConfig
   let hasHeader = isJust $ hiHeaderPos info
-  pure $ go cRunMode hasHeader
+  pure $ go acRunMode hasHeader
  where
   go runMode hasHeader = case runMode of
     Add     -> aAction hasHeader
@@ -416,18 +408,18 @@ loadTemplateRefs refs = do
     mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y)
 
 
-loadTemplates :: ( Has CtConfiguration env
+loadTemplates :: ( Has CtAppConfig env
                  , HasRIO Network env
                  , HasRIO FileSystem env
                  , HasLogFunc env
                  )
               => RIO env (Map FileType HeaderTemplate)
 loadTemplates = do
-  Configuration {..} <- viewL @CtConfiguration
-  let allRefs = builtInRefs cBuiltInTemplates <> cTemplateRefs
+  AppConfig {..} <- viewL @CtAppConfig
+  let allRefs = builtInRefs acBuiltInTemplates <> acTemplateRefs
   templates <- loadTemplateRefs @TemplateType allRefs
   logInfo . display . stats . M.toList $ templates
-  pure $ M.mapWithKey (extractHeaderTemplate cLicenseHeaders) templates
+  pure $ M.mapWithKey (extractHeaderTemplate acLicenseHeaders) templates
  where
   stats = Table2 . fmap
     (\(ft, t) -> ([i|Using #{ft} template:|], renderRef . templateRef $ t))
@@ -449,7 +441,7 @@ typeOfTemplate path = do
 
 loadConfigurationSafe :: (HasLogFunc env)
                       => FilePath
-                      -> RIO env (Maybe PtConfiguration)
+                      -> RIO env (Maybe PtAppConfig)
 loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
  where
   onError err = do
@@ -468,7 +460,7 @@ loadConfigurationSafe path = catch (Just <$> loadConfiguration path) onError
 
 
 finalConfiguration :: (HasLogFunc env, Has CommandRunOptions env)
-                   => RIO env CtConfiguration
+                   => RIO env CtAppConfig
 finalConfiguration = do
   defaultConfig' <- Just <$> parseConfiguration defaultConfig
   cmdLineConfig  <- Just <$> optionsToConfiguration
@@ -484,20 +476,20 @@ finalConfiguration = do
   pure config
 
 
-optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtConfiguration
+optionsToConfiguration :: (Has CommandRunOptions env) => RIO env PtAppConfig
 optionsToConfiguration = do
   CommandRunOptions {..} <- viewL
   variables              <- parseVariables croVariables
-  pure Configuration
-    { cRunMode             = maybe mempty pure croRunMode
-    , cSourcePaths         = ifNot null croSourcePaths
-    , cExcludedPaths       = ifNot null croExcludedPaths
-    , cExcludeIgnoredPaths = ifNot (== False) croExcludeIgnoredPaths
-    , cBuiltInTemplates    = pure croBuiltInTemplates
-    , cTemplateRefs        = croTemplateRefs
-    , cVariables           = variables
-    , cLicenseHeaders      = mempty
-    , cPostProcessConfigs  = mempty
+  pure AppConfig
+    { acRunMode             = maybe mempty pure croRunMode
+    , acSourcePaths         = ifNot null croSourcePaths
+    , acExcludedPaths       = ifNot null croExcludedPaths
+    , acExcludeIgnoredPaths = ifNot (== False) croExcludeIgnoredPaths
+    , acBuiltInTemplates    = pure croBuiltInTemplates
+    , acTemplateRefs        = croTemplateRefs
+    , acVariables           = variables
+    , acLicenseHeaders      = mempty
+    , acPostProcessConfigs  = mempty
     }
   where ifNot cond value = if cond value then mempty else pure value
 

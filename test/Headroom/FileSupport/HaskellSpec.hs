@@ -13,7 +13,7 @@ import           Data.String.Interpolate             ( __i )
 import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Config.Types               ( Configuration(..)
+import           Headroom.Config.Types               ( AppConfig(..)
                                                      , HeaderSyntax(..)
                                                      , LicenseType(..)
                                                      )
@@ -77,7 +77,7 @@ spec = do
     it "extract variables from Haskell source code" $ do
       template       <- emptyTemplate @_ @Mustache
       defaultConfig' <- parseConfiguration defaultConfig
-      config         <- makeHeadersConfig (cLicenseHeaders defaultConfig')
+      config         <- makeHeadersConfig (acLicenseHeaders defaultConfig')
       raw            <- loadFile $ codeSamples </> "full.hs"
       let ht = extractHeaderTemplate config Haskell template
           headerPos = Just (1, 29)
