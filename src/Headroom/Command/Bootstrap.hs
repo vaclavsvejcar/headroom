@@ -28,7 +28,7 @@ module Headroom.Command.Bootstrap
 where
 
 import           Data.String.Interpolate             ( iii )
-import           Headroom.Configuration.GlobalConfig ( GlobalConfig(..)
+import           Headroom.Config.GlobalConfig        ( GlobalConfig(..)
                                                      , globalConfigPath
                                                      , initGlobalConfigIfNeeded
                                                      , loadGlobalConfig

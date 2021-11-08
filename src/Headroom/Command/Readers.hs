@@ -25,7 +25,7 @@ module Headroom.Command.Readers
 where
 
 import           Data.Either.Combinators             ( maybeToRight )
-import           Headroom.Configuration.Types        ( LicenseType )
+import           Headroom.Config.Types               ( LicenseType )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.Data.Regex                 ( Regex(..)
                                                      , compile

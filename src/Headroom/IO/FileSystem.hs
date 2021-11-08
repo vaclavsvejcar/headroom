@@ -42,7 +42,7 @@ module Headroom.IO.FileSystem
   )
 where
 
-import           Headroom.Configuration.Types        ( CtHeadersConfig )
+import           Headroom.Config.Types               ( CtHeadersConfig )
 import           Headroom.Data.Regex                 ( Regex
                                                      , match
                                                      )

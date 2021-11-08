@@ -21,7 +21,7 @@ module Headroom.Command.Types
   )
 where
 
-import           Headroom.Configuration.Types        ( GenMode
+import           Headroom.Config.Types               ( GenMode
                                                      , LicenseType
                                                      , RunMode
                                                      )

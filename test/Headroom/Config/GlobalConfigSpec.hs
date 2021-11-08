@@ -5,12 +5,12 @@
 {-# LANGUAGE StrictData            #-}
 {-# LANGUAGE TemplateHaskell       #-}
 
-module Headroom.Configuration.GlobalConfigSpec
+module Headroom.Config.GlobalConfigSpec
   ( spec
   )
 where
 
-import           Headroom.Configuration.GlobalConfig
+import           Headroom.Config.GlobalConfig
 import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Lens                  ( suffixLenses
                                                      , suffixLensesFor

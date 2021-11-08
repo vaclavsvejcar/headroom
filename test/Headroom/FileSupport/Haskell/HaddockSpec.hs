@@ -8,7 +8,7 @@ module Headroom.FileSupport.Haskell.HaddockSpec
   )
 where
 
-import           Headroom.Configuration.Types        ( HeaderSyntax(..)
+import           Headroom.Config.Types               ( HeaderSyntax(..)
                                                      , LicenseType(..)
                                                      )
 import           Headroom.Data.Regex                 ( re )

@@ -6,7 +6,7 @@
 {-# LANGUAGE StrictData        #-}
 
 {-|
-Module      : Headroom.Configuration.Compat
+Module      : Headroom.Config.Compat
 Description : Compatibility checks for YAML configuration
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -18,7 +18,7 @@ This module contains functions and data types used for checking compatibility of
 user's YAML configuration with current version of Headroom.
 -}
 
-module Headroom.Configuration.Compat
+module Headroom.Config.Compat
   ( VersionError(..)
   , checkCompatibility
   )

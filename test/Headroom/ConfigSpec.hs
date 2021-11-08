@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Headroom.ConfigurationSpec
+module Headroom.ConfigSpec
   ( spec
   )
 where
 
-import           Headroom.Configuration
+import           Headroom.Config
 import           Headroom.Embedded                   ( defaultConfig )
 import           RIO
 import           Test.Hspec

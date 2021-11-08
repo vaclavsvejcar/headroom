@@ -8,7 +8,7 @@ module Headroom.Command.ReadersSpec
 where
 
 import           Headroom.Command.Readers
-import           Headroom.Configuration.Types        ( LicenseType )
+import           Headroom.Config.Types               ( LicenseType )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.FileType.Types             ( FileType )
 import           RIO

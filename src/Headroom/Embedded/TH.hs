@@ -24,7 +24,7 @@ module Headroom.Embedded.TH
 where
 
 import           Data.FileEmbed                      ( embedStringFile )
-import           Headroom.Configuration.Types        ( LicenseType(..) )
+import           Headroom.Config.Types               ( LicenseType(..) )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           Headroom.FileType.Types             ( FileType(..) )
 import           Headroom.Meta                       ( TemplateType )

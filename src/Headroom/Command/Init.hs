@@ -37,15 +37,15 @@ where
 import           Data.String.Interpolate             ( iii )
 import           Headroom.Command.Types              ( CommandInitOptions(..) )
 import           Headroom.Command.Utils              ( bootstrap )
-import           Headroom.Configuration              ( makeHeadersConfig
+import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Configuration.Enrich       ( Enrich(..)
+import           Headroom.Config.Enrich              ( Enrich(..)
                                                      , replaceEmptyValue
                                                      , withArray
                                                      , withText
                                                      )
-import           Headroom.Configuration.Types        ( Configuration(..)
+import           Headroom.Config.Types               ( Configuration(..)
                                                      , LicenseType(..)
                                                      )
 import           Headroom.Data.Has                   ( Has(..)

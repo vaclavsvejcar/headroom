@@ -3,7 +3,7 @@
 {-# LANGUAGE StrictData        #-}
 
 {-|
-Module      : Headroom.Configuration.Enrich
+Module      : Headroom.Config.Enrich
 Description : Simple enrichment of YAML configuration stubs
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -17,7 +17,7 @@ without the "Data.Yaml" and parsing, because that way all comments inside YAML
 file would be lost.
 -}
 
-module Headroom.Configuration.Enrich
+module Headroom.Config.Enrich
   ( -- * Data Types
     Enrich(..)
   , ValueType(..)

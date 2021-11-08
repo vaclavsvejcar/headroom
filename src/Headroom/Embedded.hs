@@ -22,7 +22,7 @@ module Headroom.Embedded
   )
 where
 
-import           Headroom.Configuration.Types        ( LicenseType(..) )
+import           Headroom.Config.Types               ( LicenseType(..) )
 import           Headroom.Embedded.TH                ( embedConfigFile
                                                      , embedDefaultConfig
                                                      , embedDefaultGlobalConfig

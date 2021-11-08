@@ -31,11 +31,11 @@ import           Headroom.Command.Types              ( Command(..)
                                                      , CommandGenOptions(..)
                                                      )
 import           Headroom.Command.Utils              ( bootstrap )
-import           Headroom.Configuration.Enrich       ( Enrich(..)
+import           Headroom.Config.Enrich              ( Enrich(..)
                                                      , replaceEmptyValue
                                                      , withText
                                                      )
-import           Headroom.Configuration.Types        ( GenMode(..) )
+import           Headroom.Config.Types               ( GenMode(..) )
 import           Headroom.Data.Lens                  ( suffixLensesFor )
 import           Headroom.Embedded                   ( configFileStub
                                                      , licenseTemplate

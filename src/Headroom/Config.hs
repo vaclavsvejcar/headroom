@@ -5,7 +5,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 {-|
-Module      : Headroom.Configuration
+Module      : Headroom.Config
 Description : Configuration handling (loading, parsing, validating)
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -19,7 +19,7 @@ Headroom uses the
 pattern for the configuration.
 -}
 
-module Headroom.Configuration
+module Headroom.Config
   ( -- * Loading & Parsing Configuration
     loadConfiguration
   , parseConfiguration
@@ -32,8 +32,8 @@ where
 
 import           Data.Monoid                         ( Last(..) )
 import qualified Data.Yaml                          as Y
-import           Headroom.Configuration.Compat       ( checkCompatibility )
-import           Headroom.Configuration.Types        ( Configuration(..)
+import           Headroom.Config.Compat              ( checkCompatibility )
+import           Headroom.Config.Types               ( Configuration(..)
                                                      , ConfigurationError(..)
                                                      , ConfigurationKey(..)
                                                      , CtConfiguration

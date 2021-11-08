@@ -16,7 +16,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 {-|
-Module      : Headroom.Configuration.Types
+Module      : Headroom.Config.Types
 Description : Data types for /Headroom/ configuration
 Copyright   : (c) 2019-2021 Vaclav Svejcar
 License     : BSD-3-Clause
@@ -34,7 +34,7 @@ pattern, but instead of defining separate data type for each /phase/
 data type and related /closed type family/.
 -}
 
-module Headroom.Configuration.Types
+module Headroom.Config.Types
   ( -- * Error Types
     ConfigurationError(..)
   , ConfigurationKey(..)

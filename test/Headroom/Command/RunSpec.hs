@@ -18,7 +18,7 @@ module Headroom.Command.RunSpec
 where
 
 import           Headroom.Command.Run
-import           Headroom.Configuration.Types        ( CtPostProcessConfigs
+import           Headroom.Config.Types               ( CtPostProcessConfigs
                                                      , HeaderSyntax(..)
                                                      , PostProcessConfig(..)
                                                      , PostProcessConfigs(..)

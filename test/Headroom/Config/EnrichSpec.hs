@@ -1,12 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Headroom.Configuration.EnrichSpec
+module Headroom.Config.EnrichSpec
   ( spec
   )
 where
 
-import           Headroom.Configuration.Enrich
+import           Headroom.Config.Enrich
 import           RIO
 import           Test.Hspec
 

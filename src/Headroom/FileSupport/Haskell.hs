@@ -57,7 +57,7 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      )
 
-import           Headroom.Configuration.Types        ( HeaderConfig(..)
+import           Headroom.Config.Types               ( HeaderConfig(..)
                                                      , HeaderSyntax
                                                      )
 import           Headroom.FileType.Types             ( FileType(Haskell) )

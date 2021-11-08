@@ -27,7 +27,7 @@ module Headroom.FileSupport.Types
   )
 where
 
-import           Headroom.Configuration.Types        ( HeaderSyntax )
+import           Headroom.Config.Types               ( HeaderSyntax )
 import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Header.Types               ( HeaderTemplate )

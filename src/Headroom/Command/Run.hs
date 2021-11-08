@@ -57,11 +57,11 @@ import           Headroom.Command.Bootstrap          ( bootstrap
                                                      , runRIO'
                                                      )
 import           Headroom.Command.Types              ( CommandRunOptions(..) )
-import           Headroom.Configuration              ( loadConfiguration
+import           Headroom.Config                     ( loadConfiguration
                                                      , makeConfiguration
                                                      , parseConfiguration
                                                      )
-import           Headroom.Configuration.Types        ( Configuration(..)
+import           Headroom.Config.Types               ( Configuration(..)
                                                      , CtConfiguration
                                                      , CtPostProcessConfigs
                                                      , HeaderConfig(..)

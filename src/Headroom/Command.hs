@@ -26,7 +26,7 @@ import           Headroom.Command.Readers            ( licenseReader
                                                      , templateRefReader
                                                      )
 import           Headroom.Command.Types              ( Command(..) )
-import           Headroom.Configuration.Types        ( LicenseType
+import           Headroom.Config.Types               ( LicenseType
                                                      , RunMode(..)
                                                      )
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )

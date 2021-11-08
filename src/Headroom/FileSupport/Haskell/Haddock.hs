@@ -29,7 +29,7 @@ where
 
 import           Control.Applicative                 ( Alternative(..) )
 import           Control.Monad                       ( ap )
-import           Headroom.Configuration.Types        ( HeaderSyntax )
+import           Headroom.Config.Types               ( HeaderSyntax )
 import           Headroom.Data.Regex                 ( re
                                                      , scan
                                                      )

@@ -10,10 +10,10 @@ module Headroom.FileSupport.HaskellSpec
 where
 
 import           Data.String.Interpolate             ( __i )
-import           Headroom.Configuration              ( makeHeadersConfig
+import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Configuration.Types        ( Configuration(..)
+import           Headroom.Config.Types               ( Configuration(..)
                                                      , HeaderSyntax(..)
                                                      , LicenseType(..)
                                                      )

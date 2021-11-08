@@ -2,12 +2,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 
-module Headroom.Configuration.CompatSpec
+module Headroom.Config.CompatSpec
   ( spec
   )
 where
 
-import           Headroom.Configuration.Compat
+import           Headroom.Config.Compat
 import           Headroom.Meta.Version               ( Version(..)
                                                      , pvp
                                                      )

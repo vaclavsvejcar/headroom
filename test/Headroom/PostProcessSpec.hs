@@ -10,7 +10,7 @@ module Headroom.PostProcessSpec
   )
 where
 
-import           Headroom.Configuration.Types        ( PostProcessConfig(..)
+import           Headroom.Config.Types               ( PostProcessConfig(..)
                                                      , PostProcessConfigs(..)
                                                      , UpdateCopyrightConfig(..)
                                                      )

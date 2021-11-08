@@ -5,10 +5,10 @@ module Headroom.FileTypeSpec
   )
 where
 
-import           Headroom.Configuration              ( makeHeadersConfig
+import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Configuration.Types        ( Configuration(..) )
+import           Headroom.Config.Types               ( Configuration(..) )
 import           Headroom.Embedded                   ( defaultConfig )
 import           Headroom.FileType
 import           Headroom.FileType.Types             ( FileType(..) )

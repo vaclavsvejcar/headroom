@@ -7,7 +7,7 @@ module Headroom.Header.SanitizeSpec
   )
 where
 
-import           Headroom.Configuration.Types        ( HeaderSyntax(..) )
+import           Headroom.Config.Types               ( HeaderSyntax(..) )
 import           Headroom.Data.Regex                 ( re )
 import           Headroom.Data.Text                  ( fromLines )
 import           Headroom.Header.Sanitize

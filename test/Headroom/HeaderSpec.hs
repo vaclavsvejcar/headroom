@@ -10,10 +10,10 @@ module Headroom.HeaderSpec
   )
 where
 
-import           Headroom.Configuration              ( makeHeadersConfig
+import           Headroom.Config                     ( makeHeadersConfig
                                                      , parseConfiguration
                                                      )
-import           Headroom.Configuration.Types        ( Configuration(..)
+import           Headroom.Config.Types               ( Configuration(..)
                                                      , HeaderConfig(..)
                                                      , HeaderSyntax(..)
                                                      , HeadersConfig(..)

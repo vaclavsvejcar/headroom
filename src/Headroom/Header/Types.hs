@@ -20,7 +20,7 @@ module Headroom.Header.Types
   )
 where
 
-import           Headroom.Configuration.Types        ( CtHeaderConfig )
+import           Headroom.Config.Types               ( CtHeaderConfig )
 import           Headroom.FileSupport.TemplateData   ( TemplateData )
 import           Headroom.FileType.Types             ( FileType )
 import           Headroom.Meta                       ( TemplateType )

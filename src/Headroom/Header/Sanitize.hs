@@ -26,7 +26,7 @@ module Headroom.Header.Sanitize
   )
 where
 
-import           Headroom.Configuration.Types        ( HeaderSyntax(..) )
+import           Headroom.Config.Types               ( HeaderSyntax(..) )
 import qualified Headroom.Data.Regex                as R
 import qualified Headroom.Data.Text                 as T
 import           RIO
