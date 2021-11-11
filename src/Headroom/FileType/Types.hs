@@ -20,28 +20,17 @@ import           RIO
 
 -- | Supported type of source code file.
 data FileType
-  = C
-  -- ^ support for /C/ programming language
-  | CPP
-  -- ^ support for /C++/ programming language
-  | CSS
-  -- ^ support for /CSS/
-  | Go
-  -- ^ support for /Go/ programming language
-  | Haskell
-  -- ^ support for /Haskell/ programming language
-  | HTML
-  -- ^ support for /HTML/
-  | Java
-  -- ^ support for /Java/ programming language
-  | JS
-  -- ^ support for /JavaScript/ programming language
-  | PureScript
-  -- ^ support for /PureScript/ programming language
-  | Rust
-  -- ^ support for /Rust/ programming language
-  | Scala
-  -- ^ support for /Scala/ programming language
-  | Shell
-  -- ^ support for /Shell/
+  = C          -- ^ support for /C/ programming language
+  | CPP        -- ^ support for /C++/ programming language
+  | CSS        -- ^ support for /CSS/
+  | Go         -- ^ support for /Go/ programming language
+  | Haskell    -- ^ support for /Haskell/ programming language
+  | HTML       -- ^ support for /HTML/
+  | Java       -- ^ support for /Java/ programming language
+  | JS         -- ^ support for /JavaScript/ programming language
+  | PHP        -- ^ support for /PHP/ programming language
+  | PureScript -- ^ support for /PureScript/ programming language
+  | Rust       -- ^ support for /Rust/ programming language
+  | Scala      -- ^ support for /Scala/ programming language
+  | Shell      -- ^ support for /Shell/
   deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)

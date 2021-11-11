@@ -1,43 +1,35 @@
-Version `0.4.2.0` is minor release that brings some improvements and bugfixes, without any breaking changes in _CLI_ interface or configuration.
+Version `0.4.3.0` is minor release that brings some improvements and bugfixes, without any breaking changes in _CLI_ interface or configuration.
 
 ## New & Noteworthy
 
-### Support for URL-based templates
-Until now, _Headroom_ allowed to use only either _built-in_ templates or templates loaded from local file system. This version adds option to load templates from URL (at this moment only _HTTP_ and _HTTPS_ protocols are allowed). To use URL templates, just put the _HTTP(S)_ address where you normally put path to local template, i.e.:
+### Support for PHP language
+This version adds support for managing license/copyright headers in _PHP_ source code files. Default configuration assumes that license/copyright header is the very first _DocBlock_ comment present in _PHP_ file, such as:
+
+```php
+<?php
+
+/**
+ * This is a file-level DocBlock, considered as license/copyright header
+ * 
+ * A warning will be raised, saying that to document the define, use
+ * another DocBlock
+ * @package SomePackage
+ */
+
+define('foo', 'bar');
 
 ```
--t|--template-file https://example.com/path/haskell.mustache
-```
 
-For command line or
+At this moment, only basic support is present (i.e. no _dynamic variables_ are extracted from the header), but this might change in future releases.
 
-```yaml
-template-paths:
-  - /some/local/haskell.mustache
-  - https://example.com/path/rust.mustache
-```
+### Global Configuration
+Since this release, apart from usual per-project configuration that _Headroom_ uses (`.headroom.yaml` files), it also adds _global configuration_, stored in user's home directory (`~/.headroom`), where some global config values can be changed, such as how often (and if) _Headroom_ should check for updates. See [Configuration Overview][doc:configuration] chapter for more details.
 
-for _YAML_ configuration.
+### Automatically check for updates
+This release adds functionality that automatically checks whether new version of _Headroom_ is available and if yes, it notifies user in command line. By default, this happens once a day and it can be changed (or disabled) in _global configuration_. See [Configuration Overview][doc:configuration] chapter for more details.
 
-Note that you can freely combine all template types (i.e. _built-in templates_, _local templates_ and _URL templates_), but in case that same template will be define from multiple sources, following order will be applied to select one (left to right from least to most preferred):
-
-```
-built-in template > URL template > local template
-```
-
-Also note that naming convention is the same as for local templates, i.e.
-
-```
-http(s)://path/to/<FILE_TYPE>.<TEMPLATE_TYPE>
-```
-
-See [configuration chapter][doc:configuration] for more details.
-
-
-### Automatically exclude source paths ignored by GIT
-It may happen that some (otherwise valid) source files inside your source directory are for some reason set to be ignored by _Git_, therefore you also need _Headroom_ to ignore them. Until now, this has to be done manually using the `exclude-source-paths`/`--exclude-source-path=PATH` _YAML_/_CLI_ options. Thanks to the [vcs-ignore][github:vcs-ignore] library, _Headroom_ can not exclude these files for you by scanning _Git's_ ignore rules. All you need to do is use either `exclude-ignored-paths: true` _YAML_ option or `--exclude-ignored-paths` _CLI_ option.
-
-See [configuration chapter][doc:configuration] for more details.
+!!! note
+    Info about new version is retrieved using _GitHub REST API_ from project releases page, no personal info is collected and no tracking is done. Your privacy is priority for us and always will be respected.
 
 ## Other bugfixes and improvements
 - minor tweaks and performance improvements

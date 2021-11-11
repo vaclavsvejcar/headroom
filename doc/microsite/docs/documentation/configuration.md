@@ -1,10 +1,45 @@
+Headroom uses two main sources of configuration, _global configuration_, shared between all _Headroom_ instances, and _application configuration_, that is specific for project in which _Headroom_ is executed.
+
+## Global Configuration
+This configuration is used to configure some global rules that are applied for all instances of _Headroom_, for example whether _Headroom_ should automatically check for updates, etc. It's located in directory in user's home directory (`~/.headroom`) and has following structure:
+
+```
+~/.headroom
+├── cache.sqlite
+└── global-config.yaml
+```
+
+Where:
+
+- `cache.sqlite` is key-value cache _(SQLite database)_ used by _Headroom_ to store some values, such as when was the last attemt to check updates done
+- `global-config.yaml` is the global configuration _YAML_ file
+
+### YAML File Structure
+Below is the structure of `global-config.yaml` configuration file:
+
+```yaml
+## This is the global configuration file for Headroom.
+## See https://github.com/vaclavsvejcar/headroom for more details.
+
+## Configuration for Headroom Updater.
+updates:
+
+  ## Whether Headroom should automatically check for available updates. 
+  check-for-updates: true
+
+  ## How often (in days) should Headroom check for updates.
+  update-interval-days: 1
+```
+
+At this moment, only configuration of automatic updates is present.
+
+## Application Configuration
 Headroom uses three different sources of configuration, where the next one eventually overrides the previous one:
 
 1. default configuration in [embedded/default-config.yaml][file:embedded/default-config.yaml]
 1. custom configuration in `.headroom.yaml`
 1. command line arguments
 
-## YAML Configuration
 The _YAML_ configuration file, located in `.headroom.yaml`, is the main and most capable configuration source for _Headroom_. Don't forget to check the _default YAML configuration_ in [embedded/default-config.yaml][file:embedded/default-config.yaml], both to know more about all possible configuration keys (it's well documented there), but also to know which value you need to override when in your custom `.headroom.yaml`.
 
 ### Configuration Version
@@ -141,6 +176,7 @@ _Headroom_ can manage license headers only for supported types of source code fi
 | _HTML_       | `html`                | `.html`, `.htm`    |
 | _Java_       | `java`                | `.java`            |
 | _JavaScript_ | `js`                  | `.js`              |
+| _PHP_        | `php`                 | `.php`             |
 | _PureScript_ | `purescript`          | `.purs`            |
 | _Rust_       | `rust`                | `.rs`              |
 | _Scala_      | `scala`               | `.scala`           |

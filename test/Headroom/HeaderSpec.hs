@@ -401,6 +401,7 @@ spec = do
       sampleJava1        <- loadSample Java $ "java" </> "sample1.java"
       sampleJava2        <- loadSample Java $ "java" </> "sample2.java"
       sampleJs1          <- loadSample JS $ "js" </> "sample1.js"
+      samplePhp1         <- loadSample PHP $ "php" </> "sample1.php"
       sampleRust1        <- loadSample Rust $ "rust" </> "sample1.rs"
       sampleScala1       <- loadSample Scala $ "scala" </> "sample1.scala"
       sampleScala2       <- loadSample Scala $ "scala" </> "sample2.scala"
@@ -419,6 +420,7 @@ spec = do
       findHeader hscJava sampleJava1 `shouldBe` Just (0, 2)
       findHeader hscJava sampleJava2 `shouldBe` Nothing
       findHeader hscJs sampleJs1 `shouldBe` Just (0, 2)
+      findHeader hscPhp samplePhp1 `shouldBe` Just (2, 8)
       findHeader hscRust sampleRust1 `shouldBe` Just (0, 2)
       findHeader hscScala sampleScala1 `shouldBe` Just (0, 2)
       findHeader hscScala sampleScala2 `shouldBe` Nothing

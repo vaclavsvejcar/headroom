@@ -221,6 +221,28 @@ spec = do
             ]
       analyzeSourceCode (fileSupport JS) sample `shouldBe` expected
 
+    it "analyzes PHP source code" $ do
+      sample <- loadFile $ codeSamples </> "php" </> "sample1.php"
+      let
+        expected = SourceCode
+          [ (Code   , "<?php")
+          , (Code   , "")
+          , (Comment, "/**")
+          , (Comment, " * This is a file-level DocBlock")
+          , (Comment, " * ")
+          , ( Comment
+            , " * A warning will be raised, saying that to document the define, use"
+            )
+          , (Comment, " * another DocBlock")
+          , (Comment, " * @package SomePackage")
+          , (Comment, " */")
+          , (Code   , "")
+          , (Code   , "define('foo', 'bar');")
+          , (Code   , "")
+          , (Comment, "/* not a header */")
+          ]
+      analyzeSourceCode (fileSupport PHP) sample `shouldBe` expected
+
     it "analyzes PureScript source code" $ do
       sample <- loadFile $ codeSamples </> "purescript" </> "full.purs"
       let expected = SourceCode

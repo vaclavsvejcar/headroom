@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 07bfaeaa139b706c87d03d11ab86f93fcf068b0b44b1208161675cb108b14734
+-- hash: f3ac9faff7a6ac4e89520300d1fc2a090f01e3954e7f54d29316c0d51e90d1b2
 
 name:           headroom
 version:        0.4.3.0
@@ -34,6 +34,7 @@ extra-source-files:
     embedded/license/apache2/html.mustache
     embedded/license/apache2/java.mustache
     embedded/license/apache2/js.mustache
+    embedded/license/apache2/php.mustache
     embedded/license/apache2/purescript.mustache
     embedded/license/apache2/rust.mustache
     embedded/license/apache2/scala.mustache
@@ -46,6 +47,7 @@ extra-source-files:
     embedded/license/bsd3/html.mustache
     embedded/license/bsd3/java.mustache
     embedded/license/bsd3/js.mustache
+    embedded/license/bsd3/php.mustache
     embedded/license/bsd3/purescript.mustache
     embedded/license/bsd3/rust.mustache
     embedded/license/bsd3/scala.mustache
@@ -58,6 +60,7 @@ extra-source-files:
     embedded/license/gpl2/html.mustache
     embedded/license/gpl2/java.mustache
     embedded/license/gpl2/js.mustache
+    embedded/license/gpl2/php.mustache
     embedded/license/gpl2/purescript.mustache
     embedded/license/gpl2/rust.mustache
     embedded/license/gpl2/scala.mustache
@@ -70,6 +73,7 @@ extra-source-files:
     embedded/license/gpl3/html.mustache
     embedded/license/gpl3/java.mustache
     embedded/license/gpl3/js.mustache
+    embedded/license/gpl3/php.mustache
     embedded/license/gpl3/purescript.mustache
     embedded/license/gpl3/rust.mustache
     embedded/license/gpl3/scala.mustache
@@ -82,6 +86,7 @@ extra-source-files:
     embedded/license/mit/html.mustache
     embedded/license/mit/java.mustache
     embedded/license/mit/js.mustache
+    embedded/license/mit/php.mustache
     embedded/license/mit/purescript.mustache
     embedded/license/mit/rust.mustache
     embedded/license/mit/scala.mustache
@@ -94,6 +99,7 @@ extra-source-files:
     embedded/license/mpl2/html.mustache
     embedded/license/mpl2/java.mustache
     embedded/license/mpl2/js.mustache
+    embedded/license/mpl2/php.mustache
     embedded/license/mpl2/purescript.mustache
     embedded/license/mpl2/rust.mustache
     embedded/license/mpl2/scala.mustache
@@ -117,6 +123,7 @@ extra-source-files:
     test-data/code-samples/java/sample2.java
     test-data/code-samples/js/sample1.js
     test-data/code-samples/js/sample2.js
+    test-data/code-samples/php/sample1.php
     test-data/code-samples/purescript/full.purs
     test-data/code-samples/rust/sample1.rs
     test-data/code-samples/scala/sample1.scala
@@ -168,6 +175,7 @@ library
       Headroom.FileSupport.HTML
       Headroom.FileSupport.Java
       Headroom.FileSupport.JS
+      Headroom.FileSupport.PHP
       Headroom.FileSupport.PureScript
       Headroom.FileSupport.Rust
       Headroom.FileSupport.Scala
@@ -289,6 +297,7 @@ test-suite spec
       Headroom.FileSupport.HTMLSpec
       Headroom.FileSupport.JavaSpec
       Headroom.FileSupport.JSSpec
+      Headroom.FileSupport.PHPSpec
       Headroom.FileSupport.PureScriptSpec
       Headroom.FileSupport.RustSpec
       Headroom.FileSupport.ScalaSpec

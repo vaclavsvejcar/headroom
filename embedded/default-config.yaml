@@ -202,6 +202,19 @@ license-headers:
       starts-with: ^\/\*
       ends-with: \*\/$
 
+  ## PHP configuration
+  php:
+    file-extensions: ["php"]
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
+    put-after: []
+    put-before: []
+    block-comment:
+      starts-with: ^\/\*\*
+      ends-with: \*\/$
+
   ## PureScript configuration
   purescript:
     file-extensions: ["purs"]

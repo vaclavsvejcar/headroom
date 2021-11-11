@@ -35,6 +35,7 @@ import qualified Headroom.FileSupport.Haskell       as Haskell
 import qualified Headroom.FileSupport.HTML          as HTML
 import qualified Headroom.FileSupport.Java          as Java
 import qualified Headroom.FileSupport.JS            as JS
+import qualified Headroom.FileSupport.PHP           as PHP
 import qualified Headroom.FileSupport.PureScript    as PureScript
 import qualified Headroom.FileSupport.Rust          as Rust
 import qualified Headroom.FileSupport.Scala         as Scala
@@ -63,6 +64,7 @@ fileSupport Haskell    = Haskell.fileSupport
 fileSupport HTML       = HTML.fileSupport
 fileSupport Java       = Java.fileSupport
 fileSupport JS         = JS.fileSupport
+fileSupport PHP        = PHP.fileSupport
 fileSupport PureScript = PureScript.fileSupport
 fileSupport Rust       = Rust.fileSupport
 fileSupport Scala      = Scala.fileSupport
