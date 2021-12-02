@@ -51,7 +51,9 @@ import           Headroom.Meta.Version               ( Version
                                                      , printVersionP
                                                      )
 import           Headroom.UI.Message                 ( messageInfo )
-import           Headroom.Updater                    ( checkUpdates )
+import           Headroom.Updater                    ( UpdaterError(..)
+                                                     , checkUpdates
+                                                     )
 import           RIO
 import           RIO.FilePath                        ( (</>) )
 import qualified RIO.Text                           as T
@@ -94,10 +96,14 @@ bootstrap = do
   welcomeMessage
   initGlobalConfigIfNeeded
   globalConfig@GlobalConfig {..} <- loadGlobalConfig
-  checkUpdates gcUpdates >>= \case
+  catch (checkUpdates gcUpdates) onError >>= \case
     Nothing         -> pure ()
     Just newVersion -> displayUpdate newVersion
   pure BootstrapEnv { beGlobalConfig = globalConfig }
+ where
+  onError err = do
+    logWarn . display . T.pack $ displayException (err :: UpdaterError)
+    pure Nothing
 
 
 -- | Shared /SQLite/-based 'KVStore'.
