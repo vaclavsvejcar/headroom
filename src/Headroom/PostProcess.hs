@@ -65,46 +65,6 @@ suffixLenses ''UpdateCopyrightConfig
 suffixLensesFor ["ppcConfig"] ''PostProcessConfig
 
 
--- | Runs the /post-processing function/ using the given /environment/ and text
--- of rendered /license header/ as input.
-postProcess :: PostProcess env
-            -- ^ /post-processor/ to run
-            -> env
-            -- ^ environment value
-            -> Text
-            -- ^ text of rendered /license header/
-            -> Text
-            -- ^ processed text of /license header/
-postProcess (PostProcess fn) env input = runReader (fn input) env
-
-
--- | Composition of various /post-processors/, which environment is
--- based on /YAML/ configuration and which can be enabled/disabled to fit
--- end user's needs.
-configuredPostProcess :: (Has CurrentYear env, Has UpdateCopyrightMode env)
-                      => CtPostProcessConfigs
-                      -- ^ configuration of /post-processors/
-                      -> PostProcess env
-                      -- ^ composed /post-processor/
-configuredPostProcess PostProcessConfigs {..} = mconcat
-  [ifEnabled ppcsUpdateCopyright updateCopyright]
- where
-  ifEnabled PostProcessConfig {..} fn | ppcEnabled = fn
-                                      | otherwise  = mempty
-
-
--- | Takes already rendered /license header/ and post-process it based on the
--- given configuration.
-postProcessHeader :: ConfiguredEnv
-                  -- ^ configuration used to define post-processing behaviour
-                  -> Text
-                  -- ^ rendered text of /license header/
-                  -> Text
-                  -- ^ post-processed text of /license header/
-postProcessHeader env =
-  postProcess (configuredPostProcess (cePostProcessConfigs env)) env
-
-
 -- | Environemnt data type for the composed /post-processor/
 -- ('configuredPostProcess').
 data ConfiguredEnv = ConfiguredEnv
@@ -148,6 +108,46 @@ mkConfiguredEnv ceCurrentYear vars configs = do
   mode     = \configs' -> maybe UpdateAllAuthors
                                 (UpdateSelectedAuthors . SelectedAuthors)
                                 (configs' ^. authorsL)
+
+
+-- | Runs the /post-processing function/ using the given /environment/ and text
+-- of rendered /license header/ as input.
+postProcess :: PostProcess env
+            -- ^ /post-processor/ to run
+            -> env
+            -- ^ environment value
+            -> Text
+            -- ^ text of rendered /license header/
+            -> Text
+            -- ^ processed text of /license header/
+postProcess (PostProcess fn) env input = runReader (fn input) env
+
+
+-- | Composition of various /post-processors/, which environment is
+-- based on /YAML/ configuration and which can be enabled/disabled to fit
+-- end user's needs.
+configuredPostProcess :: (Has CurrentYear env, Has UpdateCopyrightMode env)
+                      => CtPostProcessConfigs
+                      -- ^ configuration of /post-processors/
+                      -> PostProcess env
+                      -- ^ composed /post-processor/
+configuredPostProcess PostProcessConfigs {..} = mconcat
+  [ifEnabled ppcsUpdateCopyright updateCopyright]
+ where
+  ifEnabled PostProcessConfig {..} fn | ppcEnabled = fn
+                                      | otherwise  = mempty
+
+
+-- | Takes already rendered /license header/ and post-process it based on the
+-- given configuration.
+postProcessHeader :: ConfiguredEnv
+                  -- ^ configuration used to define post-processing behaviour
+                  -> Text
+                  -- ^ rendered text of /license header/
+                  -> Text
+                  -- ^ post-processed text of /license header/
+postProcessHeader env =
+  postProcess (configuredPostProcess (cePostProcessConfigs env)) env
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
