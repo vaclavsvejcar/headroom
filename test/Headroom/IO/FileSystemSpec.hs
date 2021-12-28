@@ -11,8 +11,8 @@ import           Headroom.Data.Regex                 ( re )
 import           Headroom.IO.FileSystem
 import           RIO
 import           RIO.FilePath                        ( (</>) )
-import           RIO.List                            ( sort )
 import qualified RIO.List                           as L
+import           RIO.List                            ( sort )
 import           Test.Hspec
 
 

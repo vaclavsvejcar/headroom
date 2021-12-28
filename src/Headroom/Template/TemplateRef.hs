@@ -52,10 +52,10 @@ import           Headroom.Types                      ( LicenseType
                                                      )
 import           RIO
 import qualified RIO.Text                           as T
+import qualified Text.URI                           as URI
 import           Text.URI                            ( URI(..)
                                                      , mkURI
                                                      )
-import qualified Text.URI                           as URI
 
 
 ---------------------------------  DATA TYPES  ---------------------------------

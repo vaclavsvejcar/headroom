@@ -58,8 +58,8 @@ import qualified Network.HTTP.Req                   as Req
 import qualified Network.HTTP.Types.Status          as HC
 import           RIO
 import qualified RIO.Text                           as T
-import           Text.URI                            ( URI )
 import qualified Text.URI                           as URI
+import           Text.URI                            ( URI )
 
 
 --------------------------------  TYPE ALIASES  --------------------------------

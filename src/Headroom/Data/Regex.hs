@@ -1,10 +1,10 @@
-{-# LANGUAGE BangPatterns      #-}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE StrictData        #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE BangPatterns          #-}
+{-# LANGUAGE LambdaCase            #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE StrictData            #-}
+{-# LANGUAGE TemplateHaskellQuotes #-}
 
 {-|
 Module      : Headroom.Data.Regex
@@ -116,7 +116,7 @@ re = QuasiQuoter { quoteExp  = quoteExpRegex
                  , quoteDec  = undefined
                  }
  where
-  quoteExpRegex txt = [| compileUnsafe . T.pack $ txt |]
+  quoteExpRegex txt = [|compileUnsafe . T.pack $ txt|]
     where !_ = compileUnsafe . T.pack $ txt -- check at compile time
 
 

@@ -38,8 +38,6 @@ where
 import           Headroom.Config.Types               ( CtHeaderConfig
                                                      , CtHeadersConfig
                                                      , HeaderConfig(..)
-                                                     , HeaderConfig(..)
-                                                     , HeaderSyntax(..)
                                                      , HeaderSyntax(..)
                                                      )
 import           Headroom.Data.Coerce                ( coerce
