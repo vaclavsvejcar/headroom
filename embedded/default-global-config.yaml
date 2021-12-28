@@ -8,4 +8,4 @@ updates:
   check-for-updates: true
 
   ## How often (in days) should Headroom check for updates.
-  update-interval-days: 1
+  update-interval-days: 7
