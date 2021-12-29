@@ -29,6 +29,7 @@ module Headroom.PostProcess.UpdateCopyright
   )
 where
 
+import           Data.String.Interpolate             ( i )
 import           Headroom.Data.Has                   ( Has(..) )
 import           Headroom.Data.Regex                 ( re
                                                      , replace
@@ -45,7 +46,6 @@ import qualified RIO.Text                           as T
 
 ---------------------------------  DATA TYPES  ---------------------------------
 
-
 -- | Non-empty list of authors for which to update years in their copyrights.
 newtype SelectedAuthors = SelectedAuthors (NonEmpty Text) deriving (Eq, Show)
 
@@ -58,7 +58,6 @@ data UpdateCopyrightMode
 
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
-
 
 -- | /Post-processor/ that updates years and year ranges in any
 -- present copyright statements.
@@ -96,15 +95,21 @@ updateCopyright = PostProcess $ \input -> do
 updateYears :: CurrentYear -- ^ current year
             -> Text        -- ^ text to update
             -> Text        -- ^ text with updated years
-updateYears (CurrentYear year) = processYear . processRange
+updateYears cy = replace [re|(\d{4})(?:-)?(\d{4})?|] go
  where
-  processYear  = replace [re|(?!\d{4}-)(?<!-)(\d{4})|] processYear'
-  processRange = replace [re|(\d{4})-(\d{4})|] processRange'
-  replaceYear curr | read curr == Just year = tshow year
-                   | otherwise              = mconcat [curr, "-", tshow year]
-  replaceRange full fY tY | read tY == Just year = full
-                          | otherwise            = mconcat [fY, "-", tshow year]
-  processYear' _    (curr : _) = replaceYear curr
-  processYear' full _          = full
-  processRange' full (fromY : toY : _) = replaceRange full fromY toY
-  processRange' full _                 = full
+  go _ [r1] | (Just y1) <- read r1 = bumpYear cy y1
+  go _ [r1, r2] | (Just y1, Just y2) <- (read r1, read r2) = bumpRange cy y1 y2
+  go full _                        = full
+
+
+------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+bumpYear :: CurrentYear -> Integer -> Text
+bumpYear (CurrentYear cy) y | y >= cy   = tshow y
+                            | otherwise = [i|#{y}-#{cy}|]
+
+
+bumpRange :: CurrentYear -> Integer -> Integer -> Text
+bumpRange (CurrentYear cy) y1 y2 | y2 >= cy  = [i|#{y1}-#{y2}|]
+                                 | otherwise = [i|#{y1}-#{cy}|]
+

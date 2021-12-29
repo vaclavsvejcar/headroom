@@ -56,8 +56,20 @@ spec = do
       let sample = "Copyright (c) 2020"
       updateYears currYear sample `shouldBe` sample
 
+    it "does nothing if year is higher than current year" $ do
+      let sample = "Copyright (c) 2021"
+      updateYears currYear sample `shouldBe` sample
+
     it "does nothing on up-to-date year range" $ do
       let sample = "Copyright (c) 2018-2020"
+      updateYears currYear sample `shouldBe` sample
+
+    it "does nothing if second year range is higher than current year" $ do
+      let sample = "Copyright (c) 2018-2021"
+      updateYears currYear sample `shouldBe` sample
+
+    it "does nothing if entire year range is higher than current year" $ do
+      let sample = "Copyright (c) 2021-2023"
       updateYears currYear sample `shouldBe` sample
 
     it "updates outdated year" $ do
