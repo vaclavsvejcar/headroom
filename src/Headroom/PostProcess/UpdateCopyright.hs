@@ -98,8 +98,8 @@ updateYears :: CurrentYear -- ^ current year
 updateYears cy = replace [re|(\d{4})(?:-)?(\d{4})?|] go
  where
   go _ [r1] | (Just y1) <- read r1 = bumpYear cy y1
-  go _ [r1, r2] | (Just y1, Just y2) <- (read r1, read r2) = bumpRange cy y1 y2
-  go full _                        = full
+  go _ rs@[_, _] | [Just y1, Just y2] <- read <$> rs = bumpRange cy y1 y2
+  go other _                       = other
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
