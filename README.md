@@ -31,6 +31,9 @@ Here is the list of projects using _Headroom_. If you're using _Headroom_ and ar
 - [kowainik/summoner](https://github.com/kowainik/summoner) - Tool for scaffolding batteries-included production-level Haskell projects
 - [wireapp/wire-server](https://github.com/wireapp/wire-server) - Wire back-end services (https://wire.com)
 
+## Mentions
+- [Bind The Gap magazine, issue #2](https://bindthegap.news/issues/02dec2020.html) has chapter dedicated to _Headroom_ (pages _17-18_).
+
 ## Documentation
 * for end-user documentation, [official project microsite][web:headroom]
 * for _Haskell API_ documentation, see [Headroom on Hackage][hackage:headroom]
