@@ -18,11 +18,13 @@ module Headroom.FileType.Types where
 import           Headroom.Data.EnumExtra             ( EnumExtra(..) )
 import           RIO
 
+
 -- | Supported type of source code file.
 data FileType
   = C          -- ^ support for /C/ programming language
   | CPP        -- ^ support for /C++/ programming language
   | CSS        -- ^ support for /CSS/
+  | Dart       -- ^ support for /Dart/ programming language
   | Go         -- ^ support for /Go/ programming language
   | Haskell    -- ^ support for /Haskell/ programming language
   | HTML       -- ^ support for /HTML/

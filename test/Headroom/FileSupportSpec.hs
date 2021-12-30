@@ -90,7 +90,7 @@ spec = do
             ]
       analyzeSourceCode (fileSupport CSS) sample `shouldBe` expected
 
-    it "analyzes Go source code" $ do
+    it "analyzes Dart source code" $ do
       sample <- loadFile $ codeSamples </> "go" </> "sample1.go"
       let expected = SourceCode
             [ (Code   , "")
@@ -111,6 +111,23 @@ spec = do
             , (Code   , "}")
             ]
       analyzeSourceCode (fileSupport Go) sample `shouldBe` expected
+
+    it "analyzes Go source code" $ do
+      sample <- loadFile $ codeSamples </> "dart" </> "sample1.dart"
+      let expected = SourceCode
+            [ (Code   , "")
+            , (Comment, "// This is the")
+            , (Comment, "// header")
+            , (Code   , "")
+            , (Comment, "// this is not header")
+            , (Code   , "")
+            , (Comment, "// this is not the header")
+            , (Code   , "void main() {")
+            , (Comment, "  /* another comment */")
+            , (Code   , "  print('Hello, World!');")
+            , (Code   , "}")
+            ]
+      analyzeSourceCode (fileSupport Dart) sample `shouldBe` expected
 
     it "analyzes Haskell source code" $ do
       sample <- loadFile $ codeSamples </> "haskell" </> "full.hs"

@@ -30,6 +30,7 @@ import           Control.Monad.State                 ( get
 import qualified Headroom.FileSupport.C             as C
 import qualified Headroom.FileSupport.CPP           as CPP
 import qualified Headroom.FileSupport.CSS           as CSS
+import qualified Headroom.FileSupport.Dart          as Dart
 import qualified Headroom.FileSupport.Go            as Go
 import qualified Headroom.FileSupport.Haskell       as Haskell
 import qualified Headroom.FileSupport.HTML          as HTML
@@ -59,6 +60,7 @@ fileSupport :: FileType -> FileSupport
 fileSupport C          = C.fileSupport
 fileSupport CPP        = CPP.fileSupport
 fileSupport CSS        = CSS.fileSupport
+fileSupport Dart       = Dart.fileSupport
 fileSupport Go         = Go.fileSupport
 fileSupport Haskell    = Haskell.fileSupport
 fileSupport HTML       = HTML.fileSupport

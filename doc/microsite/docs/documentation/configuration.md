@@ -171,6 +171,7 @@ _Headroom_ can manage license headers only for supported types of source code fi
 | _C_          | `c`                   | `.c`               |
 | _C++_        | `cpp`                 | `.cpp`             |
 | _CSS_        | `css`                 | `.css`             |
+| _Dart_       | `dart`                | `.dart`            |
 | _Go_         | `go`                  | `.go`              |
 | _Haskell_    | `haskell`             | `.hs`              |
 | _HTML_       | `html`                | `.html`, `.htm`    |

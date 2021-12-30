@@ -138,6 +138,18 @@ license-headers:
       starts-with: ^\/\*
       ends-with: \*\/$
 
+  ## Dart configuration
+  dart:
+    file-extensions: ["dart"]
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
+    put-after: []
+    put-before: []
+    line-comment:
+      prefixed-by: ^\/\/
+
   ## Go configuration
   go:
     file-extensions: ["go"]

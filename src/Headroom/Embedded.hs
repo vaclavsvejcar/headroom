@@ -49,17 +49,15 @@ defaultGlobalConfig = $(embedDefaultGlobalConfig)
 
 -- | License template for given license.
 licenseTemplate :: IsString a
-                => LicenseType
-                -- ^ license for which to return the template
-                -> FileType
-                -- ^ license for which to return the template
-                -> a
-                -- ^ template text
+                => LicenseType -- ^ license for which to return the template
+                -> FileType    -- ^ license for which to return the template
+                -> a           -- ^ template text
 licenseTemplate licenseType fileType = case licenseType of
   Apache2 -> case fileType of
     C          -> $(embedTemplate Apache2 C)
     CPP        -> $(embedTemplate Apache2 CPP)
     CSS        -> $(embedTemplate Apache2 CSS)
+    Dart       -> $(embedTemplate Apache2 Dart)
     Go         -> $(embedTemplate Apache2 Go)
     Haskell    -> $(embedTemplate Apache2 Haskell)
     HTML       -> $(embedTemplate Apache2 HTML)
@@ -74,6 +72,7 @@ licenseTemplate licenseType fileType = case licenseType of
     C          -> $(embedTemplate BSD3 C)
     CPP        -> $(embedTemplate BSD3 CPP)
     CSS        -> $(embedTemplate BSD3 CSS)
+    Dart       -> $(embedTemplate BSD3 Dart)
     Go         -> $(embedTemplate BSD3 Go)
     Haskell    -> $(embedTemplate BSD3 Haskell)
     HTML       -> $(embedTemplate BSD3 HTML)
@@ -88,6 +87,7 @@ licenseTemplate licenseType fileType = case licenseType of
     C          -> $(embedTemplate GPL2 C)
     CPP        -> $(embedTemplate GPL2 CPP)
     CSS        -> $(embedTemplate GPL2 CSS)
+    Dart       -> $(embedTemplate GPL2 Dart)
     Go         -> $(embedTemplate GPL2 Go)
     Haskell    -> $(embedTemplate GPL2 Haskell)
     HTML       -> $(embedTemplate GPL2 HTML)
@@ -102,6 +102,7 @@ licenseTemplate licenseType fileType = case licenseType of
     C          -> $(embedTemplate GPL3 C)
     CPP        -> $(embedTemplate GPL3 CPP)
     CSS        -> $(embedTemplate GPL3 CSS)
+    Dart       -> $(embedTemplate GPL3 Dart)
     Go         -> $(embedTemplate GPL3 Go)
     Haskell    -> $(embedTemplate GPL3 Haskell)
     HTML       -> $(embedTemplate GPL3 HTML)
@@ -116,6 +117,7 @@ licenseTemplate licenseType fileType = case licenseType of
     C          -> $(embedTemplate MIT C)
     CPP        -> $(embedTemplate MIT CPP)
     CSS        -> $(embedTemplate MIT CSS)
+    Dart       -> $(embedTemplate MIT Dart)
     Go         -> $(embedTemplate MIT Go)
     Haskell    -> $(embedTemplate MIT Haskell)
     HTML       -> $(embedTemplate MIT HTML)
@@ -130,6 +132,7 @@ licenseTemplate licenseType fileType = case licenseType of
     C          -> $(embedTemplate MPL2 C)
     CPP        -> $(embedTemplate MPL2 CPP)
     CSS        -> $(embedTemplate MPL2 CSS)
+    Dart       -> $(embedTemplate MPL2 Dart)
     Go         -> $(embedTemplate MPL2 Go)
     Haskell    -> $(embedTemplate MPL2 Haskell)
     HTML       -> $(embedTemplate MPL2 HTML)

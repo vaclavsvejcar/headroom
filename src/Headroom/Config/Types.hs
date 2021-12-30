@@ -398,32 +398,20 @@ instance FromJSON PtHeaderConfig where
 
 -- | Group of 'HeaderConfig' configurations for supported file types.
 data HeadersConfig (p :: Phase) = HeadersConfig
-  { hscC          :: HeaderConfig p
-  -- ^ configuration for /C/ programming language
-  , hscCpp        :: HeaderConfig p
-  -- ^ configuration for /C++/ programming language
-  , hscCss        :: HeaderConfig p
-  -- ^ configuration for /CSS/
-  , hscGo         :: HeaderConfig p
-  -- ^ configuration for /Go/
-  , hscHaskell    :: HeaderConfig p
-  -- ^ configuration for /Haskell/ programming language
-  , hscHtml       :: HeaderConfig p
-  -- ^ configuration for /HTML/
-  , hscJava       :: HeaderConfig p
-  -- ^ configuration for /Java/ programming language
-  , hscJs         :: HeaderConfig p
-  -- ^ configuration for /JavaScript/ programming language
-  , hscPhp        :: HeaderConfig p
-  -- ^ configuration for /PHP/ programming language
-  , hscPureScript :: HeaderConfig p
-  -- ^ configuration for /PureScript/ programming language
-  , hscRust       :: HeaderConfig p
-  -- ^ configuration for /Rust/ programming language
-  , hscScala      :: HeaderConfig p
-  -- ^ configuration for /Scala/ programming language
-  , hscShell      :: HeaderConfig p
-  -- ^ configuration for /Shell/
+  { hscC          :: HeaderConfig p -- ^ configuration for /C/
+  , hscCpp        :: HeaderConfig p -- ^ configuration for /C++/
+  , hscCss        :: HeaderConfig p -- ^ configuration for /CSS/
+  , hscDart       :: HeaderConfig p -- ^ configuration for /Dart/
+  , hscGo         :: HeaderConfig p -- ^ configuration for /Go/
+  , hscHaskell    :: HeaderConfig p -- ^ configuration for /Haskell/
+  , hscHtml       :: HeaderConfig p -- ^ configuration for /HTML/
+  , hscJava       :: HeaderConfig p -- ^ configuration for /Java/
+  , hscJs         :: HeaderConfig p -- ^ configuration for /JavaScript/
+  , hscPhp        :: HeaderConfig p -- ^ configuration for /PHP/
+  , hscPureScript :: HeaderConfig p -- ^ configuration for /PureScript/
+  , hscRust       :: HeaderConfig p -- ^ configuration for /Rust/
+  , hscScala      :: HeaderConfig p -- ^ configuration for /Scala/
+  , hscShell      :: HeaderConfig p -- ^ configuration for /Shell/
   }
 
 -- | Alias for complete variant of 'HeadersConfig'.
@@ -448,6 +436,7 @@ instance FromJSON PtHeadersConfig where
     hscC          <- obj .:? "c" .!= mempty
     hscCpp        <- obj .:? "cpp" .!= mempty
     hscCss        <- obj .:? "css" .!= mempty
+    hscDart       <- obj .:? "dart" .!= mempty
     hscGo         <- obj .:? "go" .!= mempty
     hscHaskell    <- obj .:? "haskell" .!= mempty
     hscHtml       <- obj .:? "html" .!= mempty

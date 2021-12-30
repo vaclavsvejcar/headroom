@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 - [#78] Check automatically for Headroom updates
 - [#81] Add support for _PHP_ language
 - [#83] FIXED: _Update Copyright_ post-processor incorrectly changes years in some cases
+- [#84] Add support for _Dart_ language
 - Bump _LTS Haskell_ to `18.20`
 
 ## 0.4.2.0 (released 2021-07-01)

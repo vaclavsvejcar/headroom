@@ -33,43 +33,34 @@ import           RIO
 import qualified RIO.List                           as L
 
 
-
 -- | Returns 'FileType' for given file extension (without dot), using configured
 -- values from the 'HeadersConfig'.
-fileTypeByExt :: CtHeadersConfig
-              -- ^ license headers configuration
-              -> Text
-              -- ^ file extension (without dot)
-              -> Maybe FileType
-              -- ^ found 'FileType'
+fileTypeByExt :: CtHeadersConfig -- ^ license headers configuration
+              -> Text            -- ^ file extension (without dot)
+              -> Maybe FileType  -- ^ found 'FileType'
 fileTypeByExt config ext =
   L.find (elem ext . listExtensions config) (allValues @FileType)
 
 
 -- | Lists all recognized file extensions for given 'FileType', using configured
 -- values from the 'HeadersConfig'.
-listExtensions :: CtHeadersConfig
-               -- ^ license headers configuration
-               -> FileType
-               -- ^ 'FileType' for which to list extensions
-               -> [Text]
-               -- ^ list of appropriate file extensions
+listExtensions :: CtHeadersConfig -- ^ license headers configuration
+               -> FileType        -- ^ 'FileType' for which to list extensions
+               -> [Text]          -- ^ list of appropriate file extensions
 listExtensions config fileType =
   hcFileExtensions (configByFileType config fileType)
 
 
 -- | Returns the proper 'HeaderConfig' for the given 'FileType', selected
 -- from the 'HeadersConfig'.
-configByFileType :: CtHeadersConfig
-                 -- ^ license headers configuration
-                 -> FileType
-                 -- ^ selected 'FileType'
-                 -> CtHeaderConfig
-                 -- ^ appropriate 'HeaderConfig'
+configByFileType :: CtHeadersConfig -- ^ license headers configuration
+                 -> FileType        -- ^ selected 'FileType'
+                 -> CtHeaderConfig  -- ^ appropriate 'HeaderConfig'
 configByFileType HeadersConfig {..} fileType = case fileType of
   C          -> hscC
   CPP        -> hscCpp
   CSS        -> hscCss
+  Dart       -> hscDart
   Go         -> hscGo
   Haskell    -> hscHaskell
   HTML       -> hscHtml

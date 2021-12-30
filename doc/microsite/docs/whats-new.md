@@ -2,6 +2,22 @@ Version `0.4.3.0` is minor release that brings some improvements and bugfixes, w
 
 ## New & Noteworthy
 
+### Support for Dart language
+This version adds basic support for managing license/copyright headers in _Dart_ source code files. Default configuration assumes that licence/copyright header is the first single-line comment (or more, but not separated by _newline_), such as:
+
+```dart
+// Super Awesome App
+// Copyright (c) 2021 John Smith
+// this is still copyright header
+
+// this is not copyright header anymore
+
+void main() {
+  /* another comment */
+  print('Hello, World!');
+}
+```
+
 ### Support for PHP language
 This version adds support for managing license/copyright headers in _PHP_ source code files. Default configuration assumes that license/copyright header is the very first _DocBlock_ comment present in _PHP_ file, such as:
 
@@ -32,7 +48,7 @@ This release adds functionality that automatically checks whether new version of
     Info about new version is retrieved using _GitHub REST API_ from project releases page, no personal info is collected and no tracking is done. Your privacy is priority for us and always will be respected.
 
 ## Other bugfixes and improvements
-- [[#83]][github/issue/83] - 'Update Copyright' post-processor incorrectly updates years in some cases
+- [[#83]][github/issue/83] - _Update Copyright_ post-processor incorrectly updates years in some cases
 - minor tweaks and performance improvements
 
 [doc:configuration]: documentation/configuration.md

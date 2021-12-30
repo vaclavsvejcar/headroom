@@ -112,6 +112,7 @@ makeHeadersConfig pt = do
   hscC          <- makeHeaderConfig C (hscC pt)
   hscCpp        <- makeHeaderConfig CPP (hscCpp pt)
   hscCss        <- makeHeaderConfig CSS (hscCss pt)
+  hscDart       <- makeHeaderConfig Dart (hscDart pt)
   hscGo         <- makeHeaderConfig Go (hscGo pt)
   hscHaskell    <- makeHeaderConfig Haskell (hscHaskell pt)
   hscHtml       <- makeHeaderConfig HTML (hscHtml pt)
