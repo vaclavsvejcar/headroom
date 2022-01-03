@@ -4,7 +4,7 @@
 {-|
 Module      : Headroom.IO.FileSystem
 Description : File system related IO operations
-Copyright   : (c) 2019-2021 Vaclav Svejcar
+Copyright   : (c) 2019-2022 Vaclav Svejcar
 License     : BSD-3-Clause
 Maintainer  : vaclav.svejcar@gmail.com
 Stability   : experimental

@@ -16,7 +16,7 @@ variables:
   author: Vaclav Svejcar
   license: BSD-3-Clause
   email: vaclav.svejcar@gmail.com
-  year: 2019-2021
+  year: 2019-2022
 
 license-headers:
   haskell:
