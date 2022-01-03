@@ -41,7 +41,6 @@ import qualified RIO.Text                           as T
 -- syntax (just the syntax for comment itself - like @//@ or @--@). If such
 -- prefix is found, it's then added to the input 'HeaderSyntax'.
 --
--- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> findPrefix (BlockComment [re|^\/\*|] [re|\*\/$|] Nothing) "/*\n * foo\n * bar\n */"
 -- BlockComment "^\\/\\*" "\\*\\/$" (Just " *")
@@ -65,7 +64,6 @@ findPrefix syntax text = case syntax of
 -- comments, this is to make it visually unified, but for line comments it's
 -- necessary in order not to break syntax of target source code file.
 --
--- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> sanitizeSyntax (LineComment [re|^--|] (Just "--")) "-- foo\nbar"
 -- "-- foo\n-- bar"
@@ -87,7 +85,6 @@ sanitizeSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
 
 -- | Strips comment syntax from given text.
 --
--- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> stripCommentSyntax (LineComment [re|^--|] (Just "--")) "-- a\n-- b"
 -- "a\n b"

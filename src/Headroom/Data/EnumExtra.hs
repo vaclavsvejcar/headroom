@@ -34,7 +34,6 @@ class (Bounded a, Enum a, Eq a, Ord a, Show a) => EnumExtra a where
 
   -- | Returns list of all enum values.
   --
-  -- >>> :set -XDeriveAnyClass -XTypeApplications
   -- >>> data Test = Foo | Bar deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
   -- >>> allValues @Test
   -- [Foo,Bar]
@@ -45,7 +44,6 @@ class (Bounded a, Enum a, Eq a, Ord a, Show a) => EnumExtra a where
   -- | Returns all values of enum as single string, individual values separated
   -- with comma.
   --
-  -- >>> :set -XDeriveAnyClass -XTypeApplications
   -- >>> data Test = Foo | Bar deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
   -- >>> allValuesToText @Test
   -- "Foo, Bar"
@@ -55,7 +53,6 @@ class (Bounded a, Enum a, Eq a, Ord a, Show a) => EnumExtra a where
 
   -- | Returns textual representation of enum value. Opposite to 'textToEnum'.
   --
-  -- >>> :set -XDeriveAnyClass
   -- >>> data Test = Foo | Bar deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
   -- >>> enumToText Bar
   -- "Bar"
@@ -66,7 +63,6 @@ class (Bounded a, Enum a, Eq a, Ord a, Show a) => EnumExtra a where
   -- | Returns enum value from its textual representation.
   -- Opposite to 'enumToText'.
   --
-  -- >>> :set -XDeriveAnyClass
   -- >>> data Test = Foo | Bar deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)
   -- >>> (textToEnum "Foo") :: (Maybe Test)
   -- Just Foo

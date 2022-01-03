@@ -86,7 +86,6 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
 -- Note that recursive variable reference and/or cyclic references are not
 -- supported.
 --
--- >>> :set -XTypeApplications
 -- >>> import Headroom.Template.Mustache (Mustache)
 -- >>> let compiled = compileVariables @Mustache $ mkVariables [("name", "John"), ("msg", "Hello, {{ name }}")]
 -- >>> let expected = mkVariables [("name", "John"), ("msg", "Hello, John")]

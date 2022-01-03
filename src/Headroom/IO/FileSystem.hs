@@ -238,7 +238,6 @@ loadFile = readFileUtf8
 -- | Takes list of patterns and file paths and returns list of file paths where
 -- those matching the given patterns are excluded.
 --
--- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> excludePaths [[re|\.hidden|], [re|zzz|]] ["foo/.hidden", "test/bar", "x/zzz/e"]
 -- ["test/bar"]

@@ -179,7 +179,6 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- Based on the 'HeaderSyntax' specified in given 'HeaderConfig', this function
 -- delegates its work to either 'findBlockHeader' or 'findLineHeader'.
 --
--- >>> :set -XFlexibleContexts -XTypeFamilies -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (BlockComment [re|^{-|] [re|(?<!#)-}$|] Nothing)
 -- >>> findHeader hc $ SourceCode [(Code, "foo"), (Code, "bar"), (Comment, "{- HEADER -}")]
@@ -201,7 +200,6 @@ findHeader HeaderConfig {..} input = case hcHeaderSyntax of
 -- | Finds header in the form of /multi-line comment/ syntax, which is delimited
 -- with starting and ending pattern.
 --
--- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> let sc = SourceCode [(Code, ""), (Comment, "{- HEADER -}"), (Code, ""), (Code,"")]
 -- >>> findBlockHeader [re|^{-|] [re|(?<!#)-}$|] sc 0
@@ -234,7 +232,6 @@ findBlockHeader start end sc offset = mapT2 (+ offset) <$> position
 -- | Finds header in the form of /single-line comment/ syntax, which is
 -- delimited with the prefix pattern.
 --
--- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 -- >>> let sc = SourceCode [(Code, ""), (Code, "a"), (Comment, "-- first"), (Comment, "-- second"), (Code, "foo")]
 -- >>> findLineHeader [re|^--|] sc 0
@@ -270,7 +267,6 @@ findLineHeader prefix sc offset = mapT2 (+ offset) <$> position
 -- If both first and second patterns are empty, then all lines are returned in
 -- the middle part.
 --
--- >>> :set -XQuasiQuotes
 -- >>> import Headroom.Data.Regex (re)
 --
 -- >>> let ls = [(Code, "text"), (Code, "->"), (Code, "RESULT"), (Code, "<-"), (Code, "foo")]

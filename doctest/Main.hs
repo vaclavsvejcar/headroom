@@ -1,6 +1,18 @@
-module Main (main) where
+module Main
+  ( main
+  )
+where
 
-import Test.DocTest
-    
+import           Test.DocTest
+
 main :: IO ()
-main = doctest ["-XOverloadedStrings", "-XTemplateHaskell", "src"]
+main = doctest
+  [ "-XDeriveAnyClass"
+  , "-XFlexibleContexts"
+  , "-XOverloadedStrings"
+  , "-XTemplateHaskell"
+  , "-XTypeApplications"
+  , "-XTypeFamilies"
+  , "-XQuasiQuotes"
+  , "src"
+  ]
