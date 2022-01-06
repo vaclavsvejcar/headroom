@@ -407,6 +407,7 @@ data HeadersConfig (p :: Phase) = HeadersConfig
   , hscHtml       :: HeaderConfig p -- ^ configuration for /HTML/
   , hscJava       :: HeaderConfig p -- ^ configuration for /Java/
   , hscJs         :: HeaderConfig p -- ^ configuration for /JavaScript/
+  , hscKotlin     :: HeaderConfig p -- ^ configuration for /Kotlin/
   , hscPhp        :: HeaderConfig p -- ^ configuration for /PHP/
   , hscPureScript :: HeaderConfig p -- ^ configuration for /PureScript/
   , hscRust       :: HeaderConfig p -- ^ configuration for /Rust/
@@ -442,6 +443,7 @@ instance FromJSON PtHeadersConfig where
     hscHtml       <- obj .:? "html" .!= mempty
     hscJava       <- obj .:? "java" .!= mempty
     hscJs         <- obj .:? "js" .!= mempty
+    hscKotlin     <- obj .:? "kotlin" .!= mempty
     hscPhp        <- obj .:? "php" .!= mempty
     hscPureScript <- obj .:? "purescript" .!= mempty
     hscRust       <- obj .:? "rust" .!= mempty

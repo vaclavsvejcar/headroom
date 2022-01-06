@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#81] Add support for _PHP_ language
 - [#83] FIXED: _Update Copyright_ post-processor incorrectly changes years in some cases
 - [#84] Add support for _Dart_ language
+- [#85] Add support for _Kotlin_ language
 - Bump _LTS Haskell_ to `18.21`
 
 ## 0.4.2.0 (released 2021-07-01)

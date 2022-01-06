@@ -118,6 +118,7 @@ makeHeadersConfig pt = do
   hscHtml       <- makeHeaderConfig HTML (hscHtml pt)
   hscJava       <- makeHeaderConfig Java (hscJava pt)
   hscJs         <- makeHeaderConfig JS (hscJs pt)
+  hscKotlin     <- makeHeaderConfig Kotlin (hscKotlin pt)
   hscPhp        <- makeHeaderConfig PHP (hscPhp pt)
   hscPureScript <- makeHeaderConfig PureScript (hscPureScript pt)
   hscRust       <- makeHeaderConfig Rust (hscRust pt)

@@ -3,7 +3,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TypeApplications  #-}
 
-module Headroom.FileSupport.JavaSpec
+module Headroom.FileSupport.KotlinSpec
   ( spec
   )
 where
@@ -20,7 +20,7 @@ import           Headroom.FileSupport.TemplateData   ( TemplateData(..) )
 import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      , SyntaxAnalysis(..)
                                                      )
-import           Headroom.FileType.Types             ( FileType(Java) )
+import           Headroom.FileType.Types             ( FileType(Kotlin) )
 import           Headroom.Header                     ( extractHeaderTemplate )
 import           Headroom.IO.FileSystem              ( loadFile )
 import           Headroom.Template                   ( emptyTemplate )
@@ -33,25 +33,25 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
-  let codeSamples = "test-data" </> "code-samples" </> "java"
+  let codeSamples = "test-data" </> "code-samples" </> "kotlin"
 
 
   describe "fsSyntaxAnalysis" $ do
     it "correctly detects comment starts/ends" $ do
       let samples =
-            [ ("non comment line"                , (False, False))
-            , ("// single line comment"          , (True, True))
-            , ("not // single line comment"      , (False, False))
-            , ("/* block comment start"          , (True, False))
-            , ("block comment end */"            , (False, True))
-            , ("/* block comment start/end */"   , (True, True))
-            , ("/** JavaDoc comment start/end */", (True, True))
+            [ ("non comment line"             , (False, False))
+            , ("// single line comment"       , (True, True))
+            , ("not // single line comment"   , (False, False))
+            , ("/* block comment start"       , (True, False))
+            , ("block comment end */"         , (False, True))
+            , ("/* block comment start/end */", (True, True))
+            , ("/** KDoc comment start/end */", (True, True))
             ]
       all checkSyntaxAnalysis samples `shouldBe` True
 
 
   describe "fsExtractTemplateData" $ do
-    it "doesn't provide any custom data for Java" $ do
+    it "doesn't provide any custom data for Kotlin" $ do
       template <- emptyTemplate @_ @Mustache
       let syntax   = undefined
           expected = NoTemplateData
@@ -59,24 +59,24 @@ spec = do
 
 
   describe "fsExtractVariables" $ do
-    it "extract variables from Java source code" $ do
+    it "extract variables from Kotlin source code" $ do
       template       <- emptyTemplate @_ @Mustache
       defaultConfig' <- parseAppConfig defaultConfig
       config         <- makeHeadersConfig (acLicenseHeaders defaultConfig')
-      raw            <- loadFile $ codeSamples </> "sample1.java"
-      let ht        = extractHeaderTemplate config Java template
+      raw            <- loadFile $ codeSamples </> "sample1.kt"
+      let ht        = extractHeaderTemplate config Kotlin template
           headerPos = Just (0, 2)
-          expected  = mkVariables [("_java_package_name", "foo")]
+          expected  = mkVariables [("_kotlin_package_name", "foo")]
           sample    = analyzeSourceCode fileSupport' raw
       fsExtractVariables fileSupport' ht headerPos sample `shouldBe` expected
 
 
   describe "fsFileType" $ do
-    it "matches correct type for Java" $ do
-      fsFileType fileSupport' `shouldBe` Java
+    it "matches correct type for Kotlin" $ do
+      fsFileType fileSupport' `shouldBe` Kotlin
 
  where
-  fileSupport' = fileSupport Java
+  fileSupport' = fileSupport Kotlin
   checkSyntaxAnalysis (l, (s, e)) =
     let SyntaxAnalysis {..} = fsSyntaxAnalysis fileSupport'
     in  saIsCommentStart l == s && saIsCommentEnd l == e

@@ -238,6 +238,22 @@ spec = do
             ]
       analyzeSourceCode (fileSupport JS) sample `shouldBe` expected
 
+    it "analyzes Kotlin source code" $ do
+      sample <- loadFile $ codeSamples </> "kotlin" </> "sample1.kt"
+      let expected = SourceCode
+            [ (Comment, "/*")
+            , (Comment, " * This is copyright header")
+            , (Comment, " */")
+            , (Code   , "")
+            , (Code   , "package foo")
+            , (Code   , "")
+            , (Comment, "/** this is not license header */")
+            , (Code, "fun main(args : Array<String>) {")
+            , (Code   , "    println(\"Hello, World!\")")
+            , (Code   , "}")
+            ]
+      analyzeSourceCode (fileSupport Kotlin) sample `shouldBe` expected
+
     it "analyzes PHP source code" $ do
       sample <- loadFile $ codeSamples </> "php" </> "sample1.php"
       let

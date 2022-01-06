@@ -147,6 +147,11 @@ This support includes extracting additional info from processed _Java source cod
 
 - `_java_package_name` - Contains package name of the currently processed `Java` source code file.
 
+### Kotlin Support
+This support includes extracting additional info from processed _Kotlin source code file_ and exposing it using following _dynamic variables_:
+
+- `_kotlin_package_name` - Contains package name of the currently processed `Kotlin` source code file.
+
 ### PureScript Support
 This support includes extracting additional info from processed _PureScript source code file_ and exposing it using following _dynamic variables_:
 

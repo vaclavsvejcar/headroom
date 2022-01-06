@@ -214,6 +214,19 @@ license-headers:
       starts-with: ^\/\*
       ends-with: \*\/$
 
+  ## Kotlin configuration
+  kotlin:
+    file-extensions: ["kt"]
+    margin-top-code: 0
+    margin-top-file: 0
+    margin-bottom-code: 0
+    margin-bottom-file: 0
+    put-after: []
+    put-before: ["^package"]
+    block-comment:
+      starts-with: ^\/\*
+      ends-with: \*\/$
+
   ## PHP configuration
   php:
     file-extensions: ["php"]

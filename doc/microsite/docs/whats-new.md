@@ -18,6 +18,28 @@ void main() {
 }
 ```
 
+### Support for Kotlin language
+This version adds support for _Kotlin_ programming language. Default configuration assumes that license/copyright header is the very first block comment, such as:
+
+```kotlin
+/*
+ * This is copyright header
+ */
+
+package foo
+
+/** this is not license header */
+fun main(args : Array<String>) {
+    println("Hello, World!")
+}
+```
+
+Also support includes extracting additional info from processed Java source code file and exposing it using following _dynamic variables_:
+
+- `_kotlin_package_name` - Contains package name of the currently processed Kotlin source code file.
+
+For more info about how _dynamic variables_ and _content-aware templates_ work, see [Templates][doc:templates] chapter.
+
 ### Support for PHP language
 This version adds support for managing license/copyright headers in _PHP_ source code files. Default configuration assumes that license/copyright header is the very first _DocBlock_ comment present in _PHP_ file, such as:
 
@@ -54,5 +76,6 @@ This release adds functionality that automatically checks whether new version of
 [doc:configuration]: documentation/configuration.md
 [doc:migration-guide]: migration-guide.md
 [doc:running-headroom]: documentation/running-headroom.md
+[doc:templates]: documentation/templates.md
 [github:vcs-ignore]: https://github.com/vaclavsvejcar/vcs-ignore
 [github/issue/83]: https://github.com/vaclavsvejcar/headroom/issues/83
