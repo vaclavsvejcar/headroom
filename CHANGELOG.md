@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.4.3.0 (in development)
+## 0.4.3.0 (released 2022-01-20)
 - [#78] Check automatically for Headroom updates
 - [#81] Add support for _PHP_ language
 - [#83] FIXED: _Update Copyright_ post-processor incorrectly changes years in some cases
