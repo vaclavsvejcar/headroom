@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 0.4.4.0 (in development)
+- Bump _LTS Haskell_ to `18.23`
+
 ## 0.4.3.0 (released 2022-01-20)
 - [#78] Check automatically for Headroom updates
 - [#81] Add support for _PHP_ language
