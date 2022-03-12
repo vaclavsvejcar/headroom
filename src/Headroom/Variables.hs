@@ -47,20 +47,16 @@ import qualified RIO.Text                           as T
 --
 -- >>> mkVariables [("key1", "value1")]
 -- Variables (fromList [("key1","value1")])
-mkVariables :: [(Text, Text)]
-            -- ^ pairs of /key-value/
-            -> Variables
-            -- ^ constructed variables
+mkVariables :: [(Text, Text)] -- ^ pairs of /key-value/
+            -> Variables      -- ^ constructed variables
 mkVariables = Variables . HM.fromList
 
 
 -- | /Dynamic variables/ that are common for all parsed files.
 --
 -- * @___current_year__@ - current year
-dynamicVariables :: CurrentYear
-                 -- ^ current year
-                 -> Variables
-                 -- ^ map of /dynamic variables/
+dynamicVariables :: CurrentYear -- ^ current year
+                 -> Variables   -- ^ map of /dynamic variables/
 dynamicVariables (CurrentYear year) =
   mkVariables [("_current_year", tshow year)]
 
@@ -70,10 +66,8 @@ dynamicVariables (CurrentYear year) =
 -- >>> parseVariables ["key1=value1"]
 -- Variables (fromList [("key1","value1")])
 parseVariables :: MonadThrow m
-               => [Text]
-               -- ^ list of raw variables
-               -> m Variables
-               -- ^ parsed variables
+               => [Text]      -- ^ list of raw variables
+               -> m Variables -- ^ parsed variables
 parseVariables variables = fmap mkVariables (mapM parse variables)
  where
   parse input = case T.split (== '=') input of
@@ -93,10 +87,8 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
 -- True
 compileVariables :: forall a m
                   . (Template a, MonadThrow m)
-                 => Variables
-                 -- ^ input variables to compile
-                 -> m Variables
-                 -- ^ compiled variables
+                 => Variables   -- ^ input variables to compile
+                 -> m Variables -- ^ compiled variables
 compileVariables variables@(Variables kvs) = do
   compiled <- mapM compileVariable (HM.toList kvs)
   pure $ mkVariables compiled
@@ -110,8 +102,7 @@ compileVariables variables@(Variables kvs) = do
 ---------------------------------  Error Types  --------------------------------
 
 -- | Exception specific to the "Headroom.Variables" module.
-data VariablesError = InvalidVariable Text
-                    -- ^ invalid variable input (as @key=value@)
+data VariablesError = InvalidVariable Text -- ^ invalid variable input (as @key=value@)
   deriving (Eq, Show)
 
 
