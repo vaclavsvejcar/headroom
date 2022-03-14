@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cf66462b85b45c90a6af25f49f7d8fd7f6acc81884937baba9aaaecb4d76a785
+-- hash: 1ddd1a16d2e1ee596879286c439421ea1d5dcc555f0af0bed0d32b9164fc0030
 
 name:           headroom
 version:        0.4.4.0
@@ -244,7 +244,7 @@ library
     , microlens-th
     , modern-uri
     , mtl
-    , mustache
+    , mustache >=2.3.1
     , optparse-applicative
     , pcre-heavy
     , pcre-light

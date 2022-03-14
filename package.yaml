@@ -75,7 +75,7 @@ library:
     - microlens-th
     - modern-uri
     - mtl
-    - mustache
+    - mustache >=2.3.1
     - pcre-light
     - pcre-heavy
     - persistent
