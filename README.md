@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/vaclavsvejcar/headroom/workflows/CI/badge.svg)
 [![Hackage version](http://img.shields.io/hackage/v/headroom.svg)](https://hackage.haskell.org/package/headroom)
-[![Stackage version](https://www.stackage.org/package/headroom/badge/lts?label=Stackage)](https://www.stackage.org/package/headroom)
+[![Stackage version](https://www.stackage.org/package/headroom/badge/lts?label=stackage%20LTS)](https://www.stackage.org/package/headroom)
 
 Would you like to have nice, up-to-date license/copyright headers in your source code files but hate to manage them manually? Then __Headroom__ is the right tool for you. Define your license header as [Mustache][web:mustache] template, put any template variables into [YAML][wiki:yaml] configuarion file, and you're ready to go!
 
