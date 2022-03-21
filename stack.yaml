@@ -1,3 +1,6 @@
-resolver: lts-18.28
+resolver: lts-19.0
 packages:
   - .
+extra-deps:
+  - mustache-2.4.0
+  - unordered-containers-0.2.16.0
