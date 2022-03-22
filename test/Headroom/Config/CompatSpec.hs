@@ -48,3 +48,11 @@ spec = do
       let err CannotParseVersion = True
           err _                  = False
       checkCompatibility versions curr yaml `shouldThrow` err
+
+    it "fails when source YAML has invalid syntax" $ do
+      let yaml     = "invalid: [:]"
+          curr     = [pvp|0.2.0.0|]
+          versions = [[pvp|0.1.0.0|], [pvp|0.2.1.0|], [pvp|0.4.0.0|]]
+      let err (CannotParseYaml _) = True
+          err _                   = False
+      checkCompatibility versions curr yaml `shouldThrow` err

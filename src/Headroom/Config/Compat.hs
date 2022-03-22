@@ -60,13 +60,11 @@ instance FromJSON VersionObj where
 
 -- | Exception specific to the "Headroom.Configuration.Compat" module.
 data VersionError
-  = CannotParseVersion
-  -- ^ cannot parse version info from given YAML configuration
-  | NewerVersionDetected Version
-  -- ^ configuration has newer version than Headroom
-  | UnsupportedVersion [Version] Version
-  -- ^ given YAML configuration is not compatible
-  deriving (Eq, Show)
+  = CannotParseVersion                   -- ^ cannot parse version info from YAML
+  | CannotParseYaml Y.ParseException     -- ^ error parsing YAML file
+  | NewerVersionDetected Version         -- ^ configuration has too new version
+  | UnsupportedVersion [Version] Version -- ^ given YAML configuration is not compatible
+  deriving (Show)
 
 
 instance Exception VersionError where
@@ -94,8 +92,11 @@ checkCompatibility breakingVersions current raw = do
   _                  <- checkNewerVersion current version
   pure version
  where
-  parseObj = either (const . throwM $ CannotParseVersion) pure decoded
+  parseObj = either (throwM . handleEx) pure decoded
   decoded  = Y.decodeEither' raw
+  handleEx = \case
+    err@(Y.InvalidYaml _) -> CannotParseYaml err
+    _                     -> CannotParseVersion
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
@@ -120,6 +121,10 @@ displayException' = \case
       has been added in version 0.4.0.0, please see following migration guide
       for more details on how to proceed:
       #{"\n\t" <> webDocMigration v0400}
+    |]
+  CannotParseYaml ex -> [iii|
+      Cannot parse #{configFileName :: String} configuration file:
+      #{"\n" <> Y.prettyPrintParseException ex}
     |]
   NewerVersionDetected version -> [iii|
       The version set in your #{configFileName :: String} configuration file
