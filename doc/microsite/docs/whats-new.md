@@ -1,61 +1,19 @@
-Version `0.4.3.0` is minor release that brings some improvements and bugfixes, without any breaking changes in _CLI_ interface or configuration.
+Version `0.4.4.0` is minor release that brings some improvements and bugfixes, without any breaking changes in _CLI_ interface or configuration.
 
 ## New & Noteworthy
 
-### Support for Dart language
-This version adds basic support for managing license/copyright headers in _Dart_ source code files. Default configuration assumes that licence/copyright header is the first single-line comment (or more, but not separated by _newline_), such as:
+### Support for Python language
+This version adds support for managing license/copyright headers in _Python_ source code files. Default configuration assumes that license/copyright header is the very first comment present in _Python_ file, such as:
 
-```dart
-// Super Awesome App
-// Copyright (c) 2021 John Smith
-// this is still copyright header
+```python
+#!/usr/bin/env python3
 
-// this is not copyright header anymore
+# This is
+# header
 
-void main() {
-  /* another comment */
-  print('Hello, World!');
-}
-```
+# This is not
 
-### Support for Kotlin language
-This version adds support for _Kotlin_ programming language. Default configuration assumes that license/copyright header is the very first block comment, such as:
-
-```kotlin
-/*
- * This is copyright header
- */
-
-package foo
-
-/** this is not license header */
-fun main(args : Array<String>) {
-    println("Hello, World!")
-}
-```
-
-Also support includes extracting additional info from processed Java source code file and exposing it using following _dynamic variables_:
-
-- `_kotlin_package_name` - Contains package name of the currently processed Kotlin source code file.
-
-For more info about how _dynamic variables_ and _content-aware templates_ work, see [Templates][doc:templates] chapter.
-
-### Support for PHP language
-This version adds support for managing license/copyright headers in _PHP_ source code files. Default configuration assumes that license/copyright header is the very first _DocBlock_ comment present in _PHP_ file, such as:
-
-```php
-<?php
-
-/**
- * This is a file-level DocBlock, considered as license/copyright header
- * 
- * A warning will be raised, saying that to document the define, use
- * another DocBlock
- * @package SomePackage
- */
-
-define('foo', 'bar');
-
+print("This line will be printed.")
 ```
 
 At this moment, only basic support is present (i.e. no _dynamic variables_ are extracted from the header), but this might change in future releases.
@@ -70,12 +28,11 @@ This release adds functionality that automatically checks whether new version of
     Info about new version is retrieved using _GitHub REST API_ from project releases page, no personal info is collected and no tracking is done. Your privacy is priority for us and always will be respected.
 
 ## Other bugfixes and improvements
-- [[#83]][github/issue/83] - _Update Copyright_ post-processor incorrectly updates years in some cases
-- minor tweaks and performance improvements
+- [[#87]][github/issue/87] - FIXED: Misleading error message when YAML syntax of .headroom.yaml is invalid
 
 [doc:configuration]: documentation/configuration.md
 [doc:migration-guide]: migration-guide.md
 [doc:running-headroom]: documentation/running-headroom.md
 [doc:templates]: documentation/templates.md
 [github:vcs-ignore]: https://github.com/vaclavsvejcar/vcs-ignore
-[github/issue/83]: https://github.com/vaclavsvejcar/headroom/issues/83
+[github/issue/87]: https://github.com/vaclavsvejcar/headroom/issues/87
