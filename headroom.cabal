@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1ddd1a16d2e1ee596879286c439421ea1d5dcc555f0af0bed0d32b9164fc0030
+-- hash: af6bc53d71dddd0c65cecac96cfc7c8cf880c4b788b9a5cdb09f91e251755723
 
 name:           headroom
 version:        0.4.4.0
@@ -38,6 +38,7 @@ extra-source-files:
     embedded/license/apache2/kotlin.mustache
     embedded/license/apache2/php.mustache
     embedded/license/apache2/purescript.mustache
+    embedded/license/apache2/python.mustache
     embedded/license/apache2/rust.mustache
     embedded/license/apache2/scala.mustache
     embedded/license/apache2/shell.mustache
@@ -53,6 +54,7 @@ extra-source-files:
     embedded/license/bsd3/kotlin.mustache
     embedded/license/bsd3/php.mustache
     embedded/license/bsd3/purescript.mustache
+    embedded/license/bsd3/python.mustache
     embedded/license/bsd3/rust.mustache
     embedded/license/bsd3/scala.mustache
     embedded/license/bsd3/shell.mustache
@@ -68,6 +70,7 @@ extra-source-files:
     embedded/license/gpl2/kotlin.mustache
     embedded/license/gpl2/php.mustache
     embedded/license/gpl2/purescript.mustache
+    embedded/license/gpl2/python.mustache
     embedded/license/gpl2/rust.mustache
     embedded/license/gpl2/scala.mustache
     embedded/license/gpl2/shell.mustache
@@ -83,6 +86,7 @@ extra-source-files:
     embedded/license/gpl3/kotlin.mustache
     embedded/license/gpl3/php.mustache
     embedded/license/gpl3/purescript.mustache
+    embedded/license/gpl3/python.mustache
     embedded/license/gpl3/rust.mustache
     embedded/license/gpl3/scala.mustache
     embedded/license/gpl3/shell.mustache
@@ -98,6 +102,7 @@ extra-source-files:
     embedded/license/mit/kotlin.mustache
     embedded/license/mit/php.mustache
     embedded/license/mit/purescript.mustache
+    embedded/license/mit/python.mustache
     embedded/license/mit/rust.mustache
     embedded/license/mit/scala.mustache
     embedded/license/mit/shell.mustache
@@ -113,6 +118,7 @@ extra-source-files:
     embedded/license/mpl2/kotlin.mustache
     embedded/license/mpl2/php.mustache
     embedded/license/mpl2/purescript.mustache
+    embedded/license/mpl2/python.mustache
     embedded/license/mpl2/rust.mustache
     embedded/license/mpl2/scala.mustache
     embedded/license/mpl2/shell.mustache
@@ -139,6 +145,7 @@ extra-source-files:
     test-data/code-samples/kotlin/sample1.kt
     test-data/code-samples/php/sample1.php
     test-data/code-samples/purescript/full.purs
+    test-data/code-samples/python/sample1.py
     test-data/code-samples/rust/sample1.rs
     test-data/code-samples/scala/sample1.scala
     test-data/code-samples/scala/sample2.scala
@@ -193,6 +200,7 @@ library
       Headroom.FileSupport.Kotlin
       Headroom.FileSupport.PHP
       Headroom.FileSupport.PureScript
+      Headroom.FileSupport.Python
       Headroom.FileSupport.Rust
       Headroom.FileSupport.Scala
       Headroom.FileSupport.Shell
@@ -317,6 +325,7 @@ test-suite spec
       Headroom.FileSupport.KotlinSpec
       Headroom.FileSupport.PHPSpec
       Headroom.FileSupport.PureScriptSpec
+      Headroom.FileSupport.PythonSpec
       Headroom.FileSupport.RustSpec
       Headroom.FileSupport.ScalaSpec
       Headroom.FileSupport.ShellSpec

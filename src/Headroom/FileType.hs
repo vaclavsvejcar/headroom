@@ -69,6 +69,7 @@ configByFileType HeadersConfig {..} fileType = case fileType of
   Kotlin     -> hscKotlin
   PHP        -> hscPhp
   PureScript -> hscPureScript
+  Python     -> hscPython
   Rust       -> hscRust
   Scala      -> hscScala
   Shell      -> hscShell

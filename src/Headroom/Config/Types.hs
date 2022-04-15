@@ -410,6 +410,7 @@ data HeadersConfig (p :: Phase) = HeadersConfig
   , hscKotlin     :: HeaderConfig p -- ^ configuration for /Kotlin/
   , hscPhp        :: HeaderConfig p -- ^ configuration for /PHP/
   , hscPureScript :: HeaderConfig p -- ^ configuration for /PureScript/
+  , hscPython     :: HeaderConfig p -- ^ configuration for /Python/
   , hscRust       :: HeaderConfig p -- ^ configuration for /Rust/
   , hscScala      :: HeaderConfig p -- ^ configuration for /Scala/
   , hscShell      :: HeaderConfig p -- ^ configuration for /Shell/
@@ -446,6 +447,7 @@ instance FromJSON PtHeadersConfig where
     hscKotlin     <- obj .:? "kotlin" .!= mempty
     hscPhp        <- obj .:? "php" .!= mempty
     hscPureScript <- obj .:? "purescript" .!= mempty
+    hscPython     <- obj .:? "python" .!= mempty
     hscRust       <- obj .:? "rust" .!= mempty
     hscScala      <- obj .:? "scala" .!= mempty
     hscShell      <- obj .:? "shell" .!= mempty

@@ -404,6 +404,8 @@ spec = do
       sampleJs1          <- loadSample JS $ "js" </> "sample1.js"
       sampleKotlin       <- loadSample Kotlin $ "kotlin" </> "sample1.kt"
       samplePhp1         <- loadSample PHP $ "php" </> "sample1.php"
+      samplePureScript1  <- loadSample PureScript $ "purescript" </> "full.purs"
+      samplePython1      <- loadSample Python $ "python" </> "sample1.py"
       sampleRust1        <- loadSample Rust $ "rust" </> "sample1.rs"
       sampleScala1       <- loadSample Scala $ "scala" </> "sample1.scala"
       sampleScala2       <- loadSample Scala $ "scala" </> "sample2.scala"
@@ -425,6 +427,8 @@ spec = do
       findHeader hscJs sampleJs1 `shouldBe` Just (0, 2)
       findHeader hscKotlin sampleKotlin `shouldBe` Just (0, 2)
       findHeader hscPhp samplePhp1 `shouldBe` Just (2, 8)
+      findHeader hscPureScript samplePureScript1 `shouldBe` Just (1, 1)
+      findHeader hscPython samplePython1 `shouldBe` Just (2, 3)
       findHeader hscRust sampleRust1 `shouldBe` Just (0, 2)
       findHeader hscScala sampleScala1 `shouldBe` Just (0, 2)
       findHeader hscScala sampleScala2 `shouldBe` Nothing

@@ -153,7 +153,8 @@ indentField (Just offset) text = fromLines . go . toLines $ text
 
 --------------------------------------------------------------------------------
 -- Below code is slightly modified version of code copied from:
--- https://github.com/haskell/haddock/blob/ghc-8.10/haddock-api/src/Haddock/Interface/ParseModuleHeader.hs
+-- https://github.com/haskell/haddock/blob/ghc-9.2/haddock-api/src/Haddock/Interface/ParseModuleHeader.hs
+-- commit ID: 1e56f63c3197e7ca1c1e506e083c2bad25d08793
 -------------------------------------------------------------------------------
 -- Small parser to parse module header.
 -------------------------------------------------------------------------------

@@ -297,6 +297,20 @@ spec = do
             ]
       analyzeSourceCode (fileSupport PureScript) sample `shouldBe` expected
 
+    it "analyzes Python source code" $ do
+      sample <- loadFile $ codeSamples </> "python" </> "sample1.py"
+      let expected = SourceCode
+            [ (Code   , "#!/usr/bin/env python3")
+            , (Code   , "")
+            , (Comment, "# This is")
+            , (Comment, "# header")
+            , (Code   , "")
+            , (Comment, "# This is not")
+            , (Code   , "")
+            , (Code, "print(\"This line will be printed.\")")
+            ]
+      analyzeSourceCode (fileSupport Python) sample `shouldBe` expected
+
     it "analyzes Rust source code" $ do
       sample <- loadFile $ codeSamples </> "rust" </> "sample1.rs"
       let expected = SourceCode

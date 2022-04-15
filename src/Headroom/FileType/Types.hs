@@ -33,6 +33,7 @@ data FileType
   | Kotlin     -- ^ support for /Kotlin/ programming language
   | PHP        -- ^ support for /PHP/ programming language
   | PureScript -- ^ support for /PureScript/ programming language
+  | Python     -- ^ support for /Python/ programming language
   | Rust       -- ^ support for /Rust/ programming language
   | Scala      -- ^ support for /Scala/ programming language
   | Shell      -- ^ support for /Shell/

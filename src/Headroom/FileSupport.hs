@@ -39,6 +39,7 @@ import qualified Headroom.FileSupport.JS            as JS
 import qualified Headroom.FileSupport.Kotlin        as Kotlin
 import qualified Headroom.FileSupport.PHP           as PHP
 import qualified Headroom.FileSupport.PureScript    as PureScript
+import qualified Headroom.FileSupport.Python        as Python
 import qualified Headroom.FileSupport.Rust          as Rust
 import qualified Headroom.FileSupport.Scala         as Scala
 import qualified Headroom.FileSupport.Shell         as Shell
@@ -70,6 +71,7 @@ fileSupport JS         = JS.fileSupport
 fileSupport Kotlin     = Kotlin.fileSupport
 fileSupport PHP        = PHP.fileSupport
 fileSupport PureScript = PureScript.fileSupport
+fileSupport Python     = Python.fileSupport
 fileSupport Rust       = Rust.fileSupport
 fileSupport Scala      = Scala.fileSupport
 fileSupport Shell      = Shell.fileSupport

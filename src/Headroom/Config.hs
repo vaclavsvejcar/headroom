@@ -121,6 +121,7 @@ makeHeadersConfig pt = do
   hscKotlin     <- makeHeaderConfig Kotlin (hscKotlin pt)
   hscPhp        <- makeHeaderConfig PHP (hscPhp pt)
   hscPureScript <- makeHeaderConfig PureScript (hscPureScript pt)
+  hscPython     <- makeHeaderConfig Python (hscPython pt)
   hscRust       <- makeHeaderConfig Rust (hscRust pt)
   hscScala      <- makeHeaderConfig Scala (hscScala pt)
   hscShell      <- makeHeaderConfig Shell (hscShell pt)

@@ -252,6 +252,18 @@ license-headers:
     line-comment:
       prefixed-by: ^--
 
+  ## Python configuration
+  python:
+    file-extensions: ["py"]
+    margin-top-code: 1
+    margin-top-file: 0
+    margin-bottom-code: 1
+    margin-bottom-file: 0
+    put-after: ["^#!"]
+    put-before: []
+    line-comment:
+      prefixed-by: ^#
+
   ## Rust configuration
   rust:
     file-extensions: ["rs"]
