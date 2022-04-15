@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## 0.4.4.0 (in development)
 - [#87] FIXED: Misleading error message when YAML syntax of .headroom.yaml is invalid
 - [#88] Add support for _Python_
+- [#89] Support GHC 9.2
 - Bump _LTS Haskell_ to `19.3`
 
 ## 0.4.3.0 (released 2022-01-20)

@@ -5,6 +5,7 @@
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE StrictData        #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 {-|
 Module      : Headroom.Command.Bootstrap
