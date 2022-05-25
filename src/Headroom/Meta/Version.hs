@@ -81,7 +81,7 @@ parseVersion :: Text
              -- ^ parsed 'Version'
 parseVersion raw = do
   groups <- match [re|^v?([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$|] raw
-  check . catMaybes $ T.read <$> groups
+  check (mapMaybe T.read groups)
  where
   check [ma1, ma2, mi, p] = Just $ Version ma1 ma2 mi p
   check _                 = Nothing

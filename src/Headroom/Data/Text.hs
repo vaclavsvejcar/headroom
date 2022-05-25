@@ -89,7 +89,7 @@ mapLinesF :: Foldable t
           -- ^ input text
           -> Text
           -- ^ resulting text
-mapLinesF f = fromLines . concat . (toList <$>) . go . toLines
+mapLinesF f = fromLines . concatMap toList . go . toLines
  where
   go []       = []
   go (x : xs) = f x : go xs
