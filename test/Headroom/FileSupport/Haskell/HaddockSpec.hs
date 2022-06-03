@@ -46,8 +46,8 @@ spec = do
 
 
   describe "extractModuleHeader" $ do
-    it "extracts fields from Haddock module header" $ do
-      raw <- loadFile $ codeSamples </> "haskell" </> "header.hs"
+    it "extracts fields from Haddock block module header" $ do
+      raw <- loadFile $ codeSamples </> "haskell" </> "header-block.hs"
       let
         expected = HaddockModuleHeader
           { hmhCopyright   = Just
@@ -56,7 +56,7 @@ spec = do
           , hmhMaintainer  = Just "sample@email.com"
           , hmhPortability = Just "POSIX"
           , hmhStability   = Just "experimental"
-          , hmhShortDesc   = Just "Short description"
+          , hmhShortDesc   = Just "Short description (block)"
           , hmhLongDesc    =
             Just
               "Here is a longer description of this module, containing some\n\
@@ -64,6 +64,26 @@ spec = do
           }
         sample = analyzeSourceCode (fileSupport Haskell) raw
         syntax = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
+      extractModuleHeader sample NoTemplateData syntax `shouldBe` expected
+
+    it "extracts fields from Haddock line module header" $ do
+      raw <- loadFile $ codeSamples </> "haskell" </> "header-line.hs"
+      let
+        expected = HaddockModuleHeader
+          { hmhCopyright   = Just
+            "(c) Some Guy, 2013\n                  Someone Else, 2014"
+          , hmhLicense     = Just "GPL-3"
+          , hmhMaintainer  = Just "sample@email.com"
+          , hmhPortability = Just "POSIX"
+          , hmhStability   = Just "experimental"
+          , hmhShortDesc   = Just "Short description (line)"
+          , hmhLongDesc    =
+            Just
+              "Here is a longer description of this module, containing some\n\
+              \commentary with @some markup@."
+          }
+        sample = analyzeSourceCode (fileSupport Haskell) raw
+        syntax = LineComment [re|^--|] (Just "-- ")
       extractModuleHeader sample NoTemplateData syntax `shouldBe` expected
 
 

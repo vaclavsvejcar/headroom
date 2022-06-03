@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: af6bc53d71dddd0c65cecac96cfc7c8cf880c4b788b9a5cdb09f91e251755723
+-- hash: 8f3c30df6bdb1ba29823efc9cb611e8983c910c48b223aa5cc2452376053e5a0
 
 name:           headroom
 version:        0.4.4.0
@@ -132,7 +132,8 @@ extra-source-files:
     test-data/code-samples/dart/sample1.dart
     test-data/code-samples/go/sample1.go
     test-data/code-samples/haskell/full.hs
-    test-data/code-samples/haskell/header.hs
+    test-data/code-samples/haskell/header-block.hs
+    test-data/code-samples/haskell/header-line.hs
     test-data/code-samples/haskell/sample1.hs
     test-data/code-samples/haskell/sample2.hs
     test-data/code-samples/haskell/sample3.hs

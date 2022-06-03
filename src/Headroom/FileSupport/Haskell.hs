@@ -58,7 +58,7 @@ import           Headroom.FileSupport.Types          ( FileSupport(..)
                                                      )
 
 import           Headroom.Config.Types               ( HeaderConfig(..)
-                                                     , HeaderSyntax
+                                                     , HeaderSyntax(..)
                                                      )
 import           Headroom.FileType.Types             ( FileType(Haskell) )
 import           Headroom.Header.Types               ( HeaderTemplate(..) )
@@ -119,8 +119,11 @@ extractVariables HeaderTemplate {..} headerPos source =
     ]
  where
   HaddockModuleHeader {..} = extractModuleHeader header htTemplateData syntax
-  header                   = maybe mempty (\(s, e) -> cut s e source) headerPos
+  header                   = maybe mempty (\(s, e) -> cut s e source) headerPos'
   syntax                   = hcHeaderSyntax htConfig
+  headerPos'               = case syntax of
+    LineComment{}  -> fmap (\(s, e) -> (s + 1, e + 1)) headerPos
+    BlockComment{} -> headerPos
 
 
 extractModuleName :: SourceCode -> Maybe Text

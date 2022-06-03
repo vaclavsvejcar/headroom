@@ -29,13 +29,14 @@ where
 
 import           Control.Applicative                 ( Alternative(..) )
 import           Control.Monad                       ( ap )
-import           Headroom.Config.Types               ( HeaderSyntax )
+import           Headroom.Config.Types               ( HeaderSyntax(..) )
 import           Headroom.Data.Regex                 ( re
                                                      , scan
                                                      )
 import           Headroom.Data.Text                  ( fromLines
                                                      , toLines
                                                      )
+import qualified Headroom.Data.Text                 as T
 import           Headroom.FileSupport.TemplateData   ( HaddockOffsets(..)
                                                      , HaskellTemplateData'(..)
                                                      , TemplateData(..)
@@ -112,8 +113,9 @@ extractModuleHeader source templateData syntax =
       hmhLongDesc    = if null rest' then Nothing else process rest'
   in  HaddockModuleHeader { .. }
  where
-  (fields', rest') = fromMaybe ([], input) $ runP fields input
-  input            = T.unpack . stripCommentSyntax syntax . toText $ source
+  (fields', rest')    = fromMaybe ([], input) $ runP fields input
+  input               = T.unpack . stripCommentSyntax' . toText $ source
+  stripCommentSyntax' = stripCommentSyntax syntax . T.replaceFirst "-- |" ""
   extractField name = fmap (T.strip . T.pack) (lookup name fields')
   process = Just . T.strip . T.pack
   indent c t = T.strip $ indentField c t

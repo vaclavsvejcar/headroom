@@ -1,6 +1,6 @@
 {-|
 Module      : Test
-Description : Short description
+Description : Short description (block)
 Copyright   : (c) Some Guy, 2013
                   Someone Else, 2014
 License     : GPL-3

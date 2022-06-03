@@ -73,11 +73,11 @@ sanitizeSyntax :: HeaderSyntax
                -- ^ header to sanitize
                -> Text
                -- ^ sanitized header
-sanitizeSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
+sanitizeSyntax syntax = mapCommentLines syntax (process mPrefix)
  where
-  addPrefix Nothing l = Just l
-  addPrefix (Just p) l | p `T.isPrefixOf` l = Just l
-                       | otherwise          = Just $ p <> " " <> l
+  process Nothing l = Just l
+  process (Just p) l | p `T.isPrefixOf` l = Just l
+                     | otherwise          = Just $ addPrefix p l
   mPrefix = case syntax of
     BlockComment _ _ p -> p
     LineComment _ p    -> p
@@ -87,14 +87,14 @@ sanitizeSyntax syntax = mapCommentLines syntax (addPrefix mPrefix)
 --
 -- >>> import Headroom.Data.Regex (re)
 -- >>> stripCommentSyntax (LineComment [re|^--|] (Just "--")) "-- a\n-- b"
--- "a\n b"
+-- " a\n b"
 stripCommentSyntax :: HeaderSyntax
                    -- ^ copyright header syntax
                    -> Text
                    -- ^ input text from which to strip the syntax
                    -> Text
                    -- ^ processed text
-stripCommentSyntax syntax = T.strip . T.fromLines . go [] . T.toLines . T.strip
+stripCommentSyntax syntax = T.fromLines . go [] . T.toLines . T.strip
  where
   (s, e, p) = case syntax of
     BlockComment s' e' p' -> (Just s', Just e', p')
@@ -109,6 +109,11 @@ stripCommentSyntax syntax = T.strip . T.fromLines . go [] . T.toLines . T.strip
 
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
+
+addPrefix :: Text -> Text -> Text
+addPrefix p l | " " `T.isSuffixOf` p || " " `T.isPrefixOf` l = p <> l
+              | otherwise = p <> " " <> l
+
 
 mapCommentLines :: Foldable t
                 => HeaderSyntax
