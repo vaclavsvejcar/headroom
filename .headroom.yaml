@@ -23,8 +23,8 @@ license-headers:
     put-after: ["^{-#"]
     put-before: ["^module"]
     margin-top-code: 1
-    margin-bottom-code: 1
-    margin-bottom-file: 1
+    line-comment:
+      prefixed-by: ^--
 
 post-process:
   update-copyright:

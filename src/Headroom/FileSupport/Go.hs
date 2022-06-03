@@ -1,33 +1,31 @@
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE QuasiQuotes       #-}
 
-{-|
-Module      : Headroom.FileSupport.Go
-Description : Support for /Go/ source code files
-Copyright   : (c) 2019-2022 Vaclav Svejcar
-License     : BSD-3-Clause
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
+-- |
+-- Module      : Headroom.FileSupport.Go
+-- Description : Support for /Go/ source code files
+-- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- License     : BSD-3-Clause
+-- Maintainer  : vaclav.svejcar@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- Basic support for /Go language/ source code files. This implementation doesn't
+-- extract any variables or template data.
+module Headroom.FileSupport.Go (
+    fileSupport
+) where
 
-Basic support for /Go language/ source code files. This implementation doesn't
-extract any variables or template data.
--}
-
-module Headroom.FileSupport.Go
-  ( fileSupport
-  )
-where
-
-import           Headroom.Data.Regex                 ( isMatch
-                                                     , re
-                                                     )
-import           Headroom.FileSupport.Types          ( FileSupport(..)
-                                                     , SyntaxAnalysis(..)
-                                                     , defaultFileSupport
-                                                     )
-import           Headroom.FileType.Types             ( FileType(Go) )
-
+import Headroom.Data.Regex (
+    isMatch
+    , re
+ )
+import Headroom.FileSupport.Types (
+    FileSupport (..)
+    , SyntaxAnalysis (..)
+    , defaultFileSupport
+ )
+import Headroom.FileType.Types (FileType (Go))
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
@@ -35,10 +33,11 @@ import           Headroom.FileType.Types             ( FileType(Go) )
 fileSupport :: FileSupport
 fileSupport = defaultFileSupport Go syntaxAnalysis
 
-
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
 syntaxAnalysis :: SyntaxAnalysis
-syntaxAnalysis = SyntaxAnalysis { saIsCommentStart = isMatch [re|^\/\*|^\/\/|]
-                                , saIsCommentEnd   = isMatch [re|\*\/$|^\/\/|]
-                                }
+syntaxAnalysis =
+    SyntaxAnalysis
+        { saIsCommentStart = isMatch [re|^\/\*|^\/\/|]
+        , saIsCommentEnd = isMatch [re|\*\/$|^\/\/|]
+        }

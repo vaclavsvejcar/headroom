@@ -1,0 +1,3 @@
+comma-style: leading
+haddock-style: single-line
+import-export-comma-style: leading

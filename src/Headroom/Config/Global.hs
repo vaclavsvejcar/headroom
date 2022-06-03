@@ -1,71 +1,72 @@
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StrictData #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE StrictData        #-}
 
-{-|
-Module      : Headroom.Config.Global
-Description : Global configutation
-Copyright   : (c) 2019-2022 Vaclav Svejcar
-License     : BSD-3-Clause
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
+-- |
+-- Module      : Headroom.Config.Global
+-- Description : Global configutation
+-- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- License     : BSD-3-Clause
+-- Maintainer  : vaclav.svejcar@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- /Global configuration/ is configuration shared between all /Headroom/ instances
+-- and it's located in user's home directory.
+module Headroom.Config.Global (
+    GlobalConfig (..)
+    , UpdaterConfig (..)
+    , initGlobalConfigIfNeeded
+    , loadGlobalConfig
+    , parseGlobalConfig
+    , globalConfigPath
+) where
 
-/Global configuration/ is configuration shared between all /Headroom/ instances
-and it's located in user's home directory.
--}
-
-module Headroom.Config.Global
-  ( GlobalConfig(..)
-  , UpdaterConfig(..)
-  , initGlobalConfigIfNeeded
-  , loadGlobalConfig
-  , parseGlobalConfig
-  , globalConfigPath
-  )
-where
-
-import           Data.Aeson                          ( FromJSON(..)
-                                                     , genericParseJSON
-                                                     )
-import qualified Data.Yaml                          as Y
-import           Headroom.Data.Has                   ( Has(..)
-                                                     , HasRIO
-                                                     )
-import           Headroom.Data.Serialization         ( aesonOptions )
-import           Headroom.Embedded                   ( defaultGlobalConfig )
-import           Headroom.IO.FileSystem              ( FileSystem(..) )
-import           Headroom.Meta                       ( globalConfigDirName
-                                                     , globalConfigFileName
-                                                     )
-import           RIO
-import qualified RIO.ByteString                     as B
-import           RIO.FilePath                        ( (</>) )
-
+import Data.Aeson (
+    FromJSON (..)
+    , genericParseJSON
+ )
+import qualified Data.Yaml as Y
+import Headroom.Data.Has (
+    Has (..)
+    , HasRIO
+ )
+import Headroom.Data.Serialization (aesonOptions)
+import Headroom.Embedded (defaultGlobalConfig)
+import Headroom.IO.FileSystem (FileSystem (..))
+import Headroom.Meta (
+    globalConfigDirName
+    , globalConfigFileName
+ )
+import RIO
+import qualified RIO.ByteString as B
+import RIO.FilePath ((</>))
 
 ---------------------------------  DATA TYPES  ---------------------------------
 
 -- | Data type representing updater configuration.
 data UpdaterConfig = UpdaterConfig
-  { ucCheckForUpdates    :: Bool    -- ^ whether to check for updates
-  , ucUpdateIntervalDays :: Integer -- ^ how ofter check for updates
-  }
-  deriving (Eq, Generic, Show)
+    { ucCheckForUpdates :: Bool
+    -- ^ whether to check for updates
+    , ucUpdateIntervalDays :: Integer
+    -- ^ how ofter check for updates
+    }
+    deriving (Eq, Generic, Show)
 
 instance FromJSON UpdaterConfig where
-  parseJSON = genericParseJSON aesonOptions
+    parseJSON = genericParseJSON aesonOptions
 
 -- | Data type representing global configuration options.
 data GlobalConfig = GlobalConfig
-  { gcUpdates :: UpdaterConfig -- ^ config for updater
-  }
-  deriving (Eq, Generic, Show)
+    { gcUpdates :: UpdaterConfig
+    -- ^ config for updater
+    }
+    deriving (Eq, Generic, Show)
 
 instance FromJSON GlobalConfig where
-  parseJSON = genericParseJSON aesonOptions
-
+    parseJSON = genericParseJSON aesonOptions
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
@@ -73,30 +74,27 @@ instance FromJSON GlobalConfig where
 -- it creates one with default values.
 initGlobalConfigIfNeeded :: (HasRIO FileSystem env) => RIO env ()
 initGlobalConfigIfNeeded = do
-  FileSystem {..} <- viewL
-  userDir         <- fsGetUserDirectory
-  configPath      <- globalConfigPath
-  whenM (not <$> fsDoesFileExist configPath) $ do
-    fsCreateDirectory $ userDir </> globalConfigDirName
-    fsWriteFile configPath defaultGlobalConfig
-
+    FileSystem{..} <- viewL
+    userDir <- fsGetUserDirectory
+    configPath <- globalConfigPath
+    whenM (not <$> fsDoesFileExist configPath) $ do
+        fsCreateDirectory $ userDir </> globalConfigDirName
+        fsWriteFile configPath defaultGlobalConfig
 
 -- | Loads global configuration from /YAML/ file.
 loadGlobalConfig :: (HasRIO FileSystem env) => RIO env GlobalConfig
 loadGlobalConfig = do
-  configPath <- globalConfigPath
-  content    <- liftIO . B.readFile $ configPath
-  Y.decodeThrow content
-
+    configPath <- globalConfigPath
+    content <- liftIO . B.readFile $ configPath
+    Y.decodeThrow content
 
 -- | Parses global configuration /YAML/ file.
 parseGlobalConfig :: (MonadThrow m) => ByteString -> m GlobalConfig
 parseGlobalConfig = Y.decodeThrow
 
-
 -- | Path to global configuration /YAML/ file in user's directory.
 globalConfigPath :: HasRIO FileSystem env => RIO env FilePath
 globalConfigPath = do
-  FileSystem {..} <- viewL
-  userDir         <- fsGetUserDirectory
-  pure $ userDir </> globalConfigDirName </> globalConfigFileName
+    FileSystem{..} <- viewL
+    userDir <- fsGetUserDirectory
+    pure $ userDir </> globalConfigDirName </> globalConfigFileName

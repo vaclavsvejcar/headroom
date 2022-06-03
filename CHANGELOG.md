@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 - [#87] FIXED: Misleading error message when YAML syntax of .headroom.yaml is invalid
 - [#88] Add support for _Python_
 - [#89] Support GHC 9.2
+- [#92] Switch to fourmolu source code formatter
 - [#93] FIXED: Haddock module header detection is faulty
 - Bump _LTS Haskell_ to `19.9`
 

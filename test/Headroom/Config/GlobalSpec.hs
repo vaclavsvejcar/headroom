@@ -1,86 +1,88 @@
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE NoImplicitPrelude     #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE StrictData            #-}
-{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StrictData #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Config.GlobalSpec
-  ( spec
-  )
-where
+module Headroom.Config.GlobalSpec (
+    spec
+) where
 
-import           Headroom.Config.Global
-import           Headroom.Data.Has                   ( Has(..) )
-import           Headroom.Data.Lens                  ( suffixLenses
-                                                     , suffixLensesFor
-                                                     )
-import           Headroom.Embedded                   ( defaultGlobalConfig )
-import           Headroom.IO.FileSystem              ( FileSystem(..)
-                                                     , mkFileSystem
-                                                     )
-import           Headroom.Meta                       ( globalConfigDirName
-                                                     , globalConfigFileName
-                                                     )
-import           RIO
-import           RIO.Directory                       ( doesFileExist )
-import           RIO.FilePath                        ( (</>) )
-import           Test.Hspec
-
-
+import Headroom.Config.Global
+import Headroom.Data.Has (Has (..))
+import Headroom.Data.Lens (
+    suffixLenses
+    , suffixLensesFor
+ )
+import Headroom.Embedded (defaultGlobalConfig)
+import Headroom.IO.FileSystem (
+    FileSystem (..)
+    , mkFileSystem
+ )
+import Headroom.Meta (
+    globalConfigDirName
+    , globalConfigFileName
+ )
+import RIO
+import RIO.Directory (doesFileExist)
+import RIO.FilePath ((</>))
+import Test.Hspec
 
 data TestEnv = TestEnv
-  { envFileSystem :: FileSystem (RIO TestEnv)
-  }
+    { envFileSystem :: FileSystem (RIO TestEnv)
+    }
 
 suffixLenses ''TestEnv
-suffixLensesFor [ "fsCreateDirectory"
-                , "fsDoesFileExist"
-                , "fsGetUserDirectory"
-                , "fsWriteFile"
-                ] ''FileSystem
+suffixLensesFor
+    [ "fsCreateDirectory"
+    , "fsDoesFileExist"
+    , "fsGetUserDirectory"
+    , "fsWriteFile"
+    ]
+    ''FileSystem
 
 instance Has (FileSystem (RIO TestEnv)) TestEnv where
-  hasLens = envFileSystemL
+    hasLens = envFileSystemL
 
 env :: TestEnv
-env = TestEnv
-  { envFileSystem = FileSystem { fsCreateDirectory     = undefined
-                               , fsDoesFileExist       = undefined
-                               , fsFindFiles           = undefined
-                               , fsFindFilesByExts     = undefined
-                               , fsFindFilesByTypes    = undefined
-                               , fsGetCurrentDirectory = undefined
-                               , fsGetUserDirectory    = undefined
-                               , fsListFiles           = undefined
-                               , fsLoadFile            = undefined
-                               , fsWriteFile           = undefined
-                               }
-  }
-
+env =
+    TestEnv
+        { envFileSystem =
+            FileSystem
+                { fsCreateDirectory = undefined
+                , fsDoesFileExist = undefined
+                , fsFindFiles = undefined
+                , fsFindFilesByExts = undefined
+                , fsFindFilesByTypes = undefined
+                , fsGetCurrentDirectory = undefined
+                , fsGetUserDirectory = undefined
+                , fsListFiles = undefined
+                , fsLoadFile = undefined
+                , fsWriteFile = undefined
+                }
+        }
 
 spec :: Spec
 spec = do
+    describe "initGlobalConfigIfNeeded" $ do
+        it "creates new config file and parent directory when needed" $ do
+            withSystemTempDirectory "global-config" $ \dir -> do
+                let cfgPath = dir </> globalConfigDirName </> globalConfigFileName
+                    fsCreateDirectory0 = fsCreateDirectory mkFileSystem
+                    fsWriteFile0 = fsWriteFile mkFileSystem
+                    env' =
+                        env
+                            & (envFileSystemL . fsCreateDirectoryL .~ fsCreateDirectory0)
+                            & (envFileSystemL . fsDoesFileExistL .~ fsDoesFileExist')
+                            & (envFileSystemL . fsGetUserDirectoryL .~ fsGetUserDirectory')
+                            & (envFileSystemL . fsWriteFileL .~ fsWriteFile0)
+                    fsDoesFileExist' = const . pure $ False
+                    fsGetUserDirectory' = pure dir
+                _ <- runRIO env' initGlobalConfigIfNeeded
+                result <- doesFileExist cfgPath
+                result `shouldBe` True
 
-  describe "initGlobalConfigIfNeeded" $ do
-    it "creates new config file and parent directory when needed" $ do
-      withSystemTempDirectory "global-config" $ \dir -> do
-        let cfgPath = dir </> globalConfigDirName </> globalConfigFileName
-            fsCreateDirectory0 = fsCreateDirectory mkFileSystem
-            fsWriteFile0 = fsWriteFile mkFileSystem
-            env' =
-              env
-                & (envFileSystemL . fsCreateDirectoryL .~ fsCreateDirectory0)
-                & (envFileSystemL . fsDoesFileExistL .~ fsDoesFileExist')
-                & (envFileSystemL . fsGetUserDirectoryL .~ fsGetUserDirectory')
-                & (envFileSystemL . fsWriteFileL .~ fsWriteFile0)
-            fsDoesFileExist'    = const . pure $ False
-            fsGetUserDirectory' = pure dir
-        _      <- runRIO env' initGlobalConfigIfNeeded
-        result <- doesFileExist cfgPath
-        result `shouldBe` True
-
-
-  describe "parseGlobalConfig" $ do
-    it "parses embedded default config YAML" $ do
-      parseGlobalConfig defaultGlobalConfig `shouldSatisfy` isRight
+    describe "parseGlobalConfig" $ do
+        it "parses embedded default config YAML" $ do
+            parseGlobalConfig defaultGlobalConfig `shouldSatisfy` isRight

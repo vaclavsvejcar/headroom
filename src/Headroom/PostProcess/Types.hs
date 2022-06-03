@@ -1,25 +1,21 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
-{-|
-Module      : Headroom.PostProcess.Types
-Description : Data types for /post-processing/
-Copyright   : (c) 2019-2022 Vaclav Svejcar
-License     : BSD-3-Clause
-Maintainer  : vaclav.svejcar@gmail.com
-Stability   : experimental
-Portability : POSIX
+-- |
+-- Module      : Headroom.PostProcess.Types
+-- Description : Data types for /post-processing/
+-- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- License     : BSD-3-Clause
+-- Maintainer  : vaclav.svejcar@gmail.com
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- This module contains data types and /type class/ instances for the
+-- /post-processing/ functions.
+module Headroom.PostProcess.Types (
+    PostProcess (..)
+) where
 
-This module contains data types and /type class/ instances for the
-/post-processing/ functions.
--}
-
-module Headroom.PostProcess.Types
-  ( PostProcess(..)
-  )
-where
-
-import           RIO
-
+import RIO
 
 -- | Definition of /post-processor/, i.e. function, that is applied to
 -- already rendered /license header/, performs some logic and returns modified
@@ -43,7 +39,7 @@ import           RIO
 newtype PostProcess env = PostProcess (Text -> Reader env Text)
 
 instance Semigroup (PostProcess env) where
-  PostProcess fnX <> PostProcess fnY = PostProcess $ fnX >=> fnY
+    PostProcess fnX <> PostProcess fnY = PostProcess $ fnX >=> fnY
 
 instance Monoid (PostProcess env) where
-  mempty = PostProcess $ \input -> pure input
+    mempty = PostProcess $ \input -> pure input
