@@ -1,5 +1,0 @@
-conf_layout:
-  lconfig_hangingTypeSignature: true
-  lconfig_importColumn: 55
-  lconfig_importAsColumn: 55
-  # lconfig_allowSingleLineExportList: true
