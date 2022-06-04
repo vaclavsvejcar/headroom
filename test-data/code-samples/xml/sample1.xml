@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    This is header.
+    
+-->
+
+<!DOCTYPE html>
+<!-- this is not header -->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test title</title>
+    </head>
+    <body>
+        Hello, World!
+    </body>
+    <!--
+        multi line block comment
+    -->
+</html>

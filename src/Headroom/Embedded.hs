@@ -68,6 +68,7 @@ licenseTemplate licenseType fileType = case licenseType of
         Rust -> $(embedTemplate Apache2 Rust)
         Scala -> $(embedTemplate Apache2 Scala)
         Shell -> $(embedTemplate Apache2 Shell)
+        XML -> $(embedTemplate Apache2 XML)
     BSD3 -> case fileType of
         C -> $(embedTemplate BSD3 C)
         CPP -> $(embedTemplate BSD3 CPP)
@@ -85,6 +86,7 @@ licenseTemplate licenseType fileType = case licenseType of
         Rust -> $(embedTemplate BSD3 Rust)
         Scala -> $(embedTemplate BSD3 Scala)
         Shell -> $(embedTemplate BSD3 Shell)
+        XML -> $(embedTemplate BSD3 XML)
     GPL2 -> case fileType of
         C -> $(embedTemplate GPL2 C)
         CPP -> $(embedTemplate GPL2 CPP)
@@ -102,6 +104,7 @@ licenseTemplate licenseType fileType = case licenseType of
         Rust -> $(embedTemplate GPL2 Rust)
         Scala -> $(embedTemplate GPL2 Scala)
         Shell -> $(embedTemplate GPL2 Shell)
+        XML -> $(embedTemplate GPL2 XML)
     GPL3 -> case fileType of
         C -> $(embedTemplate GPL3 C)
         CPP -> $(embedTemplate GPL3 CPP)
@@ -119,6 +122,7 @@ licenseTemplate licenseType fileType = case licenseType of
         Rust -> $(embedTemplate GPL3 Rust)
         Scala -> $(embedTemplate GPL3 Scala)
         Shell -> $(embedTemplate GPL3 Shell)
+        XML -> $(embedTemplate GPL3 XML)
     MIT -> case fileType of
         C -> $(embedTemplate MIT C)
         CPP -> $(embedTemplate MIT CPP)
@@ -136,6 +140,7 @@ licenseTemplate licenseType fileType = case licenseType of
         Rust -> $(embedTemplate MIT Rust)
         Scala -> $(embedTemplate MIT Scala)
         Shell -> $(embedTemplate MIT Shell)
+        XML -> $(embedTemplate MIT XML)
     MPL2 -> case fileType of
         C -> $(embedTemplate MPL2 C)
         CPP -> $(embedTemplate MPL2 CPP)
@@ -153,3 +158,4 @@ licenseTemplate licenseType fileType = case licenseType of
         Rust -> $(embedTemplate MPL2 Rust)
         Scala -> $(embedTemplate MPL2 Scala)
         Shell -> $(embedTemplate MPL2 Shell)
+        XML -> $(embedTemplate MPL2 XML)

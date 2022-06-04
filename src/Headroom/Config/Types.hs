@@ -446,6 +446,8 @@ data HeadersConfig (p :: Phase) = HeadersConfig
     -- ^ configuration for /Scala/
     , hscShell :: HeaderConfig p
     -- ^ configuration for /Shell/
+    , hscXml :: HeaderConfig p
+    -- ^ configuration for /XML/
     }
 
 -- | Alias for complete variant of 'HeadersConfig'.
@@ -487,6 +489,7 @@ instance FromJSON PtHeadersConfig where
         hscRust <- obj .:? "rust" .!= mempty
         hscScala <- obj .:? "scala" .!= mempty
         hscShell <- obj .:? "shell" .!= mempty
+        hscXml <- obj .:? "xml" .!= mempty
         pure HeadersConfig{..}
 
 ---------------------------------  Error Types  --------------------------------

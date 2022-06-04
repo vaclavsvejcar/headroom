@@ -50,4 +50,6 @@ data FileType
       Scala
     | -- | support for /Shell/
       Shell
+    | -- | support for /XML/
+      XML
     deriving (Bounded, Enum, EnumExtra, Eq, Ord, Show)

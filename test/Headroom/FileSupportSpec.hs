@@ -372,3 +372,31 @@ spec = do
                         , (Code, "echo \"TEST\"")
                         ]
             analyzeSourceCode (fileSupport Shell) sample `shouldBe` expected
+
+        it "analyzes XML source code" $ do
+            sample <- loadFile $ codeSamples </> "xml" </> "sample1.xml"
+            let expected =
+                    SourceCode
+                        [ (Code, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+                        , (Code, "")
+                        , (Comment, "<!--")
+                        , (Comment, "    This is header.")
+                        , (Comment, "    ")
+                        , (Comment, "-->")
+                        , (Code, "")
+                        , (Code, "<!DOCTYPE html>")
+                        , (Comment, "<!-- this is not header -->")
+                        , (Code, "<html>")
+                        , (Code, "    <head>")
+                        , (Code, "        <meta charset=\"utf-8\" />")
+                        , (Code, "        <title>Test title</title>")
+                        , (Code, "    </head>")
+                        , (Code, "    <body>")
+                        , (Code, "        Hello, World!")
+                        , (Code, "    </body>")
+                        , (Comment, "    <!--")
+                        , (Comment, "        multi line block comment")
+                        , (Comment, "    -->")
+                        , (Code, "</html>")
+                        ]
+            analyzeSourceCode (fileSupport XML) sample `shouldBe` expected

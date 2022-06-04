@@ -45,6 +45,7 @@ import Headroom.FileSupport.Types (
     FileSupport (..)
     , SyntaxAnalysis (..)
  )
+import qualified Headroom.FileSupport.XML as XML
 import Headroom.FileType.Types (FileType (..))
 import Headroom.SourceCode (
     LineType (..)
@@ -74,6 +75,7 @@ fileSupport Python = Python.fileSupport
 fileSupport Rust = Rust.fileSupport
 fileSupport Scala = Scala.fileSupport
 fileSupport Shell = Shell.fileSupport
+fileSupport XML = XML.fileSupport
 
 -- | Analyzes the raw source code of given type using provided 'FileSupport'.
 analyzeSourceCode ::

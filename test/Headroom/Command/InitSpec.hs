@@ -57,7 +57,7 @@ spec = do
 
     describe "findSupportedFileTypes" $ do
         it "recursively finds all known file types present in given path" $ do
-            L.sort <$> runRIO env findSupportedFileTypes `shouldReturn` [HTML]
+            L.sort <$> runRIO env findSupportedFileTypes `shouldReturn` [HTML, XML]
 
 env :: TestEnv
 env = TestEnv{..}

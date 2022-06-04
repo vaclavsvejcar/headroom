@@ -183,6 +183,7 @@ _Headroom_ can manage license headers only for supported types of source code fi
 | _Rust_       | `rust`                | `.rs`              |
 | _Scala_      | `scala`               | `.scala`           |
 | _Shell_      | `shell`               | `.sh`              |
+| _XML_        | `xml`               | `.xml`              |
 
 If you miss support for file type you use, feel free to [open new issue][meta:new-issue].
 

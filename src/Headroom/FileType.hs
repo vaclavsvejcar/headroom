@@ -80,3 +80,4 @@ configByFileType HeadersConfig{..} fileType = case fileType of
     Rust -> hscRust
     Scala -> hscScala
     Shell -> hscShell
+    XML -> hscXml

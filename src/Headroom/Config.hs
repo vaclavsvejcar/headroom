@@ -131,6 +131,7 @@ makeHeadersConfig pt = do
     hscRust <- makeHeaderConfig Rust (hscRust pt)
     hscScala <- makeHeaderConfig Scala (hscScala pt)
     hscShell <- makeHeaderConfig Shell (hscShell pt)
+    hscXml <- makeHeaderConfig XML (hscXml pt)
     pure HeadersConfig{..}
 
 -- | Makes full 'CtHeaderConfig' from provided 'PtHeaderConfig' (if valid).

@@ -426,6 +426,8 @@ spec = do
             sampleScala1 <- loadSample Scala $ "scala" </> "sample1.scala"
             sampleScala2 <- loadSample Scala $ "scala" </> "sample2.scala"
             sampleShell1 <- loadSample Shell $ "shell" </> "sample1.sh"
+            sampleXml1 <- loadSample XML $ "xml" </> "sample1.xml"
+            sampleXml2 <- loadSample XML $ "xml" </> "sample2.xml"
             findHeader hscC sampleC1 `shouldBe` Just (1, 3)
             findHeader hscC sampleC2 `shouldBe` Nothing
             findHeader hscCpp sampleCpp1 `shouldBe` Just (1, 3)
@@ -449,6 +451,8 @@ spec = do
             findHeader hscScala sampleScala1 `shouldBe` Just (0, 2)
             findHeader hscScala sampleScala2 `shouldBe` Nothing
             findHeader hscShell sampleShell1 `shouldBe` Just (2, 3)
+            findHeader hscXml sampleXml1 `shouldBe` Just (2, 5)
+            findHeader hscXml sampleXml2 `shouldBe` Nothing
 
     describe "findBlockHeader" $ do
         let s = [re|^{-\||]

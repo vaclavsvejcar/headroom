@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8f3c30df6bdb1ba29823efc9cb611e8983c910c48b223aa5cc2452376053e5a0
+-- hash: 00760d056ceded697aa22eb2a737ce5c60ff179e290dd368a5227123dc01df32
 
 name:           headroom
 version:        0.4.4.0
@@ -42,6 +42,7 @@ extra-source-files:
     embedded/license/apache2/rust.mustache
     embedded/license/apache2/scala.mustache
     embedded/license/apache2/shell.mustache
+    embedded/license/apache2/xml.mustache
     embedded/license/bsd3/c.mustache
     embedded/license/bsd3/cpp.mustache
     embedded/license/bsd3/css.mustache
@@ -58,6 +59,7 @@ extra-source-files:
     embedded/license/bsd3/rust.mustache
     embedded/license/bsd3/scala.mustache
     embedded/license/bsd3/shell.mustache
+    embedded/license/bsd3/xml.mustache
     embedded/license/gpl2/c.mustache
     embedded/license/gpl2/cpp.mustache
     embedded/license/gpl2/css.mustache
@@ -74,6 +76,7 @@ extra-source-files:
     embedded/license/gpl2/rust.mustache
     embedded/license/gpl2/scala.mustache
     embedded/license/gpl2/shell.mustache
+    embedded/license/gpl2/xml.mustache
     embedded/license/gpl3/c.mustache
     embedded/license/gpl3/cpp.mustache
     embedded/license/gpl3/css.mustache
@@ -90,6 +93,7 @@ extra-source-files:
     embedded/license/gpl3/rust.mustache
     embedded/license/gpl3/scala.mustache
     embedded/license/gpl3/shell.mustache
+    embedded/license/gpl3/xml.mustache
     embedded/license/mit/c.mustache
     embedded/license/mit/cpp.mustache
     embedded/license/mit/css.mustache
@@ -106,6 +110,7 @@ extra-source-files:
     embedded/license/mit/rust.mustache
     embedded/license/mit/scala.mustache
     embedded/license/mit/shell.mustache
+    embedded/license/mit/xml.mustache
     embedded/license/mpl2/c.mustache
     embedded/license/mpl2/cpp.mustache
     embedded/license/mpl2/css.mustache
@@ -122,6 +127,7 @@ extra-source-files:
     embedded/license/mpl2/rust.mustache
     embedded/license/mpl2/scala.mustache
     embedded/license/mpl2/shell.mustache
+    embedded/license/mpl2/xml.mustache
     test-data/test-template.mustache
     test-data/code-samples/c/sample1.c
     test-data/code-samples/c/sample2.c
@@ -151,6 +157,8 @@ extra-source-files:
     test-data/code-samples/scala/sample1.scala
     test-data/code-samples/scala/sample2.scala
     test-data/code-samples/shell/sample1.sh
+    test-data/code-samples/xml/sample1.xml
+    test-data/code-samples/xml/sample2.xml
     test-data/configs/full.yaml
     test-data/templates/haskell.mustache
     test-data/test-traverse/a.html
@@ -207,6 +215,7 @@ library
       Headroom.FileSupport.Shell
       Headroom.FileSupport.TemplateData
       Headroom.FileSupport.Types
+      Headroom.FileSupport.XML
       Headroom.FileType
       Headroom.FileType.Types
       Headroom.Header

@@ -302,6 +302,19 @@ license-headers:
     line-comment:
       prefixed-by: ^#
 
+  ## XML configuration
+  xml:
+    file-extensions: ["xml"]
+    margin-top-code: 1
+    margin-top-file: 0
+    margin-bottom-code: 1
+    margin-bottom-file: 0
+    put-after: ['<\?xml']
+    put-before: ['^(<!DOCTYPE|<[a-zA-Z])']
+    block-comment:
+      starts-with: ^<!--
+      ends-with: -->$
+
 ## Configuration for post-processing functions. These functions
 ## allows to modify/enhance already rendered license headers, e.g. update years
 ## in copyright statements, etc. Each function can be enabled/disabled using the
