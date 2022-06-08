@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#92] Switch to fourmolu source code formatter
 - [#93] FIXED: Haddock module header detection is faulty
 - [#94] Add support for _XML_
-- Bump _LTS Haskell_ to `19.9`
+- Bump _LTS Haskell_ to `19.10`
 
 ## 0.4.3.0 (released 2022-01-20)
 - [#78] Check automatically for Headroom updates
