@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.TypesSpec (
-    spec
-) where
+module Headroom.TypesSpec
+    ( spec
+    )
+where
 
 import Headroom.Variables (mkVariables)
 import RIO

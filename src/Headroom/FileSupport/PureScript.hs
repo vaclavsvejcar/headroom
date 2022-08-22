@@ -25,27 +25,28 @@
 --
 -- = Extracted Custom Data
 -- This implementation does not extract any custom data from template file.
-module Headroom.FileSupport.PureScript (
-    fileSupport
-) where
+module Headroom.FileSupport.PureScript
+    ( fileSupport
+    )
+where
 
-import Headroom.Data.Regex (
-    isMatch
+import Headroom.Data.Regex
+    ( isMatch
     , match
     , re
- )
+    )
 import Headroom.FileSupport.TemplateData (TemplateData (..))
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import Headroom.FileType.Types (FileType (PureScript))
 import Headroom.Header.Types (HeaderTemplate)
-import Headroom.SourceCode (
-    LineType (..)
+import Headroom.SourceCode
+    ( LineType (..)
     , SourceCode (..)
     , firstMatching
- )
+    )
 import Headroom.Variables (mkVariables)
 import Headroom.Variables.Types (Variables (..))
 import RIO
@@ -72,11 +73,11 @@ syntaxAnalysis =
         , saIsCommentEnd = isMatch [re|^\h*-}|\w+\h*-}|^--|]
         }
 
-extractVariables ::
-    HeaderTemplate ->
-    Maybe (Int, Int) ->
-    SourceCode ->
-    Variables
+extractVariables
+    :: HeaderTemplate
+    -> Maybe (Int, Int)
+    -> SourceCode
+    -> Variables
 extractVariables _ _ source =
     (mkVariables . catMaybes)
         [("_purescript_module_name",) <$> extractModuleName source]

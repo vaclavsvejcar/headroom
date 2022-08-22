@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Config.EnrichSpec (
-    spec
-) where
+module Headroom.Config.EnrichSpec
+    ( spec
+    )
+where
 
 import Headroom.Config.Enrich
 import RIO

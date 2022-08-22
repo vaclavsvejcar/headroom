@@ -13,12 +13,13 @@
 -- This module contains some /Template Haskell/ powered functions, used by
 -- "Headroom.Embedded" module, that needs to be placed in separated module, due to
 -- /GHC/ stage restriction.
-module Headroom.Embedded.TH (
-    embedConfigFile
+module Headroom.Embedded.TH
+    ( embedConfigFile
     , embedDefaultConfig
     , embedDefaultGlobalConfig
     , embedTemplate
-) where
+    )
+where
 
 import Data.FileEmbed (embedStringFile)
 import Headroom.Config.Types (LicenseType (..))
@@ -26,10 +27,10 @@ import Headroom.Data.EnumExtra (EnumExtra (..))
 import Headroom.FileType.Types (FileType (..))
 import Headroom.Meta (TemplateType)
 import Headroom.Template (Template (..))
-import Language.Haskell.TH.Syntax (
-    Exp
+import Language.Haskell.TH.Syntax
+    ( Exp
     , Q
- )
+    )
 import RIO
 import qualified RIO.NonEmpty as NE
 import qualified RIO.Text as T
@@ -48,13 +49,13 @@ embedDefaultGlobalConfig =
     embedStringFile "embedded/default-global-config.yaml"
 
 -- | Embeds /template file/ to the source code.
-embedTemplate ::
-    -- | type of the /license/
-    LicenseType ->
-    -- | type of the source code file
-    FileType ->
-    -- | content of the appropriate /template/ file
-    Q Exp
+embedTemplate
+    :: LicenseType
+    -- ^ type of the /license/
+    -> FileType
+    -- ^ type of the source code file
+    -> Q Exp
+    -- ^ content of the appropriate /template/ file
 embedTemplate lt ft =
     (embedStringFile . mconcat)
         ["embedded/license/", toStringLC lt, "/", toStringLC ft, ".", ext]

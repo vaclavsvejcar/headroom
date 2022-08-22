@@ -1,3 +1,4 @@
 comma-style: leading
+function-arrows: leading
 haddock-style: single-line
-import-export-comma-style: leading
+import-export-style: leading

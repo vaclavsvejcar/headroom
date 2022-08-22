@@ -2,9 +2,10 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Data.RegexSpec (
-    spec
-) where
+module Headroom.Data.RegexSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.Regex
 import RIO

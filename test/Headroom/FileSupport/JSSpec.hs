@@ -2,15 +2,16 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.JSSpec (
-    spec
-) where
+module Headroom.FileSupport.JSSpec
+    ( spec
+    )
+where
 
 import Headroom.FileSupport.JS
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import RIO
 import Test.Hspec
 

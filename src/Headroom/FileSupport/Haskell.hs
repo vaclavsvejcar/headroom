@@ -34,41 +34,42 @@
 -- = Extracted Custom Data
 -- This implementation extracts custom data from used template, represented by the
 -- 'HaskellTemplateData'' data type.
-module Headroom.FileSupport.Haskell (
-    fileSupport
-) where
+module Headroom.FileSupport.Haskell
+    ( fileSupport
+    )
+where
 
-import Headroom.Data.Regex (
-    isMatch
+import Headroom.Data.Regex
+    ( isMatch
     , match
     , re
- )
-import Headroom.FileSupport.Haskell.Haddock (
-    HaddockModuleHeader (..)
+    )
+import Headroom.FileSupport.Haskell.Haddock
+    ( HaddockModuleHeader (..)
     , extractModuleHeader
     , extractOffsets
- )
-import Headroom.FileSupport.TemplateData (
-    HaskellTemplateData' (..)
+    )
+import Headroom.FileSupport.TemplateData
+    ( HaskellTemplateData' (..)
     , TemplateData (..)
- )
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+    )
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 
-import Headroom.Config.Types (
-    HeaderConfig (..)
+import Headroom.Config.Types
+    ( HeaderConfig (..)
     , HeaderSyntax (..)
- )
+    )
 import Headroom.FileType.Types (FileType (Haskell))
 import Headroom.Header.Types (HeaderTemplate (..))
-import Headroom.SourceCode (
-    LineType (..)
+import Headroom.SourceCode
+    ( LineType (..)
     , SourceCode (..)
     , cut
     , firstMatching
- )
+    )
 import Headroom.Template (Template (..))
 import Headroom.Variables (mkVariables)
 import Headroom.Variables.Types (Variables (..))
@@ -102,11 +103,11 @@ extractTemplateData template syntax =
         templateData = HaskellTemplateData'{..}
      in HaskellTemplateData templateData
 
-extractVariables ::
-    HeaderTemplate ->
-    Maybe (Int, Int) ->
-    SourceCode ->
-    Variables
+extractVariables
+    :: HeaderTemplate
+    -> Maybe (Int, Int)
+    -> SourceCode
+    -> Variables
 extractVariables HeaderTemplate{..} headerPos source =
     (mkVariables . catMaybes)
         [ ("_haskell_module_copyright",) <$> hmhCopyright

@@ -11,9 +11,10 @@
 --
 -- This module contains data types and /type class/ instances for the
 -- /post-processing/ functions.
-module Headroom.PostProcess.Types (
-    PostProcess (..)
-) where
+module Headroom.PostProcess.Types
+    ( PostProcess (..)
+    )
+where
 
 import RIO
 

@@ -2,15 +2,16 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.GoSpec (
-    spec
-) where
+module Headroom.FileSupport.GoSpec
+    ( spec
+    )
+where
 
 import Headroom.FileSupport.Go
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import RIO
 import Test.Hspec
 

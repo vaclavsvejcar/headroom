@@ -3,26 +3,27 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.Haskell.HaddockSpec (
-    spec
-) where
+module Headroom.FileSupport.Haskell.HaddockSpec
+    ( spec
+    )
+where
 
-import Headroom.Config.Types (
-    HeaderSyntax (..)
+import Headroom.Config.Types
+    ( HeaderSyntax (..)
     , LicenseType (..)
- )
+    )
 import Headroom.Data.Regex (re)
 import Headroom.Data.Text (fromLines)
 import Headroom.Embedded (licenseTemplate)
-import Headroom.FileSupport (
-    analyzeSourceCode
+import Headroom.FileSupport
+    ( analyzeSourceCode
     , fileSupport
- )
+    )
 import Headroom.FileSupport.Haskell.Haddock
-import Headroom.FileSupport.TemplateData (
-    HaddockOffsets (..)
+import Headroom.FileSupport.TemplateData
+    ( HaddockOffsets (..)
     , TemplateData (..)
- )
+    )
 import Headroom.FileType.Types (FileType (..))
 import Headroom.IO.FileSystem (loadFile)
 import Headroom.Template (Template (..))

@@ -13,11 +13,12 @@
 -- Because each implementation of file support might require some custom data
 -- extracted for example from the template file, this module exposes data types
 -- specific for individual implementations.
-module Headroom.FileSupport.TemplateData (
-    TemplateData (..)
+module Headroom.FileSupport.TemplateData
+    ( TemplateData (..)
     , HaddockOffsets (..)
     , HaskellTemplateData' (..)
-) where
+    )
+where
 
 import RIO
 

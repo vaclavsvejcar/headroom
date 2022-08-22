@@ -2,15 +2,16 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.DartSpec (
-    spec
-) where
+module Headroom.FileSupport.DartSpec
+    ( spec
+    )
+where
 
 import Headroom.FileSupport.Dart
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import RIO
 import Test.Hspec
 

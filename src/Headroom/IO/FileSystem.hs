@@ -12,8 +12,8 @@
 --
 -- Module providing functions for working with the local file system, its file and
 -- directories.
-module Headroom.IO.FileSystem (
-    -- * Type Aliases
+module Headroom.IO.FileSystem
+    ( -- * Type Aliases
       CreateDirectoryFn
     , DoesFileExistFn
     , FindFilesFn
@@ -41,29 +41,30 @@ module Headroom.IO.FileSystem (
 
       -- * Other
     , excludePaths
-) where
+    )
+where
 
 import Headroom.Config.Types (CtHeadersConfig)
-import Headroom.Data.Regex (
-    Regex
+import Headroom.Data.Regex
+    ( Regex
     , match
- )
+    )
 import Headroom.FileType (listExtensions)
 import Headroom.FileType.Types (FileType)
 import RIO
-import RIO.Directory (
-    createDirectoryIfMissing
+import RIO.Directory
+    ( createDirectoryIfMissing
     , doesDirectoryExist
     , doesFileExist
     , getCurrentDirectory
     , getDirectoryContents
     , getHomeDirectory
- )
-import RIO.FilePath (
-    isExtensionOf
+    )
+import RIO.FilePath
+    ( isExtensionOf
     , takeExtension
     , (</>)
- )
+    )
 import qualified RIO.List as L
 import qualified RIO.Text as T
 
@@ -71,50 +72,50 @@ import qualified RIO.Text as T
 
 -- | Type of a function that creates new empty directory on the given path.
 type CreateDirectoryFn m =
-    -- | path of new directory
-    FilePath ->
-    -- | /IO/ action result
-    m ()
+    FilePath
+    -- ^ path of new directory
+    -> m ()
+    -- ^ /IO/ action result
 
 -- | Type of a function that returns 'True' if the argument file exists and is
 -- not a directory, and 'False' otherwise.
 type DoesFileExistFn m =
-    -- | path to check
-    FilePath ->
-    -- | whether the given path is existing file
-    m Bool
+    FilePath
+    -- ^ path to check
+    -> m Bool
+    -- ^ whether the given path is existing file
 
 -- | Type of a function that recursively finds files on given path whose
 -- filename matches the predicate.
 type FindFilesFn m =
-    -- | path to search
-    FilePath ->
-    -- | predicate to match filename
-    (FilePath -> Bool) ->
-    -- | found files
-    m [FilePath]
+    FilePath
+    -- ^ path to search
+    -> (FilePath -> Bool)
+    -- ^ predicate to match filename
+    -> m [FilePath]
+    -- ^ found files
 
 -- | Type of a function that recursively finds files on given path by file
 -- extensions.
 type FindFilesByExtsFn m =
-    -- | path to search
-    FilePath ->
-    -- | list of file extensions (without dot)
-    [Text] ->
-    -- | list of found files
-    m [FilePath]
+    FilePath
+    -- ^ path to search
+    -> [Text]
+    -- ^ list of file extensions (without dot)
+    -> m [FilePath]
+    -- ^ list of found files
 
 -- | Type of a function that recursively find files on given path by their
 -- file types.
 type FindFilesByTypesFn m =
-    -- | configuration of license headers
-    CtHeadersConfig ->
-    -- | list of file types
-    [FileType] ->
-    -- | path to search
-    FilePath ->
-    -- | list of found files
-    m [FilePath]
+    CtHeadersConfig
+    -- ^ configuration of license headers
+    -> [FileType]
+    -- ^ list of file types
+    -> FilePath
+    -- ^ path to search
+    -> m [FilePath]
+    -- ^ list of found files
 
 -- | Type of a function that obtains the current working directory as an
 -- absolute path.
@@ -127,26 +128,26 @@ type GetUserDirectoryFn m = m FilePath
 -- | Type of a function that recursively find all files on given path. If file
 -- reference is passed instead of directory, such file path is returned.
 type ListFilesFn m =
-    -- | path to search
-    FilePath ->
-    -- | list of found files
-    m [FilePath]
+    FilePath
+    -- ^ path to search
+    -> m [FilePath]
+    -- ^ list of found files
 
 -- | Type of a function that loads file content in UTF-8 encoding.
 type LoadFileFn m =
-    -- | file path
-    FilePath ->
-    -- | file content
-    m Text
+    FilePath
+    -- ^ file path
+    -> m Text
+    -- ^ file content
 
 -- | Type of a function that writes file content in UTF-8 encoding.
 type WriteFileFn m =
-    -- | file path
-    FilePath ->
-    -- | file content
-    Text ->
-    -- | write result
-    m ()
+    FilePath
+    -- ^ file path
+    -> Text
+    -- ^ file content
+    -> m ()
+    -- ^ write result
 
 -----------------------------  POLYMORPHIC RECORD  -----------------------------
 
@@ -235,11 +236,11 @@ listFiles fileOrDir = do
 --
 -- >>> fileExtension "path/to/some/file.txt"
 -- Just "txt"
-fileExtension ::
-    -- | path from which to extract file extension
-    FilePath ->
-    -- | extracted file extension
-    Maybe Text
+fileExtension
+    :: FilePath
+    -- ^ path from which to extract file extension
+    -> Maybe Text
+    -- ^ extracted file extension
 fileExtension (takeExtension -> '.' : xs) = Just $ T.pack xs
 fileExtension _ = Nothing
 
@@ -253,13 +254,13 @@ loadFile = readFileUtf8
 -- >>> import Headroom.Data.Regex (re)
 -- >>> excludePaths [[re|\.hidden|], [re|zzz|]] ["foo/.hidden", "test/bar", "x/zzz/e"]
 -- ["test/bar"]
-excludePaths ::
-    -- | patterns describing paths to exclude
-    [Regex] ->
-    -- | list of file paths
-    [FilePath] ->
-    -- | resulting list of file paths
-    [FilePath]
+excludePaths
+    :: [Regex]
+    -- ^ patterns describing paths to exclude
+    -> [FilePath]
+    -- ^ list of file paths
+    -> [FilePath]
+    -- ^ resulting list of file paths
 excludePaths _ [] = []
 excludePaths [] paths = paths
 excludePaths patterns paths = L.filter excluded paths

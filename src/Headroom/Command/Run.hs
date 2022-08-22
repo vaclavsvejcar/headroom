@@ -26,123 +26,124 @@
 --
 -- Module representing the @run@ command, the core command of /Headroom/, which is
 -- responsible for license header management.
-module Headroom.Command.Run (
-    commandRun
+module Headroom.Command.Run
+    ( commandRun
     , loadTemplateRefs
     , typeOfTemplate
 
       -- * License Header Post-processing
     , postProcessHeader'
-) where
+    )
+where
 
 import Control.Monad.Extra (ifM)
-import Data.String.Interpolate (
-    i
+import Data.String.Interpolate
+    ( i
     , iii
- )
+    )
 import Data.Time.Calendar (toGregorian)
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.Clock.POSIX (getPOSIXTime)
-import Data.Time.LocalTime (
-    getCurrentTimeZone
+import Data.Time.LocalTime
+    ( getCurrentTimeZone
     , localDay
     , utcToLocalTime
- )
-import Data.VCS.Ignore (
-    Git
+    )
+import Data.VCS.Ignore
+    ( Git
     , Repo (..)
     , findRepo
- )
-import Headroom.Command.Bootstrap (
-    bootstrap
+    )
+import Headroom.Command.Bootstrap
+    ( bootstrap
     , globalKVStore
     , runRIO'
- )
+    )
 import Headroom.Command.Types (CommandRunOptions (..))
-import Headroom.Config (
-    loadAppConfig
+import Headroom.Config
+    ( loadAppConfig
     , makeAppConfig
     , parseAppConfig
- )
-import Headroom.Config.Types (
-    AppConfig (..)
+    )
+import Headroom.Config.Types
+    ( AppConfig (..)
     , CtAppConfig
     , CtPostProcessConfigs
     , HeaderConfig (..)
     , HeaderSyntax (..)
     , PtAppConfig
     , RunMode (..)
- )
+    )
 import Headroom.Data.EnumExtra (EnumExtra (..))
-import Headroom.Data.Has (
-    Has (..)
+import Headroom.Data.Has
+    ( Has (..)
     , HasRIO
- )
-import Headroom.Data.Lens (
-    suffixLenses
+    )
+import Headroom.Data.Lens
+    ( suffixLenses
     , suffixLensesFor
- )
-import Headroom.Embedded (
-    defaultConfig
+    )
+import Headroom.Embedded
+    ( defaultConfig
     , licenseTemplate
- )
-import Headroom.FileSupport (
-    analyzeSourceCode
+    )
+import Headroom.FileSupport
+    ( analyzeSourceCode
     , fileSupport
- )
+    )
 import Headroom.FileType (fileTypeByExt)
 import Headroom.FileType.Types (FileType (..))
-import Headroom.Header (
-    addHeader
+import Headroom.Header
+    ( addHeader
     , dropHeader
     , extractHeaderInfo
     , extractHeaderTemplate
     , replaceHeader
- )
+    )
 import Headroom.Header.Sanitize (sanitizeSyntax)
-import Headroom.Header.Types (
-    HeaderInfo (..)
+import Headroom.Header.Types
+    ( HeaderInfo (..)
     , HeaderTemplate (..)
- )
-import Headroom.IO.FileSystem (
-    FileSystem (..)
+    )
+import Headroom.IO.FileSystem
+    ( FileSystem (..)
     , excludePaths
     , fileExtension
     , mkFileSystem
- )
+    )
 import Headroom.IO.KVStore (KVStore)
-import Headroom.IO.Network (
-    Network (..)
+import Headroom.IO.Network
+    ( Network (..)
     , mkNetwork
- )
-import Headroom.Meta (
-    TemplateType
+    )
+import Headroom.Meta
+    ( TemplateType
     , configFileName
- )
-import Headroom.PostProcess (
-    mkConfiguredEnv
+    )
+import Headroom.PostProcess
+    ( mkConfiguredEnv
     , postProcessHeader
- )
-import Headroom.SourceCode (
-    SourceCode
+    )
+import Headroom.SourceCode
+    ( SourceCode
     , toText
- )
+    )
 import Headroom.Template (Template (..))
-import Headroom.Template.TemplateRef (
-    TemplateRef (..)
+import Headroom.Template.TemplateRef
+    ( TemplateRef (..)
     , renderRef
- )
+    )
 import Headroom.Types (CurrentYear (..))
-import Headroom.UI (
-    Progress (..)
+import Headroom.UI
+    ( Progress (..)
     , zipWithProgress
- )
+    )
 import Headroom.UI.Table (Table2 (..))
-import Headroom.Variables (
-    compileVariables
+import Headroom.Variables
+    ( compileVariables
     , dynamicVariables
     , parseVariables
- )
+    )
 import Headroom.Variables.Types (Variables (..))
 import RIO
 import RIO.FilePath (takeBaseName)
@@ -226,11 +227,11 @@ getEnv opts logFunc = do
     pure env0{envConfiguration = config, envKVStore = kvStore}
 
 -- | Handler for /Run/ command.
-commandRun ::
-    -- | /Run/ command options
-    CommandRunOptions ->
-    -- | execution result
-    IO ()
+commandRun
+    :: CommandRunOptions
+    -- ^ /Run/ command options
+    -> IO ()
+    -- ^ execution result
 commandRun opts = runRIO' (getEnv opts) (croDebug opts) $ do
     _ <- bootstrap
     CommandRunOptions{..} <- viewL
@@ -263,10 +264,10 @@ warnOnDryRun = do
     CommandRunOptions{..} <- viewL
     when croDryRun $ logWarn "[!] Running with '--dry-run', no files are changed!"
 
-findSourceFiles ::
-    (Has CtAppConfig env, HasRIO FileSystem env, HasLogFunc env) =>
-    [FileType] ->
-    RIO env [FilePath]
+findSourceFiles
+    :: (Has CtAppConfig env, HasRIO FileSystem env, HasLogFunc env)
+    => [FileType]
+    -> RIO env [FilePath]
 findSourceFiles fileTypes = do
     AppConfig{..} <- viewL
     FileSystem{..} <- viewL
@@ -282,10 +283,10 @@ findSourceFiles fileTypes = do
     |]
     pure notIgnored
 
-excludeIgnored ::
-    (Has CtAppConfig env, HasRIO FileSystem env, HasLogFunc env) =>
-    [FilePath] ->
-    RIO env [FilePath]
+excludeIgnored
+    :: (Has CtAppConfig env, HasRIO FileSystem env, HasLogFunc env)
+    => [FilePath]
+    -> RIO env [FilePath]
 excludeIgnored paths = do
     AppConfig{..} <- viewL @CtAppConfig
     FileSystem{..} <- viewL
@@ -307,18 +308,18 @@ excludeIgnored paths = do
             _ -> logInfo [i|No VCS repository found in: #{dir}|]
         pure maybeRepo
 
-processSourceFiles ::
-    forall a env.
-    ( Template a
-    , Has CtAppConfig env
-    , Has CtPostProcessConfigs env
-    , Has CommandRunOptions env
-    , Has CurrentYear env
-    , HasLogFunc env
-    ) =>
-    Map FileType HeaderTemplate ->
-    [FilePath] ->
-    RIO env (Int, Int)
+processSourceFiles
+    :: forall a env
+     . ( Template a
+       , Has CtAppConfig env
+       , Has CtPostProcessConfigs env
+       , Has CommandRunOptions env
+       , Has CurrentYear env
+       , HasLogFunc env
+       )
+    => Map FileType HeaderTemplate
+    -> [FilePath]
+    -> RIO env (Int, Int)
 processSourceFiles templates paths = do
     AppConfig{..} <- viewL
     year <- viewL
@@ -332,21 +333,21 @@ processSourceFiles templates paths = do
     template c p = (,p) <$> (fileType c p >>= \ft -> M.lookup ft templates)
     process cVars dVars (pr, (ht, p)) = processSourceFile @a cVars dVars pr ht p
 
-processSourceFile ::
-    forall a env.
-    ( Template a
-    , Has CommandRunOptions env
-    , Has CtAppConfig env
-    , Has CtPostProcessConfigs env
-    , Has CurrentYear env
-    , HasLogFunc env
-    ) =>
-    Variables ->
-    Variables ->
-    Progress ->
-    HeaderTemplate ->
-    FilePath ->
-    RIO env Bool
+processSourceFile
+    :: forall a env
+     . ( Template a
+       , Has CommandRunOptions env
+       , Has CtAppConfig env
+       , Has CtPostProcessConfigs env
+       , Has CurrentYear env
+       , HasLogFunc env
+       )
+    => Variables
+    -> Variables
+    -> Progress
+    -> HeaderTemplate
+    -> FilePath
+    -> RIO env Bool
 processSourceFile cVars dVars progress ht@HeaderTemplate{..} path = do
     AppConfig{..} <- viewL @CtAppConfig
     CommandRunOptions{..} <- viewL
@@ -411,17 +412,17 @@ chooseAction info header = do
 -- | Loads templates using given template references. If multiple sources define
 -- template for the same 'FileType', then the preferred one (based on ordering
 -- of 'TemplateRef' is selected).
-loadTemplateRefs ::
-    forall a env.
-    ( Template a
-    , HasRIO Network env
-    , HasRIO FileSystem env
-    , HasLogFunc env
-    ) =>
-    -- | template references
-    [TemplateRef] ->
-    -- | map of templates
-    RIO env (Map FileType a)
+loadTemplateRefs
+    :: forall a env
+     . ( Template a
+       , HasRIO Network env
+       , HasRIO FileSystem env
+       , HasLogFunc env
+       )
+    => [TemplateRef]
+    -- ^ template references
+    -> RIO env (Map FileType a)
+    -- ^ map of templates
 loadTemplateRefs refs = do
     fileSystem <- viewL
     network <- viewL
@@ -449,13 +450,13 @@ loadTemplateRefs refs = do
     filterPreferred =
         mapMaybe (L.headMaybe . L.sort) . L.groupBy (\x y -> fst x == fst y)
 
-loadTemplates ::
-    ( Has CtAppConfig env
-    , HasRIO Network env
-    , HasRIO FileSystem env
-    , HasLogFunc env
-    ) =>
-    RIO env (Map FileType HeaderTemplate)
+loadTemplates
+    :: ( Has CtAppConfig env
+       , HasRIO Network env
+       , HasRIO FileSystem env
+       , HasLogFunc env
+       )
+    => RIO env (Map FileType HeaderTemplate)
 loadTemplates = do
     AppConfig{..} <- viewL @CtAppConfig
     let allRefs = builtInRefs acBuiltInTemplates <> acTemplateRefs
@@ -472,12 +473,12 @@ loadTemplates = do
         _ -> []
 
 -- | Takes path to the template file and returns detected type of the template.
-typeOfTemplate ::
-    HasLogFunc env =>
-    -- | path to the template file
-    FilePath ->
-    -- | detected template type
-    RIO env (Maybe FileType)
+typeOfTemplate
+    :: HasLogFunc env
+    => FilePath
+    -- ^ path to the template file
+    -> RIO env (Maybe FileType)
+    -- ^ detected template type
 typeOfTemplate path = do
     let fileType = textToEnum . T.pack . takeBaseName $ path
     when
@@ -485,10 +486,10 @@ typeOfTemplate path = do
         (logWarn $ "Skipping unrecognized template type: " <> fromString path)
     pure fileType
 
-loadConfigurationSafe ::
-    (HasLogFunc env) =>
-    FilePath ->
-    RIO env (Maybe PtAppConfig)
+loadConfigurationSafe
+    :: (HasLogFunc env)
+    => FilePath
+    -> RIO env (Maybe PtAppConfig)
 loadConfigurationSafe path = catch (Just <$> loadAppConfig path) onError
   where
     onError err = do
@@ -506,9 +507,9 @@ loadConfigurationSafe path = catch (Just <$> loadAppConfig path) onError
                 ]
         pure Nothing
 
-finalConfiguration ::
-    (HasLogFunc env, Has CommandRunOptions env) =>
-    RIO env CtAppConfig
+finalConfiguration
+    :: (HasLogFunc env, Has CommandRunOptions env)
+    => RIO env CtAppConfig
 finalConfiguration = do
     defaultConfig' <- Just <$> parseAppConfig defaultConfig
     cmdLineConfig <- Just <$> optionsToConfiguration
@@ -555,20 +556,20 @@ currentYear = do
 --
 --  1. sanitize possibly corrupted comment syntax ('sanitizeSyntax')
 --  2. apply /post-processors/ ('postProcessHeader')
-postProcessHeader' ::
-    forall a env.
-    ( Template a
-    , Has CtPostProcessConfigs env
-    , Has CurrentYear env
-    ) =>
-    -- | syntax of the license header comments
-    HeaderSyntax ->
-    -- | template variables
-    Variables ->
-    -- | /license header/ to post-process
-    Text ->
-    -- | post-processed /license header/
-    RIO env Text
+postProcessHeader'
+    :: forall a env
+     . ( Template a
+       , Has CtPostProcessConfigs env
+       , Has CurrentYear env
+       )
+    => HeaderSyntax
+    -- ^ syntax of the license header comments
+    -> Variables
+    -- ^ template variables
+    -> Text
+    -- ^ /license header/ to post-process
+    -> RIO env Text
+    -- ^ post-processed /license header/
 postProcessHeader' syntax vars rawHeader = do
     configs <- viewL @CtPostProcessConfigs
     year <- viewL

@@ -2,9 +2,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.VariablesSpec (
-    spec
-) where
+module Headroom.VariablesSpec
+    ( spec
+    )
+where
 
 import Headroom.Template.Mustache (Mustache)
 import Headroom.Types (CurrentYear (..))

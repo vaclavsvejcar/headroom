@@ -11,18 +11,19 @@
 -- Portability : POSIX
 --
 -- This module contains data types for "Headroom.Command" module.
-module Headroom.Command.Types (
-    Command (..)
+module Headroom.Command.Types
+    ( Command (..)
     , CommandGenOptions (..)
     , CommandInitOptions (..)
     , CommandRunOptions (..)
-) where
+    )
+where
 
-import Headroom.Config.Types (
-    GenMode
+import Headroom.Config.Types
+    ( GenMode
     , LicenseType
     , RunMode
- )
+    )
 import Headroom.Data.Regex (Regex)
 import Headroom.FileType.Types (FileType)
 import Headroom.Template.TemplateRef (TemplateRef)

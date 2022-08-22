@@ -13,27 +13,28 @@
 --
 -- This module contains code responsible for parsing command line arguments, using
 -- the /optparse-applicative/ library.
-module Headroom.Command (
-    commandParser
-) where
+module Headroom.Command
+    ( commandParser
+    )
+where
 
-import Headroom.Command.Readers (
-    licenseReader
+import Headroom.Command.Readers
+    ( licenseReader
     , licenseTypeReader
     , regexReader
     , templateRefReader
- )
+    )
 import Headroom.Command.Types (Command (..))
-import Headroom.Config.Types (
-    LicenseType
+import Headroom.Config.Types
+    ( LicenseType
     , RunMode (..)
- )
+    )
 import Headroom.Data.EnumExtra (EnumExtra (..))
-import Headroom.Meta (
-    buildVersion
+import Headroom.Meta
+    ( buildVersion
     , productDesc
     , productInfo
- )
+    )
 import Headroom.Meta.Version (printVersion)
 import Options.Applicative
 import RIO

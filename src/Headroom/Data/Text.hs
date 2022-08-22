@@ -11,8 +11,8 @@
 -- Portability : POSIX
 --
 -- Module containing bunch of useful functions for working with text.
-module Headroom.Data.Text (
-    read
+module Headroom.Data.Text
+    ( read
     , commonLinesPrefix
     , replaceFirst
 
@@ -21,7 +21,8 @@ module Headroom.Data.Text (
     , mapLinesF
     , fromLines
     , toLines
-) where
+    )
+where
 
 import RIO
 import qualified RIO.Text as T
@@ -34,11 +35,11 @@ import qualified RIO.Text.Partial as TP
 --
 -- >>> commonLinesPrefix "-- first\n-- second\n-- third"
 -- Just "-- "
-commonLinesPrefix ::
-    -- | lines of text to find prefix for
-    Text ->
-    -- | found longest common prefixs
-    Maybe Text
+commonLinesPrefix
+    :: Text
+    -- ^ lines of text to find prefix for
+    -> Maybe Text
+    -- ^ found longest common prefixs
 commonLinesPrefix text = go (toLines text) Nothing
   where
     go [] acc = acc
@@ -63,13 +64,13 @@ replaceFirst ptrn substitution text
 --
 -- >>> mapLines ("T: " <>) "foo zz\nbar"
 -- "T: foo zz\nT: bar"
-mapLines ::
-    -- | function to map over individual lines
-    (Text -> Text) ->
-    -- | input text
-    Text ->
-    -- | resulting text
-    Text
+mapLines
+    :: (Text -> Text)
+    -- ^ function to map over individual lines
+    -> Text
+    -- ^ input text
+    -> Text
+    -- ^ resulting text
 mapLines fn = mapLinesF (Just <$> fn)
 
 -- | Similar to 'mapLines', but the mapping function returns 'Foldable', which
@@ -79,14 +80,14 @@ mapLines fn = mapLinesF (Just <$> fn)
 --
 -- >>> mapLinesF (\l -> if l == "bar" then Nothing else Just l) "foo\nbar"
 -- "foo"
-mapLinesF ::
-    Foldable t =>
-    -- | function to map over inividual lines
-    (Text -> t Text) ->
-    -- | input text
-    Text ->
-    -- | resulting text
-    Text
+mapLinesF
+    :: Foldable t
+    => (Text -> t Text)
+    -- ^ function to map over inividual lines
+    -> Text
+    -- ^ input text
+    -> Text
+    -- ^ resulting text
 mapLinesF f = fromLines . concatMap toList . go . toLines
   where
     go [] = []
@@ -96,12 +97,12 @@ mapLinesF f = fromLines . concatMap toList . go . toLines
 --
 -- >>> read "123" :: Maybe Int
 -- Just 123
-read ::
-    Read a =>
-    -- | input text to parse
-    Text ->
-    -- | parsed value
-    Maybe a
+read
+    :: Read a
+    => Text
+    -- ^ input text to parse
+    -> Maybe a
+    -- ^ parsed value
 read = readMaybe . T.unpack
 
 -- | Similar to 'T.unlines', but does not automatically adds @\n@ at the end
@@ -127,11 +128,11 @@ read = readMaybe . T.unpack
 --
 -- >>> fromLines ["first", "second", ""]
 -- "first\nsecond\n"
-fromLines ::
-    -- | lines to join
-    [Text] ->
-    -- | text joined from individual lines
-    Text
+fromLines
+    :: [Text]
+    -- ^ lines to join
+    -> Text
+    -- ^ text joined from individual lines
 fromLines = T.intercalate "\n"
 
 -- | Similar to 'T.lines', but does not drop trailing newlines from output.
@@ -154,11 +155,11 @@ fromLines = T.intercalate "\n"
 --
 -- >>> toLines "first\nsecond\n"
 -- ["first","second",""]
-toLines ::
-    -- | text to break into lines
-    Text ->
-    -- | lines of input text
-    [Text]
+toLines
+    :: Text
+    -- ^ text to break into lines
+    -> [Text]
+    -- ^ lines of input text
 toLines input
     | T.null input = []
     | otherwise = T.split (== '\n') input

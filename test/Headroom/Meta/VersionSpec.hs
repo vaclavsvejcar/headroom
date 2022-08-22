@@ -2,9 +2,10 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Meta.VersionSpec (
-    spec
-) where
+module Headroom.Meta.VersionSpec
+    ( spec
+    )
+where
 
 import Headroom.Meta.Version
 import RIO

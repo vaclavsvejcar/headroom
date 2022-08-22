@@ -16,15 +16,16 @@
 -- type, and because every type of source code file requires different handling of
 -- some aspects, this file type specific support is implemented for every supported
 -- file type and exposed as instance of 'FileSupport' data type.
-module Headroom.FileSupport (
-    fileSupport
+module Headroom.FileSupport
+    ( fileSupport
     , analyzeSourceCode
-) where
+    )
+where
 
-import Control.Monad.State (
-    get
+import Control.Monad.State
+    ( get
     , put
- )
+    )
 import qualified Headroom.FileSupport.C as C
 import qualified Headroom.FileSupport.CPP as CPP
 import qualified Headroom.FileSupport.CSS as CSS
@@ -41,17 +42,17 @@ import qualified Headroom.FileSupport.Python as Python
 import qualified Headroom.FileSupport.Rust as Rust
 import qualified Headroom.FileSupport.Scala as Scala
 import qualified Headroom.FileSupport.Shell as Shell
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import qualified Headroom.FileSupport.XML as XML
 import Headroom.FileType.Types (FileType (..))
-import Headroom.SourceCode (
-    LineType (..)
+import Headroom.SourceCode
+    ( LineType (..)
     , SourceCode
     , fromText
- )
+    )
 import RIO
 import qualified RIO.Text as T
 
@@ -78,13 +79,13 @@ fileSupport Shell = Shell.fileSupport
 fileSupport XML = XML.fileSupport
 
 -- | Analyzes the raw source code of given type using provided 'FileSupport'.
-analyzeSourceCode ::
-    -- | 'FileSupport' implementation used for analysis
-    FileSupport ->
-    -- | raw source code to analyze
-    Text ->
-    -- | analyzed source code
-    SourceCode
+analyzeSourceCode
+    :: FileSupport
+    -- ^ 'FileSupport' implementation used for analysis
+    -> Text
+    -- ^ raw source code to analyze
+    -> SourceCode
+    -- ^ analyzed source code
 analyzeSourceCode fs = fromText state0 process
   where
     SyntaxAnalysis{..} = fsSyntaxAnalysis fs

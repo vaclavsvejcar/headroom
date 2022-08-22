@@ -5,18 +5,19 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Command.InitSpec (
-    spec
-) where
+module Headroom.Command.InitSpec
+    ( spec
+    )
+where
 
 import Headroom.Command.Init
 import Headroom.Command.Types (CommandInitOptions (..))
 import Headroom.Config.Types (LicenseType (..))
 import Headroom.Data.Has (Has (..))
-import Headroom.Data.Lens (
-    suffixLenses
+import Headroom.Data.Lens
+    ( suffixLenses
     , suffixLensesFor
- )
+    )
 import Headroom.FileType.Types (FileType (..))
 import Headroom.IO.FileSystem (FileSystem (..))
 import RIO

@@ -14,18 +14,19 @@
 --
 -- This module provides support for <https://mustache.github.io Mustache>
 -- templates.
-module Headroom.Template.Mustache (
-    Mustache (..)
-) where
+module Headroom.Template.Mustache
+    ( Mustache (..)
+    )
+where
 
-import Headroom.Template (
-    Template (..)
+import Headroom.Template
+    ( Template (..)
     , TemplateError (..)
- )
-import Headroom.Template.TemplateRef (
-    TemplateRef
+    )
+import Headroom.Template.TemplateRef
+    ( TemplateRef
     , renderRef
- )
+    )
 import Headroom.Variables.Types (Variables (..))
 import RIO
 import qualified RIO.Text as T

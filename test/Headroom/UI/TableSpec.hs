@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.UI.TableSpec (
-    spec
-) where
+module Headroom.UI.TableSpec
+    ( spec
+    )
+where
 
 import qualified Headroom.Data.Text as T
 import Headroom.UI.Table

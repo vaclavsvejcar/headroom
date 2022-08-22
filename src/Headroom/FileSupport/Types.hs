@@ -13,8 +13,8 @@
 --
 -- Data types for "Headroom.FileSupport" module in separated module
 -- (to avoid cyclic dependencies).
-module Headroom.FileSupport.Types (
-    -- * Data Types
+module Headroom.FileSupport.Types
+    ( -- * Data Types
       FileSupport (..)
     , SyntaxAnalysis (..)
 
@@ -24,7 +24,8 @@ module Headroom.FileSupport.Types (
       -- * Function Type Aliases
     , ExtractTemplateDataFn
     , ExtractVariablesFn
-) where
+    )
+where
 
 import Headroom.Config.Types (HeaderSyntax)
 import Headroom.FileSupport.TemplateData (TemplateData (..))
@@ -51,35 +52,35 @@ data SyntaxAnalysis = SyntaxAnalysis
 
 -- | Type of a function that extracts additional template data from template.
 type ExtractTemplateDataFn =
-    forall a.
-    Template a =>
-    -- | template to use for extraction
-    a ->
-    -- | copyright header syntax
-    HeaderSyntax ->
-    -- | extracted template data
-    TemplateData
+    forall a
+     . Template a
+    => a
+    -- ^ template to use for extraction
+    -> HeaderSyntax
+    -- ^ copyright header syntax
+    -> TemplateData
+    -- ^ extracted template data
 
 -- | Type of a function that extracts variables from analyzed source code file.
 type ExtractVariablesFn =
-    -- | header template
-    HeaderTemplate ->
-    -- | header position as @(startLine, endLine)@
-    Maybe (Int, Int) ->
-    -- | analyzed source code file
-    SourceCode ->
-    -- | extracted variables
-    Variables
+    HeaderTemplate
+    -- ^ header template
+    -> Maybe (Int, Int)
+    -- ^ header position as @(startLine, endLine)@
+    -> SourceCode
+    -- ^ analyzed source code file
+    -> Variables
+    -- ^ extracted variables
 
 -- | Default implementation of 'FileSupport' that doesn't extract any variables
 -- or template data.
-defaultFileSupport ::
-    -- | type of the source code file
-    FileType ->
-    -- | function that analyzes source code
-    SyntaxAnalysis ->
-    -- | resulting 'FileSupport'
-    FileSupport
+defaultFileSupport
+    :: FileType
+    -- ^ type of the source code file
+    -> SyntaxAnalysis
+    -- ^ function that analyzes source code
+    -> FileSupport
+    -- ^ resulting 'FileSupport'
 defaultFileSupport fileType syntaxAnalysis =
     FileSupport
         { fsSyntaxAnalysis = syntaxAnalysis

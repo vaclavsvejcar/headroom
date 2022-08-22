@@ -3,9 +3,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.IO.KVStoreSpec (
-    spec
-) where
+module Headroom.IO.KVStoreSpec
+    ( spec
+    )
+where
 
 import Headroom.IO.KVStore
 import RIO

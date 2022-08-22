@@ -16,22 +16,23 @@
 --
 -- This module contains data types and functions for working with
 -- Haskell PVP versions (<https://pvp.haskell.org/faq/>) in type safe way.
-module Headroom.Meta.Version (
-    Version (..)
+module Headroom.Meta.Version
+    ( Version (..)
     , parseVersion
     , printVersion
     , printVersionP
     , pvp
-) where
+    )
+where
 
-import Data.Aeson (
-    FromJSON (..)
+import Data.Aeson
+    ( FromJSON (..)
     , Value (String)
- )
-import Headroom.Data.Regex (
-    match
+    )
+import Headroom.Data.Regex
+    ( match
     , re
- )
+    )
 import qualified Headroom.Data.Text as T
 import Language.Haskell.TH.Quote (QuasiQuoter (..))
 import RIO
@@ -71,11 +72,11 @@ instance FromJSON Version where
 --
 -- >>> parseVersion "0.3.2.0"
 -- Just (Version {vMajor1 = 0, vMajor2 = 3, vMinor = 2, vPatch = 0})
-parseVersion ::
-    -- | input text to parse version from
-    Text ->
-    -- | parsed 'Version'
-    Maybe Version
+parseVersion
+    :: Text
+    -- ^ input text to parse version from
+    -> Maybe Version
+    -- ^ parsed 'Version'
 parseVersion raw = do
     groups <- match [re|^v?([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$|] raw
     check (mapMaybe T.read groups)
@@ -87,11 +88,11 @@ parseVersion raw = do
 --
 -- >>> printVersion (Version 0 3 2 0)
 -- "0.3.2.0"
-printVersion ::
-    -- | 'Version' to print
-    Version ->
-    -- | textual representation
-    Text
+printVersion
+    :: Version
+    -- ^ 'Version' to print
+    -> Text
+    -- ^ textual representation
 printVersion (Version ma1 ma2 mi p) = T.intercalate "." chunks
   where
     chunks = tshow <$> [ma1, ma2, mi, p]

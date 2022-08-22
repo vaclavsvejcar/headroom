@@ -10,9 +10,10 @@
 -- Portability : POSIX
 --
 -- This module contains data types for "Headroom.Variables" module.
-module Headroom.Variables.Types (
-    Variables (..)
-) where
+module Headroom.Variables.Types
+    ( Variables (..)
+    )
+where
 
 import RIO
 

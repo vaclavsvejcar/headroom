@@ -4,9 +4,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Template.TemplateRefSpec (
-    spec
-) where
+module Headroom.Template.TemplateRefSpec
+    ( spec
+    )
+where
 
 import qualified Data.Aeson as Aeson
 import Headroom.Template.TemplateRef

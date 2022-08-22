@@ -5,15 +5,16 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.PostProcessSpec (
-    spec
-) where
+module Headroom.PostProcessSpec
+    ( spec
+    )
+where
 
-import Headroom.Config.Types (
-    PostProcessConfig (..)
+import Headroom.Config.Types
+    ( PostProcessConfig (..)
     , PostProcessConfigs (..)
     , UpdateCopyrightConfig (..)
- )
+    )
 import Headroom.Data.Has (Has (..))
 import Headroom.Data.Text (fromLines)
 import Headroom.PostProcess

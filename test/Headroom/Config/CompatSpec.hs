@@ -2,15 +2,16 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Config.CompatSpec (
-    spec
-) where
+module Headroom.Config.CompatSpec
+    ( spec
+    )
+where
 
 import Headroom.Config.Compat
-import Headroom.Meta.Version (
-    Version (..)
+import Headroom.Meta.Version
+    ( Version (..)
     , pvp
- )
+    )
 import RIO
 import Test.Hspec
 

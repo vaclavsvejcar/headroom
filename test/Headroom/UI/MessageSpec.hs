@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.UI.MessageSpec (
-    spec
-) where
+module Headroom.UI.MessageSpec
+    ( spec
+    )
+where
 
 import Headroom.UI.Message
 import RIO

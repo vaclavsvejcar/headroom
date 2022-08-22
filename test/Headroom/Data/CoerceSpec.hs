@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Data.CoerceSpec (
-    spec
-) where
+module Headroom.Data.CoerceSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.Coerce
 import RIO

@@ -8,9 +8,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.UpdaterSpec (
-    spec
-) where
+module Headroom.UpdaterSpec
+    ( spec
+    )
+where
 
 import Data.Aeson (Value)
 import qualified Data.Aeson as A
@@ -18,34 +19,34 @@ import Data.String.Interpolate (i)
 import Data.Time (UTCTime (..))
 import Headroom.Config.Global (UpdaterConfig (..))
 import Headroom.Data.Has (Has (..))
-import Headroom.Data.Lens (
-    suffixLenses
+import Headroom.Data.Lens
+    ( suffixLenses
     , suffixLensesFor
- )
-import Headroom.IO.KVStore (
-    KVStore (..)
+    )
+import Headroom.IO.KVStore
+    ( KVStore (..)
     , inMemoryKVStore
     , valueKey
- )
-import Headroom.IO.Network (
-    Network (..)
+    )
+import Headroom.IO.Network
+    ( Network (..)
     , NetworkError (..)
- )
+    )
 import Headroom.Meta (buildVersion)
-import Headroom.Meta.Version (
-    printVersionP
+import Headroom.Meta.Version
+    ( printVersionP
     , pvp
- )
+    )
 import Headroom.Updater
 import RIO
 import qualified RIO.ByteString as B
 import qualified RIO.ByteString.Lazy as BL
 import RIO.FilePath ((</>))
 import RIO.Partial (fromJust)
-import RIO.Time (
-    addDays
+import RIO.Time
+    ( addDays
     , getCurrentTime
- )
+    )
 import Test.Hspec
 
 data TestEnv = TestEnv

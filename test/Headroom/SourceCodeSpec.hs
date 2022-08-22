@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.SourceCodeSpec (
-    spec
-) where
+module Headroom.SourceCodeSpec
+    ( spec
+    )
+where
 
 import Headroom.SourceCode
 import RIO

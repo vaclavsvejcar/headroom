@@ -13,10 +13,11 @@
 --
 -- This module provides 'Has' /type class/, adapted to the needs of this
 -- application.
-module Headroom.Data.Has (
-    Has (..)
+module Headroom.Data.Has
+    ( Has (..)
     , HasRIO
-) where
+    )
+where
 
 import RIO
 

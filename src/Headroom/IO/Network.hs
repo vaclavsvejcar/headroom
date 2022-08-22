@@ -16,8 +16,8 @@
 --
 -- Module providing support to perform selected network IO operations, such as
 -- downloading file content, etc.
-module Headroom.IO.Network (
-    -- * Type Aliases
+module Headroom.IO.Network
+    ( -- * Type Aliases
       DownloadContentFn
 
       -- * Polymorphic Record
@@ -29,22 +29,23 @@ module Headroom.IO.Network (
 
       -- * Error Data Types
     , NetworkError (..)
-) where
+    )
+where
 
 import Data.String.Interpolate (i)
-import Headroom.Meta (
-    buildVersion
+import Headroom.Meta
+    ( buildVersion
     , productName
     , productVendor
- )
+    )
 import Headroom.Meta.Version (printVersion)
-import Headroom.Types (
-    fromHeadroomError
+import Headroom.Types
+    ( fromHeadroomError
     , toHeadroomError
- )
+    )
 import qualified Network.HTTP.Client as HC
-import Network.HTTP.Req (
-    BsResponse
+import Network.HTTP.Req
+    ( BsResponse
     , GET (GET)
     , HttpException (..)
     , MonadHttp
@@ -56,7 +57,7 @@ import Network.HTTP.Req (
     , responseBody
     , runReq
     , useURI
- )
+    )
 import qualified Network.HTTP.Req as Req
 import qualified Network.HTTP.Types.Status as HC
 import RIO
@@ -68,10 +69,10 @@ import qualified Text.URI as URI
 
 -- | Type of a function that returns content of remote resource.
 type DownloadContentFn m =
-    -- | /URI/ of remote resource
-    URI ->
-    -- | downloaded content
-    m ByteString
+    URI
+    -- ^ /URI/ of remote resource
+    -> m ByteString
+    -- ^ downloaded content
 
 -----------------------------  POLYMORPHIC RECORD  -----------------------------
 
@@ -89,12 +90,12 @@ mkNetwork = Network{nDownloadContent = downloadContent}
 
 -- | Downloads content of remote resource as 'ByteString'. Note that only
 -- @http@ and @https@ protocols are supported at this moment.
-downloadContent ::
-    MonadIO m =>
-    -- | /URI/ of remote resource
-    URI ->
-    -- | downloaded content
-    m ByteString
+downloadContent
+    :: MonadIO m
+    => URI
+    -- ^ /URI/ of remote resource
+    -> m ByteString
+    -- ^ downloaded content
 downloadContent uri = runReq defaultHttpConfig $ do
     response <- httpGet uri
     pure $ responseBody response

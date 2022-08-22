@@ -25,33 +25,34 @@
 -- already rendered /license headers/. This is useful to perform some additional
 -- operations such as some sort of text alignment, update some parts of the header,
 -- etc.
-module Headroom.PostProcess (
-    postProcess
+module Headroom.PostProcess
+    ( postProcess
     , configuredPostProcess
     , postProcessHeader
 
       -- * Environment Data Types
     , ConfiguredEnv (..)
     , mkConfiguredEnv
-) where
+    )
+where
 
-import Headroom.Config.Types (
-    CtPostProcessConfigs
+import Headroom.Config.Types
+    ( CtPostProcessConfigs
     , PostProcessConfig (..)
     , PostProcessConfigs (..)
     , UpdateCopyrightConfig (..)
- )
+    )
 import Headroom.Data.Has (Has (..))
-import Headroom.Data.Lens (
-    suffixLenses
+import Headroom.Data.Lens
+    ( suffixLenses
     , suffixLensesFor
- )
+    )
 import Headroom.PostProcess.Types (PostProcess (..))
-import Headroom.PostProcess.UpdateCopyright (
-    SelectedAuthors (..)
+import Headroom.PostProcess.UpdateCopyright
+    ( SelectedAuthors (..)
     , UpdateCopyrightMode (..)
     , updateCopyright
- )
+    )
 import Headroom.Template (Template (..))
 import Headroom.Template.TemplateRef (TemplateRef (..))
 import Headroom.Types (CurrentYear (..))
@@ -86,17 +87,17 @@ instance Has UpdateCopyrightMode ConfiguredEnv where
 -- | Constructor function for 'ConfiguredEnv' data type. This function takes
 -- 'Variables' as argument, because it performs template compilation on
 -- selected fields of 'CtPostProcessConfigs'.
-mkConfiguredEnv ::
-    forall a m.
-    (Template a, MonadThrow m) =>
-    -- | current year
-    CurrentYear ->
-    -- | template variables
-    Variables ->
-    -- | configuration for /post-processors/
-    CtPostProcessConfigs ->
-    -- | environment data type
-    m ConfiguredEnv
+mkConfiguredEnv
+    :: forall a m
+     . (Template a, MonadThrow m)
+    => CurrentYear
+    -- ^ current year
+    -> Variables
+    -- ^ template variables
+    -> CtPostProcessConfigs
+    -- ^ configuration for /post-processors/
+    -> m ConfiguredEnv
+    -- ^ environment data type
 mkConfiguredEnv ceCurrentYear vars configs = do
     cePostProcessConfigs <- compileTemplates @a vars configs
     let ceUpdateCopyrightMode = mode cePostProcessConfigs
@@ -111,26 +112,26 @@ mkConfiguredEnv ceCurrentYear vars configs = do
 
 -- | Runs the /post-processing function/ using the given /environment/ and text
 -- of rendered /license header/ as input.
-postProcess ::
-    -- | /post-processor/ to run
-    PostProcess env ->
-    -- | environment value
-    env ->
-    -- | text of rendered /license header/
-    Text ->
-    -- | processed text of /license header/
-    Text
+postProcess
+    :: PostProcess env
+    -- ^ /post-processor/ to run
+    -> env
+    -- ^ environment value
+    -> Text
+    -- ^ text of rendered /license header/
+    -> Text
+    -- ^ processed text of /license header/
 postProcess (PostProcess fn) env input = runReader (fn input) env
 
 -- | Composition of various /post-processors/, which environment is
 -- based on /YAML/ configuration and which can be enabled/disabled to fit
 -- end user's needs.
-configuredPostProcess ::
-    (Has CurrentYear env, Has UpdateCopyrightMode env) =>
-    -- | configuration of /post-processors/
-    CtPostProcessConfigs ->
-    -- | composed /post-processor/
-    PostProcess env
+configuredPostProcess
+    :: (Has CurrentYear env, Has UpdateCopyrightMode env)
+    => CtPostProcessConfigs
+    -- ^ configuration of /post-processors/
+    -> PostProcess env
+    -- ^ composed /post-processor/
 configuredPostProcess PostProcessConfigs{..} =
     mconcat
         [ifEnabled ppcsUpdateCopyright updateCopyright]
@@ -141,24 +142,24 @@ configuredPostProcess PostProcessConfigs{..} =
 
 -- | Takes already rendered /license header/ and post-process it based on the
 -- given configuration.
-postProcessHeader ::
-    -- | configuration used to define post-processing behaviour
-    ConfiguredEnv ->
-    -- | rendered text of /license header/
-    Text ->
-    -- | post-processed text of /license header/
-    Text
+postProcessHeader
+    :: ConfiguredEnv
+    -- ^ configuration used to define post-processing behaviour
+    -> Text
+    -- ^ rendered text of /license header/
+    -> Text
+    -- ^ post-processed text of /license header/
 postProcessHeader env =
     postProcess (configuredPostProcess (cePostProcessConfigs env)) env
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-compileTemplates ::
-    forall a m.
-    (Template a, MonadThrow m) =>
-    Variables ->
-    CtPostProcessConfigs ->
-    m CtPostProcessConfigs
+compileTemplates
+    :: forall a m
+     . (Template a, MonadThrow m)
+    => Variables
+    -> CtPostProcessConfigs
+    -> m CtPostProcessConfigs
 compileTemplates vars configs = configs & traverseOf authorsL compileAuthors'
   where
     authorsL = ppcsUpdateCopyrightL . ppcConfigL . uccSelectedAuthorsL

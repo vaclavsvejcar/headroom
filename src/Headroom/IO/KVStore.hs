@@ -28,8 +28,8 @@
 -- This is really simple /key-value/ persistent store that uses /SQLite/ as a
 -- backend. Main goal is to provide /type-safe/ way how to define value keys, that
 -- can be later used to set/put the actual value into the store.
-module Headroom.IO.KVStore (
-    -- * Type Aliases
+module Headroom.IO.KVStore
+    ( -- * Type Aliases
       GetValueFn
     , PutValueFn
     , KVStore (..)
@@ -45,32 +45,33 @@ module Headroom.IO.KVStore (
     , inMemoryKVStore
     , sqliteKVStore
     , valueKey
-) where
+    )
+where
 
-import Database.Persist (
-    PersistStoreRead (..)
+import Database.Persist
+    ( PersistStoreRead (..)
     , PersistStoreWrite (..)
- )
-import Database.Persist.Sqlite (
-    runMigrationSilent
+    )
+import Database.Persist.Sqlite
+    ( runMigrationSilent
     , runSqlite
- )
-import Database.Persist.TH (
-    mkMigrate
+    )
+import Database.Persist.TH
+    ( mkMigrate
     , mkPersist
     , persistLowerCase
     , share
     , sqlSettings
- )
+    )
 import RIO
 import qualified RIO.Map as M
 import qualified RIO.Text as T
-import RIO.Time (
-    UTCTime
+import RIO.Time
+    ( UTCTime
     , defaultTimeLocale
     , formatTime
     , parseTimeM
- )
+    )
 
 ------------------------------  TEMPLATE HASKELL  ------------------------------
 
@@ -87,23 +88,23 @@ StoreRecord
 
 -- | Gets the value for given 'ValueKey' from the store.
 type GetValueFn m =
-    forall a.
-    (ValueCodec a) =>
-    -- | key for the value
-    ValueKey a ->
-    -- | value (if found)
-    m (Maybe a)
+    forall a
+     . (ValueCodec a)
+    => ValueKey a
+    -- ^ key for the value
+    -> m (Maybe a)
+    -- ^ value (if found)
 
 -- | Puts the value for given 'ValueKey' into the store.
 type PutValueFn m =
-    forall a.
-    (ValueCodec a) =>
-    -- | key for the value
-    ValueKey a ->
-    -- | value to put into store
-    a ->
-    -- | operation result
-    m ()
+    forall a
+     . (ValueCodec a)
+    => ValueKey a
+    -- ^ key for the value
+    -> a
+    -- ^ value to put into store
+    -> m ()
+    -- ^ operation result
 
 -----------------------------  POLYMORPHIC RECORD  -----------------------------
 
@@ -115,12 +116,12 @@ data KVStore m = KVStore
     }
 
 -- | Constructs persistent instance of 'KVStore' that uses /SQLite/ as a backend.
-sqliteKVStore ::
-    MonadIO m =>
-    -- | path of the store location
-    StorePath ->
-    -- | store instance
-    KVStore m
+sqliteKVStore
+    :: MonadIO m
+    => StorePath
+    -- ^ path of the store location
+    -> KVStore m
+    -- ^ store instance
 sqliteKVStore sp =
     KVStore{kvGetValue = getValueSQLite sp, kvPutValue = putValueSQLite sp}
 
@@ -140,18 +141,18 @@ inMemoryKVStore = do
 -- representation used by the store to hold values.
 class ValueCodec a where
     -- | Encodes value into textual representation.
-    encodeValue ::
-        -- | value to encode
-        a ->
-        -- | textual representation
-        Text
+    encodeValue
+        :: a
+        -- ^ value to encode
+        -> Text
+        -- ^ textual representation
 
     -- | Decodes value from textual representation.
-    decodeValue ::
-        -- | value to decode
-        Text ->
-        -- | decoded value (if available)
-        Maybe a
+    decodeValue
+        :: Text
+        -- ^ value to decode
+        -> Maybe a
+        -- ^ decoded value (if available)
 
 instance ValueCodec Text where
     encodeValue = id

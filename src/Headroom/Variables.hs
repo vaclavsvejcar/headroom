@@ -17,8 +17,8 @@
 -- Portability : POSIX
 --
 -- Module containing costructor and useful functions for the 'Variables' data type.
-module Headroom.Variables (
-    -- * Constructing Variables
+module Headroom.Variables
+    ( -- * Constructing Variables
       mkVariables
     , dynamicVariables
 
@@ -27,16 +27,17 @@ module Headroom.Variables (
 
       -- * Processing Variables
     , compileVariables
-) where
+    )
+where
 
 import Data.String.Interpolate (iii)
 import Headroom.Template (Template (..))
 import Headroom.Template.TemplateRef (TemplateRef (..))
-import Headroom.Types (
-    CurrentYear (..)
+import Headroom.Types
+    ( CurrentYear (..)
     , fromHeadroomError
     , toHeadroomError
- )
+    )
 import Headroom.Variables.Types (Variables (..))
 import RIO
 import qualified RIO.HashMap as HM
@@ -46,21 +47,21 @@ import qualified RIO.Text as T
 --
 -- >>> mkVariables [("key1", "value1")]
 -- Variables (fromList [("key1","value1")])
-mkVariables ::
-    -- | pairs of /key-value/
-    [(Text, Text)] ->
-    -- | constructed variables
-    Variables
+mkVariables
+    :: [(Text, Text)]
+    -- ^ pairs of /key-value/
+    -> Variables
+    -- ^ constructed variables
 mkVariables = Variables . HM.fromList
 
 -- | /Dynamic variables/ that are common for all parsed files.
 --
 -- * @___current_year__@ - current year
-dynamicVariables ::
-    -- | current year
-    CurrentYear ->
-    -- | map of /dynamic variables/
-    Variables
+dynamicVariables
+    :: CurrentYear
+    -- ^ current year
+    -> Variables
+    -- ^ map of /dynamic variables/
 dynamicVariables (CurrentYear year) =
     mkVariables [("_current_year", tshow year)]
 
@@ -68,12 +69,12 @@ dynamicVariables (CurrentYear year) =
 --
 -- >>> parseVariables ["key1=value1"]
 -- Variables (fromList [("key1","value1")])
-parseVariables ::
-    MonadThrow m =>
-    -- | list of raw variables
-    [Text] ->
-    -- | parsed variables
-    m Variables
+parseVariables
+    :: MonadThrow m
+    => [Text]
+    -- ^ list of raw variables
+    -> m Variables
+    -- ^ parsed variables
 parseVariables variables = fmap mkVariables (mapM parse variables)
   where
     parse input = case T.split (== '=') input of
@@ -90,13 +91,13 @@ parseVariables variables = fmap mkVariables (mapM parse variables)
 -- >>> let expected = mkVariables [("name", "John"), ("msg", "Hello, John")]
 -- >>> compiled == Just expected
 -- True
-compileVariables ::
-    forall a m.
-    (Template a, MonadThrow m) =>
-    -- | input variables to compile
-    Variables ->
-    -- | compiled variables
-    m Variables
+compileVariables
+    :: forall a m
+     . (Template a, MonadThrow m)
+    => Variables
+    -- ^ input variables to compile
+    -> m Variables
+    -- ^ compiled variables
 compileVariables variables@(Variables kvs) = do
     compiled <- mapM compileVariable (HM.toList kvs)
     pure $ mkVariables compiled

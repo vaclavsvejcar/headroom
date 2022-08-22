@@ -5,25 +5,26 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Config.GlobalSpec (
-    spec
-) where
+module Headroom.Config.GlobalSpec
+    ( spec
+    )
+where
 
 import Headroom.Config.Global
 import Headroom.Data.Has (Has (..))
-import Headroom.Data.Lens (
-    suffixLenses
+import Headroom.Data.Lens
+    ( suffixLenses
     , suffixLensesFor
- )
+    )
 import Headroom.Embedded (defaultGlobalConfig)
-import Headroom.IO.FileSystem (
-    FileSystem (..)
+import Headroom.IO.FileSystem
+    ( FileSystem (..)
     , mkFileSystem
- )
-import Headroom.Meta (
-    globalConfigDirName
+    )
+import Headroom.Meta
+    ( globalConfigDirName
     , globalConfigFileName
- )
+    )
 import RIO
 import RIO.Directory (doesFileExist)
 import RIO.FilePath ((</>))

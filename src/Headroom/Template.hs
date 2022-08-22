@@ -16,8 +16,8 @@
 --
 -- Module providing interface for working with template files in extensible way.
 -- Supported template is represented by the 'Template' /type class/.
-module Headroom.Template (
-    -- * Extendable Template Support
+module Headroom.Template
+    ( -- * Extendable Template Support
       Template (..)
 
       -- * Helper Functions
@@ -25,14 +25,15 @@ module Headroom.Template (
 
       -- * Error Data Types
     , TemplateError (..)
-) where
+    )
+where
 
 import Data.String.Interpolate (iii)
 import Headroom.Template.TemplateRef (TemplateRef (..))
-import Headroom.Types (
-    fromHeadroomError
+import Headroom.Types
+    ( fromHeadroomError
     , toHeadroomError
- )
+    )
 import Headroom.Variables.Types (Variables (..))
 import RIO
 import qualified RIO.Text as T
@@ -40,45 +41,45 @@ import qualified RIO.Text as T
 -- | /Type class/ representing supported template file.
 class Template a where
     -- | Returns list of supported file extensions for this template type.
-    templateExtensions ::
-        -- | list of supported file extensions
-        NonEmpty Text
+    templateExtensions
+        :: NonEmpty Text
+        -- ^ list of supported file extensions
 
     -- | Parses template from given raw text.
-    parseTemplate ::
-        MonadThrow m =>
-        -- | reference to template source
-        TemplateRef ->
-        -- | raw template text
-        Text ->
-        -- | parsed template
-        m a
+    parseTemplate
+        :: MonadThrow m
+        => TemplateRef
+        -- ^ reference to template source
+        -> Text
+        -- ^ raw template text
+        -> m a
+        -- ^ parsed template
 
     -- | Renders parsed template and replaces all variables with actual values.
-    renderTemplate ::
-        MonadThrow m =>
-        -- | values of variables to replace
-        Variables ->
-        -- | parsed template to render
-        a ->
-        -- | rendered template text
-        m Text
+    renderTemplate
+        :: MonadThrow m
+        => Variables
+        -- ^ values of variables to replace
+        -> a
+        -- ^ parsed template to render
+        -> m Text
+        -- ^ rendered template text
 
     -- | Returns the raw text of the template, same that has been parsed by
     -- 'parseTemplate' method.
-    rawTemplate ::
-        -- | template for which to return raw template text
-        a ->
-        -- | raw template text
-        Text
+    rawTemplate
+        :: a
+        -- ^ template for which to return raw template text
+        -> Text
+        -- ^ raw template text
 
     -- | Returns a reference to template source, from which this template was
     -- loaded.
-    templateRef ::
-        -- | template for which to return reference
-        a ->
-        -- | template reference
-        TemplateRef
+    templateRef
+        :: a
+        -- ^ template for which to return reference
+        -> TemplateRef
+        -- ^ template reference
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 

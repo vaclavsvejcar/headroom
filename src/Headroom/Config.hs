@@ -17,8 +17,8 @@
 -- Headroom uses the
 -- <https://medium.com/@jonathangfischoff/the-partial-options-monoid-pattern-31914a71fc67 partial options monoid>
 -- pattern for the configuration.
-module Headroom.Config (
-    -- * Loading & Parsing Configuration
+module Headroom.Config
+    ( -- * Loading & Parsing Configuration
       loadAppConfig
     , parseAppConfig
 
@@ -26,13 +26,14 @@ module Headroom.Config (
     , makeAppConfig
     , makeHeadersConfig
     , makeHeaderConfig
-) where
+    )
+where
 
 import Data.Monoid (Last (..))
 import qualified Data.Yaml as Y
 import Headroom.Config.Compat (checkCompatibility)
-import Headroom.Config.Types (
-    AppConfig (..)
+import Headroom.Config.Types
+    ( AppConfig (..)
     , ConfigurationError (..)
     , ConfigurationKey (..)
     , CtAppConfig
@@ -53,13 +54,13 @@ import Headroom.Config.Types (
     , PtPostProcessConfigs
     , PtUpdateCopyrightConfig
     , UpdateCopyrightConfig (..)
- )
+    )
 import Headroom.Data.Lens (suffixLenses)
 import Headroom.FileType.Types (FileType (..))
-import Headroom.Meta (
-    buildVersion
+import Headroom.Meta
+    ( buildVersion
     , configBreakingChanges
- )
+    )
 import RIO
 import qualified RIO.ByteString as B
 
@@ -77,21 +78,21 @@ loadAppConfig path = do
     parseAppConfig content
 
 -- | Parses application configuration from given raw input in /YAML/ format.
-parseAppConfig ::
-    MonadThrow m =>
-    -- | raw input to parse
-    ByteString ->
-    -- | parsed application configuration
-    m PtAppConfig
+parseAppConfig
+    :: MonadThrow m
+    => ByteString
+    -- ^ raw input to parse
+    -> m PtAppConfig
+    -- ^ parsed application configuration
 parseAppConfig = Y.decodeThrow
 
 -- | Makes full 'CtAppConfig' from provided 'PtAppConfig' (if valid).
-makeAppConfig ::
-    MonadThrow m =>
-    -- | source 'PtAppConfig'
-    PtAppConfig ->
-    -- | full 'CtAppConfig'
-    m CtAppConfig
+makeAppConfig
+    :: MonadThrow m
+    => PtAppConfig
+    -- ^ source 'PtAppConfig'
+    -> m CtAppConfig
+    -- ^ full 'CtAppConfig'
 makeAppConfig pt = do
     acRunMode <- lastOrError CkRunMode (acRunMode pt)
     acSourcePaths <- lastOrError CkSourcePaths (acSourcePaths pt)
@@ -108,12 +109,12 @@ makeAppConfig pt = do
     pure AppConfig{..}
 
 -- | Makes full 'CtHeadersConfig' from provided 'PtHeadersConfig' (if valid).
-makeHeadersConfig ::
-    MonadThrow m =>
-    -- | source 'PtHeadersConfig'
-    PtHeadersConfig ->
-    -- | full 'CtHeadersConfig'
-    m CtHeadersConfig
+makeHeadersConfig
+    :: MonadThrow m
+    => PtHeadersConfig
+    -- ^ source 'PtHeadersConfig'
+    -> m CtHeadersConfig
+    -- ^ full 'CtHeadersConfig'
 makeHeadersConfig pt = do
     hscC <- makeHeaderConfig C (hscC pt)
     hscCpp <- makeHeaderConfig CPP (hscCpp pt)
@@ -135,14 +136,14 @@ makeHeadersConfig pt = do
     pure HeadersConfig{..}
 
 -- | Makes full 'CtHeaderConfig' from provided 'PtHeaderConfig' (if valid).
-makeHeaderConfig ::
-    MonadThrow m =>
-    -- | determines file type of configuration
-    FileType ->
-    -- | source 'PtHeaderConfig'
-    PtHeaderConfig ->
-    -- | full 'CtHeaderConfig'
-    m CtHeaderConfig
+makeHeaderConfig
+    :: MonadThrow m
+    => FileType
+    -- ^ determines file type of configuration
+    -> PtHeaderConfig
+    -- ^ source 'PtHeaderConfig'
+    -> m CtHeaderConfig
+    -- ^ full 'CtHeaderConfig'
 makeHeaderConfig fileType pt = do
     hcFileExtensions <-
         lastOrError
@@ -165,10 +166,10 @@ makeHeaderConfig fileType pt = do
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-makePostProcessConfigs ::
-    MonadThrow m =>
-    PtPostProcessConfigs ->
-    m CtPostProcessConfigs
+makePostProcessConfigs
+    :: MonadThrow m
+    => PtPostProcessConfigs
+    -> m CtPostProcessConfigs
 makePostProcessConfigs pt = do
     ppcsUpdateCopyright <-
         makePostProcessConfig
@@ -176,20 +177,20 @@ makePostProcessConfigs pt = do
             makeUpdateCopyrightConfig
     pure PostProcessConfigs{..}
 
-makePostProcessConfig ::
-    MonadThrow m =>
-    PtPostProcessConfig c ->
-    (c 'Partial -> m (c 'Complete)) ->
-    m (CtPostProcessConfig c)
+makePostProcessConfig
+    :: MonadThrow m
+    => PtPostProcessConfig c
+    -> (c 'Partial -> m (c 'Complete))
+    -> m (CtPostProcessConfig c)
 makePostProcessConfig pt fn = do
     ppcEnabled <- lastOrError CkEnabled (pt ^. ppcEnabledL)
     ppcConfig <- fn $ pt ^. ppcConfigL
     pure PostProcessConfig{..}
 
-makeUpdateCopyrightConfig ::
-    MonadThrow m =>
-    PtUpdateCopyrightConfig ->
-    m CtUpdateCopyrightConfig
+makeUpdateCopyrightConfig
+    :: MonadThrow m
+    => PtUpdateCopyrightConfig
+    -> m CtUpdateCopyrightConfig
 makeUpdateCopyrightConfig pt = do
     let uccSelectedAuthors = lastOrNothing $ pt ^. uccSelectedAuthorsL
     pure UpdateCopyrightConfig{..}

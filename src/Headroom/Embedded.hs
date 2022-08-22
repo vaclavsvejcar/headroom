@@ -12,20 +12,21 @@
 -- Portability : POSIX
 --
 -- Contains contents of files embedded using the "Data.FileEmbed" module.
-module Headroom.Embedded (
-    configFileStub
+module Headroom.Embedded
+    ( configFileStub
     , defaultConfig
     , defaultGlobalConfig
     , licenseTemplate
-) where
+    )
+where
 
 import Headroom.Config.Types (LicenseType (..))
-import Headroom.Embedded.TH (
-    embedConfigFile
+import Headroom.Embedded.TH
+    ( embedConfigFile
     , embedDefaultConfig
     , embedDefaultGlobalConfig
     , embedTemplate
- )
+    )
 import Headroom.FileType.Types (FileType (..))
 import RIO
 
@@ -42,14 +43,14 @@ defaultGlobalConfig :: IsString a => a
 defaultGlobalConfig = $(embedDefaultGlobalConfig)
 
 -- | License template for given license.
-licenseTemplate ::
-    IsString a =>
-    -- | license for which to return the template
-    LicenseType ->
-    -- | license for which to return the template
-    FileType ->
-    -- | template text
-    a
+licenseTemplate
+    :: IsString a
+    => LicenseType
+    -- ^ license for which to return the template
+    -> FileType
+    -- ^ license for which to return the template
+    -> a
+    -- ^ template text
 licenseTemplate licenseType fileType = case licenseType of
     Apache2 -> case fileType of
         C -> $(embedTemplate Apache2 C)

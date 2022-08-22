@@ -2,15 +2,16 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.PHPSpec (
-    spec
-) where
+module Headroom.FileSupport.PHPSpec
+    ( spec
+    )
+where
 
 import Headroom.FileSupport.PHP
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import RIO
 import Test.Hspec
 

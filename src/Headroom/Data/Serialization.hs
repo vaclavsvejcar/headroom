@@ -12,22 +12,23 @@
 --
 -- Module providing support for data (de)serialization, mainly from/to /JSON/
 -- and /YAML/.
-module Headroom.Data.Serialization (
-    -- * JSON/YAML Serialization
+module Headroom.Data.Serialization
+    ( -- * JSON/YAML Serialization
       aesonOptions
     , dropFieldPrefix
     , symbolCase
 
       -- * Pretty Printing
     , prettyPrintYAML
-) where
+    )
+where
 
-import Data.Aeson (
-    Options
+import Data.Aeson
+    ( Options
     , ToJSON (..)
     , defaultOptions
     , fieldLabelModifier
- )
+    )
 import qualified Data.Yaml.Pretty as YP
 import RIO
 import qualified RIO.Char as C
@@ -55,13 +56,13 @@ dropFieldPrefix = \case
 --
 -- >>> symbolCase '-' "fooBar"
 -- "foo-bar"
-symbolCase ::
-    -- | word separator symbol
-    Char ->
-    -- | input text
-    String ->
-    -- | processed text
-    String
+symbolCase
+    :: Char
+    -- ^ word separator symbol
+    -> String
+    -- ^ input text
+    -> String
+    -- ^ processed text
 symbolCase sym = \case
     [] -> []
     (x : xs)
@@ -69,12 +70,12 @@ symbolCase sym = \case
         | otherwise -> x : symbolCase sym xs
 
 -- | Pretty prints given data as /YAML/.
-prettyPrintYAML ::
-    ToJSON a =>
-    -- | data to pretty print
-    a ->
-    -- | pretty printed /YAML/ output
-    Text
+prettyPrintYAML
+    :: ToJSON a
+    => a
+    -- ^ data to pretty print
+    -> Text
+    -- ^ pretty printed /YAML/ output
 prettyPrintYAML = decodeUtf8Lenient . YP.encodePretty prettyConfig
   where
     prettyConfig = YP.setConfCompare compare YP.defConfig

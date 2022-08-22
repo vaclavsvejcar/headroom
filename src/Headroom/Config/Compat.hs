@@ -16,33 +16,34 @@
 --
 -- This module contains functions and data types used for checking compatibility of
 -- user's YAML configuration with current version of Headroom.
-module Headroom.Config.Compat (
-    VersionError (..)
+module Headroom.Config.Compat
+    ( VersionError (..)
     , checkCompatibility
-) where
+    )
+where
 
-import Data.Aeson (
-    FromJSON (..)
+import Data.Aeson
+    ( FromJSON (..)
     , withObject
     , (.:)
- )
+    )
 import Data.String.Interpolate (iii)
 import qualified Data.Yaml as Y
-import Headroom.Meta (
-    buildVersion
+import Headroom.Meta
+    ( buildVersion
     , configFileName
     , productName
     , webDocMigration
- )
-import Headroom.Meta.Version (
-    Version (..)
+    )
+import Headroom.Meta.Version
+    ( Version (..)
     , printVersionP
     , pvp
- )
-import Headroom.Types (
-    fromHeadroomError
+    )
+import Headroom.Types
+    ( fromHeadroomError
     , toHeadroomError
- )
+    )
 import RIO
 import qualified RIO.List as L
 
@@ -78,16 +79,16 @@ instance Exception VersionError where
 
 -- | Checks whether the given not yet parsed YAML configuration is compatible,
 -- using list of versions that caused breaking changes into configuration.
-checkCompatibility ::
-    MonadThrow m =>
-    -- | list of versions with breaking changes in configuration
-    [Version] ->
-    -- | current Headroom version
-    Version ->
-    -- | raw, not yet parsed YAML configuration
-    ByteString ->
-    -- | detected compatible version or error
-    m Version
+checkCompatibility
+    :: MonadThrow m
+    => [Version]
+    -- ^ list of versions with breaking changes in configuration
+    -> Version
+    -- ^ current Headroom version
+    -> ByteString
+    -- ^ raw, not yet parsed YAML configuration
+    -> m Version
+    -- ^ detected compatible version or error
 checkCompatibility breakingVersions current raw = do
     VersionObj version <- parseObj
     _ <- checkBreakingChanges breakingVersions version
@@ -109,7 +110,7 @@ checkBreakingChanges vs v = case L.filter (v <) . L.sort $ vs of
 
 checkNewerVersion :: MonadThrow m => Version -> Version -> m ()
 checkNewerVersion current checked =
-    if current < checked then throwM $ NewerVersionDetected checked else pure ()
+    when (current < checked) . throwM $ NewerVersionDetected checked
 
 displayException' :: VersionError -> String
 displayException' = \case

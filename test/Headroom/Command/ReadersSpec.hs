@@ -3,9 +3,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Command.ReadersSpec (
-    spec
-) where
+module Headroom.Command.ReadersSpec
+    ( spec
+    )
+where
 
 import Headroom.Command.Readers
 import Headroom.Config.Types (LicenseType)

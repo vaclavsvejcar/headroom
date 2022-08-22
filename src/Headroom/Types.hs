@@ -14,8 +14,8 @@
 -- Portability : POSIX
 --
 -- Module containing most of the data types used by the application.
-module Headroom.Types (
-    -- * Error Data Types
+module Headroom.Types
+    ( -- * Error Data Types
       HeadroomError (..)
 
       -- ** Helper Functions
@@ -25,12 +25,13 @@ module Headroom.Types (
       -- * Other Data Types
     , CurrentYear (..)
     , LicenseType (..)
-) where
+    )
+where
 
-import Data.Aeson (
-    FromJSON (..)
+import Data.Aeson
+    ( FromJSON (..)
     , Value (String)
- )
+    )
 import Data.Typeable (cast)
 import Headroom.Data.EnumExtra (EnumExtra (..))
 import RIO
@@ -46,21 +47,21 @@ instance Exception HeadroomError where
     displayException (HeadroomError he) = displayException he
 
 -- | Wraps given exception into 'HeadroomError'.
-toHeadroomError ::
-    Exception e =>
-    -- | exception to wrap
-    e ->
-    -- | wrapped exception
-    SomeException
+toHeadroomError
+    :: Exception e
+    => e
+    -- ^ exception to wrap
+    -> SomeException
+    -- ^ wrapped exception
 toHeadroomError = toException . HeadroomError
 
 -- | Unwraps given exception from 'HeadroomError'.
-fromHeadroomError ::
-    Exception e =>
-    -- | exception to unwrap
-    SomeException ->
-    -- | unwrapped exception
-    Maybe e
+fromHeadroomError
+    :: Exception e
+    => SomeException
+    -- ^ exception to unwrap
+    -> Maybe e
+    -- ^ unwrapped exception
 fromHeadroomError e = do
     HeadroomError he <- fromException e
     cast he

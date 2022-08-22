@@ -11,11 +11,12 @@
 -- Portability : POSIX
 --
 -- This module contains data types for "Headroom.Header" module.
-module Headroom.Header.Types (
-    -- * Data Types
+module Headroom.Header.Types
+    ( -- * Data Types
       HeaderInfo (..)
     , HeaderTemplate (..)
-) where
+    )
+where
 
 import Headroom.Config.Types (CtHeaderConfig)
 import Headroom.FileSupport.TemplateData (TemplateData)

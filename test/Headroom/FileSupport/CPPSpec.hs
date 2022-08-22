@@ -2,15 +2,16 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.CPPSpec (
-    spec
-) where
+module Headroom.FileSupport.CPPSpec
+    ( spec
+    )
+where
 
 import Headroom.FileSupport.CPP
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import RIO
 import Test.Hspec
 

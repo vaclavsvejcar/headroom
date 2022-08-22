@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.ConfigSpec (
-    spec
-) where
+module Headroom.ConfigSpec
+    ( spec
+    )
+where
 
 import Headroom.Config
 import Headroom.Embedded (defaultConfig)

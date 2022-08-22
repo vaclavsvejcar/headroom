@@ -19,53 +19,54 @@
 -- /Update Manager (Updater)/ is responsible for fetching data about latest version
 -- of /Headroom/ and informing user about available updates. In future versions, it
 -- might be capable to update /Headroom/ binaries automatically.
-module Headroom.Updater (
-    checkUpdates
+module Headroom.Updater
+    ( checkUpdates
     , fetchLatestVersion
     , parseLatestVersion
 
       -- * Error Data Types
     , UpdaterError (..)
-) where
+    )
+where
 
 import Data.Aeson (Value (String))
 import qualified Data.Aeson as A
 import Data.String.Interpolate (iii)
 import Data.Time (UTCTime (utctDay))
 import Headroom.Config.Global (UpdaterConfig (..))
-import Headroom.Data.Has (
-    Has (..)
+import Headroom.Data.Has
+    ( Has (..)
     , HasRIO
- )
-import Headroom.IO.KVStore (
-    KVStore (..)
+    )
+import Headroom.IO.KVStore
+    ( KVStore (..)
     , valueKey
- )
+    )
 import Headroom.IO.Network (Network (..))
 import Headroom.Meta (buildVersion)
-import Headroom.Meta.Version (
-    Version
+import Headroom.Meta.Version
+    ( Version
     , parseVersion
- )
-import Headroom.Types (
-    fromHeadroomError
+    )
+import Headroom.Types
+    ( fromHeadroomError
     , toHeadroomError
- )
+    )
 import Lens.Micro.Aeson (key)
 import RIO
 import qualified RIO.ByteString.Lazy as BL
 import qualified RIO.Text as T
-import RIO.Time (
-    diffDays
+import RIO.Time
+    ( diffDays
     , getCurrentTime
- )
+    )
 import qualified Text.URI as URI
 
 -- | Check whether newer version is available (if enabled by configuration).
-checkUpdates ::
-    (HasRIO KVStore env, HasRIO Network env) =>
-    UpdaterConfig ->
-    RIO env (Maybe Version)
+checkUpdates
+    :: (HasRIO KVStore env, HasRIO Network env)
+    => UpdaterConfig
+    -> RIO env (Maybe Version)
 checkUpdates UpdaterConfig{..} = do
     KVStore{..} <- viewL
     now <- getCurrentTime
@@ -101,12 +102,12 @@ fetchLatestVersion = do
             "https://api.github.com/repos/vaclavsvejcar/headroom/releases/latest"
 
 -- | Parses latest version number from /GitHub/ API response.
-parseLatestVersion ::
-    MonadThrow m =>
-    -- | raw JSON response from /GitHub/
-    Value ->
-    -- | parsed version
-    m Version
+parseLatestVersion
+    :: MonadThrow m
+    => Value
+    -- ^ raw JSON response from /GitHub/
+    -> m Version
+    -- ^ parsed version
 parseLatestVersion json = case json ^? key "name" of
     Just (String rawValue) -> case parseVersion rawValue of
         Just version -> pure version

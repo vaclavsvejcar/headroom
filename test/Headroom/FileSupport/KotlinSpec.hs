@@ -3,25 +3,26 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.KotlinSpec (
-    spec
-) where
+module Headroom.FileSupport.KotlinSpec
+    ( spec
+    )
+where
 
-import Headroom.Config (
-    makeHeadersConfig
+import Headroom.Config
+    ( makeHeadersConfig
     , parseAppConfig
- )
+    )
 import Headroom.Config.Types (AppConfig (..))
 import Headroom.Embedded (defaultConfig)
-import Headroom.FileSupport (
-    analyzeSourceCode
+import Headroom.FileSupport
+    ( analyzeSourceCode
     , fileSupport
- )
+    )
 import Headroom.FileSupport.TemplateData (TemplateData (..))
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import Headroom.FileType.Types (FileType (Kotlin))
 import Headroom.Header (extractHeaderTemplate)
 import Headroom.IO.FileSystem (loadFile)

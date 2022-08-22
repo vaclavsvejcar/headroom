@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.UI.ProgressSpec (
-    spec
-) where
+module Headroom.UI.ProgressSpec
+    ( spec
+    )
+where
 
 import Headroom.UI.Progress
 import RIO

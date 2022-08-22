@@ -4,45 +4,46 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupport.HaskellSpec (
-    spec
-) where
+module Headroom.FileSupport.HaskellSpec
+    ( spec
+    )
+where
 
 import Data.String.Interpolate (__i)
-import Headroom.Config (
-    makeHeadersConfig
+import Headroom.Config
+    ( makeHeadersConfig
     , parseAppConfig
- )
-import Headroom.Config.Types (
-    AppConfig (..)
+    )
+import Headroom.Config.Types
+    ( AppConfig (..)
     , HeaderSyntax (..)
     , LicenseType (..)
- )
+    )
 import Headroom.Data.Regex (re)
-import Headroom.Embedded (
-    defaultConfig
+import Headroom.Embedded
+    ( defaultConfig
     , licenseTemplate
- )
-import Headroom.FileSupport (
-    analyzeSourceCode
+    )
+import Headroom.FileSupport
+    ( analyzeSourceCode
     , fileSupport
- )
-import Headroom.FileSupport.TemplateData (
-    HaddockOffsets (..)
+    )
+import Headroom.FileSupport.TemplateData
+    ( HaddockOffsets (..)
     , HaskellTemplateData' (..)
     , TemplateData (..)
- )
-import Headroom.FileSupport.Types (
-    FileSupport (..)
+    )
+import Headroom.FileSupport.Types
+    ( FileSupport (..)
     , SyntaxAnalysis (..)
- )
+    )
 import Headroom.FileType.Types (FileType (..))
 import Headroom.Header (extractHeaderTemplate)
 import Headroom.IO.FileSystem (loadFile)
-import Headroom.Template (
-    Template (..)
+import Headroom.Template
+    ( Template (..)
     , emptyTemplate
- )
+    )
 import Headroom.Template.Mustache (Mustache)
 import Headroom.Template.TemplateRef (TemplateRef (..))
 import Headroom.Variables (mkVariables)

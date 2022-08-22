@@ -10,20 +10,21 @@
 -- Portability : POSIX
 --
 -- Provides customized versions of /lens/ functions.
-module Headroom.Data.Lens (
-    suffixLenses
+module Headroom.Data.Lens
+    ( suffixLenses
     , suffixLensesFor
-) where
+    )
+where
 
 import qualified Language.Haskell.TH.Lib as TH
 import qualified Language.Haskell.TH.Syntax as TH
-import Lens.Micro.TH (
-    DefName (..)
+import Lens.Micro.TH
+    ( DefName (..)
     , lensField
     , lensRules
     , lensRulesFor
     , makeLensesWith
- )
+    )
 import RIO
 
 -- | A template haskell function to build lenses for a record type. This

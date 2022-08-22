@@ -21,8 +21,8 @@
 --
 -- 'TemplateRef' data type represents reference to template file, either local or
 -- remote, which can be later opened/downloaded and parsed into template.
-module Headroom.Template.TemplateRef (
-    -- * Data Types
+module Headroom.Template.TemplateRef
+    ( -- * Data Types
       TemplateRef (..)
 
       -- * Constructor Functions
@@ -33,33 +33,34 @@ module Headroom.Template.TemplateRef (
 
       -- * Error Types
     , TemplateRefError (..)
-) where
+    )
+where
 
-import Data.Aeson (
-    FromJSON (..)
+import Data.Aeson
+    ( FromJSON (..)
     , Value (String)
- )
-import Data.String.Interpolate (
-    i
+    )
+import Data.String.Interpolate
+    ( i
     , iii
- )
+    )
 import Headroom.Data.EnumExtra (textToEnum)
-import Headroom.Data.Regex (
-    match
+import Headroom.Data.Regex
+    ( match
     , re
- )
+    )
 import Headroom.FileType.Types (FileType (..))
-import Headroom.Types (
-    LicenseType
+import Headroom.Types
+    ( LicenseType
     , fromHeadroomError
     , toHeadroomError
- )
+    )
 import RIO
 import qualified RIO.Text as T
-import Text.URI (
-    URI (..)
+import Text.URI
+    ( URI (..)
     , mkURI
- )
+    )
 import qualified Text.URI as URI
 
 ---------------------------------  DATA TYPES  ---------------------------------
@@ -90,12 +91,12 @@ instance FromJSON TemplateRef where
 --
 -- >>> mkTemplateRef "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
 -- Just (UriTemplateRef (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing}))
-mkTemplateRef ::
-    MonadThrow m =>
-    -- | input text
-    Text ->
-    -- | created 'TemplateRef' (or error)
-    m TemplateRef
+mkTemplateRef
+    :: MonadThrow m
+    => Text
+    -- ^ input text
+    -> m TemplateRef
+    -- ^ created 'TemplateRef' (or error)
 mkTemplateRef raw = case match [re|(^\w+):\/\/|] raw of
     Just (_ : p : _)
         | p `elem` ["http", "https"] -> uriTemplateRef
@@ -110,11 +111,11 @@ mkTemplateRef raw = case match [re|(^\w+):\/\/|] raw of
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Renders given 'TemplateRef' into human-friendly text.
-renderRef ::
-    -- | 'TemplateRef' to render
-    TemplateRef ->
-    -- | rendered text
-    Text
+renderRef
+    :: TemplateRef
+    -- ^ 'TemplateRef' to render
+    -> Text
+    -- ^ rendered text
 renderRef (InlineRef content) = [i|<inline template '#{content}'>|]
 renderRef (LocalTemplateRef path) = T.pack path
 renderRef (UriTemplateRef uri) = URI.render uri

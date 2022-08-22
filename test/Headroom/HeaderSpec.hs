@@ -5,40 +5,41 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.HeaderSpec (
-    spec
-) where
+module Headroom.HeaderSpec
+    ( spec
+    )
+where
 
-import Headroom.Config (
-    makeHeadersConfig
+import Headroom.Config
+    ( makeHeadersConfig
     , parseAppConfig
- )
-import Headroom.Config.Types (
-    AppConfig (..)
+    )
+import Headroom.Config.Types
+    ( AppConfig (..)
     , HeaderConfig (..)
     , HeaderSyntax (..)
     , HeadersConfig (..)
- )
+    )
 import Headroom.Data.Regex (re)
 import Headroom.Embedded (defaultConfig)
-import Headroom.FileSupport (
-    analyzeSourceCode
+import Headroom.FileSupport
+    ( analyzeSourceCode
     , fileSupport
- )
+    )
 import Headroom.FileType.Types (FileType (..))
 import Headroom.Header
 import Headroom.Header.Types (HeaderInfo (..))
 import Headroom.IO.FileSystem (loadFile)
-import Headroom.SourceCode (
-    LineType (..)
+import Headroom.SourceCode
+    ( LineType (..)
     , SourceCode (..)
- )
+    )
 import RIO
 import RIO.FilePath ((</>))
-import Test.Hspec hiding (
-    after
+import Test.Hspec hiding
+    ( after
     , before
- )
+    )
 
 spec :: Spec
 spec = do

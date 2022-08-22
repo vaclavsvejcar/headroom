@@ -23,64 +23,65 @@
 -- Module representing the @init@ command, responsible for generating all the
 -- required files (configuration, templates) for the given project, which are then
 -- required by the @run@ or @gen@ commands.
-module Headroom.Command.Init (
-    Env (..)
+module Headroom.Command.Init
+    ( Env (..)
     , Paths (..)
     , commandInit
     , doesAppConfigExist
     , findSupportedFileTypes
-) where
+    )
+where
 
 import Data.String.Interpolate (iii)
 import Headroom.Command.Types (CommandInitOptions (..))
 import Headroom.Command.Utils (bootstrap)
-import Headroom.Config (
-    makeHeadersConfig
+import Headroom.Config
+    ( makeHeadersConfig
     , parseAppConfig
- )
-import Headroom.Config.Enrich (
-    Enrich (..)
+    )
+import Headroom.Config.Enrich
+    ( Enrich (..)
     , replaceEmptyValue
     , withArray
     , withText
- )
-import Headroom.Config.Types (
-    AppConfig (..)
+    )
+import Headroom.Config.Types
+    ( AppConfig (..)
     , LicenseType (..)
- )
-import Headroom.Data.Has (
-    Has (..)
+    )
+import Headroom.Data.Has
+    ( Has (..)
     , HasRIO
- )
+    )
 import Headroom.Data.Lens (suffixLenses)
-import Headroom.Embedded (
-    configFileStub
+import Headroom.Embedded
+    ( configFileStub
     , defaultConfig
     , licenseTemplate
- )
+    )
 import Headroom.FileType (fileTypeByExt)
 import Headroom.FileType.Types (FileType (..))
-import Headroom.IO.FileSystem (
-    FileSystem (..)
+import Headroom.IO.FileSystem
+    ( FileSystem (..)
     , fileExtension
     , findFiles
     , mkFileSystem
- )
-import Headroom.Meta (
-    TemplateType
+    )
+import Headroom.Meta
+    ( TemplateType
     , buildVersion
     , configFileName
- )
+    )
 import Headroom.Meta.Version (printVersion)
 import Headroom.Template (Template (..))
-import Headroom.Types (
-    fromHeadroomError
+import Headroom.Types
+    ( fromHeadroomError
     , toHeadroomError
- )
-import Headroom.UI (
-    Progress (..)
+    )
+import Headroom.UI
+    ( Progress (..)
     , zipWithProgress
- )
+    )
 import RIO
 import qualified RIO.Char as C
 import RIO.FilePath ((</>))
@@ -136,11 +137,11 @@ env' opts logFunc = do
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Handler for @init@ command.
-commandInit ::
-    -- | @init@ command options
-    CommandInitOptions ->
-    -- | execution result
-    IO ()
+commandInit
+    :: CommandInitOptions
+    -- ^ @init@ command options
+    -> IO ()
+    -- ^ execution result
 commandInit opts =
     bootstrap (env' opts) False $
         doesAppConfigExist >>= \case
@@ -155,9 +156,9 @@ commandInit opts =
 
 -- | Recursively scans provided source paths for known file types for which
 -- templates can be generated.
-findSupportedFileTypes ::
-    (Has CommandInitOptions env, HasLogFunc env) =>
-    RIO env [FileType]
+findSupportedFileTypes
+    :: (Has CommandInitOptions env, HasLogFunc env)
+    => RIO env [FileType]
 findSupportedFileTypes = do
     opts <- viewL
     pHeadersConfig <- acLicenseHeaders <$> parseAppConfig defaultConfig
@@ -179,9 +180,9 @@ findSupportedFileTypes = do
             pure fileTypes
 
 -- | Checks whether application config file already exists.
-doesAppConfigExist ::
-    (HasLogFunc env, HasRIO FileSystem env, Has Paths env) =>
-    RIO env Bool
+doesAppConfigExist
+    :: (HasLogFunc env, HasRIO FileSystem env, Has Paths env)
+    => RIO env Bool
 doesAppConfigExist = do
     FileSystem{..} <- viewL
     Paths{..} <- viewL
@@ -190,10 +191,10 @@ doesAppConfigExist = do
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-createTemplates ::
-    (Has CommandInitOptions env, HasLogFunc env, Has Paths env) =>
-    [FileType] ->
-    RIO env ()
+createTemplates
+    :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
+    => [FileType]
+    -> RIO env ()
 createTemplates fileTypes = do
     opts <- viewL
     Paths{..} <- viewL
@@ -201,12 +202,12 @@ createTemplates fileTypes = do
         (\(p, lf) -> createTemplate pTemplatesDir lf p)
         (zipWithProgress $ fmap (cioLicenseType opts,) fileTypes)
 
-createTemplate ::
-    (HasLogFunc env) =>
-    FilePath ->
-    (LicenseType, FileType) ->
-    Progress ->
-    RIO env ()
+createTemplate
+    :: (HasLogFunc env)
+    => FilePath
+    -> (LicenseType, FileType)
+    -> Progress
+    -> RIO env ()
 createTemplate templatesDir (licenseType, fileType) progress = do
     let extension = NE.head $ templateExtensions @TemplateType
         file = (fmap C.toLower . show $ fileType) <> "." <> T.unpack extension
@@ -217,9 +218,9 @@ createTemplate templatesDir (licenseType, fileType) progress = do
             [display progress, " Creating template file in ", fromString filePath]
     writeFileUtf8 filePath template
 
-createConfigFile ::
-    (Has CommandInitOptions env, HasLogFunc env, Has Paths env) =>
-    RIO env ()
+createConfigFile
+    :: (Has CommandInitOptions env, HasLogFunc env, Has Paths env)
+    => RIO env ()
 createConfigFile = do
     opts <- viewL
     p@Paths{..} <- viewL
@@ -233,9 +234,9 @@ createConfigFile = do
             , replaceEmptyValue "template-paths" $ withArray [pTemplatesDir paths]
             ]
 
-makeTemplatesDir ::
-    (HasLogFunc env, HasRIO FileSystem env, Has Paths env) =>
-    RIO env ()
+makeTemplatesDir
+    :: (HasLogFunc env, HasRIO FileSystem env, Has Paths env)
+    => RIO env ()
 makeTemplatesDir = do
     FileSystem{..} <- viewL
     Paths{..} <- viewL

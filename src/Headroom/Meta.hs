@@ -13,8 +13,8 @@
 --
 -- Module providing application metadata, such as application name, vendor,
 -- version, etc.
-module Headroom.Meta (
-    TemplateType
+module Headroom.Meta
+    ( TemplateType
     , buildVersion
     , configBreakingChanges
     , configFileName
@@ -29,15 +29,16 @@ module Headroom.Meta (
     , webDocConfigCurr
     , webDocMigration
     , webRepo
-) where
+    )
+where
 
 import Data.Version (showVersion)
-import Headroom.Meta.Version (
-    Version (..)
+import Headroom.Meta.Version
+    ( Version (..)
     , parseVersion
     , printVersion
     , pvp
- )
+    )
 import Headroom.Template.Mustache (Mustache)
 import Paths_headroom (version)
 import RIO

@@ -1,14 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileTypeSpec (
-    spec
-) where
+module Headroom.FileTypeSpec
+    ( spec
+    )
+where
 
-import Headroom.Config (
-    makeHeadersConfig
+import Headroom.Config
+    ( makeHeadersConfig
     , parseAppConfig
- )
+    )
 import Headroom.Config.Types (AppConfig (..))
 import Headroom.Embedded (defaultConfig)
 import Headroom.FileType

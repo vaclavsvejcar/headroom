@@ -13,26 +13,27 @@
 --
 -- This module contains custom readers required by the /optparse-applicative/
 -- library to parse data types such as 'LicenseType' or 'FileType'.
-module Headroom.Command.Readers (
-    licenseReader
+module Headroom.Command.Readers
+    ( licenseReader
     , licenseTypeReader
     , regexReader
     , templateRefReader
     , parseLicense
-) where
+    )
+where
 
 import Data.Either.Combinators (maybeToRight)
 import Headroom.Config.Types (LicenseType)
 import Headroom.Data.EnumExtra (EnumExtra (..))
-import Headroom.Data.Regex (
-    Regex (..)
+import Headroom.Data.Regex
+    ( Regex (..)
     , compile
- )
+    )
 import Headroom.FileType.Types (FileType (..))
-import Headroom.Template.TemplateRef (
-    TemplateRef (..)
+import Headroom.Template.TemplateRef
+    ( TemplateRef (..)
     , mkTemplateRef
- )
+    )
 import Options.Applicative
 import RIO
 import qualified RIO.Text as T

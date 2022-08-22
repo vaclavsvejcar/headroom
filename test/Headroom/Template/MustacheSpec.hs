@@ -3,9 +3,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Template.MustacheSpec (
-    spec
-) where
+module Headroom.Template.MustacheSpec
+    ( spec
+    )
+where
 
 import Headroom.Template
 import Headroom.Template.Mustache

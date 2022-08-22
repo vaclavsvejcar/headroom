@@ -1,17 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.FileSupportSpec (
-    spec
-) where
+module Headroom.FileSupportSpec
+    ( spec
+    )
+where
 
 import Headroom.FileSupport
 import Headroom.FileType.Types (FileType (..))
 import Headroom.IO.FileSystem (loadFile)
-import Headroom.SourceCode (
-    LineType (..)
+import Headroom.SourceCode
+    ( LineType (..)
     , SourceCode (..)
- )
+    )
 import RIO
 import RIO.FilePath ((</>))
 import Test.Hspec

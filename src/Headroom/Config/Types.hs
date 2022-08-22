@@ -32,8 +32,8 @@
 -- pattern, but instead of defining separate data type for each /phase/
 -- (/partial/ or /complete/ configuration), the /phase/ is expressed by the 'Phase'
 -- data type and related /closed type family/.
-module Headroom.Config.Types (
-    -- * Error Types
+module Headroom.Config.Types
+    ( -- * Error Types
       ConfigurationError (..)
     , ConfigurationKey (..)
 
@@ -70,33 +70,34 @@ module Headroom.Config.Types (
     , GenMode (..)
     , LicenseType (..)
     , RunMode (..)
-) where
+    )
+where
 
 import Control.Exception (throw)
-import Data.Aeson (
-    FromJSON (..)
+import Data.Aeson
+    ( FromJSON (..)
     , Value (String)
     , genericParseJSON
     , withObject
     , (.!=)
     , (.:?)
- )
+    )
 import Data.Monoid (Last (..))
-import Data.String.Interpolate (
-    i
+import Data.String.Interpolate
+    ( i
     , iii
- )
+    )
 import Generic.Data (Generically (..))
 import Headroom.Data.Regex (Regex (..))
 import Headroom.Data.Serialization (aesonOptions)
 import Headroom.FileType.Types (FileType)
 import Headroom.Meta (webDocConfigCurr)
 import Headroom.Template.TemplateRef (TemplateRef)
-import Headroom.Types (
-    LicenseType (..)
+import Headroom.Types
+    ( LicenseType (..)
     , fromHeadroomError
     , toHeadroomError
- )
+    )
 import Headroom.Variables.Types (Variables (..))
 import RIO
 import qualified RIO.Text as T

@@ -11,10 +11,11 @@
 -- Portability : POSIX
 --
 -- This component displays progress in format @[CURR of TOTAL]@.
-module Headroom.UI.Progress (
-    Progress (..)
+module Headroom.UI.Progress
+    ( Progress (..)
     , zipWithProgress
-) where
+    )
+where
 
 import RIO
 import qualified RIO.Text as T
@@ -38,11 +39,11 @@ instance Display Progress where
 --
 -- >>> zipWithProgress ["a", "b"]
 -- [(Progress 1 2,"a"),(Progress 2 2,"b")]
-zipWithProgress ::
-    -- | list to zip with progress
-    [a] ->
-    -- | zipped result
-    [(Progress, a)]
+zipWithProgress
+    :: [a]
+    -- ^ list to zip with progress
+    -> [(Progress, a)]
+    -- ^ zipped result
 zipWithProgress list = zip progresses list
   where
     listLength = length list

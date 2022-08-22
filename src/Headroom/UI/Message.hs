@@ -13,13 +13,14 @@
 -- Portability : POSIX
 --
 -- Module providing UI component for message box (info/warning/error).
-module Headroom.UI.Message (
-    MessageType (..)
+module Headroom.UI.Message
+    ( MessageType (..)
     , Message (..)
     , messageInfo
     , messageWarn
     , messageError
-) where
+    )
+where
 
 import Data.String.Interpolate (i)
 import RIO

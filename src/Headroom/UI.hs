@@ -10,8 +10,9 @@
 -- Portability : POSIX
 --
 -- Various UI components.
-module Headroom.UI (
-    module Headroom.UI.Progress
-) where
+module Headroom.UI
+    ( module Headroom.UI.Progress
+    )
+where
 
 import Headroom.UI.Progress

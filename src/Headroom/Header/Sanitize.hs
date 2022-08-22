@@ -17,11 +17,12 @@
 -- Because header manipulation done by /Headroom/ can disrupt the comment syntax
 -- structure, sanitizing the header is the last step done in the flow, making
 -- sure that license header syntax is not broken.
-module Headroom.Header.Sanitize (
-    findPrefix
+module Headroom.Header.Sanitize
+    ( findPrefix
     , sanitizeSyntax
     , stripCommentSyntax
-) where
+    )
+where
 
 import Headroom.Config.Types (HeaderSyntax (..))
 import qualified Headroom.Data.Regex as R
@@ -40,13 +41,13 @@ import qualified RIO.Text as T
 -- >>> import Headroom.Data.Regex (re)
 -- >>> findPrefix (BlockComment [re|^\/\*|] [re|\*\/$|] Nothing) "/*\n * foo\n * bar\n */"
 -- BlockComment "^\\/\\*" "\\*\\/$" (Just " *")
-findPrefix ::
-    -- | describes comment syntax of the header
-    HeaderSyntax ->
-    -- | text containint the comment
-    Text ->
-    -- | input 'HeaderSyntax' with added prefix (if found)
-    HeaderSyntax
+findPrefix
+    :: HeaderSyntax
+    -- ^ describes comment syntax of the header
+    -> Text
+    -- ^ text containint the comment
+    -> HeaderSyntax
+    -- ^ input 'HeaderSyntax' with added prefix (if found)
 findPrefix syntax text = case syntax of
     BlockComment s e _ -> BlockComment s e prefix
     LineComment s _ -> LineComment s prefix
@@ -63,13 +64,13 @@ findPrefix syntax text = case syntax of
 -- >>> import Headroom.Data.Regex (re)
 -- >>> sanitizeSyntax (LineComment [re|^--|] (Just "--")) "-- foo\nbar"
 -- "-- foo\n-- bar"
-sanitizeSyntax ::
-    -- | header syntax definition that may contain prefix
-    HeaderSyntax ->
-    -- | header to sanitize
-    Text ->
-    -- | sanitized header
-    Text
+sanitizeSyntax
+    :: HeaderSyntax
+    -- ^ header syntax definition that may contain prefix
+    -> Text
+    -- ^ header to sanitize
+    -> Text
+    -- ^ sanitized header
 sanitizeSyntax syntax = mapCommentLines syntax (process mPrefix)
   where
     process Nothing l = Just l
@@ -85,13 +86,13 @@ sanitizeSyntax syntax = mapCommentLines syntax (process mPrefix)
 -- >>> import Headroom.Data.Regex (re)
 -- >>> stripCommentSyntax (LineComment [re|^--|] (Just "--")) "-- a\n-- b"
 -- " a\n b"
-stripCommentSyntax ::
-    -- | copyright header syntax
-    HeaderSyntax ->
-    -- | input text from which to strip the syntax
-    Text ->
-    -- | processed text
-    Text
+stripCommentSyntax
+    :: HeaderSyntax
+    -- ^ copyright header syntax
+    -> Text
+    -- ^ input text from which to strip the syntax
+    -> Text
+    -- ^ processed text
 stripCommentSyntax syntax = T.fromLines . go [] . T.toLines . T.strip
   where
     (s, e, p) = case syntax of
@@ -113,12 +114,12 @@ addPrefix p l
     | T.null l = p
     | otherwise = p <> " " <> l
 
-mapCommentLines ::
-    Foldable t =>
-    HeaderSyntax ->
-    (Text -> t Text) ->
-    Text ->
-    Text
+mapCommentLines
+    :: Foldable t
+    => HeaderSyntax
+    -> (Text -> t Text)
+    -> Text
+    -> Text
 mapCommentLines syntax f = T.mapLinesF $ \case
     line
         | isCommentBody syntax line -> toList . f $ line

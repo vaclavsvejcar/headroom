@@ -2,9 +2,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Data.TextSpec (
-    spec
-) where
+module Headroom.Data.TextSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.Text
 import RIO

@@ -2,9 +2,10 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.IO.FileSystemSpec (
-    spec
-) where
+module Headroom.IO.FileSystemSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.Regex (re)
 import Headroom.IO.FileSystem

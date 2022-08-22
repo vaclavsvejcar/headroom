@@ -2,9 +2,10 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Header.SanitizeSpec (
-    spec
-) where
+module Headroom.Header.SanitizeSpec
+    ( spec
+    )
+where
 
 import Headroom.Config.Types (HeaderSyntax (..))
 import Headroom.Data.Regex (re)

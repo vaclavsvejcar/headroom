@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Data.SerializationSpec (
-    spec
-) where
+module Headroom.Data.SerializationSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.Serialization
 import RIO

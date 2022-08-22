@@ -15,8 +15,8 @@
 -- i.e. replacing default values with real ones, etc. This is intentionally done
 -- without the "Data.Yaml" and parsing, because that way all comments inside YAML
 -- file would be lost.
-module Headroom.Config.Enrich (
-    -- * Data Types
+module Headroom.Config.Enrich
+    ( -- * Data Types
       Enrich (..)
     , ValueType (..)
 
@@ -26,7 +26,8 @@ module Headroom.Config.Enrich (
 
       -- * Field Manipulation
     , replaceEmptyValue
-) where
+    )
+where
 
 import Data.Aeson (ToJSON (..))
 import Headroom.Data.Serialization (prettyPrintYAML)
@@ -60,34 +61,34 @@ data ValueType
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Generates /YAML/ array field from given list and field name.
-withArray ::
-    ToJSON a =>
-    -- | input list used as value
-    [a] ->
-    -- | field name
-    Text ->
-    -- | generated fields as @(valueType, generatedField)@
-    (ValueType, Text)
+withArray
+    :: ToJSON a
+    => [a]
+    -- ^ input list used as value
+    -> Text
+    -- ^ field name
+    -> (ValueType, Text)
+    -- ^ generated fields as @(valueType, generatedField)@
 withArray list field = (Array, asYAML field list)
 
 -- | Generates /YAML/ string from given text value and field name.
-withText ::
-    -- | input text value
-    Text ->
-    -- | field name
-    Text ->
-    -- | generated fields as @(valueType, generatedField)@
-    (ValueType, Text)
+withText
+    :: Text
+    -- ^ input text value
+    -> Text
+    -- ^ field name
+    -> (ValueType, Text)
+    -- ^ generated fields as @(valueType, generatedField)@
 withText text field = (String, asYAML field text)
 
 -- | Replaces empty value of given field with actual generated value.
-replaceEmptyValue ::
-    -- | field name
-    Text ->
-    -- | field value generator function
-    (Text -> (ValueType, Text)) ->
-    -- | resulting enrichment step
-    Enrich
+replaceEmptyValue
+    :: Text
+    -- ^ field name
+    -> (Text -> (ValueType, Text))
+    -- ^ field value generator function
+    -> Enrich
+    -- ^ resulting enrichment step
 replaceEmptyValue field replaceFn = Enrich $ \doc -> do
     TP.replace old new doc
   where

@@ -16,8 +16,8 @@
 --
 -- This module provides functionality for updating years in copyright statements
 -- in already rendered /license headers/.
-module Headroom.PostProcess.UpdateCopyright (
-    -- * Data Types
+module Headroom.PostProcess.UpdateCopyright
+    ( -- * Data Types
       SelectedAuthors (..)
     , UpdateCopyrightMode (..)
 
@@ -26,18 +26,19 @@ module Headroom.PostProcess.UpdateCopyright (
 
       -- * Helper Functions
     , updateYears
-) where
+    )
+where
 
 import Data.String.Interpolate (i)
 import Headroom.Data.Has (Has (..))
-import Headroom.Data.Regex (
-    re
+import Headroom.Data.Regex
+    ( re
     , replace
- )
-import Headroom.Data.Text (
-    mapLines
+    )
+import Headroom.Data.Text
+    ( mapLines
     , read
- )
+    )
 import Headroom.PostProcess.Types (PostProcess (..))
 import Headroom.Types (CurrentYear (..))
 import RIO
@@ -65,9 +66,9 @@ data UpdateCopyrightMode
 -- = Reader Environment Parameters
 --   ['CurrentYear'] value of the current year
 --   ['UpdateCopyrightMode'] mode specifying the behaviour of the updater
-updateCopyright ::
-    (Has CurrentYear env, Has UpdateCopyrightMode env) =>
-    PostProcess env
+updateCopyright
+    :: (Has CurrentYear env, Has UpdateCopyrightMode env)
+    => PostProcess env
 updateCopyright = PostProcess $ \input -> do
     currentYear <- viewL
     mode <- viewL
@@ -93,13 +94,13 @@ updateCopyright = PostProcess $ \input -> do
 --
 -- >>> updateYears (CurrentYear 2020) "Copyright (c) 2018-2019"
 -- "Copyright (c) 2018-2020"
-updateYears ::
-    -- | current year
-    CurrentYear ->
-    -- | text to update
-    Text ->
-    -- | text with updated years
-    Text
+updateYears
+    :: CurrentYear
+    -- ^ current year
+    -> Text
+    -- ^ text to update
+    -> Text
+    -- ^ text with updated years
 updateYears cy = replace [re|(\d{4})(?:-)?(\d{4})?|] go
   where
     go _ [r1] | (Just y1) <- read r1 = bumpYear cy y1

@@ -17,18 +17,18 @@
 module Main where
 
 import Headroom.Command (commandParser)
-import Headroom.Command.Gen (
-    commandGen
+import Headroom.Command.Gen
+    ( commandGen
     , parseGenMode
- )
+    )
 import Headroom.Command.Init (commandInit)
 import Headroom.Command.Run (commandRun)
-import Headroom.Command.Types (
-    Command (..)
+import Headroom.Command.Types
+    ( Command (..)
     , CommandGenOptions (..)
     , CommandInitOptions (..)
     , CommandRunOptions (..)
- )
+    )
 import Headroom.Types (HeadroomError (..))
 import Options.Applicative (execParser)
 import RIO

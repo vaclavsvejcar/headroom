@@ -17,8 +17,8 @@
 --
 -- This module is the heart of /Headroom/ as it contains functions for working with
 -- the /license headers/ and the /source code files/.
-module Headroom.Header (
-    -- * Header Info Extraction
+module Headroom.Header
+    ( -- * Header Info Extraction
       extractHeaderInfo
     , extractHeaderTemplate
 
@@ -32,35 +32,36 @@ module Headroom.Header (
     , findBlockHeader
     , findLineHeader
     , splitSource
-) where
+    )
+where
 
-import Headroom.Config.Types (
-    CtHeaderConfig
+import Headroom.Config.Types
+    ( CtHeaderConfig
     , CtHeadersConfig
     , HeaderConfig (..)
     , HeaderSyntax (..)
- )
-import Headroom.Data.Coerce (
-    coerce
+    )
+import Headroom.Data.Coerce
+    ( coerce
     , inner
- )
+    )
 import Headroom.Data.Lens (suffixLensesFor)
-import Headroom.Data.Regex (
-    Regex
+import Headroom.Data.Regex
+    ( Regex
     , isMatch
- )
+    )
 import Headroom.FileSupport (fileSupport)
 import Headroom.FileSupport.Types (FileSupport (..))
 import Headroom.FileType (configByFileType)
 import Headroom.FileType.Types (FileType)
 import Headroom.Header.Sanitize (findPrefix)
-import Headroom.Header.Types (
-    HeaderInfo (..)
+import Headroom.Header.Types
+    ( HeaderInfo (..)
     , HeaderTemplate (..)
- )
+    )
 import Headroom.Meta (TemplateType)
-import Headroom.SourceCode (
-    CodeLine
+import Headroom.SourceCode
+    ( CodeLine
     , LineType (..)
     , SourceCode (..)
     , firstMatching
@@ -68,7 +69,7 @@ import Headroom.SourceCode (
     , lastMatching
     , stripEnd
     , stripStart
- )
+    )
 import Headroom.Template (Template (..))
 import RIO
 import qualified RIO.List as L
@@ -79,13 +80,13 @@ suffixLensesFor ["hiHeaderPos"] ''HeaderInfo
 
 -- | Extracts info about the processed file to be later used by the header
 -- detection/manipulation functions.
-extractHeaderInfo ::
-    -- | template info
-    HeaderTemplate ->
-    -- | text used for detection
-    SourceCode ->
-    -- | resulting file info
-    HeaderInfo
+extractHeaderInfo
+    :: HeaderTemplate
+    -- ^ template info
+    -> SourceCode
+    -- ^ text used for detection
+    -> HeaderInfo
+    -- ^ resulting file info
 extractHeaderInfo ht@HeaderTemplate{..} source =
     let hiFileType = htFileType
         hiHeaderConfig = htConfig
@@ -96,15 +97,15 @@ extractHeaderInfo ht@HeaderTemplate{..} source =
     FileSupport{..} = fileSupport htFileType
 
 -- | Constructs new 'HeaderTemplate' from provided data.
-extractHeaderTemplate ::
-    -- | configuration for license headers
-    CtHeadersConfig ->
-    -- | type of source code files this template is for
-    FileType ->
-    -- | parsed template
-    TemplateType ->
-    -- | resulting template info
-    HeaderTemplate
+extractHeaderTemplate
+    :: CtHeadersConfig
+    -- ^ configuration for license headers
+    -> FileType
+    -- ^ type of source code files this template is for
+    -> TemplateType
+    -- ^ parsed template
+    -> HeaderTemplate
+    -- ^ resulting template info
 extractHeaderTemplate configs fileType template =
     let htConfig = withP (configByFileType configs fileType)
         htTemplateData = fsExtractTemplateData template (hcHeaderSyntax htConfig)
@@ -119,15 +120,15 @@ extractHeaderTemplate configs fileType template =
 -- | Adds given header at position specified by the 'HeaderInfo'. Does nothing
 -- if any header is already present, use 'replaceHeader' if you need to
 -- override it.
-addHeader ::
-    -- | additional info about the header
-    HeaderInfo ->
-    -- | text of the new header
-    Text ->
-    -- | source code where to add the header
-    SourceCode ->
-    -- | resulting source code with added header
-    SourceCode
+addHeader
+    :: HeaderInfo
+    -- ^ additional info about the header
+    -> Text
+    -- ^ text of the new header
+    -> SourceCode
+    -- ^ source code where to add the header
+    -> SourceCode
+    -- ^ resulting source code with added header
 addHeader HeaderInfo{..} _ source | isJust hiHeaderPos = source
 addHeader HeaderInfo{..} header source = mconcat chunks
   where
@@ -145,13 +146,13 @@ addHeader HeaderInfo{..} header source = mconcat chunks
 
 -- | Drops header at position specified by the 'HeaderInfo' from the given
 -- source code. Does nothing if no header is present.
-dropHeader ::
-    -- | additional info about the header
-    HeaderInfo ->
-    -- | text of the file from which to drop the header
-    SourceCode ->
-    -- | resulting text with dropped header
-    SourceCode
+dropHeader
+    :: HeaderInfo
+    -- ^ additional info about the header
+    -> SourceCode
+    -- ^ text of the file from which to drop the header
+    -> SourceCode
+    -- ^ resulting text with dropped header
 dropHeader (HeaderInfo _ _ Nothing _) source = source
 dropHeader (HeaderInfo _ _ (Just (start, end)) _) source = result
   where
@@ -162,15 +163,15 @@ dropHeader (HeaderInfo _ _ (Just (start, end)) _) source = result
 -- | Replaces existing header at position specified by the 'HeaderInfo' in the
 -- given text. Basically combines 'addHeader' with 'dropHeader'. If no header
 -- is present, then the given one is added to the text.
-replaceHeader ::
-    -- | additional info about the header
-    HeaderInfo ->
-    -- | text of the new header
-    Text ->
-    -- | text of the file where to replace the header
-    SourceCode ->
-    -- | resulting text with replaced header
-    SourceCode
+replaceHeader
+    :: HeaderInfo
+    -- ^ additional info about the header
+    -> Text
+    -- ^ text of the new header
+    -> SourceCode
+    -- ^ text of the file where to replace the header
+    -> SourceCode
+    -- ^ resulting text with replaced header
 replaceHeader fileInfo header = addHeader' . dropHeader'
   where
     addHeader' = addHeader infoWithoutPos header
@@ -186,13 +187,13 @@ replaceHeader fileInfo header = addHeader' . dropHeader'
 -- >>> let hc = HeaderConfig ["hs"] 0 0 0 0 [] [] (LineComment [re|^--|] Nothing)
 -- >>> findHeader hc $ SourceCode [(Code, "foo"), (Code, "bar"), (Comment, "-- HEADER")]
 -- Just (2,2)
-findHeader ::
-    -- | appropriate header configuration
-    CtHeaderConfig ->
-    -- | text in which to detect the header
-    SourceCode ->
-    -- | header position @(startLine, endLine)@
-    Maybe (Int, Int)
+findHeader
+    :: CtHeaderConfig
+    -- ^ appropriate header configuration
+    -> SourceCode
+    -- ^ text in which to detect the header
+    -> Maybe (Int, Int)
+    -- ^ header position @(startLine, endLine)@
 findHeader HeaderConfig{..} input = case hcHeaderSyntax of
     BlockComment start end _ -> findBlockHeader start end headerArea splitAt
     LineComment prefix _ -> findLineHeader prefix headerArea splitAt
@@ -202,17 +203,17 @@ findHeader HeaderConfig{..} input = case hcHeaderSyntax of
 
 -- | Finds header in the form of /multi-line comment/ syntax, which is delimited
 -- with starting and ending pattern.
-findBlockHeader ::
-    -- | starting pattern (e.g. @{\-@ or @/*@)
-    Regex ->
-    -- | ending pattern (e.g. @-\}@ or @*/@)
-    Regex ->
-    -- | source code in which to detect the header
-    SourceCode ->
-    -- | line number offset (adds to resulting position)
-    Int ->
-    -- | header position @(startLine + offset, endLine + offset)@
-    Maybe (Int, Int)
+findBlockHeader
+    :: Regex
+    -- ^ starting pattern (e.g. @{\-@ or @/*@)
+    -> Regex
+    -- ^ ending pattern (e.g. @-\}@ or @*/@)
+    -> SourceCode
+    -- ^ source code in which to detect the header
+    -> Int
+    -- ^ line number offset (adds to resulting position)
+    -> Maybe (Int, Int)
+    -- ^ header position @(startLine + offset, endLine + offset)@
 findBlockHeader start end sc offset = mapT2 (+ offset) <$> position
   where
     ls = zip [0 ..] $ coerce sc
@@ -234,15 +235,15 @@ findBlockHeader start end sc offset = mapT2 (+ offset) <$> position
 -- >>> let sc = SourceCode [(Code, ""), (Code, "a"), (Comment, "-- first"), (Comment, "-- second"), (Code, "foo")]
 -- >>> findLineHeader [re|^--|] sc 0
 -- Just (2,3)
-findLineHeader ::
-    -- | prefix pattern (e.g. @--@ or @//@)
-    Regex ->
-    -- | source code in which to detect the header
-    SourceCode ->
-    -- | line number offset (adds to resulting position)
-    Int ->
-    -- | header position @(startLine + offset, endLine + offset)@
-    Maybe (Int, Int)
+findLineHeader
+    :: Regex
+    -- ^ prefix pattern (e.g. @--@ or @//@)
+    -> SourceCode
+    -- ^ source code in which to detect the header
+    -> Int
+    -- ^ line number offset (adds to resulting position)
+    -> Maybe (Int, Int)
+    -- ^ header position @(startLine + offset, endLine + offset)@
 findLineHeader prefix sc offset = mapT2 (+ offset) <$> position
   where
     ls = zip [0 ..] $ coerce sc
@@ -277,11 +278,11 @@ findLineHeader prefix sc offset = mapT2 (+ offset) <$> position
 --
 -- >>> splitSource [] [] $ SourceCode [(Code,"foo"), (Code,"bar")]
 -- (SourceCode [],SourceCode [(Code,"foo"),(Code,"bar")],SourceCode [])
-splitSource ::
-    [Regex] ->
-    [Regex] ->
-    SourceCode ->
-    (SourceCode, SourceCode, SourceCode)
+splitSource
+    :: [Regex]
+    -> [Regex]
+    -> SourceCode
+    -> (SourceCode, SourceCode, SourceCode)
 splitSource [] [] sc = (mempty, sc, mempty)
 splitSource fstPs sndPs sc = (before, middle, after)
   where

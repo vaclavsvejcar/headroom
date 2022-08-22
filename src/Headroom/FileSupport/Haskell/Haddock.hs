@@ -17,35 +17,36 @@
 --
 -- Support for extracting data from /Haddock module headers/ present in
 -- /Haskell source code files/ or /templates/.
-module Headroom.FileSupport.Haskell.Haddock (
-    HaddockModuleHeader (..)
+module Headroom.FileSupport.Haskell.Haddock
+    ( HaddockModuleHeader (..)
     , extractOffsets
     , extractModuleHeader
     , indentField
-) where
+    )
+where
 
 import Control.Applicative (Alternative (..))
 import Control.Monad (ap)
 import Headroom.Config.Types (HeaderSyntax (..))
-import Headroom.Data.Regex (
-    re
+import Headroom.Data.Regex
+    ( re
     , scan
- )
-import Headroom.Data.Text (
-    fromLines
+    )
+import Headroom.Data.Text
+    ( fromLines
     , toLines
- )
+    )
 import qualified Headroom.Data.Text as T
-import Headroom.FileSupport.TemplateData (
-    HaddockOffsets (..)
+import Headroom.FileSupport.TemplateData
+    ( HaddockOffsets (..)
     , HaskellTemplateData' (..)
     , TemplateData (..)
- )
+    )
 import Headroom.Header.Sanitize (stripCommentSyntax)
-import Headroom.SourceCode (
-    SourceCode (..)
+import Headroom.SourceCode
+    ( SourceCode (..)
     , toText
- )
+    )
 import Headroom.Template (Template (..))
 import RIO
 import qualified RIO.Char as C
@@ -73,14 +74,14 @@ data HaddockModuleHeader = HaddockModuleHeader
 -- | Extracts /offsets/ for selected haddock fields (i.e. number of chars
 -- between start of line and field value). This is needed to properly format
 -- multi-line field values rendered in new /license headers/.
-extractOffsets ::
-    Template a =>
-    -- | parsed /template/
-    a ->
-    -- | copyright header syntax
-    HeaderSyntax ->
-    -- | extracted offsets
-    HaddockOffsets
+extractOffsets
+    :: Template a
+    => a
+    -- ^ parsed /template/
+    -> HeaderSyntax
+    -- ^ copyright header syntax
+    -> HaddockOffsets
+    -- ^ extracted offsets
 extractOffsets template syntax =
     let hoCopyright = extractCopyrightOffset templateText
      in HaddockOffsets{..}
@@ -93,15 +94,15 @@ extractCopyrightOffset text = case scan [re|\h*Copyright\h*:\h*|] text of
     _ -> Nothing
 
 -- | Extracts metadata from given /Haddock/ module header.
-extractModuleHeader ::
-    -- | source code containing /Haddock/ module header
-    SourceCode ->
-    -- | extracted metadata from corresponding /template/
-    TemplateData ->
-    -- | copyright header syntax
-    HeaderSyntax ->
-    -- | extracted metadata
-    HaddockModuleHeader
+extractModuleHeader
+    :: SourceCode
+    -- ^ source code containing /Haddock/ module header
+    -> TemplateData
+    -- ^ extracted metadata from corresponding /template/
+    -> HeaderSyntax
+    -- ^ copyright header syntax
+    -> HaddockModuleHeader
+    -- ^ extracted metadata
 extractModuleHeader source templateData syntax =
     let hmhCopyright = indent hoCopyright <$> extractField "Copyright"
         hmhLicense = extractField "License"
@@ -136,13 +137,13 @@ extractModuleHeader source templateData syntax =
 --
 -- >>> indentField (Just 2) "foo\nbar\nbaz"
 -- "foo\n  bar\n  baz"
-indentField ::
-    -- | offset (in number of black chars) for 2nd and subsequent lines
-    Maybe Int ->
-    -- | input text to indent
-    Text ->
-    -- | processed text
-    Text
+indentField
+    :: Maybe Int
+    -- ^ offset (in number of black chars) for 2nd and subsequent lines
+    -> Text
+    -- ^ input text to indent
+    -> Text
+    -- ^ processed text
 indentField Nothing text = text
 indentField (Just offset) text = fromLines . go . toLines $ text
   where

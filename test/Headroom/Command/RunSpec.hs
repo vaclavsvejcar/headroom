@@ -12,24 +12,25 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Command.RunSpec (
-    spec
-) where
+module Headroom.Command.RunSpec
+    ( spec
+    )
+where
 
 import Headroom.Command.Run
-import Headroom.Config.Types (
-    CtPostProcessConfigs
+import Headroom.Config.Types
+    ( CtPostProcessConfigs
     , HeaderSyntax (..)
     , PostProcessConfig (..)
     , PostProcessConfigs (..)
     , UpdateCopyrightConfig (..)
- )
+    )
 import Headroom.Data.EnumExtra (EnumExtra (..))
 import Headroom.Data.Has (Has (..))
-import Headroom.Data.Lens (
-    suffixLenses
+import Headroom.Data.Lens
+    ( suffixLenses
     , suffixLensesFor
- )
+    )
 import Headroom.Data.Regex (re)
 import Headroom.Data.Text (fromLines)
 import Headroom.FileType.Types (FileType (..))

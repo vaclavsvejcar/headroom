@@ -3,9 +3,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.Data.EnumExtraSpec (
-    spec
-) where
+module Headroom.Data.EnumExtraSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.EnumExtra
 import RIO

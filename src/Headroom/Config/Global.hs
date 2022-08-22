@@ -15,31 +15,32 @@
 --
 -- /Global configuration/ is configuration shared between all /Headroom/ instances
 -- and it's located in user's home directory.
-module Headroom.Config.Global (
-    GlobalConfig (..)
+module Headroom.Config.Global
+    ( GlobalConfig (..)
     , UpdaterConfig (..)
     , initGlobalConfigIfNeeded
     , loadGlobalConfig
     , parseGlobalConfig
     , globalConfigPath
-) where
+    )
+where
 
-import Data.Aeson (
-    FromJSON (..)
+import Data.Aeson
+    ( FromJSON (..)
     , genericParseJSON
- )
+    )
 import qualified Data.Yaml as Y
-import Headroom.Data.Has (
-    Has (..)
+import Headroom.Data.Has
+    ( Has (..)
     , HasRIO
- )
+    )
 import Headroom.Data.Serialization (aesonOptions)
 import Headroom.Embedded (defaultGlobalConfig)
 import Headroom.IO.FileSystem (FileSystem (..))
-import Headroom.Meta (
-    globalConfigDirName
+import Headroom.Meta
+    ( globalConfigDirName
     , globalConfigFileName
- )
+    )
 import RIO
 import qualified RIO.ByteString as B
 import RIO.FilePath ((</>))

@@ -5,9 +5,10 @@
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.PostProcess.TypesSpec (
-    spec
-) where
+module Headroom.PostProcess.TypesSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.Has (Has (..))
 import Headroom.PostProcess (postProcess)

@@ -14,9 +14,10 @@
 --
 -- Provides extra functionality for enum-like types, e.g. reading/writing
 -- from/to textual representation, etc.
-module Headroom.Data.EnumExtra (
-    EnumExtra (..)
-) where
+module Headroom.Data.EnumExtra
+    ( EnumExtra (..)
+    )
+where
 
 import RIO
 import qualified RIO.List as L

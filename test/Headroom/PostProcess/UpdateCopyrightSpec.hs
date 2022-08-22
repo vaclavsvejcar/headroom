@@ -4,9 +4,10 @@
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Headroom.PostProcess.UpdateCopyrightSpec (
-    spec
-) where
+module Headroom.PostProcess.UpdateCopyrightSpec
+    ( spec
+    )
+where
 
 import Headroom.Data.Has (Has (..))
 import Headroom.Data.Text (fromLines)

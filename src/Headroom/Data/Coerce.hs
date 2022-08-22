@@ -11,15 +11,16 @@
 --
 -- This module provides some extra functionality extending the "Data.Coerce"
 -- module.
-module Headroom.Data.Coerce (
-    coerce
+module Headroom.Data.Coerce
+    ( coerce
     , inner
-) where
+    )
+where
 
-import Data.Coerce (
-    Coercible
+import Data.Coerce
+    ( Coercible
     , coerce
- )
+    )
 import RIO
 
 -- | Allows to map the coercible value. This might be useful for example to
@@ -30,12 +31,12 @@ import RIO
 -- >>> newtype Foo = Foo Text deriving (Eq, Show)
 -- >>> inner T.toUpper (Foo "hello")
 -- Foo "HELLO"
-inner ::
-    (Coercible a b) =>
-    -- | function to modify coerced value
-    (b -> b) ->
-    -- | value to modify
-    a ->
-    -- | modified value
-    a
+inner
+    :: (Coercible a b)
+    => (b -> b)
+    -- ^ function to modify coerced value
+    -> a
+    -- ^ value to modify
+    -> a
+    -- ^ modified value
 inner f = coerce . f . coerce
