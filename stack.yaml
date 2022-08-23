@@ -4,3 +4,4 @@ packages:
 extra-deps:
   - mustache-2.4.0
   - unordered-containers-0.2.16.0
+  - entropy-0.4.1.7 ## Temporary fix for https://github.com/TomMD/entropy/issues/75
