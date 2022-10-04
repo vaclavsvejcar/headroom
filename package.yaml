@@ -34,7 +34,6 @@ extra-source-files:
 
 dependencies:
   - base >= 4.7 && < 5
-  - entropy <= 0.4.1.7
   - optparse-applicative
   - rio
 

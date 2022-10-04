@@ -1,6 +1,6 @@
-resolver: lts-19.20
+resolver: lts-19.27
 packages:
   - .
 extra-deps:
-  - mustache-2.4.0
+  - mustache-2.4.1
   - unordered-containers-0.2.16.0

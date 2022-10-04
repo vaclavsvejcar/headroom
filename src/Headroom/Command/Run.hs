@@ -327,7 +327,7 @@ processSourceFiles templates paths = do
         withTemplate = mapMaybe (template acLicenseHeaders) paths
     cVars <- compileVariables @a (dVars <> acVariables)
     processed <- mapM (process cVars dVars) (zipWithProgress withTemplate)
-    pure (length withTemplate, length . filter (== True) $ processed)
+    pure (length withTemplate, length . filter id $ processed)
   where
     fileType c p = fileExtension p >>= fileTypeByExt c
     template c p = (,p) <$> (fileType c p >>= \ft -> M.lookup ft templates)
@@ -533,7 +533,7 @@ optionsToConfiguration = do
             { acRunMode = maybe mempty pure croRunMode
             , acSourcePaths = ifNot null croSourcePaths
             , acExcludedPaths = ifNot null croExcludedPaths
-            , acExcludeIgnoredPaths = ifNot (== False) croExcludeIgnoredPaths
+            , acExcludeIgnoredPaths = ifNot not croExcludeIgnoredPaths
             , acBuiltInTemplates = pure croBuiltInTemplates
             , acTemplateRefs = croTemplateRefs
             , acVariables = variables
