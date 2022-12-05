@@ -47,7 +47,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
         ghc:
           # - "8.8.3"
-          - "9.0.2"
+          - "9.2.5"
         cabal: ["3.6"]
         # exclude:
         #   - os: windows-latest
