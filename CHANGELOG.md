@@ -1,14 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.4.4.0 (in development)
+## 0.5.0.0 (in development)
 - [#87] FIXED: Misleading error message when YAML syntax of .headroom.yaml is invalid
 - [#88] Add support for _Python_
 - [#89] Support GHC 9.2
 - [#92] Switch to fourmolu source code formatter
 - [#93] FIXED: Haddock module header detection is faulty
 - [#94] Add support for _XML_
-- Bump _LTS Haskell_ to `19.27`
+- Bump _LTS Haskell_ to `20.3`
 
 ## 0.4.3.0 (released 2022-01-20)
 - [#78] Check automatically for Headroom updates

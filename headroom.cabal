@@ -1,13 +1,13 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 00760d056ceded697aa22eb2a737ce5c60ff179e290dd368a5227123dc01df32
+-- hash: d29d354c65c545533e5805aa91bddec9e52a4a133e2504e2808b6e982f575214
 
 name:           headroom
-version:        0.4.4.0
+version:        0.5.0.0
 synopsis:       License Header Manager
 description:    Would you like to have nice, up-to-date license/copyright headers in your source code files but hate to manage them by hand? Then Headroom is the right tool for you! Now you can define your license header as Mustache template, put all the variables (such as author's name, year, etc.) into the YAML config file and Headroom will take care to add such license headers to all your source code files.
 category:       Utils
@@ -281,6 +281,8 @@ executable headroom
   main-is: Main.hs
   other-modules:
       Paths_headroom
+  autogen-modules:
+      Paths_headroom
   hs-source-dirs:
       app
   ghc-options: -optP-Wno-nonportable-include-path -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -Werror=incomplete-patterns -threaded -rtsopts -with-rtsopts=-N
@@ -295,6 +297,8 @@ test-suite doctest
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      Paths_headroom
+  autogen-modules:
       Paths_headroom
   hs-source-dirs:
       doctest
@@ -358,6 +362,8 @@ test-suite spec
       Headroom.UI.TableSpec
       Headroom.UpdaterSpec
       Headroom.VariablesSpec
+      Paths_headroom
+  autogen-modules:
       Paths_headroom
   hs-source-dirs:
       test
