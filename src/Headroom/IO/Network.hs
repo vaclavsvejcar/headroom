@@ -8,7 +8,7 @@
 -- |
 -- Module      : Headroom.IO.Network
 -- Description : Network related IO operations
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -83,7 +83,7 @@ data Network m = Network
     }
 
 -- | Constructs new 'Network' that performs real network /IO/ operations.
-mkNetwork :: MonadIO m => Network m
+mkNetwork :: (MonadIO m) => Network m
 mkNetwork = Network{nDownloadContent = downloadContent}
 
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
@@ -91,7 +91,7 @@ mkNetwork = Network{nDownloadContent = downloadContent}
 -- | Downloads content of remote resource as 'ByteString'. Note that only
 -- @http@ and @https@ protocols are supported at this moment.
 downloadContent
-    :: MonadIO m
+    :: (MonadIO m)
     => URI
     -- ^ /URI/ of remote resource
     -> m ByteString
@@ -119,7 +119,7 @@ httpGet uri = do
   where
     doGet u = try @_ @HttpException $ req GET u NoReqBody bsResponse headers
 
-handleHttpException :: MonadThrow m => URI -> HttpException -> m BsResponse
+handleHttpException :: (MonadThrow m) => URI -> HttpException -> m BsResponse
 handleHttpException uri ex = case ex of
     VanillaHttpException (HC.HttpExceptionRequest _ c) -> case c of
         HC.ConnectionFailure ex' ->

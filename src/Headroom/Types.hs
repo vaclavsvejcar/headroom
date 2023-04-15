@@ -7,7 +7,7 @@
 -- |
 -- Module      : Headroom.Types
 -- Description : Application data types
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -38,7 +38,7 @@ import RIO
 import qualified RIO.Text as T
 
 -- | Top-level of the /Headroom/ exception hierarchy.
-data HeadroomError = forall e. Exception e => HeadroomError e
+data HeadroomError = forall e. (Exception e) => HeadroomError e
 
 instance Show HeadroomError where
     show (HeadroomError he) = show he
@@ -48,16 +48,16 @@ instance Exception HeadroomError where
 
 -- | Wraps given exception into 'HeadroomError'.
 toHeadroomError
-    :: Exception e
+    :: (Exception e)
     => e
-    -- ^ exception to wrap
+    -- ^  exception to wrap
     -> SomeException
     -- ^ wrapped exception
 toHeadroomError = toException . HeadroomError
 
 -- | Unwraps given exception from 'HeadroomError'.
 fromHeadroomError
-    :: Exception e
+    :: (Exception e)
     => SomeException
     -- ^ exception to unwrap
     -> Maybe e

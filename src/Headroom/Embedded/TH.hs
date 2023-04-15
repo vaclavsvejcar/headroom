@@ -4,7 +4,7 @@
 -- |
 -- Module      : Headroom.Embedded.TH
 -- Description : /Template Haskell/ functions for "Headroom.Embedded"
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -64,5 +64,5 @@ embedTemplate lt ft =
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-toStringLC :: EnumExtra a => a -> String
+toStringLC :: (EnumExtra a) => a -> String
 toStringLC = T.unpack . T.toLower . enumToText

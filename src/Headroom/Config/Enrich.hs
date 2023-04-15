@@ -5,7 +5,7 @@
 -- |
 -- Module      : Headroom.Config.Enrich
 -- Description : Simple enrichment of YAML configuration stubs
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -62,7 +62,7 @@ data ValueType
 
 -- | Generates /YAML/ array field from given list and field name.
 withArray
-    :: ToJSON a
+    :: (ToJSON a)
     => [a]
     -- ^ input list used as value
     -> Text
@@ -97,7 +97,7 @@ replaceEmptyValue field replaceFn = Enrich $ \doc -> do
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-asYAML :: ToJSON a => Text -> a -> Text
+asYAML :: (ToJSON a) => Text -> a -> Text
 asYAML field value = T.stripEnd . prettyPrintYAML $ M.fromList [(field, value)]
 
 emptyValue :: ValueType -> Text

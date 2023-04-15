@@ -18,7 +18,7 @@
 -- |
 -- Module      : Headroom.Config.Types
 -- Description : Data types for /Headroom/ configuration
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -43,7 +43,7 @@ module Headroom.Config.Types
 
       -- * Data Types
 
-      -- ** Top Level Configuration
+      -- **  Top Level Configuration
     , AppConfig (..)
     , CtAppConfig
     , PtAppConfig
@@ -245,11 +245,11 @@ deriving instance Generic (PtPostProcessConfig c)
 deriving via
     (Generically (PtPostProcessConfig c))
     instance
-        Semigroup (c 'Partial) => Semigroup (PtPostProcessConfig c)
+        (Semigroup (c 'Partial)) => Semigroup (PtPostProcessConfig c)
 deriving via
     (Generically (PtPostProcessConfig c))
     instance
-        Monoid (c 'Partial) => Monoid (PtPostProcessConfig c)
+        (Monoid (c 'Partial)) => Monoid (PtPostProcessConfig c)
 
 instance (FromJSON (c 'Partial), Monoid (c 'Partial)) => FromJSON (PtPostProcessConfig c) where
     parseJSON = withObject "PtPostProcessConfig" $ \obj -> do

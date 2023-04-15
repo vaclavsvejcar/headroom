@@ -9,7 +9,7 @@
 -- |
 -- Module      : Headroom.FileSupport.Haskell
 -- Description : Support for /Haskell/ source code files
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -97,7 +97,7 @@ syntaxAnalysis =
         , saIsCommentEnd = isMatch [re|^\h*-}|\w+\h*-}|^--|]
         }
 
-extractTemplateData :: Template a => a -> HeaderSyntax -> TemplateData
+extractTemplateData :: (Template a) => a -> HeaderSyntax -> TemplateData
 extractTemplateData template syntax =
     let htdHaddockOffsets = extractOffsets template syntax
         templateData = HaskellTemplateData'{..}

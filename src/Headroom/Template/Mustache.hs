@@ -6,7 +6,7 @@
 -- |
 -- Module      : Headroom.Template.Mustache
 -- Description : Implementation of /Mustache/ template support
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -52,13 +52,13 @@ instance Template Mustache where
     rawTemplate = mRawTemplate
     templateRef = mTemplateRef
 
-parseTemplate' :: MonadThrow m => TemplateRef -> Text -> m Mustache
+parseTemplate' :: (MonadThrow m) => TemplateRef -> Text -> m Mustache
 parseTemplate' ref raw =
     case MU.compileTemplate (T.unpack $ renderRef ref) raw of
         Left err -> throwM . ParseError $ tshow err
         Right res -> pure $ Mustache res raw ref
 
-renderTemplate' :: MonadThrow m => Variables -> Mustache -> m Text
+renderTemplate' :: (MonadThrow m) => Variables -> Mustache -> m Text
 renderTemplate' (Variables variables) (Mustache t@(MU.Template name _ _) _ _) =
     case MU.checkedSubstitute t variables of
         ([], rendered) -> pure rendered

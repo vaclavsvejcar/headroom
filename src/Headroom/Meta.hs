@@ -5,7 +5,7 @@
 -- |
 -- Module      : Headroom.Meta
 -- Description : Application metadata (name, vendor, etc.)
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -58,19 +58,19 @@ configBreakingChanges :: [Version]
 configBreakingChanges = [[pvp|0.4.0.0|]]
 
 -- | Name of the YAML configuration file.
-configFileName :: IsString a => a
+configFileName :: (IsString a) => a
 configFileName = ".headroom.yaml"
 
 -- | Name of the global configuration directory
-globalConfigDirName :: IsString a => a
+globalConfigDirName :: (IsString a) => a
 globalConfigDirName = ".headroom"
 
 -- | Name of the YAML global configuration file.
-globalConfigFileName :: IsString a => a
+globalConfigFileName :: (IsString a) => a
 globalConfigFileName = "global-config.yaml"
 
 -- | Name of the global cache file.
-cacheFileName :: IsString a => a
+cacheFileName :: (IsString a) => a
 cacheFileName = "cache.sqlite"
 
 -- | Full product description.
@@ -87,7 +87,7 @@ productName :: Text
 productName = "headroom"
 
 -- | Product vendor.
-productVendor :: IsString a => a
+productVendor :: (IsString a) => a
 productVendor = "norcane"
 
 -- | Product documentation website for given version.

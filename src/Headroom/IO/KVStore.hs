@@ -19,7 +19,7 @@
 -- |
 -- Module      : Headroom.IO.KVStore
 -- Description : Key-value persistent store
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -34,7 +34,7 @@ module Headroom.IO.KVStore
     , PutValueFn
     , KVStore (..)
 
-      -- * Type Classes
+      -- *  Type Classes
     , ValueCodec (..)
 
       -- * Data Types
@@ -117,7 +117,7 @@ data KVStore m = KVStore
 
 -- | Constructs persistent instance of 'KVStore' that uses /SQLite/ as a backend.
 sqliteKVStore
-    :: MonadIO m
+    :: (MonadIO m)
     => StorePath
     -- ^ path of the store location
     -> KVStore m
@@ -126,7 +126,7 @@ sqliteKVStore sp =
     KVStore{kvGetValue = getValueSQLite sp, kvPutValue = putValueSQLite sp}
 
 -- | Constructs non-persistent in-memory instance of 'KVStore'.
-inMemoryKVStore :: MonadIO m => m (KVStore m)
+inMemoryKVStore :: (MonadIO m) => m (KVStore m)
 inMemoryKVStore = do
     ref <- newIORef M.empty
     pure
@@ -143,9 +143,9 @@ class ValueCodec a where
     -- | Encodes value into textual representation.
     encodeValue
         :: a
-        -- ^ value to encode
+        -- ^  value to encode
         -> Text
-        -- ^ textual representation
+        -- ^  textual representation
 
     -- | Decodes value from textual representation.
     decodeValue
@@ -176,17 +176,17 @@ newtype StorePath = StorePath Text deriving (Eq, Show)
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-getValueInMemory :: MonadIO m => IORef (Map Text Text) -> GetValueFn m
+getValueInMemory :: (MonadIO m) => IORef (Map Text Text) -> GetValueFn m
 getValueInMemory ref (ValueKey key) = do
     storeMap <- readIORef ref
     pure $ M.lookup key storeMap >>= decodeValue
 
-putValueInMemory :: MonadIO m => IORef (Map Text Text) -> PutValueFn m
+putValueInMemory :: (MonadIO m) => IORef (Map Text Text) -> PutValueFn m
 putValueInMemory ref (ValueKey key) value = do
     modifyIORef ref $ M.insert key (encodeValue value)
     pure ()
 
-getValueSQLite :: MonadIO m => StorePath -> GetValueFn m
+getValueSQLite :: (MonadIO m) => StorePath -> GetValueFn m
 getValueSQLite (StorePath path) (ValueKey key) = do
     liftIO . runSqlite path $ do
         _ <- runMigrationSilent migrateAll
@@ -195,7 +195,7 @@ getValueSQLite (StorePath path) (ValueKey key) = do
             Just (StoreRecord v) -> pure . decodeValue $ v
             Nothing -> pure Nothing
 
-putValueSQLite :: MonadIO m => StorePath -> PutValueFn m
+putValueSQLite :: (MonadIO m) => StorePath -> PutValueFn m
 putValueSQLite (StorePath path) (ValueKey key) value = do
     liftIO . runSqlite path $ do
         _ <- runMigrationSilent migrateAll

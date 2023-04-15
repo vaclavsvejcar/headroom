@@ -9,7 +9,7 @@
 -- |
 -- Module      : Headroom.FileSupport.Haskell.Haddock
 -- Description : Extraction of /Haddock module header/ fields
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -75,7 +75,7 @@ data HaddockModuleHeader = HaddockModuleHeader
 -- between start of line and field value). This is needed to properly format
 -- multi-line field values rendered in new /license headers/.
 extractOffsets
-    :: Template a
+    :: (Template a)
     => a
     -- ^ parsed /template/
     -> HeaderSyntax

@@ -5,7 +5,7 @@
 -- |
 -- Module      : Headroom.FileSupport.Types
 -- Description : Data types for "Headroom.FileSupport" module
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -53,7 +53,7 @@ data SyntaxAnalysis = SyntaxAnalysis
 -- | Type of a function that extracts additional template data from template.
 type ExtractTemplateDataFn =
     forall a
-     . Template a
+     . (Template a)
     => a
     -- ^ template to use for extraction
     -> HeaderSyntax

@@ -4,7 +4,7 @@
 -- |
 -- Module      : Headroom.IO.FileSystem
 -- Description : File system related IO operations
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -147,7 +147,7 @@ type WriteFileFn m =
     -> Text
     -- ^ file content
     -> m ()
-    -- ^ write result
+    -- ^  write result
 
 -----------------------------  POLYMORPHIC RECORD  -----------------------------
 
@@ -184,7 +184,7 @@ data FileSystem m = FileSystem
     }
 
 -- | Creates new 'FileSystem' that performs actual disk /IO/ operations.
-mkFileSystem :: MonadIO m => FileSystem m
+mkFileSystem :: (MonadIO m) => FileSystem m
 mkFileSystem =
     FileSystem
         { fsCreateDirectory = createDirectoryIfMissing True
@@ -202,23 +202,23 @@ mkFileSystem =
 ------------------------------  PUBLIC FUNCTIONS  ------------------------------
 
 -- | Recursively finds files on given path whose filename matches the predicate.
-findFiles :: MonadIO m => FindFilesFn m
+findFiles :: (MonadIO m) => FindFilesFn m
 findFiles path predicate = fmap (filter predicate) (listFiles path)
 
 -- | Recursively finds files on given path by file extensions.
-findFilesByExts :: MonadIO m => FindFilesByExtsFn m
+findFilesByExts :: (MonadIO m) => FindFilesByExtsFn m
 findFilesByExts path exts = findFiles path predicate
   where
     predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
 
 -- | Recursively find files on given path by their file types.
-findFilesByTypes :: MonadIO m => FindFilesByTypesFn m
+findFilesByTypes :: (MonadIO m) => FindFilesByTypesFn m
 findFilesByTypes headersConfig types path =
     findFilesByExts path (types >>= listExtensions headersConfig)
 
 -- | Recursively find all files on given path. If file reference is passed
 -- instead of directory, such file path is returned.
-listFiles :: MonadIO m => ListFilesFn m
+listFiles :: (MonadIO m) => ListFilesFn m
 listFiles fileOrDir = do
     isDir <- doesDirectoryExist fileOrDir
     if isDir then listDirectory fileOrDir else pure [fileOrDir]
@@ -245,7 +245,7 @@ fileExtension (takeExtension -> '.' : xs) = Just $ T.pack xs
 fileExtension _ = Nothing
 
 -- | Loads file content in UTF8 encoding.
-loadFile :: MonadIO m => LoadFileFn m
+loadFile :: (MonadIO m) => LoadFileFn m
 loadFile = readFileUtf8
 
 -- | Takes list of patterns and file paths and returns list of file paths where

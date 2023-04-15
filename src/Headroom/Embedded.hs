@@ -5,7 +5,7 @@
 -- |
 -- Module      : Headroom.Embedded
 -- Description : Embedded files
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -31,20 +31,20 @@ import Headroom.FileType.Types (FileType (..))
 import RIO
 
 -- | Content of dummy /YAML/ configuration file for the application.
-configFileStub :: IsString a => a
+configFileStub :: (IsString a) => a
 configFileStub = $(embedConfigFile)
 
 -- | Default /YAML/ configuration.
-defaultConfig :: IsString a => a
+defaultConfig :: (IsString a) => a
 defaultConfig = $(embedDefaultConfig)
 
 -- | Default /YAML/ configuration for the global configuration file.
-defaultGlobalConfig :: IsString a => a
+defaultGlobalConfig :: (IsString a) => a
 defaultGlobalConfig = $(embedDefaultGlobalConfig)
 
 -- | License template for given license.
 licenseTemplate
-    :: IsString a
+    :: (IsString a)
     => LicenseType
     -- ^ license for which to return the template
     -> FileType

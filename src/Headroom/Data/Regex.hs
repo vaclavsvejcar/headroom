@@ -9,7 +9,7 @@
 -- |
 -- Module      : Headroom.Data.Regex
 -- Description : Helper functions for regular expressions
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -76,7 +76,7 @@ instance FromJSON Regex where
 -- | Compiles given /regex/ in /runtime/. If possible, prefer the 're'
 -- /quasi quotation/ version that does the same at /compile time/.
 compile
-    :: MonadThrow m
+    :: (MonadThrow m)
     => Text
     -- ^ /regex/ to compile
     -> m Regex

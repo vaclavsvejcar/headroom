@@ -5,7 +5,7 @@
 -- |
 -- Module      : Headroom.Data.Has
 -- Description : Simplified variant of @Data.Has@
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -34,7 +34,7 @@ class Has a t where
     hasLens :: Lens' t a
     hasLens afa t = (\a -> modifier (const a) t) <$> afa (getter t)
 
-    viewL :: MonadReader t m => m a
+    viewL :: (MonadReader t m) => m a
     viewL = view hasLens
 
 -- | Handy type alias that allows to avoid ugly type singatures. Allows to

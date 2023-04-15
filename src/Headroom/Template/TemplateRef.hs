@@ -13,7 +13,7 @@
 -- |
 -- Module      : Headroom.Template.TemplateRef
 -- Description : Representation of reference to template file
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -92,7 +92,7 @@ instance FromJSON TemplateRef where
 -- >>> mkTemplateRef "https://foo.bar/haskell.mustache" :: Maybe TemplateRef
 -- Just (UriTemplateRef (URI {uriScheme = Just "https", uriAuthority = Right (Authority {authUserInfo = Nothing, authHost = "foo.bar", authPort = Nothing}), uriPath = Just (False,"haskell.mustache" :| []), uriQuery = [], uriFragment = Nothing}))
 mkTemplateRef
-    :: MonadThrow m
+    :: (MonadThrow m)
     => Text
     -- ^ input text
     -> m TemplateRef

@@ -10,7 +10,7 @@
 -- |
 -- Module      : Headroom.Variables
 -- Description : Support for template variables
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -70,7 +70,7 @@ dynamicVariables (CurrentYear year) =
 -- >>> parseVariables ["key1=value1"]
 -- Variables (fromList [("key1","value1")])
 parseVariables
-    :: MonadThrow m
+    :: (MonadThrow m)
     => [Text]
     -- ^ list of raw variables
     -> m Variables

@@ -7,7 +7,7 @@
 -- |
 -- Module      : Headroom.Config.Global
 -- Description : Global configutation
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -94,7 +94,7 @@ parseGlobalConfig :: (MonadThrow m) => ByteString -> m GlobalConfig
 parseGlobalConfig = Y.decodeThrow
 
 -- | Path to global configuration /YAML/ file in user's directory.
-globalConfigPath :: HasRIO FileSystem env => RIO env FilePath
+globalConfigPath :: (HasRIO FileSystem env) => RIO env FilePath
 globalConfigPath = do
     FileSystem{..} <- viewL
     userDir <- fsGetUserDirectory

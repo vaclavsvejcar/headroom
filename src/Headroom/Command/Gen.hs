@@ -8,7 +8,7 @@
 -- |
 -- Module      : Headroom.Command.Gen
 -- Description : Handler for the @gen@ command.
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -71,7 +71,7 @@ env' opts logFunc = pure $ Env{envLogFunc = logFunc, envGenOptions = opts}
 
 -- | Parses 'GenMode' from combination of options from given 'Command'.
 parseGenMode
-    :: MonadThrow m
+    :: (MonadThrow m)
     => Command
     -- ^ command from which to parse the 'GenMode'
     -> m GenMode

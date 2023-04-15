@@ -8,7 +8,7 @@
 -- |
 -- Module      : Headroom.Config.Compat
 -- Description : Compatibility checks for YAML configuration
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -80,7 +80,7 @@ instance Exception VersionError where
 -- | Checks whether the given not yet parsed YAML configuration is compatible,
 -- using list of versions that caused breaking changes into configuration.
 checkCompatibility
-    :: MonadThrow m
+    :: (MonadThrow m)
     => [Version]
     -- ^ list of versions with breaking changes in configuration
     -> Version
@@ -103,12 +103,12 @@ checkCompatibility breakingVersions current raw = do
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
-checkBreakingChanges :: MonadThrow m => [Version] -> Version -> m ()
+checkBreakingChanges :: (MonadThrow m) => [Version] -> Version -> m ()
 checkBreakingChanges vs v = case L.filter (v <) . L.sort $ vs of
     [] -> pure ()
     newer -> throwM $ UnsupportedVersion newer v
 
-checkNewerVersion :: MonadThrow m => Version -> Version -> m ()
+checkNewerVersion :: (MonadThrow m) => Version -> Version -> m ()
 checkNewerVersion current checked =
     when (current < checked) . throwM $ NewerVersionDetected checked
 

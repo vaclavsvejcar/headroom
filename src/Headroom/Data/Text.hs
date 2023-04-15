@@ -4,7 +4,7 @@
 -- |
 -- Module      : Headroom.Data.Text
 -- Description : Additional utilities for text manipulation
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -81,7 +81,7 @@ mapLines fn = mapLinesF (Just <$> fn)
 -- >>> mapLinesF (\l -> if l == "bar" then Nothing else Just l) "foo\nbar"
 -- "foo"
 mapLinesF
-    :: Foldable t
+    :: (Foldable t)
     => (Text -> t Text)
     -- ^ function to map over inividual lines
     -> Text
@@ -98,7 +98,7 @@ mapLinesF f = fromLines . concatMap toList . go . toLines
 -- >>> read "123" :: Maybe Int
 -- Just 123
 read
-    :: Read a
+    :: (Read a)
     => Text
     -- ^ input text to parse
     -> Maybe a

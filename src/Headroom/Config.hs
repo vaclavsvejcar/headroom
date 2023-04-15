@@ -7,7 +7,7 @@
 -- |
 -- Module      : Headroom.Config
 -- Description : Configuration handling (loading, parsing, validating)
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -79,7 +79,7 @@ loadAppConfig path = do
 
 -- | Parses application configuration from given raw input in /YAML/ format.
 parseAppConfig
-    :: MonadThrow m
+    :: (MonadThrow m)
     => ByteString
     -- ^ raw input to parse
     -> m PtAppConfig
@@ -88,9 +88,9 @@ parseAppConfig = Y.decodeThrow
 
 -- | Makes full 'CtAppConfig' from provided 'PtAppConfig' (if valid).
 makeAppConfig
-    :: MonadThrow m
+    :: (MonadThrow m)
     => PtAppConfig
-    -- ^ source 'PtAppConfig'
+    -- ^  source 'PtAppConfig'
     -> m CtAppConfig
     -- ^ full 'CtAppConfig'
 makeAppConfig pt = do
@@ -110,7 +110,7 @@ makeAppConfig pt = do
 
 -- | Makes full 'CtHeadersConfig' from provided 'PtHeadersConfig' (if valid).
 makeHeadersConfig
-    :: MonadThrow m
+    :: (MonadThrow m)
     => PtHeadersConfig
     -- ^ source 'PtHeadersConfig'
     -> m CtHeadersConfig
@@ -137,7 +137,7 @@ makeHeadersConfig pt = do
 
 -- | Makes full 'CtHeaderConfig' from provided 'PtHeaderConfig' (if valid).
 makeHeaderConfig
-    :: MonadThrow m
+    :: (MonadThrow m)
     => FileType
     -- ^ determines file type of configuration
     -> PtHeaderConfig
@@ -167,7 +167,7 @@ makeHeaderConfig fileType pt = do
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
 makePostProcessConfigs
-    :: MonadThrow m
+    :: (MonadThrow m)
     => PtPostProcessConfigs
     -> m CtPostProcessConfigs
 makePostProcessConfigs pt = do
@@ -178,7 +178,7 @@ makePostProcessConfigs pt = do
     pure PostProcessConfigs{..}
 
 makePostProcessConfig
-    :: MonadThrow m
+    :: (MonadThrow m)
     => PtPostProcessConfig c
     -> (c 'Partial -> m (c 'Complete))
     -> m (CtPostProcessConfig c)
@@ -188,14 +188,14 @@ makePostProcessConfig pt fn = do
     pure PostProcessConfig{..}
 
 makeUpdateCopyrightConfig
-    :: MonadThrow m
+    :: (MonadThrow m)
     => PtUpdateCopyrightConfig
     -> m CtUpdateCopyrightConfig
 makeUpdateCopyrightConfig pt = do
     let uccSelectedAuthors = lastOrNothing $ pt ^. uccSelectedAuthorsL
     pure UpdateCopyrightConfig{..}
 
-lastOrError :: MonadThrow m => ConfigurationKey -> Last a -> m a
+lastOrError :: (MonadThrow m) => ConfigurationKey -> Last a -> m a
 lastOrError key (Last a) = maybe (throwM $ MissingConfiguration key) pure a
 
 lastOrNothing :: Last (Maybe a) -> Maybe a

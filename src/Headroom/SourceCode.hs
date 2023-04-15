@@ -8,7 +8,7 @@
 -- |
 -- Module      : Headroom.SourceCode
 -- Description : Type safe representation of analyzed source code
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -88,7 +88,7 @@ fromText s0 f (toLines -> ls) = coerce $ zip (evalState (mapM f ls) s0) ls
 -- | Converts analyzed 'SourceCode' back into 'Text'.
 toText
     :: SourceCode
-    -- ^ source code to convert back to plain text
+    -- ^  source code to convert back to plain text
     -> Text
     -- ^ resulting plain text
 toText (SourceCode sc) = fromLines . fmap snd $ sc

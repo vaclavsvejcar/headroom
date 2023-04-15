@@ -4,7 +4,7 @@
 -- |
 -- Module      : Headroom.Data.Serialization
 -- Description : Various functions for data (de)serialization
--- Copyright   : (c) 2019-2022 Vaclav Svejcar
+-- Copyright   : (c) 2019-2023 Vaclav Svejcar
 -- License     : BSD-3-Clause
 -- Maintainer  : vaclav.svejcar@gmail.com
 -- Stability   : experimental
@@ -71,7 +71,7 @@ symbolCase sym = \case
 
 -- | Pretty prints given data as /YAML/.
 prettyPrintYAML
-    :: ToJSON a
+    :: (ToJSON a)
     => a
     -- ^ data to pretty print
     -> Text
