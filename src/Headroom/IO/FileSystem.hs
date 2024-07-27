@@ -209,7 +209,7 @@ findFiles path predicate = fmap (filter predicate) (listFiles path)
 findFilesByExts :: (MonadIO m) => FindFilesByExtsFn m
 findFilesByExts path exts = findFiles path predicate
   where
-    predicate p = any (`isExtensionOf` p) (fmap T.unpack exts)
+    predicate p = any ((`isExtensionOf` p) . T.unpack) exts
 
 -- | Recursively find files on given path by their file types.
 findFilesByTypes :: (MonadIO m) => FindFilesByTypesFn m
