@@ -45,8 +45,8 @@ licenseReader = eitherReader parseLicense'
   where
     parseLicense' raw = maybeToRight errMsg (parseLicense $ T.pack raw)
     errMsg =
-        T.unpack $
-            mconcat
+        T.unpack
+            $ mconcat
                 [ "invalid license/file type, must be in format 'licenseType:fileType' "
                 , "(e.g. bsd3:haskell)"
                 , "\nAvailable license types: "
@@ -61,8 +61,8 @@ licenseTypeReader = eitherReader parseLicenseType
   where
     parseLicenseType raw = maybeToRight errMsg (textToEnum $ T.pack raw)
     errMsg =
-        T.unpack $
-            mconcat
+        T.unpack
+            $ mconcat
                 [ "invalid license type, available options: "
                 , T.toLower (allValuesToText @LicenseType)
                 ]

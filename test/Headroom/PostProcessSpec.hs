@@ -39,9 +39,9 @@ spec = do
                         , ppcConfig =
                             UpdateCopyrightConfig
                                 { uccSelectedAuthors =
-                                    Just $
-                                        a
-                                            :| []
+                                    Just
+                                        $ a
+                                        :| []
                                 }
                         }
                 }

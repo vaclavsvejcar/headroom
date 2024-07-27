@@ -126,8 +126,8 @@ env' opts logFunc = do
                 { pConfigFile = configFileName
                 , pTemplatesDir = "headroom-templates"
                 }
-    pure $
-        Env
+    pure
+        $ Env
             { envLogFunc = logFunc
             , envFileSystem = mkFileSystem
             , envInitOptions = opts
@@ -143,8 +143,9 @@ commandInit
     -> IO ()
     -- ^ execution result
 commandInit opts =
-    bootstrap (env' opts) False $
-        doesAppConfigExist >>= \case
+    bootstrap (env' opts) False
+        $ doesAppConfigExist
+        >>= \case
             False -> do
                 fileTypes <- findSupportedFileTypes
                 makeTemplatesDir
@@ -213,8 +214,8 @@ createTemplate templatesDir (licenseType, fileType) progress = do
         file = (fmap C.toLower . show $ fileType) <> "." <> T.unpack extension
         filePath = templatesDir </> file
         template = licenseTemplate licenseType fileType
-    logInfo $
-        mconcat
+    logInfo
+        $ mconcat
             [display progress, " Creating template file in ", fromString filePath]
     writeFileUtf8 filePath template
 

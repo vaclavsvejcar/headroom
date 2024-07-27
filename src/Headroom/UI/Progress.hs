@@ -28,8 +28,8 @@ data Progress = Progress Int Int
 
 instance Display Progress where
     textDisplay (Progress current total) =
-        T.pack $
-            mconcat ["[", currentS, " of ", totalS, "]"]
+        T.pack
+            $ mconcat ["[", currentS, " of ", totalS, "]"]
       where
         format = "%" <> (show . length $ totalS) <> "d"
         currentS = printf format current

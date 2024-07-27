@@ -245,8 +245,8 @@ commandRun opts = runRIO' (getEnv opts) (croDebug opts) $ do
     (total, processed) <- processSourceFiles @TemplateType templates sourceFiles
     endTS <- liftIO getPOSIXTime
     when (processed > 0) $ logStickyDone "-----"
-    logStickyDone $
-        mconcat
+    logStickyDone
+        $ mconcat
             [ "Done: "
             , if isCheck then "outdated " else "modified "
             , display processed
@@ -494,8 +494,8 @@ loadConfigurationSafe path = catch (Just <$> loadAppConfig path) onError
   where
     onError err = do
         logDebug $ displayShow (err :: IOException)
-        logInfo $
-            mconcat
+        logInfo
+            $ mconcat
                 [ "Configuration file '"
                 , fromString path
                 , "' not found. You can either specify all required parameter by "

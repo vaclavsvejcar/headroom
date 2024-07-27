@@ -40,8 +40,8 @@ spec = do
     describe "extractOffsets" $ do
         it "extract offsets for selected fields of module header" $ do
             template <-
-                parseTemplate @Mustache (BuiltInRef BSD3 Haskell) $
-                    licenseTemplate BSD3 Haskell
+                parseTemplate @Mustache (BuiltInRef BSD3 Haskell)
+                    $ licenseTemplate BSD3 Haskell
             let syntax = BlockComment [re|^{-\||] [re|(?<!#)-}$|] Nothing
                 expected = HaddockOffsets{hoCopyright = Just 14}
             extractOffsets template syntax `shouldBe` expected

@@ -97,10 +97,10 @@ analyzeSourceCode fs = fromText state0 process
             tpe = \c -> if c > 0 then Comment else Code
             (ns, res) =
                 if
-                        | isStart l && isEnd l -> (cs, Comment)
-                        | isStart l -> (cs + 1, Comment)
-                        | isEnd l -> (cs - 1, tpe cs)
-                        | cs > 0 -> (cs, Comment)
-                        | otherwise -> (0, Code)
+                    | isStart l && isEnd l -> (cs, Comment)
+                    | isStart l -> (cs + 1, Comment)
+                    | isEnd l -> (cs - 1, tpe cs)
+                    | cs > 0 -> (cs, Comment)
+                    | otherwise -> (0, Code)
         put ns
         pure res

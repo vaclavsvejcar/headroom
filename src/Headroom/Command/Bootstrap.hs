@@ -120,8 +120,8 @@ globalKVStore = do
         . StorePath
         . T.pack
         $ userDir
-            </> globalConfigDirName
-            </> cacheFileName
+        </> globalConfigDirName
+        </> cacheFileName
 
 ------------------------------  PRIVATE FUNCTIONS  -----------------------------
 
