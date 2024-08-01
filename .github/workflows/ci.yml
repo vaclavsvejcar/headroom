@@ -38,7 +38,7 @@ jobs:
         if: matrix.os == 'macOS-latest'
         run: |
           brew install pcre
-          ln -s /opt/homebrew/Cellar/pcre/8.45/include/pcre.h /Library/Developer/CommandLineTools/usr/include/pcre.h
+          sudo ln -s /opt/homebrew/Cellar/pcre/8.45/include/pcre.h /Library/Developer/CommandLineTools/usr/include/pcre.h
 
       - name: Freeze
         run: |
