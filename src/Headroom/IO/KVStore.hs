@@ -13,6 +13,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -143,9 +144,9 @@ class ValueCodec a where
     -- | Encodes value into textual representation.
     encodeValue
         :: a
-        -- ^  value to encode
+        -- ^ value to encode
         -> Text
-        -- ^  textual representation
+        -- ^ textual representation
 
     -- | Decodes value from textual representation.
     decodeValue
