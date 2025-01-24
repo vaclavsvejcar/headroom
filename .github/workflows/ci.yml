@@ -34,11 +34,14 @@ jobs:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
 
-      - name: Install dependencies
-        if: matrix.os == 'macOS-latest'
+      - name: Install PCRE library on macOS and Ubuntu
         run: |
-          brew install pcre
-          sudo ln -s /opt/homebrew/Cellar/pcre/8.45/include/pcre.h /Library/Developer/CommandLineTools/usr/include/pcre.h
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install pcre
+          elif [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y libpcre3 libpcre3-dev
+          fi
 
       - name: Freeze
         run: |

@@ -80,10 +80,10 @@ runRIO'
     -- ^ /RIO/ application to execute
     -> IO a
     -- ^ execution result
-runRIO' enfFn isDebug logic = do
+runRIO' envFn isDebug logic = do
     defLogOptions <- logOptionsHandle stderr isDebug
     withLogFunc (setLogUseLoc False defLogOptions) $ \logFunc -> do
-        env <- liftIO $ enfFn logFunc
+        env <- liftIO $ envFn logFunc
         runRIO env logic
 
 -- | Executes the initialization logic that should be performed before any other
