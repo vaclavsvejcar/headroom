@@ -84,6 +84,15 @@ jobs:
           ghc-version: ${{ matrix.ghc }}
           stack-version: ${{ matrix.stack }}
 
+      - name: Install PCRE library on macOS and Ubuntu
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install pcre
+          elif [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y libpcre3 libpcre3-dev
+          fi
+
       - uses: actions/cache@v2.1.4
         name: Cache ~/.stack
         with:
