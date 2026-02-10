@@ -53,19 +53,17 @@ jobs:
           path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
           key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
 
-      - name: Set PCRE flags for macOS (Homebrew)
+      - name: Set PCRE paths for macOS (Homebrew)
         if: runner.os == 'macOS'
         run: |
-          echo "PCRE_DIR=$(brew --prefix pcre)" >> $GITHUB_ENV
+          PCRE_DIR=$(brew --prefix pcre)
+          echo "C_INCLUDE_PATH=$PCRE_DIR/include" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=$PCRE_DIR/lib" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$PCRE_DIR/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
-          if [[ -n "$PCRE_DIR" ]]; then
-            cabal configure --enable-tests --enable-benchmarks --test-show-details=direct \
-              --extra-include-dirs="$PCRE_DIR/include" --extra-lib-dirs="$PCRE_DIR/lib"
-          else
-            cabal configure --enable-tests --enable-benchmarks --test-show-details=direct
-          fi
+          cabal configure --enable-tests --enable-benchmarks --test-show-details=direct
           cabal build all --only-dependencies
 
       - name: Build
