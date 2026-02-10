@@ -24,10 +24,10 @@ jobs:
         #   ghc: 8.6.5
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-      - uses: haskell/actions/setup@v1
+      - uses: haskell-actions/setup@v2
         id: setup-haskell-cabal
         name: Setup Haskell
         with:
@@ -47,7 +47,7 @@ jobs:
         run: |
           cabal freeze
 
-      - uses: actions/cache@v2.1.4
+      - uses: actions/cache@v4
         name: Cache ~/.cabal/store
         with:
           path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
@@ -75,10 +75,10 @@ jobs:
         ghc: ["9.6.6"]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-      - uses: haskell/actions/setup@v1
+      - uses: haskell-actions/setup@v2
         name: Setup Haskell Stack
         with:
           ghc-version: ${{ matrix.ghc }}
@@ -93,7 +93,7 @@ jobs:
             sudo apt-get install -y libpcre3 libpcre3-dev
           fi
 
-      - uses: actions/cache@v2.1.4
+      - uses: actions/cache@v4
         name: Cache ~/.stack
         with:
           path: ~/.stack

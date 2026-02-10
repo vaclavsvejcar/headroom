@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Create Release
         id: create_release
@@ -32,7 +32,7 @@ jobs:
       - name: Output Release URL File
         run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
       - name: Save Release URL File for publish
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: release_url
           path: release_url.txt
@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set tag name
         uses: little-core-labs/get-git-tag@v3.0.1
@@ -65,7 +65,7 @@ jobs:
           tagRegexGroup: 1
 
       - name: Setup Haskell
-        uses: haskell/actions/setup@v1
+        uses: haskell-actions/setup@v2
         id: setup-haskell-cabal
         with:
           ghc-version: ${{ matrix.ghc }}
@@ -76,7 +76,7 @@ jobs:
           cabal freeze
 
       - name: Cache ~/.cabal/store
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
           key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
@@ -102,14 +102,14 @@ jobs:
       #     file: dist/headroom
 
       - name: Load Release URL File from release job
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: release_url
 
       - name: Get Release File Name & Upload URL
         id: get_release_info
         run: |
-          echo "::set-output name=upload_url::$(cat release_url/release_url.txt)"
+          echo "upload_url=$(cat release_url/release_url.txt)" >> $GITHUB_OUTPUT
 
       - name: Upload Release Asset
         id: upload-release-asset
